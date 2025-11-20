@@ -1,54 +1,420 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plats Thionville - Livraison maison</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Quiz Départements Français</title>
+  <meta name="description" content="Quiz interactif pour apprendre les départements français."/>
+
+  <style>
+    :root{
+      --bg:#f7fafc; 
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent:#294155; 
+      --accent-2:#3B1E40; 
+      --accent-3:#C7BDB1; 
+      --success:#16a34a;
+      --danger:#ef4444;
+      --glass:rgba(255,255,255,0.6);
+      --radius:14px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:linear-gradient(180deg,var(--bg),#ffffff);color:#0f172a}
+
+    header{padding:18px 20px;display:flex;align-items:center;gap:16px;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+    h1{font-size:18px;margin:0}
+    p.lead{margin:0;color:var(--muted);font-size:13px}
+
+    main{max-width:1100px;margin:14px auto;padding:18px}
+
+
+    .modes-banner{display:flex;gap:10px;overflow:hidden;padding:6px;border-radius:12px;background:linear-gradient(90deg,rgba(41,65,85,0.06),rgba(59,30,64,0.04));}
+    .mode-pill{flex:0 0 auto;padding:12px 14px;background:var(--card);border-radius:12px;cursor:pointer;box-shadow:0 4px 12px rgba(15,23,42,0.06);min-width:150px}
+    .mode-pill.active{outline:3px solid rgba(41,65,85,0.12)}
+    .mode-title{font-weight:600}
+    .mode-desc{font-size:12px;color:var(--muted)}
+
+    .layout{display:grid;grid-template-columns:1fr 340px;gap:20px;margin-top:18px}
+    .panel{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:0 8px 20px rgba(15,23,42,0.06)}
+
+
+    .quiz-area{min-height:320px;display:flex;flex-direction:column;gap:14px}
+    .question{font-size:20px;font-weight:700}
+    .timer-wrap{display:flex;align-items:center;gap:12px}
+    .progress{height:14px;background:linear-gradient(90deg,#e6eef6,#f3edea);border-radius:999px;flex:1;overflow:hidden}
+    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:100%}
+    .time-num{min-width:48px;text-align:center;font-weight:600}
+
+    .choices{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .choice{padding:12px;border-radius:10px;border:1px solid #e6eef6;cursor:pointer;background:linear-gradient(180deg,white,rgba(250,250,250,0.9));font-weight:600}
+    .choice.correct{border-color:var(--success);background:linear-gradient(180deg,rgba(22,163,74,0.06),white)}
+    .choice.wrong{border-color:var(--danger);opacity:0.85}
+
+    .controls{display:flex;gap:8px;align-items:center}
+    button.btn{padding:10px 12px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:700;cursor:pointer}
+    button.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--muted)}
+
+
+    .scoreboard h3{margin-top:0}
+    .scores-list{max-height:340px;overflow:auto;margin-top:8px}
+    .score-row{display:flex;justify-content:space-between;padding:8px;border-radius:8px;background:linear-gradient(180deg,#fff,rgba(250,250,250,0.9));margin-bottom:8px}
+    .small{font-size:13px;color:var(--muted)}
+
+    footer{margin-top:28px;text-align:center;color:var(--muted);font-size:13px}
+
+
+    .focus-area{scroll-margin-top:20px}
+
+
+    @media (max-width:900px){
+      .layout{grid-template-columns:1fr}
+      .modes-banner{gap:6px}
+      .mode-pill{min-width:120px}
+    }
+  </style>
 </head>
 <body>
-
-  <!-- Header -->
   <header>
-    <h1>Plats Maison Thionville</h1>
-    <p>Vos plats frais et desserts livrés à domicile</p>
-    <a href="#commande" class="btn">Commander Maintenant</a>
-  </header>
+    <div class="brand">
+      <div class="logo">FD</div>
+      <div>
+        <h1>Départements — Quiz</h1>
 
-  <!-- Plats du jour -->
-  <section id="plats">
-    <h2>Plats du jour</h2>
-    <div class="plat-container">
-      <div class="plat-card">
-        <img src="images/plat1.jpg" alt="Plat Protéiné">
-        <h3>Poulet Citron & Riz</h3>
-        <p>Plat Protéiné</p>
-        <p>Prix : 7€</p>
-        <a href="https://wa.me/33600000000?text=Je+commande+Poulet+Citron" class="btn">Commander</a>
-      </div>
-      <div class="plat-card">
-        <img src="images/plat2.jpg" alt="Plat Végétarien">
-        <h3>Curry Pois Chiches & Épinards</h3>
-        <p>Plat Végétarien</p>
-        <p>Prix : 6€</p>
-        <a href="https://wa.me/33600000000?text=Je+commande+Curry+Pois+Chiches" class="btn">Commander</a>
+        <!-- "pub" explications ajouter à l'écran d'accueil sur smartphone-->
+        <p class="lead"></p> 
       </div>
     </div>
-  </section>
+    <div class="actions">
+      <button class="btn" id="btn-random">Question aléatoire</button>
+    </div>
+  </header>
 
-  <!-- Tracker livreur simulé -->
-  <section id="tracker">
-    <h2>Suivi de votre livraison</h2>
-    <p id="tracker-status">Livreur en préparation...</p>
-  </section>
+  <main>
+    <!-- banner -->
+    <div class="modes-banner" id="modesBanner"></div>
 
-  <!-- Footer -->
-  <footer>
-    <p>Contact : 06 00 00 00 00 | Email : contact@plats-thionville.fr</p>
-    <p>Horaires : 11h30 - 22h | Zone desservie : Thionville</p>
-    <p>© 2025 Plats Maison Thionville | Mentions légales | RGPD</p>
-  </footer>
+    <div class="layout">
+      <section class="panel focus-area" id="quizPanel">
+        <div class="quiz-area" id="quizArea">
+          <div class="question" id="question">Bienvenue — sélectionne un mode pour commencer</div>
 
-  <script src="script.js"></script>
+          <div class="timer-wrap" style="display:none" id="timerWrap">
+            <div style="width:64px;text-align:center;font-weight:700">Temps</div>
+            <div class="progress" aria-hidden="true"><i id="progressFill" style="width:100%"></i></div>
+            <div class="time-num" id="timeNum">60s</div>
+          </div>
+
+          <div class="choices" id="choices"></div>
+
+          <div class="controls">
+            <button class="btn" id="nextBtn" style="display:none">Question suivante</button>
+            <button class="ghost" id="resetBtn">Réinitialiser score local</button>
+            <div style="flex:1"></div>
+            <div class="small" id="hint"></div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel scoreboard">
+        <h3>Classement — Top scores</h3>
+        <p class="small">Scores en ligne si Firebase configuré, sinon localStorage</p>
+
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <input id="nameInput" placeholder="Ton nom (optionnel)" style="flex:1;padding:8px;border-radius:8px;border:1px solid #e6eef6" />
+          <button id="saveScoreBtn" class="btn">Sauvegarder</button>
+        </div>
+
+        <div class="scores-list" id="scoresList" aria-live="polite"></div>
+
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="ghost" id="clearScoresBtn">Effacer tout (local)</button>
+          <button class="ghost" id="adminToggle">Modérateur</button>
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      <small>Site éducatif — conçu pour l'apprentissage. Version prototype.</small>
+    </footer>
+  </main>
+
+
+  <script>
+
+    const DEPARTEMENTS = [
+      {num:'01',name:'Ain'},{num:'02',name:'Aisne'},{num:'03',name:'Allier'},{num:'04',name:'Alpes-de-Haute-Provence'},{num:'05',name:'Hautes-Alpes'},{num:'06',name:'Alpes-Maritimes'},{num:'07',name:'Ardèche'},{num:'08',name:'Ardennes'},{num:'09',name:'Ariège'},{num:'10',name:'Aube'},{num:'11',name:'Aude'},{num:'12',name:'Aveyron'},{num:'13',name:'Bouches-du-Rhône'},{num:'14',name:'Calvados'},{num:'15',name:'Cantal'},{num:'16',name:'Charente'},{num:'17',name:'Charente-Maritime'},{num:'18',name:'Cher'},{num:'19',name:'Corrèze'},{num:'2A',name:'Corse-du-Sud'},{num:'2B',name:'Haute-Corse'},{num:'21',name:"Côte-d'Or"},{num:'22',name:"Côtes-d'Armor"},{num:'23',name:'Creuse'},{num:'24',name:'Dordogne'},{num:'25',name:'Doubs'},{num:'26',name:'Drôme'},{num:'27',name:'Eure'},{num:'28',name:'Eure-et-Loir'},{num:'29',name:'Finistère'},{num:'30',name:'Gard'},{num:'31',name:'Haute-Garonne'},{num:'32',name:'Gers'},{num:'33',name:'Gironde'},{num:'34',name:'Hérault'},{num:'35',name:"Ille-et-Vilaine"},{num:'36',name:'Indre'},{num:'37',name:'Indre-et-Loire'},{num:'38',name:'Isère'},{num:'39',name:'Jura'},{num:'40',name:'Landes'},{num:'41',name:'Loir-et-Cher'},{num:'42',name:'Loire'},{num:'43',name:'Haute-Loire'},{num:'44',name:'Loire-Atlantique'},{num:'45',name:'Loiret'},{num:'46',name:'Lot'},{num:'47',name:'Lot-et-Garonne'},{num:'48',name:'Lozère'},{num:'49',name:'Maine-et-Loire'},{num:'50',name:'Manche'},{num:'51',name:'Marne'},{num:'52',name:'Haute-Marne'},{num:'53',name:'Mayenne'},{num:'54',name:'Meurthe-et-Moselle'},{num:'55',name:'Meuse'},{num:'56',name:'Morbihan'},{num:'57',name:'Moselle'},{num:'58',name:'Nièvre'},{num:'59',name:'Nord'},{num:'60',name:'Oise'},{num:'61',name:'Orne'},{num:'62',name:'Pas-de-Calais'},{num:'63',name:'Puy-de-Dôme'},{num:'64',name:"Pyrénées-Atlantiques"},{num:'65',name:'Hautes-Pyrénées'},{num:'66',name:"Pyrénées-Orientales"},{num:'67',name:'Bas-Rhin'},{num:'68',name:'Haut-Rhin'},{num:'69',name:'Rhône'},{num:'70',name:'Haute-Saône'},{num:'71',name:'Saône-et-Loire'},{num:'72',name:'Sarthe'},{num:'73',name:'Savoie'},{num:'74',name:'Haute-Savoie'},{num:'75',name:'Paris'},{num:'76',name:'Seine-Maritime'},{num:'77',name:'Seine-et-Marne'},{num:'78',name:'Yvelines'},{num:'79',name:'Deux-Sèvres'},{num:'80',name:'Somme'},{num:'81',name:'Tarn'},{num:'82',name:'Tarn-et-Garonne'},{num:'83',name:'Var'},{num:'84',name:'Vaucluse'},{num:'85',name:'Vendée'},{num:'86',name:'Vienne'},{num:'87',name:'Haute-Vienne'},{num:'88',name:'Vosges'},{num:'89',name:'Yonne'},{num:'90',name:'Territoire de Belfort'},{num:'91',name:'Essonne'},{num:'92',name:'Hauts-de-Seine'},{num:'93',name:'Seine-Saint-Denis'},{num:'94',name:'Val-de-Marne'},{num:'95',name:'Val-d\'Oise'},{num:'971',name:'Guadeloupe'},{num:'972',name:'Martinique'},{num:'973',name:'Guyane'},{num:'974',name:'La Réunion'},{num:'976',name:'Mayotte'}
+    ];
+
+
+    const MODES = [
+      {id:1,title:'Nom → Numéro',desc:"Afficher le nom d'un département, trouver son numéro (60s)" ,time:60},
+      {id:2,title:'Numéro → Nom',desc:"Afficher le numéro, trouver le bon nom (60s)",time:60},
+      {id:3,title:'Position (carte) (à venir)',desc:"Trouver la position sur la carte (bientôt)",time:60},
+      {id:4,title:'Mode spécial DOM-TOM',desc:"Questions sur les outre-mer (60s)",time:60},
+      {id:5,title:'Mix général',desc:"Mix des modes — 180 secondes",time:180}
+    ];
+
+    let state = {
+      currentMode: MODES[0],
+      timer:null,
+      timeLeft:0,
+      currentQuestion:null,
+      awaiting:false,
+      score:0,
+      total:0,
+      admin:false,
+      firebaseConfigured:false
+    };
+
+    /***** UI refs */
+    const modesBanner = document.getElementById('modesBanner');
+    const questionEl = document.getElementById('question');
+    const choicesEl = document.getElementById('choices');
+    const timerWrap = document.getElementById('timerWrap');
+    const progressFill = document.getElementById('progressFill');
+    const timeNum = document.getElementById('timeNum');
+    const nextBtn = document.getElementById('nextBtn');
+    const hint = document.getElementById('hint');
+    const nameInput = document.getElementById('nameInput');
+    const saveScoreBtn = document.getElementById('saveScoreBtn');
+    const scoresList = document.getElementById('scoresList');
+    const clearScoresBtn = document.getElementById('clearScoresBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const adminToggle = document.getElementById('adminToggle');
+    const btnRandom = document.getElementById('btn-random');
+
+    /***** build banner */
+    function renderModesBanner(){
+      modesBanner.innerHTML = '';
+      MODES.forEach(m=>{
+        const el = document.createElement('div');
+        el.className = 'mode-pill' + (m.id===state.currentMode.id? ' active':'');
+        el.innerHTML = `<div class='mode-title'>${m.title}</div><div class='mode-desc'>${m.desc}</div>`;
+        el.addEventListener('click',()=>{
+          openMode(m);
+        });
+        modesBanner.appendChild(el);
+      });
+    }
+
+    /***** helpers *****/
+    function shuffle(a){return a.sort(()=>Math.random()-0.5)}
+    function pickRandom(arr){return arr[Math.floor(Math.random()*arr.length)]}
+
+    /***** question generation *****/
+    function makeQuestionForMode(mode){
+      // returns {prompt,choices,answer}
+      if(mode.id===1){ // name -> number
+        const target = pickRandom(DEPARTEMENTS);
+        const correct = target.num;
+        // build 4 more distractors
+        const distractors = new Set();
+        while(distractors.size<4){
+          const c = pickRandom(DEPARTEMENTS).num;
+          if(c!==correct) distractors.add(c);
+        }
+        const choices = shuffle([correct,...distractors]);
+        return {prompt:`Quel est le numéro du département « ${target.name} » ?`,choices,answer:correct};
+      }
+      if(mode.id===2){ // number -> name
+        const target = pickRandom(DEPARTEMENTS);
+        const correct = target.name;
+        const distractors = new Set();
+        while(distractors.size<4){
+          const c = pickRandom(DEPARTEMENTS).name;
+          if(c!==correct) distractors.add(c);
+        }
+        const choices = shuffle([correct,...distractors]);
+        return {prompt:`Quel est le nom du département numéro ${target.num} ?`,choices,answer:correct};
+      }
+      // default fallbacks
+      const t = pickRandom(DEPARTEMENTS);
+      return {prompt:`Quel est le numéro du département « ${t.name} » ?`,choices:shuffle([t.num,...Array.from(new Set(Array.from({length:4},()=>pickRandom(DEPARTEMENTS).num)))]),answer:t.num};
+    }
+
+    /***** render question *****/
+    function renderQuestion(q){
+      state.currentQuestion = q;
+      questionEl.textContent = q.prompt;
+      choicesEl.innerHTML = '';
+      q.choices.forEach(ch =>{
+        const b = document.createElement('button');
+        b.className = 'choice';
+        b.textContent = ch;
+        b.addEventListener('click',()=>onChoice(ch,b));
+        choicesEl.appendChild(b);
+      });
+    }
+
+    /***** choice handler */
+    function onChoice(choice,btnEl){
+      if(state.awaiting) return;
+      state.awaiting = true;
+      // reveal
+      const correct = state.currentQuestion.answer;
+      Array.from(choicesEl.children).forEach(c=>{
+        c.classList.remove('correct','wrong');
+        c.disabled = true;
+        if(c.textContent===correct) c.classList.add('correct');
+        if(c!==btnEl && btnEl.textContent!==correct && c.textContent===btnEl.textContent) c.classList.add('wrong');
+      });
+
+      if(choice===correct){
+        state.score++;
+        hint.textContent = '✅ Correct !';
+      } else {
+        hint.textContent = `❌ Faux — réponse: ${correct}`;
+      }
+      state.total++;
+      nextBtn.style.display = 'inline-block';
+      stopTimer();
+    }
+
+    /***** mode lifecycle */
+    function openMode(mode){
+      state.currentMode = mode;
+      renderModesBanner();
+      // scroll quiz into view and freeze other content visually
+      document.getElementById('quizPanel').scrollIntoView({behavior:'smooth',block:'center'});
+      startMode(mode);
+    }
+
+    function startMode(mode){
+      state.score = 0; state.total = 0; state.awaiting=false;
+      hint.textContent = '';
+      nextBtn.style.display='none';
+      // first question
+      const q = makeQuestionForMode(mode);
+      renderQuestion(q);
+      setupTimer(mode.time);
+    }
+
+    /***** timer functions */
+    function setupTimer(seconds){
+      timerWrap.style.display='flex';
+      state.timeLeft = seconds;
+      updateTimerUI();
+      stopTimer();
+      state.timer = setInterval(()=>{
+        state.timeLeft--;
+        updateTimerUI();
+        if(state.timeLeft<=0){
+          stopTimer();
+          onTimeUp();
+        }
+      },1000);
+    }
+    function updateTimerUI(){
+      timeNum.textContent = `${state.timeLeft}s`;
+      const pct = Math.max(0,(state.timeLeft / state.currentMode.time) * 100);
+      progressFill.style.width = pct+"%";
+      // change color near end
+      if(state.timeLeft<=10) progressFill.style.filter = 'brightness(1.05)';
+      else progressFill.style.filter = 'none';
+    }
+    function stopTimer(){ if(state.timer){clearInterval(state.timer);state.timer=null;} }
+    function onTimeUp(){
+      hint.textContent = '⏱ Temps écoulé !';
+      // reveal correct
+      Array.from(choicesEl.children).forEach(c=>{ if(c.textContent===state.currentQuestion.answer) c.classList.add('correct'); c.disabled=true;});
+      nextBtn.style.display = 'inline-block';
+    }
+
+    /***** next question */
+    nextBtn.addEventListener('click',()=>{
+      hint.textContent = '';
+      state.awaiting=false;
+      nextBtn.style.display='none';
+      const q = (state.currentMode.id===5) ? makeQuestionForMode(pickRandom(MODES)) : makeQuestionForMode(state.currentMode);
+      renderQuestion(q);
+      setupTimer(state.currentMode.time);
+    });
+
+    /***** random question button */
+    btnRandom.addEventListener('click',()=>{
+      openMode(MODES[0]);
+      const q = makeQuestionForMode(MODES[0]);
+      renderQuestion(q);
+      setupTimer(MODES[0].time);
+    });
+
+    /***** SCORE persistence (localStorage fallback + Firebase optional) */
+    const STORAGE_KEY = 'fd_quiz_scores_v1';
+    function loadLocalScores(){
+      try{const raw=localStorage.getItem(STORAGE_KEY);return raw?JSON.parse(raw):[];}catch(e){return []}
+    }
+    function saveLocalScores(list){localStorage.setItem(STORAGE_KEY,JSON.stringify(list));renderScores(list)}
+    function addLocalScore(name,score,mode){
+      const list = loadLocalScores();
+      list.push({name:name||'Anonyme',score,mode:mode.title || mode,ts:Date.now()});
+      // sort desc
+      list.sort((a,b)=>b.score-a.score);
+      saveLocalScores(list.slice(0,100));
+    }
+    function renderScores(list){
+      const rows = (list||loadLocalScores()).slice(0,50);
+      scoresList.innerHTML='';
+      rows.forEach((r,idx)=>{
+        const el = document.createElement('div');el.className='score-row';
+        el.innerHTML = `<div><strong>${idx+1}. ${escapeHtml(r.name)}</strong><div class='small'>${r.mode} • ${r.score} pts</div></div><div style='text-align:right'><div class='small'>${new Date(r.ts).toLocaleString()}</div>${state.admin?'<button class="ghost btn-sm" data-idx="'+idx+'">Suppr</button>':''}</div>`;
+        scoresList.appendChild(el);
+      });
+      // attach delete handlers if admin
+      if(state.admin){Array.from(scoresList.querySelectorAll('button')).forEach(btn=>{btn.addEventListener('click',()=>{
+        const idx = Number(btn.dataset.idx); const list = loadLocalScores(); list.splice(idx,1); saveLocalScores(list);
+      })})}
+    }
+
+    // simple escaping
+    function escapeHtml(s){return (s+'').replace(/[&<>\"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+    saveScoreBtn.addEventListener('click',()=>{
+      // save current score
+      const name = nameInput.value.trim() || 'Anonyme';
+      addLocalScore(name, state.score, state.currentMode);
+      nameInput.value='';
+      renderScores();
+    });
+
+    clearScoresBtn.addEventListener('click',()=>{ if(confirm('Effacer tous les scores locaux ?')){ localStorage.removeItem(STORAGE_KEY); renderScores([]);} });
+    resetBtn.addEventListener('click',()=>{ if(confirm('Réinitialiser votre progression locale ?')){ state.score=0; state.total=0; hint.textContent='Progression réinitialisée.'; } });
+    adminToggle.addEventListener('click',()=>{ state.admin = !state.admin; renderScores(); adminToggle.textContent = state.admin? 'Modérateur (on)':'Modérateur'; });
+
+    /***** Firebase integration (optionnelle)
+        - To enable online scores, paste your Firebase config into the firebaseConfig variable below and call initFirebase() 
+        - This code uses Firebase Realtime Database. If not provided, localStorage is used.
+    */
+    const firebaseConfig = null; // <-- replace with your config object to enable
+    async function initFirebase(){
+      if(!firebaseConfig) return;
+      // load firebase sdk dynamically
+      const s1 = document.createElement('script'); s1.src='https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js'; document.head.appendChild(s1);
+      const s2 = document.createElement('script'); s2.src='https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js'; document.head.appendChild(s2);
+      await new Promise(r=>s2.onload=r);
+      const app = firebase.initializeApp(firebaseConfig);
+      state.firebaseConfigured = true;
+      window.db = firebase.database();
+      // fetch & render remote scores
+      window.db.ref('scores').on('value',snap=>{
+        const data = snap.val()||{}; const arr = Object.keys(data).map(k=>data[k]); arr.sort((a,b)=>b.score-a.score); renderScores(arr);
+      });
+    }
+
+    // call initFirebase if configured
+    if(firebaseConfig) initFirebase(); else renderScores(loadLocalScores());
+
+    /***** boot */
+    renderModesBanner();
+
+    // keyboard shortcuts: N for next
+    document.addEventListener('keydown',e=>{ if(e.key.toLowerCase()==='n') nextBtn.click(); });
+
+    // expose helpers for later extension
+    window.FDQuiz = {openMode,MODES,DEPARTEMENTS,renderScores,addLocalScore};
+  </script>
 </body>
 </html>
