@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Départements</title>
+    <title>Quiz Départements Premium</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
@@ -11,7 +11,6 @@
 
 <header>
     <h1>Quiz des Départements Français</h1>
-
     <div class="mode-banner">
         <button id="mode1-btn" class="mode-btn">Mode 1 : Nom → Numéro</button>
         <button id="mode2-btn" class="mode-btn disabled">Mode 2</button>
@@ -25,21 +24,22 @@
 
     <!-- Bloc Quiz -->
     <section id="quiz-section" class="hidden">
-        <h2 id="question-title">Quel est le numéro du département suivant ?</h2>
+        <div class="quiz-container">
+            <div class="question-score">
+                <div id="question-title">Quel est le numéro du département suivant ?</div>
+                <div id="question" class="question-box"></div>
+                <div id="score-timer">
+                    <div id="score-current">Score : <span id="score">0</span></div>
+                    <div id="timer-box">
+                        ⏱️ Temps restant : <span id="timer">60</span>s
+                        <div id="timer-bar"><div id="timer-fill"></div></div>
+                    </div>
+                </div>
+            </div>
 
-        <div id="question" class="question-box"></div>
-
-        <div id="answer-buttons" class="answers-container">
-            <!-- JS génère les 5 boutons -->
-        </div>
-
-        <div id="timer-box">
-            <span>⏱️ Temps restant :</span>
-            <span id="timer">60</span> sec
-        </div>
-
-        <div id="score-current">
-            Score : <span id="score">0</span>
+            <div id="answer-buttons" class="answers-container">
+                <!-- Les 5 boutons seront générés par JS -->
+            </div>
         </div>
     </section>
 
@@ -47,8 +47,8 @@
     <section id="result-section" class="hidden">
         <h2>Temps écoulé ! 🎉</h2>
         <p>Score final : <span id="final-score"></span></p>
-        <button id="restart-btn">Rejouer</button>
-        <button id="home-btn">Retour accueil</button>
+        <button id="restart-btn" class="action-btn">Rejouer</button>
+        <button id="home-btn" class="action-btn">Retour accueil</button>
     </section>
 
 </main>
