@@ -21,6 +21,19 @@
 </header>
 
 <main>
+    <!-- SECTION ACCUEIL -->
+    <section id="home-section">
+        <div class="home-buttons">
+            <p>Choisis un mode pour commencer :</p>
+            <button class="home-mode-btn" data-mode="1">Mode 1</button>
+            <button class="home-mode-btn" data-mode="2">Mode 2</button>
+            <button class="home-mode-btn" data-mode="3">Mode 3</button>
+            <button class="home-mode-btn" data-mode="4">Mode 4</button>
+            <button class="home-mode-btn" data-mode="5">Mode 5</button>
+        </div>
+    </section>
+
+    <!-- SECTION QUIZ -->
     <section id="quiz-section" class="hidden">
         <div class="quiz-container">
             <div class="question-box" id="question-box">
@@ -36,20 +49,24 @@
             </div>
         </div>
 
-        <div id="score-timer">
-            <div id="score-current">Score : <span id="score">0</span></div>
-            <div id="lives">❤❤❤❤❤</div>
-            <div id="timer-box">
-                ⏱️ Temps restant : <span id="timer">20</span>s
+        <div id="timers-container">
+            <div id="timer-bar-container">
+                <span>⏱️ Temps restant :</span>
                 <div id="timer-bar"><div id="timer-fill"></div></div>
             </div>
-            <div id="question-timer-box">
-                ⏱️ Question : <span id="question-timer">3</span>s
+            <div id="question-timer-bar-container">
+                <span>⏱️ Question :</span>
                 <div id="question-timer-bar"><div id="question-timer-fill"></div></div>
             </div>
         </div>
+
+        <div id="score-lives">
+            <div id="score-current">Score : <span id="score">0</span></div>
+            <div id="lives">❤❤❤❤❤</div>
+        </div>
     </section>
 
+    <!-- SECTION RESULTAT -->
     <section id="result-section" class="hidden">
         <h2>Temps écoulé ou vies terminées !</h2>
         <p>Score final : <span id="final-score"></span></p>

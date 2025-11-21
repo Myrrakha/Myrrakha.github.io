@@ -53,41 +53,38 @@ const departements = [
     { nom: "Mayotte", numero: "976" }
 ];
 
+let score=0, timeLeft=20, qTime=3, lives=5;
+let timerInterval=null, qTimerInterval=null, awaitingNext=false;
+let currentMode=1, correctAnswer='';
+
 // DOM Elements
-const modeBtns = document.querySelectorAll('.mode-btn');
+const homeSection = document.getElementById('home-section');
 const quizSection = document.getElementById('quiz-section');
-const modeBanner = document.getElementById('mode-banner');
-const questionBox = document.getElementById('question');
-const answerBtns = document.querySelectorAll('.answer-btn');
-const timerDisplay = document.getElementById('timer');
-const timerFill = document.getElementById('timer-fill');
-const qTimerDisplay = document.getElementById('question-timer');
-const qTimerFill = document.getElementById('question-timer-fill');
-const scoreDisplay = document.getElementById('score');
-const livesDisplay = document.getElementById('lives');
 const resultSection = document.getElementById('result-section');
-const finalScore = document.getElementById('final-score');
+const homeModeBtns = document.querySelectorAll('.home-mode-btn');
 const restartBtn = document.getElementById('restart-btn');
 const homeBtn = document.getElementById('home-btn');
+const timerDisplay = document.getElementById('timer');
+const qTimerDisplay = document.getElementById('question-timer');
+const finalScore = document.getElementById('final-score');
 
-let score=0, timeLeft=20, qTime=3, lives=5;
-let timerInterval=null, qTimerInterval=null;
-let currentMode=1, awaitingNext=false;
-let correctAnswer='';
+
+// Buttons de quiz
+const answerBtns = document.querySelectorAll('.answer-btn');
+const questionBox = document.getElementById('question');
+const scoreDisplay = document.getElementById('score');
+const livesDisplay = document.getElementById('lives');
+const timerFill = document.getElementById('timer-fill');
+const qTimerFill = document.getElementById('question-timer-fill');
 
 // START MODE
-modeBtns.forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-        currentMode = parseInt(btn.dataset.mode);
-        startMode();
-    });
-});
-
 function startMode(){
+    stopAllTimers();
     score=0; lives=5; timeLeft=20; awaitingNext=false;
-    scoreDisplay.textContent=score;
     updateLives();
-    modeBanner.classList.add('hidden');
+    scoreDisplay.textContent=score;
+    homeSection.classList.add('hidden');
+    resultSection.classList.add('hidden');
     quizSection.classList.remove('hidden');
     generateQuestion();
     startMainTimer();
@@ -186,10 +183,23 @@ function endGame(){
     clearInterval(qTimerInterval);
 }
 
-// RESTART & HOME
+homeModeBtns.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+        currentMode = parseInt(btn.dataset.mode);
+        startMode();
+    });
+});
+
 restartBtn.onclick = startMode;
-homeBtn.onclick = ()=>{
+homeBtn.onclick = ()=> {
+    stopAllTimers();
     resultSection.classList.add('hidden');
-    modeBanner.classList.remove('hidden');
-    timeLeft=20; lives=5;
+    quizSection.classList.add('hidden');
+    homeSection.classList.remove('hidden');
 };
+
+// ==== STOP ALL TIMERS ====
+function stopAllTimers(){
+    clearInterval(timerInterval);
+    clearInterval(qTimerInterval);
+}

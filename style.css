@@ -105,21 +105,37 @@ h1 {
     gap: 50px;
     margin-top: 30px;
 }
+#timers-container {
+    width: 90%;
+    margin: 15px auto;
+}
+
+#timer-bar-container, #question-timer-bar-container {
+    margin: 10px 0;
+}
+
 #timer-bar, #question-timer-bar {
     width: 100%;
-    height: 20px;
+    height: 25px;  /* barres plus grandes */
     background: #3a3a50;
-    border-radius: 6px;
+    border-radius: 8px;
     margin-top: 5px;
 }
 #timer-fill, #question-timer-fill {
     height: 100%;
     width: 100%;
-    border-radius: 6px;
-    transition: width 0.2s linear, background 0.2s linear;
+    border-radius: 8px;
+    transition: width 0.15s linear, background 0.15s linear;
 }
 #timer-fill { background: #28a745; }
-#question-timer-fill { background: #8928a7; }
+#question-timer-fill { background: #8328a7; }
+
+#score-lives {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    margin-top: 15px;
+}
 
 /* RESULT */
 #result-section {
