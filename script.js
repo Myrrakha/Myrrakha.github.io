@@ -1,6 +1,4 @@
-// =============================
-// 1. LISTE DES 101 DÉPARTEMENTS
-// =============================
+// ==== 1. DEPARTEMENTS COMPLETE ====
 const departements = [
     { nom: "Ain", numero: "01" }, { nom: "Aisne", numero: "02" },
     { nom: "Allier", numero: "03" }, { nom: "Alpes-de-Haute-Provence", numero: "04" },
@@ -55,150 +53,121 @@ const departements = [
     { nom: "Mayotte", numero: "976" }
 ];
 
-// =============================
-// 2. ELEMENTS DU DOM
-// =============================
-const mode2Btn = document.getElementById("mode2-btn");
+// ==== DOM Elements ====
+const modeBtns = document.querySelectorAll('.mode-btn');
+const quizSection = document.getElementById('quiz-section');
+const modeBanner = document.getElementById('mode-banner');
+const questionBox = document.getElementById('question');
+const answersContainer = document.getElementById('answer-buttons');
+const timerDisplay = document.getElementById('timer');
+const timerFill = document.getElementById('timer-fill');
+const scoreDisplay = document.getElementById('score');
+const resultSection = document.getElementById('result-section');
+const finalScore = document.getElementById('final-score');
+const restartBtn = document.getElementById('restart-btn');
+const homeBtn = document.getElementById('home-btn');
 
-const quizSection = document.getElementById("quiz-section");
-const questionBox = document.getElementById("question");
-const answersContainer = document.getElementById("answer-buttons");
-
-const timerDisplay = document.getElementById("timer");
-const timerFill = document.getElementById("timer-fill");
-const scoreDisplay = document.getElementById("score");
-
-const resultSection = document.getElementById("result-section");
-const finalScore = document.getElementById("final-score");
-
-const restartBtn = document.getElementById("restart-btn");
-const homeBtn = document.getElementById("home-btn");
-
-// =============================
-// 3. VARIABLES DU JEU
-// =============================
 let score = 0;
 let timeLeft = 60;
 let timerInterval = null;
 let awaitingNext = false;
-let currentMode = 1; // 1 = Nom->Num, 2 = Num->Nom
+let currentMode = 1;
 
-// =============================
-// 4. LANCER LES MODES
-// =============================
-mode1Btn.addEventListener("click", () => startMode(1));
-mode2Btn.addEventListener("click", () => startMode(2));
+// ==== START MODE ====
+modeBtns.forEach((btn, index) => {
+    btn.addEventListener('click', () => startMode(index+1));
+});
 
-function startMode(mode) {
+function startMode(mode){
     currentMode = mode;
     score = 0;
-    timeLeft = (mode === 5) ? 180 : 60;
+    timeLeft = 60;
     awaitingNext = false;
     scoreDisplay.textContent = "0";
-
-    resultSection.classList.add("hidden");
-    quizSection.classList.remove("hidden");
-
+    modeBanner.classList.add('hidden');
+    quizSection.classList.remove('hidden');
     generateQuestion();
     startTimer();
 }
 
-// =============================
-// 5. GENERATION QUESTION
-// =============================
-function generateQuestion() {
-    if (awaitingNext) return;
+// ==== GENERATE QUESTION ====
+function generateQuestion(){
+    if(awaitingNext) return;
+    const randomDep = departements[Math.floor(Math.random()*departements.length)];
+    let questionText = currentMode ===1 ? randomDep.nom : randomDep.numero;
+    let correctAnswer = currentMode===1? randomDep.numero : randomDep.nom;
 
-    const randomDep = departements[Math.floor(Math.random() * departements.length)];
+    questionBox.textContent = questionText;
 
-    if (currentMode === 1) {
-        questionBox.textContent = randomDep.nom;
-    } else if (currentMode === 2) {
-        questionBox.textContent = randomDep.numero;
-    }
+    let wrongAnswers = departements.filter(d => (currentMode===1? d.numero:d.nom)!==correctAnswer)
+                        .sort(()=>Math.random()-0.5).slice(0,4)
+                        .map(d => currentMode===1? d.numero:d.nom);
 
-    let wrongAnswers = departements
-        .filter(d => (currentMode===1 ? d.numero : d.nom) !== (currentMode===1 ? randomDep.numero : randomDep.nom))
-        .sort(() => Math.random() - 0.5)
-        .slice(0,4)
-        .map(d => currentMode===1 ? d.numero : d.nom);
+    let options = [...wrongAnswers, correctAnswer].sort(()=>Math.random()-0.5);
 
-    let correctAnswer = currentMode===1 ? randomDep.numero : randomDep.nom;
-    let options = [...wrongAnswers, correctAnswer].sort(() => Math.random() - 0.5);
-
-    answersContainer.innerHTML = "";
-
-    options.forEach(option => {
-        const btn = document.createElement("button");
-        btn.classList.add("answer-btn");
+    answersContainer.innerHTML = '';
+    options.forEach(option=>{
+        const btn = document.createElement('button');
+        btn.classList.add('answer-btn');
         btn.textContent = option;
-        btn.addEventListener("click", () => handleAnswer(option, correctAnswer));
+        btn.addEventListener('click', ()=> handleAnswer(option, correctAnswer));
         answersContainer.appendChild(btn);
     });
 }
 
-// =============================
-// 6. VERIFICATION DES REPONSES
-// =============================
-function handleAnswer(selected, correct) {
-    if (awaitingNext) return;
+// ==== HANDLE ANSWER ====
+function handleAnswer(selected, correct){
+    if(awaitingNext) return;
     awaitingNext = true;
-
-    const buttons = document.querySelectorAll(".answer-btn");
-    buttons.forEach(btn => {
+    const buttons = document.querySelectorAll('.answer-btn');
+    buttons.forEach(btn=>{
         btn.disabled = true;
-        if (btn.textContent === correct) btn.classList.add("correct");
-        if (btn.textContent === selected && selected !== correct) btn.classList.add("incorrect");
+        if(btn.textContent===correct) btn.classList.add('correct');
+        if(btn.textContent===selected && selected!==correct) btn.classList.add('incorrect');
     });
-
-    if (selected === correct) {
+    if(selected===correct){
         score++;
         scoreDisplay.textContent = score;
     }
-
-    setTimeout(() => {
-        buttons.forEach(btn => {
-            btn.classList.remove("correct", "incorrect");
+    setTimeout(()=>{
+        buttons.forEach(btn=>{
+            btn.classList.remove('correct','incorrect');
             btn.disabled = false;
         });
         awaitingNext = false;
         generateQuestion();
-    }, 800);
+    },800);
 }
 
-// =============================
-// 7. TIMER
-// =============================
-function startTimer() {
+// ==== TIMER ====
+function startTimer(){
     timerDisplay.textContent = timeLeft;
     timerFill.style.width = "100%";
-
     clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
+    timerInterval = setInterval(()=>{
         timeLeft--;
         timerDisplay.textContent = timeLeft;
-        timerFill.style.width = (timeLeft / ((currentMode===5)?180:60) * 100) + "%";
-
-        if (timeLeft <= 0) {
+        timerFill.style.width = (timeLeft/60*100)+'%';
+        if(timeLeft<=10) timerFill.style.background='#dc3545';
+        else if(timeLeft<=30) timerFill.style.background='#ffa500';
+        else timerFill.style.background='#28a745';
+        if(timeLeft<=0){
             clearInterval(timerInterval);
             endGame();
         }
-    }, 1000);
+    },1000);
 }
 
-// =============================
-// 8. FIN DU JEU
-// =============================
-function endGame() {
-    quizSection.classList.add("hidden");
-    resultSection.classList.remove("hidden");
+// ==== END GAME ====
+function endGame(){
+    quizSection.classList.add('hidden');
+    resultSection.classList.remove('hidden');
     finalScore.textContent = score;
 }
 
-// =============================
-// 9. RECOMMENCER + RETOUR ACCUEIL
-// =============================
-restartBtn.addEventListener("click", () => startMode(currentMode));
-homeBtn.addEventListener("click", () => {
-    resultSection.classList.add("hidden");
+// ==== RESTART ====
+restartBtn.addEventListener('click', ()=> startMode(currentMode));
+homeBtn.addEventListener('click', ()=>{
+    resultSection.classList.add('hidden');
+    modeBanner.classList.remove('hidden');
 });

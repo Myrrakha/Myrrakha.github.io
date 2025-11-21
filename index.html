@@ -1,56 +1,50 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Départements Premium</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Départements</title>
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
 </head>
 <body>
 
 <header>
     <h1>Quiz des Départements Français</h1>
-    <div class="mode-banner">
+    <div class="mode-banner" id="mode-banner">
         <button id="mode1-btn" class="mode-btn">Mode 1 : Nom → Numéro</button>
-        <button id="mode2-btn" class="mode-btn disabled">Mode 2</button>
-        <button id="mode3-btn" class="mode-btn disabled">Mode 3</button>
-        <button id="mode4-btn" class="mode-btn disabled">Mode 4</button>
-        <button id="mode5-btn" class="mode-btn disabled">Mode 5 : Général</button>
+        <button id="mode2-btn" class="mode-btn">Mode 2 : Numéro → Nom</button>
+        <button id="mode3-btn" class="mode-btn">Mode 3</button>
+        <button id="mode4-btn" class="mode-btn">Mode 4</button>
+        <button id="mode5-btn" class="mode-btn">Mode 5 : Général</button>
     </div>
 </header>
 
 <main>
-
-    <!-- Bloc Quiz -->
     <section id="quiz-section" class="hidden">
         <div class="quiz-container">
-            <div class="question-score">
-                <div id="question-title">Quel est le numéro du département suivant ?</div>
-                <div id="question" class="question-box"></div>
-                <div id="score-timer">
-                    <div id="score-current">Score : <span id="score">0</span></div>
-                    <div id="timer-box">
-                        ⏱️ Temps restant : <span id="timer">60</span>s
-                        <div id="timer-bar"><div id="timer-fill"></div></div>
-                    </div>
-                </div>
+            <div class="question-box" id="question-box">
+                <div id="question" class="question-text"></div>
             </div>
 
-            <div id="answer-buttons" class="answers-container">
-                <!-- Les 5 boutons seront générés par JS -->
+            <div id="answer-buttons" class="answers-container"></div>
+        </div>
+
+        <div id="score-timer">
+            <div id="score-current">Score : <span id="score">0</span></div>
+            <div id="timer-box">
+                ⏱️ Temps restant : <span id="timer">60</span>s
+                <div id="timer-bar"><div id="timer-fill"></div></div>
             </div>
         </div>
     </section>
 
-    <!-- Bloc Score final -->
     <section id="result-section" class="hidden">
-        <h2>Temps écoulé ! 🎉</h2>
+        <h2>Temps écoulé !</h2>
         <p>Score final : <span id="final-score"></span></p>
         <button id="restart-btn" class="action-btn">Rejouer</button>
         <button id="home-btn" class="action-btn">Retour accueil</button>
     </section>
-
 </main>
 
 </body>
