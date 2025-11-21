@@ -12,11 +12,11 @@
 <header>
     <h1>Quiz des Départements Français</h1>
     <div class="mode-banner" id="mode-banner">
-        <button id="mode1-btn" class="mode-btn">Mode 1 : Nom → Numéro</button>
-        <button id="mode2-btn" class="mode-btn">Mode 2 : Numéro → Nom</button>
-        <button id="mode3-btn" class="mode-btn">Mode 3</button>
-        <button id="mode4-btn" class="mode-btn">Mode 4</button>
-        <button id="mode5-btn" class="mode-btn">Mode 5 : Général</button>
+        <button class="mode-btn" data-mode="1">Mode 1 : Nom → Numéro</button>
+        <button class="mode-btn" data-mode="2">Mode 2 : Numéro → Nom</button>
+        <button class="mode-btn" data-mode="3">Mode 3</button>
+        <button class="mode-btn" data-mode="4">Mode 4</button>
+        <button class="mode-btn" data-mode="5">Mode 5 : Général</button>
     </div>
 </header>
 
@@ -27,20 +27,31 @@
                 <div id="question" class="question-text"></div>
             </div>
 
-            <div id="answer-buttons" class="answers-container"></div>
+            <div id="answer-buttons" class="answers-container">
+                <button class="answer-btn"></button>
+                <button class="answer-btn"></button>
+                <button class="answer-btn"></button>
+                <button class="answer-btn"></button>
+                <button class="answer-btn"></button>
+            </div>
         </div>
 
         <div id="score-timer">
             <div id="score-current">Score : <span id="score">0</span></div>
+            <div id="lives">❤❤❤❤❤</div>
             <div id="timer-box">
-                ⏱️ Temps restant : <span id="timer">60</span>s
+                ⏱️ Temps restant : <span id="timer">20</span>s
                 <div id="timer-bar"><div id="timer-fill"></div></div>
+            </div>
+            <div id="question-timer-box">
+                ⏱️ Question : <span id="question-timer">3</span>s
+                <div id="question-timer-bar"><div id="question-timer-fill"></div></div>
             </div>
         </div>
     </section>
 
     <section id="result-section" class="hidden">
-        <h2>Temps écoulé !</h2>
+        <h2>Temps écoulé ou vies terminées !</h2>
         <p>Score final : <span id="final-score"></span></p>
         <button id="restart-btn" class="action-btn">Rejouer</button>
         <button id="home-btn" class="action-btn">Retour accueil</button>

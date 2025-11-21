@@ -1,4 +1,4 @@
-// ==== 1. DEPARTEMENTS COMPLETE ====
+// Départements complets (101)
 const departements = [
     { nom: "Ain", numero: "01" }, { nom: "Aisne", numero: "02" },
     { nom: "Allier", numero: "03" }, { nom: "Alpes-de-Haute-Provence", numero: "04" },
@@ -53,121 +53,143 @@ const departements = [
     { nom: "Mayotte", numero: "976" }
 ];
 
-// ==== DOM Elements ====
+// DOM Elements
 const modeBtns = document.querySelectorAll('.mode-btn');
 const quizSection = document.getElementById('quiz-section');
 const modeBanner = document.getElementById('mode-banner');
 const questionBox = document.getElementById('question');
-const answersContainer = document.getElementById('answer-buttons');
+const answerBtns = document.querySelectorAll('.answer-btn');
 const timerDisplay = document.getElementById('timer');
 const timerFill = document.getElementById('timer-fill');
+const qTimerDisplay = document.getElementById('question-timer');
+const qTimerFill = document.getElementById('question-timer-fill');
 const scoreDisplay = document.getElementById('score');
+const livesDisplay = document.getElementById('lives');
 const resultSection = document.getElementById('result-section');
 const finalScore = document.getElementById('final-score');
 const restartBtn = document.getElementById('restart-btn');
 const homeBtn = document.getElementById('home-btn');
 
-let score = 0;
-let timeLeft = 60;
-let timerInterval = null;
-let awaitingNext = false;
-let currentMode = 1;
+let score=0, timeLeft=20, qTime=3, lives=5;
+let timerInterval=null, qTimerInterval=null;
+let currentMode=1, awaitingNext=false;
+let correctAnswer='';
 
-// ==== START MODE ====
-modeBtns.forEach((btn, index) => {
-    btn.addEventListener('click', () => startMode(index+1));
+// START MODE
+modeBtns.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+        currentMode = parseInt(btn.dataset.mode);
+        startMode();
+    });
 });
 
-function startMode(mode){
-    currentMode = mode;
-    score = 0;
-    timeLeft = 60;
-    awaitingNext = false;
-    scoreDisplay.textContent = "0";
+function startMode(){
+    score=0; lives=5; timeLeft=20; awaitingNext=false;
+    scoreDisplay.textContent=score;
+    updateLives();
     modeBanner.classList.add('hidden');
     quizSection.classList.remove('hidden');
     generateQuestion();
-    startTimer();
+    startMainTimer();
 }
 
-// ==== GENERATE QUESTION ====
+// GENERATE QUESTION
 function generateQuestion(){
     if(awaitingNext) return;
-    const randomDep = departements[Math.floor(Math.random()*departements.length)];
-    let questionText = currentMode ===1 ? randomDep.nom : randomDep.numero;
-    let correctAnswer = currentMode===1? randomDep.numero : randomDep.nom;
+    qTime=3; qTimerDisplay.textContent=qTime; qTimerFill.style.width='100%';
+    const dep = departements[Math.floor(Math.random()*departements.length)];
+    let questionText = currentMode===1? dep.nom : dep.numero;
+    correctAnswer = currentMode===1? dep.numero : dep.nom;
+    questionBox.textContent=questionText;
 
-    questionBox.textContent = questionText;
-
-    let wrongAnswers = departements.filter(d => (currentMode===1? d.numero:d.nom)!==correctAnswer)
+    let wrongAnswers = departements.filter(d=>(currentMode===1? d.numero:d.nom)!==correctAnswer)
                         .sort(()=>Math.random()-0.5).slice(0,4)
-                        .map(d => currentMode===1? d.numero:d.nom);
+                        .map(d=>currentMode===1? d.numero:d.nom);
+    let options=[...wrongAnswers,correctAnswer].sort(()=>Math.random()-0.5);
 
-    let options = [...wrongAnswers, correctAnswer].sort(()=>Math.random()-0.5);
-
-    answersContainer.innerHTML = '';
-    options.forEach(option=>{
-        const btn = document.createElement('button');
-        btn.classList.add('answer-btn');
-        btn.textContent = option;
-        btn.addEventListener('click', ()=> handleAnswer(option, correctAnswer));
-        answersContainer.appendChild(btn);
+    answerBtns.forEach((btn,i)=>{
+        btn.textContent=options[i];
+        btn.disabled=false;
+        btn.classList.remove('correct','incorrect');
+        btn.onclick = ()=> handleAnswer(options[i]);
     });
+
+    startQTimer();
 }
 
-// ==== HANDLE ANSWER ====
-function handleAnswer(selected, correct){
+// HANDLE ANSWER
+function handleAnswer(selected){
     if(awaitingNext) return;
-    awaitingNext = true;
-    const buttons = document.querySelectorAll('.answer-btn');
-    buttons.forEach(btn=>{
-        btn.disabled = true;
-        if(btn.textContent===correct) btn.classList.add('correct');
-        if(btn.textContent===selected && selected!==correct) btn.classList.add('incorrect');
+    awaitingNext=true;
+    clearInterval(qTimerInterval);
+    answerBtns.forEach(btn=>{
+        btn.disabled=true;
+        if(btn.textContent===correctAnswer) btn.classList.add('correct');
+        if(btn.textContent===selected && selected!==correctAnswer) btn.classList.add('incorrect');
     });
-    if(selected===correct){
-        score++;
-        scoreDisplay.textContent = score;
-    }
+    if(selected===correctAnswer) score++;
+    else lives--;
+    updateLives();
+
     setTimeout(()=>{
-        buttons.forEach(btn=>{
-            btn.classList.remove('correct','incorrect');
-            btn.disabled = false;
-        });
-        awaitingNext = false;
-        generateQuestion();
+        awaitingNext=false;
+        if(lives<=0) endGame();
+        else generateQuestion();
     },800);
 }
 
-// ==== TIMER ====
-function startTimer(){
-    timerDisplay.textContent = timeLeft;
-    timerFill.style.width = "100%";
+// UPDATE LIVES DISPLAY
+function updateLives(){
+    livesDisplay.textContent='❤'.repeat(lives)+'♡'.repeat(5-lives);
+}
+
+// MAIN TIMER
+function startMainTimer(){
+    timerDisplay.textContent=timeLeft;
+    timerFill.style.width='100%';
     clearInterval(timerInterval);
-    timerInterval = setInterval(()=>{
+    timerInterval=setInterval(()=>{
         timeLeft--;
-        timerDisplay.textContent = timeLeft;
-        timerFill.style.width = (timeLeft/60*100)+'%';
-        if(timeLeft<=10) timerFill.style.background='#dc3545';
-        else if(timeLeft<=30) timerFill.style.background='#ffa500';
+        timerDisplay.textContent=timeLeft;
+        timerFill.style.width=(timeLeft/20*100)+'%';
+        if(timeLeft<=5) timerFill.style.background='#dc3545';
+        else if(timeLeft<=10) timerFill.style.background='#ffa500';
         else timerFill.style.background='#28a745';
-        if(timeLeft<=0){
-            clearInterval(timerInterval);
-            endGame();
-        }
+        if(timeLeft<=0) { clearInterval(timerInterval); endGame();}
     },1000);
 }
 
-// ==== END GAME ====
+// QUESTION TIMER
+function startQTimer(){
+    qTimerDisplay.textContent=qTime;
+    qTimerFill.style.width='100%';
+    clearInterval(qTimerInterval);
+    qTimerInterval=setInterval(()=>{
+        qTime-=0.1;
+        qTimerDisplay.textContent=Math.ceil(qTime);
+        qTimerFill.style.width=(qTime/3*100)+'%';
+        if(qTime<=0){
+            clearInterval(qTimerInterval);
+            lives--;
+            updateLives();
+            handleAnswer(''); // force mauvais
+        }
+    },100);
+}
+
+// END GAME
 function endGame(){
     quizSection.classList.add('hidden');
     resultSection.classList.remove('hidden');
-    finalScore.textContent = score;
+    finalScore.textContent=score;
+    clearInterval(timerInterval);
+    clearInterval(qTimerInterval);
 }
 
-// ==== RESTART ====
-restartBtn.addEventListener('click', ()=> startMode(currentMode));
-homeBtn.addEventListener('click', ()=>{
+// RESTART & HOME
+restartBtn.onclick = startMode;
+homeBtn.onclick = ()=>{
     resultSection.classList.add('hidden');
     modeBanner.classList.remove('hidden');
-});
+    timeLeft=20; lives=5;
+};
