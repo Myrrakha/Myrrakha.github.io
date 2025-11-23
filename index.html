@@ -753,12 +753,12 @@ const departements = [
 ];
 
 const modes = {
-    1: { time: 40, qTime: 4, lives: 5, questionType: "nom_to_num" },
-    2: { time: 40, qTime: 4, lives: 5, questionType: "num_to_nom" },
-    3: { time: 80, qTime: 8, lives: 7, questionType: "shape_to_nom_num" },
-    4: { time: 70, qTime: 7, lives: 5, questionType: "prefecture_to_nom" },
-    5: { time: 60, qTime: 5, lives: 5, questionType: "mix_nom_num_prefecture" },
-    6: { time: 80, qTime: 5, lives: 7, questionType: "mix_all" }
+    1: { time: 20, qTime: 3, lives: 5, questionType: "nom_to_num" },
+    2: { time: 20, qTime: 3, lives: 5, questionType: "num_to_nom" },
+    3: { time: 30, qTime: 3, lives: 5, questionType: "shape_to_nom_num" },
+    4: { time: 40, qTime: 4, lives: 5, questionType: "prefecture_to_nom" },
+    5: { time: 40, qTime: 4, lives: 5, questionType: "mix_nom_num_prefecture" },
+    6: { time: 50, qTime: 4, lives: 5, questionType: "mix_all" }
 };
 
 const requiredModeUnlock = { 2: 10, 3: 10, 4: 10, 5: 10, 6: 15 };
@@ -953,26 +953,32 @@ document.addEventListener('click', (e) => {
 
 modeButtons.forEach(btn => {
     btn.addEventListener('click', async e => {
+        e.preventDefault();
+        e.stopPropagation();
+        
         const selected = parseInt(btn.dataset.mode);
         if (!selected) return;
 
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        const userData = userDoc.data();
-        
-        if (selected > 1 && userData.globalScore < requiredModeUnlock[selected]) {
-            showHoverWarning(
-                `Vous devez avoir ${requiredModeUnlock[selected]} points globaux pour débloquer ce mode`,
-                e.pageX,
-                e.pageY
-            );
-            e.preventDefault();
-            e.stopPropagation();
-            return;
-        }
+        try {
+            const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+            const userData = userDoc.data();
+            
+            if (selected > 1 && userData.globalScore < requiredModeUnlock[selected]) {
+                showHoverWarning(
+                    `Vous devez avoir ${requiredModeUnlock[selected]} points globaux pour débloquer ce mode`,
+                    e.pageX,
+                    e.pageY
+                );
+                return;
+            }
 
-        currentMode = selected;
-        dropdown.classList.remove('open');
-        startMode();
+            currentMode = selected;
+            dropdown.classList.remove('open');
+            startMode();
+        } catch (error) {
+            console.error('Erreur lors du lancement du mode:', error);
+            alert('Erreur lors du chargement. Veuillez réessayer.');
+        }
     });
 });
 
