@@ -3,12 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Quiz Départements</title>
+<title>Quiz Master - Départements</title>
 <style>
-/* ====================== GENERAL ====================== */
-.hidden {
-    display: none !important;
-}
+.hidden { display: none !important; }
 
 body {
     margin: 0;
@@ -17,7 +14,6 @@ body {
     color: #f0f0f0;
 }
 
-/* ====================== HOVER WARNING ====================== */
 #hover-warning {
     position: absolute;
     padding: 8px 14px;
@@ -31,7 +27,6 @@ body {
     z-index: 9999;
 }
 
-/* ====================== HEADER ====================== */
 header {
     width: 100%;
     background: rgba(20, 20, 28, 0.8);
@@ -51,14 +46,38 @@ header {
     padding: 12px 20px;
 }
 
-.nav-left .nav-title {
+.nav-title {
     font-size: 1.4em;
     font-weight: 600;
     color: #eaeaea;
     letter-spacing: 1px;
 }
 
-/* ====================== DROPDOWN ====================== */
+.user-info {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.user-stats {
+    font-size: 0.9em;
+    text-align: right;
+}
+
+.logout-btn {
+    padding: 8px 16px;
+    background: #dc3545;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.logout-btn:hover {
+    background: #c82333;
+}
+
 .dropdown {
     position: relative;
 }
@@ -125,7 +144,88 @@ header {
     cursor: not-allowed;
 }
 
-/* ====================== ACCUEIL ====================== */
+/* AUTH SECTION */
+#auth-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+}
+
+.auth-container {
+    background: #1f1f28;
+    padding: 40px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.auth-container h2 {
+    margin-top: 0;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.95em;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #2c2c3a;
+    color: #f0f0f0;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: #9c28a7;
+    color: white;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s;
+    margin-top: 10px;
+}
+
+.auth-btn:hover {
+    background: #7d1f85;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9em;
+}
+
+.auth-switch a {
+    color: #9c28a7;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.error-msg {
+    background: #dc3545;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* HOME SECTION */
 #home-section {
     padding: 80px 20px;
     text-align: center;
@@ -136,12 +236,82 @@ header {
     margin-bottom: 10px;
 }
 
-.home-center p {
-    font-size: 1.2em;
-    opacity: 0.8;
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    max-width: 800px;
+    margin: 40px auto;
 }
 
-/* ====================== QUIZ ====================== */
+.stat-card {
+    background: #262633;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.stat-card h3 {
+    margin-top: 0;
+    color: #9c28a7;
+}
+
+.stat-value {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #f0f0f0;
+}
+
+.level-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #9c28a7, #7d1f85);
+    border-radius: 20px;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+/* LEADERBOARD */
+#leaderboard-section {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.leaderboard-container {
+    background: #262633;
+    border-radius: 15px;
+    padding: 30px;
+}
+
+.leaderboard-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin: 10px 0;
+    background: #2c2c3a;
+    border-radius: 10px;
+}
+
+.leaderboard-rank {
+    font-size: 1.5em;
+    font-weight: bold;
+    width: 50px;
+}
+
+.leaderboard-name {
+    flex: 1;
+    font-weight: 500;
+}
+
+.leaderboard-score {
+    font-size: 1.2em;
+    color: #9c28a7;
+    font-weight: bold;
+}
+
+/* QUIZ SECTION */
 #quiz-section {
     display: flex;
     flex-direction: column;
@@ -207,7 +377,6 @@ header {
     background-color: #e74c3c !important;
 }
 
-/* ====================== TIMERS & VIES ====================== */
 #timers-container {
     width: 92%;
     max-width: 1000px;
@@ -255,10 +424,23 @@ header {
     font-size: 1.4em;
 }
 
-/* ====================== RESULTAT ====================== */
+/* RESULT SECTION */
 #result-section {
     margin-top: 60px;
     text-align: center;
+}
+
+.result-stats {
+    background: #262633;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 500px;
+    margin: 30px auto;
+}
+
+.result-stats h3 {
+    color: #9c28a7;
+    margin-top: 0;
 }
 
 .action-btn {
@@ -276,7 +458,6 @@ header {
     background: #4e4e6a;
 }
 
-/* ====================== RESPONSIVE ====================== */
 @media screen and (max-width: 750px) {
     .quiz-container {
         flex-direction: column;
@@ -300,34 +481,96 @@ header {
 <header>
     <nav class="navbar">
         <div class="nav-left">
-            <span class="nav-title">Quiz Master</span>
+            <span class="nav-title">🎯 Quiz Master</span>
         </div>
 
-        <div class="nav-right">
-            <div class="dropdown">
-                <button class="dropdown-btn">Quiz ▾</button>
-                <div class="dropdown-content">
-                    <div class="dropdown-subgroup">
+        <div class="nav-right" id="nav-logged-out">
+            <!-- Vide quand déconnecté -->
+        </div>
+
+        <div class="nav-right hidden" id="nav-logged-in">
+            <div class="user-info">
+                <div class="user-stats">
+                    <div><strong id="user-pseudo">Joueur</strong></div>
+                    <div>Score Global: <strong id="user-global-score">0</strong></div>
+                </div>
+                <div class="dropdown">
+                    <button class="dropdown-btn">Quiz ▾</button>
+                    <div class="dropdown-content">
                         <span class="dropdown-subtitle">📍 Quiz Départements</span>
                         <button class="dropdown-item" data-mode="1">Mode 1 : Nom → Numéro</button>
                         <button class="dropdown-item" data-mode="2">Mode 2 : Numéro → Nom</button>
-                        <button class="dropdown-item" data-mode="3">Mode 3 : Forme → Nom/Numéro</button>
-                        <button class="dropdown-item" data-mode="4">Mode 4 : Préfecture → Département</button>
+                        <button class="dropdown-item" data-mode="3">Mode 3 : Forme → Nom/Num</button>
+                        <button class="dropdown-item" data-mode="4">Mode 4 : Préfecture → Dépt</button>
                         <button class="dropdown-item" data-mode="5">Mode 5 : Mix Nom/Num/Préf</button>
                         <button class="dropdown-item" data-mode="6">Mode 6 : Mix Total</button>
                     </div>
                 </div>
+                <button class="logout-btn" onclick="logout()">Déconnexion</button>
             </div>
         </div>
     </nav>
 </header>
 
 <main>
+    <!-- SECTION AUTHENTIFICATION -->
+    <section id="auth-section">
+        <div class="auth-container">
+            <h2 id="auth-title">Connexion</h2>
+            <div id="auth-error" class="error-msg hidden"></div>
+            
+            <form id="auth-form" onsubmit="return false;">
+                <div class="form-group" id="pseudo-group" style="display:none;">
+                    <label>Pseudo</label>
+                    <input type="text" id="auth-pseudo" placeholder="Ton pseudo">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="auth-email" placeholder="ton@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="auth-password" placeholder="••••••••" required>
+                </div>
+                <button class="auth-btn" id="auth-submit-btn">Se connecter</button>
+            </form>
+
+            <div class="auth-switch">
+                <span id="auth-switch-text">Pas encore de compte ? </span>
+                <a id="auth-switch-link" onclick="toggleAuthMode()">S'inscrire</a>
+            </div>
+        </div>
+    </section>
+
     <!-- SECTION ACCUEIL -->
-    <section id="home-section">
+    <section id="home-section" class="hidden">
         <div class="home-center">
-            <h2>Bienvenue 👋</h2>
-            <p>Sélectionne un quiz dans le menu ci-dessus pour commencer.</p>
+            <h2>Bienvenue <span id="welcome-pseudo">Joueur</span> ! 👋</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>🌍 Score Global</h3>
+                    <div class="stat-value" id="home-global-score">0</div>
+                    <div class="level-badge" id="global-level">Débutant</div>
+                </div>
+                <div class="stat-card">
+                    <h3>🗺️ Quiz Départements</h3>
+                    <div class="stat-value" id="home-dept-score">0</div>
+                    <div class="level-badge" id="dept-level">Niveau 1</div>
+                </div>
+            </div>
+
+            <p style="opacity: 0.8; margin-top: 30px;">Sélectionne un quiz dans le menu pour commencer !</p>
+        </div>
+
+        <!-- CLASSEMENT -->
+        <div id="leaderboard-section">
+            <div class="leaderboard-container">
+                <h2 style="text-align: center;">🏆 Classement Mondial</h2>
+                <div id="leaderboard-list">
+                    <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -337,7 +580,6 @@ header {
             <div class="question-box">
                 <div id="question"></div>
             </div>
-
             <div class="answers-container">
                 <button class="answer-btn"></button>
                 <button class="answer-btn"></button>
@@ -347,23 +589,17 @@ header {
             </div>
         </div>
 
-        <!-- TIMERS -->
         <div id="timers-container">
             <div id="timer-bar-container">
                 <span>⏱️ Temps restant : <span id="timer">0</span>s</span>
-                <div id="timer-bar">
-                    <div id="timer-fill"></div>
-                </div>
+                <div id="timer-bar"><div id="timer-fill"></div></div>
             </div>
             <div id="question-timer-bar-container">
                 <span>⚡ Question : <span id="question-timer">0</span>s</span>
-                <div id="question-timer-bar">
-                    <div id="question-timer-fill"></div>
-                </div>
+                <div id="question-timer-bar"><div id="question-timer-fill"></div></div>
             </div>
         </div>
 
-        <!-- SCORE & VIES -->
         <div id="score-lives">
             <div>Score : <span id="score">0</span></div>
             <div id="lives">❤❤❤❤❤</div>
@@ -372,17 +608,46 @@ header {
 
     <!-- SECTION RÉSULTAT -->
     <section id="result-section" class="hidden">
-        <h2>Fin de la partie 🎉</h2>
-        <p>Score final : <span id="final-score">0</span></p>
+        <h2>Partie terminée ! 🎉</h2>
+        <div class="result-stats">
+            <h3>Résumé</h3>
+            <p>Score de la partie : <strong id="final-score">0</strong></p>
+            <p>Nouveau score global : <strong id="new-global-score">0</strong></p>
+            <p>Score départements : <strong id="new-dept-score">0</strong></p>
+            <div id="level-up-msg" class="hidden" style="color: #2ecc71; margin-top: 15px; font-weight: bold;">
+                🎊 NIVEAU SUPÉRIEUR ATTEINT !
+            </div>
+        </div>
         <button id="restart-btn" class="action-btn">Rejouer</button>
-        <button id="home-btn" class="action-btn">Retour à l'accueil</button>
+        <button id="home-btn" class="action-btn">Accueil</button>
     </section>
 </main>
 
-<!-- Hover Warning -->
 <div id="hover-warning"></div>
 
-<script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
+  authDomain: "quiz-master-io.firebaseapp.com",
+  projectId: "quiz-master-io",
+  storageBucket: "quiz-master-io.firebasestorage.app",
+  messagingSenderId: "773382469164",
+  appId: "1:773382469164:web:5e24a9a62ce543f5190389"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+window.auth = auth;
+window.db = db;
+window.currentUser = null;
+
+// Départements data
 const departements = [
     { nom: "Ain", numero: "01", prefecture: "Bourg-en-Bresse" },
     { nom: "Aisne", numero: "02", prefecture: "Laon" },
@@ -490,19 +755,179 @@ const departements = [
 const modes = {
     1: { time: 40, qTime: 4, lives: 5, questionType: "nom_to_num" },
     2: { time: 40, qTime: 4, lives: 5, questionType: "num_to_nom" },
-    3: { time: 80, qTime: 8, lives: 15, questionType: "shape_to_nom_num" },
-    4: { time: 70, qTime: 6, lives: 7, questionType: "prefecture_to_nom" },
-    5: { time: 80, qTime: 6, lives: 7, questionType: "mix_nom_num_prefecture" },
-    6: { time: 100, qTime: 5, lives: 10, questionType: "mix_all" }
+    3: { time: 80, qTime: 8, lives: 7, questionType: "shape_to_nom_num" },
+    4: { time: 70, qTime: 7, lives: 5, questionType: "prefecture_to_nom" },
+    5: { time: 60, qTime: 5, lives: 5, questionType: "mix_nom_num_prefecture" },
+    6: { time: 80, qTime: 5, lives: 7, questionType: "mix_all" }
 };
+
 const requiredModeUnlock = { 2: 10, 3: 10, 4: 10, 5: 10, 6: 15 };
-let bestScore = [0,0,0,0,0,0];
 
 let currentMode = 0, score = 0, lives = 0, timeLeft = 0, qTime = 0;
 let timerInterval = null, qTimerInterval = null, awaitingNext = false;
 let previousQuestions = [];
 let correctAnswer;
+let isAuthMode = 'login';
 
+// AUTH FUNCTIONS
+window.toggleAuthMode = function() {
+    isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
+    const title = document.getElementById('auth-title');
+    const submitBtn = document.getElementById('auth-submit-btn');
+    const switchText = document.getElementById('auth-switch-text');
+    const switchLink = document.getElementById('auth-switch-link');
+    const pseudoGroup = document.getElementById('pseudo-group');
+    
+    if (isAuthMode === 'signup') {
+        title.textContent = 'Inscription';
+        submitBtn.textContent = "S'inscrire";
+        switchText.textContent = 'Déjà un compte ? ';
+        switchLink.textContent = 'Se connecter';
+        pseudoGroup.style.display = 'block';
+    } else {
+        title.textContent = 'Connexion';
+        submitBtn.textContent = 'Se connecter';
+        switchText.textContent = "Pas encore de compte ? ";
+        switchLink.textContent = "S'inscrire";
+        pseudoGroup.style.display = 'none';
+    }
+};
+
+document.getElementById('auth-submit-btn').addEventListener('click', async () => {
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    const pseudo = document.getElementById('auth-pseudo').value;
+    const errorDiv = document.getElementById('auth-error');
+    
+    errorDiv.classList.add('hidden');
+    
+    try {
+        if (isAuthMode === 'signup') {
+            if (!pseudo || pseudo.trim().length < 3) {
+                throw new Error('Le pseudo doit contenir au moins 3 caractères');
+            }
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            
+            await setDoc(doc(db, 'users', user.uid), {
+                pseudo: pseudo.trim(),
+                email: email,
+                globalScore: 0,
+                quizScores: {
+                    departements: 0
+                },
+                createdAt: new Date().toISOString()
+            });
+        } else {
+            await signInWithEmailAndPassword(auth, email, password);
+        }
+    } catch (error) {
+        errorDiv.textContent = error.message;
+        errorDiv.classList.remove('hidden');
+    }
+});
+
+window.logout = async function() {
+    await signOut(auth);
+};
+
+// AUTH STATE OBSERVER
+onAuthStateChanged(auth, async (user) => {
+    const authSection = document.getElementById('auth-section');
+    const homeSection = document.getElementById('home-section');
+    const navLoggedOut = document.getElementById('nav-logged-out');
+    const navLoggedIn = document.getElementById('nav-logged-in');
+    
+    if (user) {
+        window.currentUser = user;
+        authSection.classList.add('hidden');
+        homeSection.classList.remove('hidden');
+        navLoggedOut.classList.add('hidden');
+        navLoggedIn.classList.remove('hidden');
+        
+        await loadUserData();
+        await loadLeaderboard();
+    } else {
+        window.currentUser = null;
+        authSection.classList.remove('hidden');
+        homeSection.classList.add('hidden');
+        navLoggedOut.classList.remove('hidden');
+        navLoggedIn.classList.add('hidden');
+    }
+});
+
+async function loadUserData() {
+    const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+    const userData = userDoc.data();
+    
+    document.getElementById('user-pseudo').textContent = userData.pseudo;
+    document.getElementById('welcome-pseudo').textContent = userData.pseudo;
+    document.getElementById('user-global-score').textContent = userData.globalScore;
+    document.getElementById('home-global-score').textContent = userData.globalScore;
+    document.getElementById('home-dept-score').textContent = userData.quizScores?.departements || 0;
+    
+    // Calculate levels
+    const globalLevel = getGlobalLevel(userData.globalScore);
+    const deptLevel = getDeptLevel(userData.quizScores?.departements || 0);
+    
+    document.getElementById('global-level').textContent = globalLevel;
+    document.getElementById('dept-level').textContent = deptLevel;
+}
+
+function getGlobalLevel(score) {
+    if (score >= 500) return '🏆 Expert';
+    if (score >= 300) return '⭐ Avancé';
+    if (score >= 150) return '📚 Intermédiaire';
+    if (score >= 50) return '🌱 Apprenti';
+    return '🆕 Débutant';
+}
+
+function getDeptLevel(score) {
+    const level = Math.floor(score / 50) + 1;
+    return `Niveau ${level}`;
+}
+
+async function loadLeaderboard() {
+    const leaderboardList = document.getElementById('leaderboard-list');
+    leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
+    
+    try {
+        const q = query(collection(db, 'users'), orderBy('globalScore', 'desc'), limit(10));
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+            leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
+            return;
+        }
+        
+        leaderboardList.innerHTML = '';
+        let rank = 1;
+        
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const item = document.createElement('div');
+            item.className = 'leaderboard-item';
+            
+            let medal = '';
+            if (rank === 1) medal = '🥇';
+            else if (rank === 2) medal = '🥈';
+            else if (rank === 3) medal = '🥉';
+            
+            item.innerHTML = `
+                <div class="leaderboard-rank">${medal || rank}</div>
+                <div class="leaderboard-name">${data.pseudo}</div>
+                <div class="leaderboard-score">${data.globalScore}</div>
+            `;
+            
+            leaderboardList.appendChild(item);
+            rank++;
+        });
+    } catch (error) {
+        leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Erreur de chargement</div>';
+    }
+}
+
+// QUIZ LOGIC
 const homeSection = document.getElementById('home-section');
 const quizSection = document.getElementById('quiz-section');
 const resultSection = document.getElementById('result-section');
@@ -526,21 +951,17 @@ document.addEventListener('click', (e) => {
     if (!dropdown.contains(e.target)) dropdown.classList.remove('open');
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    homeSection.classList.remove('hidden');
-    quizSection.classList.add('hidden');
-    resultSection.classList.add('hidden');
-    updateModeButtons();
-});
-
 modeButtons.forEach(btn => {
-    btn.addEventListener('click', e => {
+    btn.addEventListener('click', async e => {
         const selected = parseInt(btn.dataset.mode);
         if (!selected) return;
 
-        if (selected > 1 && bestScore[selected - 2] < requiredModeUnlock[selected]) {
+        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+        const userData = userDoc.data();
+        
+        if (selected > 1 && userData.globalScore < requiredModeUnlock[selected]) {
             showHoverWarning(
-                `Vous devez faire au moins ${requiredModeUnlock[selected]} au mode ${selected - 1} pour débloquer ce mode`,
+                `Vous devez avoir ${requiredModeUnlock[selected]} points globaux pour débloquer ce mode`,
                 e.pageX,
                 e.pageY
             );
@@ -715,13 +1136,40 @@ function startQTimer() {
     }, 100);
 }
 
-function endGame() {
+async function endGame() {
     quizSection.classList.add('hidden');
     resultSection.classList.remove('hidden');
-    if(score > bestScore[currentMode-1]) bestScore[currentMode-1] = score;
     finalScore.textContent = score;
     stopAllTimers();
-    updateModeButtons();
+    
+    const userDocRef = doc(db, 'users', currentUser.uid);
+    const userDoc = await getDoc(userDocRef);
+    const userData = userDoc.data();
+    
+    const oldGlobalScore = userData.globalScore;
+    const oldDeptScore = userData.quizScores?.departements || 0;
+    
+    const newGlobalScore = oldGlobalScore + score;
+    const newDeptScore = oldDeptScore + score;
+    
+    await updateDoc(userDocRef, {
+        globalScore: newGlobalScore,
+        'quizScores.departements': newDeptScore
+    });
+    
+    document.getElementById('new-global-score').textContent = newGlobalScore;
+    document.getElementById('new-dept-score').textContent = newDeptScore;
+    
+    const oldLevel = Math.floor(oldDeptScore / 50);
+    const newLevel = Math.floor(newDeptScore / 50);
+    
+    if (newLevel > oldLevel) {
+        document.getElementById('level-up-msg').classList.remove('hidden');
+    } else {
+        document.getElementById('level-up-msg').classList.add('hidden');
+    }
+    
+    await loadLeaderboard();
 }
 
 function stopAllTimers() {
@@ -730,25 +1178,14 @@ function stopAllTimers() {
 }
 
 restartBtn.onclick = startMode;
-homeBtn.onclick = () => {
+homeBtn.onclick = async () => {
     stopAllTimers();
     quizSection.classList.add('hidden');
     resultSection.classList.add('hidden');
     homeSection.classList.remove('hidden');
+    await loadUserData();
 };
 
-function updateModeButtons() {
-    modeButtons.forEach(btn => {
-        const modeNum = parseInt(btn.dataset.mode);
-        if (modeNum > 1 && bestScore[modeNum - 2] < requiredModeUnlock[modeNum]) {
-            btn.classList.add('disabled');
-            btn.disabled = false;
-        } else {
-            btn.classList.remove('disabled');
-            btn.disabled = false;
-        }
-    });
-}
 </script>
 
 </body>
