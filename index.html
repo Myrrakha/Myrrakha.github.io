@@ -1156,8 +1156,10 @@ function handleAnswer(selected) {
         if(btn.textContent === selected && selected !== correctAnswer) btn.classList.add("incorrect");
     });
     if(selected === correctAnswer) score++;
-    else lives--;
-    updateLives();
+    else 
+        if  (lives > 0) lives--;
+        else lives = 0;
+        updateLives();
     scoreDisplay.textContent = score;
     setTimeout(() => {
         awaitingNext = false;
@@ -1167,7 +1169,9 @@ function handleAnswer(selected) {
 }
 
 function updateLives() {
-    livesDisplay.textContent = '❤'.repeat(lives) + '♡'.repeat(modes[currentMode].lives - lives);
+    const safeLives = Math.max(0, lives);
+    const maxLives = modes[currentMode].lives;
+    livesDisplay.textContent = '❤'.repeat(safeLives) + '♡'.repeat(Math.max(0, maxLives - safeLives));
 }
 
 function startMainTimer() {
@@ -1191,7 +1195,7 @@ function startQTimer() {
         qTime -= 0.1;
         qTimerDisplay.textContent = Math.ceil(qTime);
         qTimerFill.style.width = (qTime / modes[currentMode].qTime * 100) + '%';
-        if(qTime<=0){ clearInterval(qTimerInterval); lives--; updateLives(); handleAnswer(''); }
+        if(qTime<=0){ clearInterval(qTimerInterval); if (lives > 0) lives--; updateLives(); handleAnswer(''); }
     }, 100);
 }
 
