@@ -753,9 +753,9 @@ const departements = [
 ];
 
 const modes = {
-    1: { time: 40, qTime: 4, lives: 5, questionType: "nom_to_num" },
-    2: { time: 40, qTime: 4, lives: 5, questionType: "num_to_nom" },
-    3: { time: 80, qTime: 8, lives: 5, questionType: "shape_to_nom_num" },
+    1: { time: 20, qTime: 3, lives: 5, questionType: "nom_to_num" },
+    2: { time: 20, qTime: 3, lives: 5, questionType: "num_to_nom" },
+    3: { time: 30, qTime: 3, lives: 5, questionType: "shape_to_nom_num" },
     4: { time: 40, qTime: 4, lives: 5, questionType: "prefecture_to_nom" },
     5: { time: 40, qTime: 4, lives: 5, questionType: "mix_nom_num_prefecture" },
     6: { time: 50, qTime: 4, lives: 5, questionType: "mix_all" }
@@ -858,26 +858,45 @@ onAuthStateChanged(auth, async (user) => {
 
 async function loadUserData() {
     try {
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        const userData = userDoc.data();
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        
+        let userData = userDoc.data();
+        
+        // Si le profil n'existe pas, le créer
+        if (!userData) {
+            console.log('Création du profil utilisateur manquant...');
+            const defaultData = {
+                pseudo: currentUser.email.split('@')[0],
+                email: currentUser.email,
+                globalScore: 0,
+                quizScores: {
+                    departements: 0
+                },
+                createdAt: new Date().toISOString()
+            };
+            await setDoc(userDocRef, defaultData);
+            userData = defaultData;
+        }
         
         document.getElementById('user-pseudo').textContent = userData.pseudo;
         document.getElementById('welcome-pseudo').textContent = userData.pseudo;
-        document.getElementById('user-global-score').textContent = userData.globalScore;
-        document.getElementById('home-global-score').textContent = userData.globalScore;
+        document.getElementById('user-global-score').textContent = userData.globalScore || 0;
+        document.getElementById('home-global-score').textContent = userData.globalScore || 0;
         document.getElementById('home-dept-score').textContent = userData.quizScores?.departements || 0;
         
         // Calculate levels
-        const globalLevel = getGlobalLevel(userData.globalScore);
+        const globalLevel = getGlobalLevel(userData.globalScore || 0);
         const deptLevel = getDeptLevel(userData.quizScores?.departements || 0);
         
         document.getElementById('global-level').textContent = globalLevel;
         document.getElementById('dept-level').textContent = deptLevel;
         
         // Update mode buttons based on global score
-        updateModeButtons(userData.globalScore);
+        updateModeButtons(userData.globalScore || 0);
     } catch (error) {
         console.error('Erreur chargement données:', error);
+        alert('Erreur de chargement. Essayez de vous reconnecter.');
     }
 }
 
@@ -978,10 +997,26 @@ modeButtons.forEach(btn => {
         if (!selected) return;
 
         try {
-            const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-            const userData = userDoc.data();
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            const userDoc = await getDoc(userDocRef);
+            let userData = userDoc.data();
             
-            if (selected > 1 && userData.globalScore < requiredModeUnlock[selected]) {
+            // Créer le profil si manquant
+            if (!userData) {
+                const defaultData = {
+                    pseudo: currentUser.email.split('@')[0],
+                    email: currentUser.email,
+                    globalScore: 0,
+                    quizScores: { departements: 0 },
+                    createdAt: new Date().toISOString()
+                };
+                await setDoc(userDocRef, defaultData);
+                userData = defaultData;
+            }
+            
+            const globalScore = userData.globalScore || 0;
+            
+            if (selected > 1 && globalScore < requiredModeUnlock[selected]) {
                 showHoverWarning(
                     `Vous devez avoir ${requiredModeUnlock[selected]} points globaux pour débloquer ce mode`,
                     e.pageX,
@@ -1169,7 +1204,19 @@ async function endGame() {
     try {
         const userDocRef = doc(db, 'users', currentUser.uid);
         const userDoc = await getDoc(userDocRef);
-        const userData = userDoc.data();
+        let userData = userDoc.data();
+        
+        // Créer le profil si manquant
+        if (!userData) {
+            userData = {
+                pseudo: currentUser.email.split('@')[0],
+                email: currentUser.email,
+                globalScore: 0,
+                quizScores: { departements: 0 },
+                createdAt: new Date().toISOString()
+            };
+            await setDoc(userDocRef, userData);
+        }
         
         const oldGlobalScore = userData.globalScore || 0;
         const oldDeptScore = userData.quizScores?.departements || 0;
