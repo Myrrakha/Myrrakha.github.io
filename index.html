@@ -753,9 +753,9 @@ const departements = [
 ];
 
 const modes = {
-    1: { time: 20, qTime: 3, lives: 5, questionType: "nom_to_num" },
-    2: { time: 20, qTime: 3, lives: 5, questionType: "num_to_nom" },
-    3: { time: 30, qTime: 3, lives: 5, questionType: "shape_to_nom_num" },
+    1: { time: 40, qTime: 4, lives: 5, questionType: "nom_to_num" },
+    2: { time: 40, qTime: 4, lives: 5, questionType: "num_to_nom" },
+    3: { time: 80, qTime: 8, lives: 5, questionType: "shape_to_nom_num" },
     4: { time: 40, qTime: 4, lives: 5, questionType: "prefecture_to_nom" },
     5: { time: 40, qTime: 4, lives: 5, questionType: "mix_nom_num_prefecture" },
     6: { time: 50, qTime: 4, lives: 5, questionType: "mix_all" }
@@ -857,21 +857,28 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 async function loadUserData() {
-    const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-    const userData = userDoc.data();
-    
-    document.getElementById('user-pseudo').textContent = userData.pseudo;
-    document.getElementById('welcome-pseudo').textContent = userData.pseudo;
-    document.getElementById('user-global-score').textContent = userData.globalScore;
-    document.getElementById('home-global-score').textContent = userData.globalScore;
-    document.getElementById('home-dept-score').textContent = userData.quizScores?.departements || 0;
-    
-    // Calculate levels
-    const globalLevel = getGlobalLevel(userData.globalScore);
-    const deptLevel = getDeptLevel(userData.quizScores?.departements || 0);
-    
-    document.getElementById('global-level').textContent = globalLevel;
-    document.getElementById('dept-level').textContent = deptLevel;
+    try {
+        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+        const userData = userDoc.data();
+        
+        document.getElementById('user-pseudo').textContent = userData.pseudo;
+        document.getElementById('welcome-pseudo').textContent = userData.pseudo;
+        document.getElementById('user-global-score').textContent = userData.globalScore;
+        document.getElementById('home-global-score').textContent = userData.globalScore;
+        document.getElementById('home-dept-score').textContent = userData.quizScores?.departements || 0;
+        
+        // Calculate levels
+        const globalLevel = getGlobalLevel(userData.globalScore);
+        const deptLevel = getDeptLevel(userData.quizScores?.departements || 0);
+        
+        document.getElementById('global-level').textContent = globalLevel;
+        document.getElementById('dept-level').textContent = deptLevel;
+        
+        // Update mode buttons based on global score
+        updateModeButtons(userData.globalScore);
+    } catch (error) {
+        console.error('Erreur chargement données:', error);
+    }
 }
 
 function getGlobalLevel(score) {
@@ -885,6 +892,17 @@ function getGlobalLevel(score) {
 function getDeptLevel(score) {
     const level = Math.floor(score / 50) + 1;
     return `Niveau ${level}`;
+}
+
+function updateModeButtons(globalScore) {
+    modeButtons.forEach(btn => {
+        const modeNum = parseInt(btn.dataset.mode);
+        if (modeNum > 1 && globalScore < requiredModeUnlock[modeNum]) {
+            btn.classList.add('disabled');
+        } else {
+            btn.classList.remove('disabled');
+        }
+    });
 }
 
 async function loadLeaderboard() {
@@ -1148,34 +1166,50 @@ async function endGame() {
     finalScore.textContent = score;
     stopAllTimers();
     
-    const userDocRef = doc(db, 'users', currentUser.uid);
-    const userDoc = await getDoc(userDocRef);
-    const userData = userDoc.data();
-    
-    const oldGlobalScore = userData.globalScore;
-    const oldDeptScore = userData.quizScores?.departements || 0;
-    
-    const newGlobalScore = oldGlobalScore + score;
-    const newDeptScore = oldDeptScore + score;
-    
-    await updateDoc(userDocRef, {
-        globalScore: newGlobalScore,
-        'quizScores.departements': newDeptScore
-    });
-    
-    document.getElementById('new-global-score').textContent = newGlobalScore;
-    document.getElementById('new-dept-score').textContent = newDeptScore;
-    
-    const oldLevel = Math.floor(oldDeptScore / 50);
-    const newLevel = Math.floor(newDeptScore / 50);
-    
-    if (newLevel > oldLevel) {
-        document.getElementById('level-up-msg').classList.remove('hidden');
-    } else {
-        document.getElementById('level-up-msg').classList.add('hidden');
+    try {
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        const userData = userDoc.data();
+        
+        const oldGlobalScore = userData.globalScore || 0;
+        const oldDeptScore = userData.quizScores?.departements || 0;
+        
+        const newGlobalScore = oldGlobalScore + score;
+        const newDeptScore = oldDeptScore + score;
+        
+        await updateDoc(userDocRef, {
+            globalScore: newGlobalScore,
+            'quizScores.departements': newDeptScore
+        });
+        
+        // Update all displays
+        document.getElementById('new-global-score').textContent = newGlobalScore;
+        document.getElementById('new-dept-score').textContent = newDeptScore;
+        document.getElementById('user-global-score').textContent = newGlobalScore;
+        document.getElementById('home-global-score').textContent = newGlobalScore;
+        document.getElementById('home-dept-score').textContent = newDeptScore;
+        
+        // Update levels
+        document.getElementById('global-level').textContent = getGlobalLevel(newGlobalScore);
+        document.getElementById('dept-level').textContent = getDeptLevel(newDeptScore);
+        
+        // Update mode buttons
+        updateModeButtons(newGlobalScore);
+        
+        const oldLevel = Math.floor(oldDeptScore / 50);
+        const newLevel = Math.floor(newDeptScore / 50);
+        
+        if (newLevel > oldLevel) {
+            document.getElementById('level-up-msg').classList.remove('hidden');
+        } else {
+            document.getElementById('level-up-msg').classList.add('hidden');
+        }
+        
+        await loadLeaderboard();
+    } catch (error) {
+        console.error('Erreur sauvegarde scores:', error);
+        alert('Erreur lors de la sauvegarde des scores. Vérifiez votre connexion.');
     }
-    
-    await loadLeaderboard();
 }
 
 function stopAllTimers() {
