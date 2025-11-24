@@ -490,12 +490,12 @@ header {
             const baseBtn = document.getElementById('base-btn');
             if (!baseBtn) return;
             if (globalScore >= 200) {
-                baseBtn.style.display = '';
+                baseBtn.style.display = 'inline-block';
                 baseBtn.disabled = false;
                 baseBtn.classList.remove('disabled');
                 baseBtn.title = '';
             } else {
-                baseBtn.style.display = '';
+                baseBtn.style.display = 'none';
                 baseBtn.disabled = true;
                 baseBtn.classList.add('disabled');
                 baseBtn.title = 'Débloqué à 200 points globaux';
