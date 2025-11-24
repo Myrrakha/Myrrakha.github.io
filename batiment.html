@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Détail du bâtiment</title>
+  <style>
+    body { background: linear-gradient(135deg, #181a20, #23233a); color: #f0f0f0; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; }
+    .center { max-width: 600px; margin: 60px auto; background: #23233a; border-radius: 16px; padding: 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+    .back-btn { display: inline-block; margin-bottom: 20px; background: #3a3a50; color: #fff; border: none; border-radius: 8px; padding: 10px 18px; font-size: 1em; cursor: pointer; transition: 0.2s; }
+    .back-btn:hover { background: #4e4e6a; }
+    .bat-title { font-size: 2em; font-weight: bold; color: #a8a8ff; margin-bottom: 10px; }
+    .bat-desc { font-size: 1.1em; margin-bottom: 18px; }
+    .bat-info { margin-bottom: 18px; }
+    .stat-value { font-weight: bold; color: #fff; }
+    .action-btn { margin: 10px 0; padding: 12px 25px; border-radius: 10px; background: #3a3a50; border: none; cursor: pointer; color: #f0f0f0; transition: 0.25s; }
+    .action-btn:hover { background: #4e4e6a; }
+  </style>
+</head>
+<body>
+  <div class="center">
+    <button class="back-btn" onclick="window.history.back()">← Retour</button>
+    <div id="batiment-detail"></div>
+  </div>
+  <script>
+    // --- Structure complète de gestion des bâtiments ---
+    const params = new URLSearchParams(window.location.search);
+    const batId = params.get('id');
+    // Liste complète des bâtiments (copiée de base.html)
+    const BATIMENTS = [
+      { id: 'marche', nom: 'Marché', desc: "Échange score global contre ressources.", type: 'util', niveau: 0, max: 1, cout: { globalScore: 10 } },
+      { id: 'scierie', nom: 'Scierie', desc: "Produit du bois.", type: 'prod', niveau: 0, max: 5, cout: { pierre: 5 } },
+      { id: 'mine_pierre', nom: 'Mine de pierre', desc: "Produit de la pierre.", type: 'prod', niveau: 0, max: 5, cout: { bois: 5 } },
+      { id: 'mine_cuivre', nom: 'Mine de cuivre', desc: "Produit du cuivre.", type: 'prod', niveau: 0, max: 3, cout: { pierre: 10 } },
+      { id: 'ferme', nom: 'Ferme', desc: "Produit de la nourriture.", type: 'prod', niveau: 0, max: 5, cout: { bois: 8 } },
+      { id: 'tailleur', nom: 'Atelier de tailleur', desc: "Augmente le confort de la population.", type: 'confort', niveau: 0, max: 3, cout: { bois: 10, nourriture: 5 } },
+      { id: 'caserne', nom: 'Caserne', desc: "Permet de recruter des armées.", type: 'mil', niveau: 0, max: 1, cout: { pierre: 20, bois: 20 } },
+      { id: 'tour', nom: 'Tour de défense', desc: "Améliore la défense.", type: 'def', niveau: 0, max: 4, cout: { pierre: 15, cuivre: 5 } },
+      { id: 'bat_politique', nom: 'Bâtiment politique', desc: "Débloque la politique.", type: 'util', niveau: 0, max: 1, cout: { pierre: 30, bois: 20 } },
+      { id: 'bat_eco', nom: 'Bâtiment économique', desc: "Débloque l'économie avancée.", type: 'util', niveau: 0, max: 1, cout: { pierre: 30, bois: 20 } },
+      { id: 'lab', nom: 'Laboratoire de recherche', desc: "Permet de lancer des recherches.", type: 'util', niveau: 0, max: 1, cout: { pierre: 25, bois: 15 } },
+      { id: 'forge', nom: 'Forge', desc: "Permet de fabriquer des armes.", type: 'prod', niveau: 0, max: 2, cout: { cuivre: 10, pierre: 10 } },
+      { id: 'temple', nom: 'Temple', desc: "Augmente le moral et la loyauté.", type: 'confort', niveau: 0, max: 1, cout: { pierre: 20, nourriture: 10 } },
+      { id: 'bibliotheque', nom: 'Bibliothèque', desc: "Accélère les recherches.", type: 'util', niveau: 0, max: 1, cout: { bois: 25, nourriture: 10 } },
+      { id: 'port', nom: 'Port', desc: "Permet le commerce maritime.", type: 'util', niveau: 0, max: 1, cout: { bois: 40, pierre: 20 } },
+      { id: 'observatoire', nom: 'Observatoire', desc: "Débloque des recherches avancées.", type: 'util', niveau: 0, max: 1, cout: { cuivre: 20, pierre: 20 } },
+      { id: 'jardin', nom: 'Jardin public', desc: "Augmente le confort et la santé.", type: 'confort', niveau: 0, max: 2, cout: { nourriture: 15, bois: 10 } },
+      { id: 'banque', nom: 'Banque', desc: "Augmente la capacité de stockage d'or.", type: 'eco', niveau: 0, max: 1, cout: { pierre: 30, bois: 30 } },
+      { id: 'atelier', nom: "Atelier d'artisan", desc: "Produit des objets spéciaux.", type: 'prod', niveau: 0, max: 2, cout: { bois: 20, cuivre: 10 } },
+      { id: 'tour_mage', nom: 'Tour de mage', desc: "Débloque des pouvoirs magiques.", type: 'util', niveau: 0, max: 1, cout: { cuivre: 30, nourriture: 20 } },
+      { id: 'arene', nom: 'Arène', desc: "Organise des tournois pour la population.", type: 'confort', niveau: 0, max: 1, cout: { pierre: 25, nourriture: 15 } },
+      { id: 'statue', nom: 'Statue héroïque', desc: "Augmente le prestige de la ville.", type: 'confort', niveau: 0, max: 1, cout: { pierre: 50 } },
+      { id: 'hopital', nom: 'Hôpital', desc: "Soigne la population et les armées.", type: 'util', niveau: 0, max: 1, cout: { pierre: 20, nourriture: 20 } },
+      { id: 'entrepot', nom: 'Entrepôt', desc: "Augmente la capacité de stockage.", type: 'util', niveau: 0, max: 2, cout: { bois: 20, pierre: 10 } },
+    ];
+
+    const defaultBase = {
+      globalScore: 0,
+      basePos: { x: 0, y: 0 },
+      population: 10,
+      economie: 100,
+      politique: 'République',
+      ressources: { bois: 0, pierre: 0, cuivre: 0, nourriture: 0, or: 0 },
+      batiments: {},
+      armees: [],
+      defense: 0,
+      lab: 0,
+      heros: [],
+      recherches: [],
+      popConfort: 0,
+      popFood: 0,
+      lois: [],
+      economieFacteurs: {},
+    };
+
+    function loadBatiment() {
+      let base = {};
+      try { base = JSON.parse(localStorage.getItem('playerBase') || '{}'); } catch(e) { base = {}; }
+      base = Object.assign({}, defaultBase, base);
+      const bat = BATIMENTS.find(b => b.id === batId);
+      const detailDiv = document.getElementById('batiment-detail');
+      if (!bat) {
+        detailDiv.innerHTML = '<div>Bâtiment inconnu.</div>';
+        return;
+      }
+      const niveau = base.batiments[bat.id] || 0;
+      let coutStr = '';
+      if (bat.cout) {
+        coutStr = 'Coût : ' + Object.entries(bat.cout).map(([k,v]) => `${v} ${k}`).join(', ');
+      }
+      let btnText = 'Construire';
+      let btnDisabled = false;
+      let btnAction = 'construire';
+      if (bat.id === 'marche' && niveau > 0) {
+        btnText = 'Utiliser';
+        btnAction = 'utiliser';
+      } else if (niveau >= bat.max) {
+        btnText = 'Max';
+        btnDisabled = true;
+      }
+      detailDiv.innerHTML = `
+        <div class="bat-title">${bat.nom}</div>
+        <div class="bat-desc">${bat.desc}</div>
+        <div class="bat-info">Niveau actuel : <span class="stat-value">${niveau}</span> / ${bat.max}</div>
+        ${coutStr ? `<div class='bat-info'>${coutStr}</div>` : ''}
+        <button class="action-btn" id="batiment-action-btn" ${btnDisabled ? 'disabled' : ''}>${btnText}</button>
+        <button class="action-btn" onclick="window.location.href='base.html'">Retour à la base</button>
+      `;
+      document.getElementById('batiment-action-btn').onclick = function() {
+        if (btnAction === 'construire') construireBatiment(bat.id);
+        else if (btnAction === 'utiliser') ouvrirMarche(base);
+      };
+    }
+
+    function construireBatiment(id) {
+      let base = {};
+      try { base = JSON.parse(localStorage.getItem('playerBase') || '{}'); } catch(e) { base = {}; }
+      base = Object.assign({}, defaultBase, base);
+      const bat = BATIMENTS.find(b => b.id === id);
+      if (!bat) return;
+      const niveau = base.batiments[bat.id] || 0;
+      if (niveau >= bat.max) return alert('Niveau maximum atteint !');
+      // Vérifier ressources
+      let ok = true, msg = '';
+      if (bat.cout) {
+        for (const [res, val] of Object.entries(bat.cout)) {
+          if (res === 'globalScore') {
+            if (base.globalScore < val) { ok = false; msg = 'Score global insuffisant !'; break; }
+          } else {
+            if ((base.ressources[res]||0) < val) { ok = false; msg = `Ressource insuffisante : ${res}`; break; }
+          }
+        }
+      }
+      if (!ok) return alert(msg);
+      // Déduire ressources
+      if (bat.cout) {
+        for (const [res, val] of Object.entries(bat.cout)) {
+          if (res === 'globalScore') base.globalScore -= val;
+          else base.ressources[res] = (base.ressources[res]||0) - val;
+        }
+      }
+      // Augmenter niveau
+      base.batiments[bat.id] = (base.batiments[bat.id]||0) + 1;
+
+      // Effets spéciaux pour les 10 suggestions et plus :
+      switch (bat.id) {
+        case 'forge':
+          base.ressources.or = (base.ressources.or||0) + 5 * base.batiments[bat.id];
+          alert("La forge produit 5 or à chaque niveau !");
+          break;
+        case 'temple':
+          base.popConfort += 10;
+          alert("Le temple augmente le confort de 10 !");
+          break;
+        case 'bibliotheque':
+          base.lab = (base.lab||0) + 1;
+          alert("La bibliothèque accélère les recherches (niveau de labo +1) !");
+          break;
+        case 'port':
+          base.ressources.nourriture = (base.ressources.nourriture||0) + 10;
+          alert("Le port permet d'importer 10 nourriture !");
+          break;
+        case 'observatoire':
+          base.lab = (base.lab||0) + 2;
+          alert("L'observatoire débloque des recherches avancées (labo +2) !");
+          break;
+        case 'jardin':
+          base.popConfort += 5;
+          base.population += 2;
+          alert("Le jardin public augmente le confort de 5 et la population de 2 !");
+          break;
+        case 'banque':
+          base.economie += 50;
+          alert("La banque augmente la capacité économique de 50 !");
+          break;
+        case 'atelier':
+          base.ressources.or = (base.ressources.or||0) + 10;
+          alert("L'atelier d'artisan produit 10 or !");
+          break;
+        case 'tour_mage':
+          base.popConfort += 7;
+          alert("La tour de mage augmente le confort de 7 (pouvoirs magiques) !");
+          break;
+        case 'arene':
+          base.popConfort += 8;
+          base.population += 1;
+          alert("L'arène augmente le confort de 8 et la population de 1 !");
+          break;
+        case 'statue':
+          base.economie += 20;
+          alert("La statue héroïque augmente le prestige et l'économie de 20 !");
+          break;
+        case 'hopital':
+          base.population += 5;
+          alert("L'hôpital soigne la population (+5) !");
+          break;
+        case 'entrepot':
+          base.ressources.bois += 10;
+          base.ressources.pierre += 10;
+          alert("L'entrepôt augmente le stockage de 10 bois et 10 pierre !");
+          break;
+        // Ajoutez d'autres effets spéciaux ici si besoin
+      }
+
+      localStorage.setItem('playerBase', JSON.stringify(base));
+      loadBatiment();
+    }
+
+    function ouvrirMarche(base) {
+      let choix = prompt("Échanger combien de score global contre 1 ressource de votre choix ? (10 points = 1 ressource)\nTapez le nom de la ressource (bois, pierre, cuivre, nourriture, or) :", "bois");
+      if (!choix) return;
+      choix = choix.toLowerCase();
+      if (!['bois','pierre','cuivre','nourriture','or'].includes(choix)) return alert('Ressource inconnue.');
+      if (base.globalScore < 10) return alert('Score global insuffisant !');
+      base.globalScore -= 10;
+      base.ressources[choix] = (base.ressources[choix]||0) + 1;
+      alert(`Vous avez échangé 10 points contre 1 ${choix} !`);
+      localStorage.setItem('playerBase', JSON.stringify(base));
+      loadBatiment();
+    }
+
+    loadBatiment();
+  </script>
+</body>
+</html>
