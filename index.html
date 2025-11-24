@@ -482,8 +482,40 @@ header {
     <nav class="navbar">
         <div class="nav-left">
             <span class="nav-title">🎯 Quiz Master</span>
-            <button class="action-btn" onclick="window.location.href='index.html'" style="margin-left:18px;">Quiz</button>
-            <button class="action-btn" onclick="window.location.href='base.html'" style="margin-left:8px;">Base</button>
+            <!-- Le bouton Quiz principal n'est pas affiché sur index.html, seulement dans batiment.html -->
+            <button class="action-btn" id="base-btn" onclick="window.location.href='base.html'" style="margin-left:8px; display:none;">Base</button>
+        <script>
+        // Afficher/Masquer le bouton Base selon le score global
+        function updateBaseBtnVisibility(globalScore) {
+            const baseBtn = document.getElementById('base-btn');
+            if (!baseBtn) return;
+            if (globalScore >= 200) {
+                baseBtn.style.display = '';
+                baseBtn.disabled = false;
+                baseBtn.classList.remove('disabled');
+                baseBtn.title = '';
+            } else {
+                baseBtn.style.display = '';
+                baseBtn.disabled = true;
+                baseBtn.classList.add('disabled');
+                baseBtn.title = 'Débloqué à 200 points globaux';
+            }
+        }
+
+        // Hook sur le chargement des données utilisateur pour mettre à jour le bouton Base
+        const _origLoadUserData = window.loadUserData;
+        window.loadUserData = async function() {
+            const result = await _origLoadUserData.apply(this, arguments);
+            try {
+                const userDocRef = doc(db, 'users', currentUser.uid);
+                const userDoc = await getDoc(userDocRef);
+                let userData = userDoc.data();
+                if (!userData) return result;
+                updateBaseBtnVisibility(userData.globalScore || 0);
+            } catch (e) {}
+            return result;
+        };
+        </script>
         </div>
 
         <div class="nav-right" id="nav-logged-out">

@@ -15,6 +15,13 @@
     .stat-value { font-weight: bold; color: #fff; }
     .action-btn { margin: 10px 0; padding: 12px 25px; border-radius: 10px; background: #3a3a50; border: none; cursor: pointer; color: #f0f0f0; transition: 0.25s; }
     .action-btn:hover { background: #4e4e6a; }
+    .btn-disabled, .action-btn[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed !important;
+      background: #444 !important;
+      color: #ccc !important;
+      border: 1px solid #333 !important;
+    }
   </style>
 </head>
 <body>
@@ -77,8 +84,21 @@
       let base = {};
       try { base = JSON.parse(localStorage.getItem('playerBase') || '{}'); } catch(e) { base = {}; }
       base = Object.assign({}, defaultBase, base);
-      const bat = BATIMENTS.find(b => b.id === batId);
       const detailDiv = document.getElementById('batiment-detail');
+      if (!batId) {
+        // Afficher la liste de tous les bâtiments
+        let html = '<h2>Liste des bâtiments</h2><ul style="list-style:none;padding:0;">';
+        BATIMENTS.forEach(bat => {
+          const niveau = base.batiments[bat.id] || 0;
+          const isMax = niveau >= bat.max;
+          html += `<li style='margin-bottom:18px;'><b>${bat.nom}</b> (Niv. <span class=\"stat-value\">${niveau}</span>/${bat.max})<br><small>${bat.desc}</small><br>`;
+          html += `<button class='action-btn${isMax ? ' btn-disabled' : ''}' ${isMax ? 'disabled' : ''} onclick=\"${isMax ? '' : `window.location.href='batiment.html?id=${bat.id}'`}\">${isMax ? 'Max' : 'Détail'}</button></li>`;
+        });
+        html += '</ul><button class="action-btn" onclick="window.location.href=\'base.html\'">Retour à la base</button>';
+        detailDiv.innerHTML = html;
+        return;
+      }
+      const bat = BATIMENTS.find(b => b.id === batId);
       if (!bat) {
         detailDiv.innerHTML = '<div>Bâtiment inconnu.</div>';
         return;
@@ -104,6 +124,7 @@
         <div class="bat-info">Niveau actuel : <span class="stat-value">${niveau}</span> / ${bat.max}</div>
         ${coutStr ? `<div class='bat-info'>${coutStr}</div>` : ''}
         <button class="action-btn" id="batiment-action-btn" ${btnDisabled ? 'disabled' : ''}>${btnText}</button>
+        <button class="action-btn" onclick="window.location.href='batiment.html'">← Liste des bâtiments</button>
         <button class="action-btn" onclick="window.location.href='base.html'">Retour à la base</button>
       `;
       document.getElementById('batiment-action-btn').onclick = function() {
