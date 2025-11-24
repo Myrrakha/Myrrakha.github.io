@@ -268,10 +268,12 @@
     for (let i = 1; i <= 5; i++) {
       const btn = document.getElementById('btn-chinois-' + i);
       if (!btn) continue;
-      btn.onclick = function() {
-        if (btn.disabled) {
+      btn.onclick = function(e) {
+        updateChineseButtons(); // Toujours mettre à jour l'état visuel
+        if (btn.disabled || btn.classList.contains('dropdown-item-disabled')) {
+          e.preventDefault();
           alert(`Vous devez avoir ${requiredChineseUnlock[i]} points globaux pour débloquer ce niveau !`);
-          return;
+          return false;
         }
         window.location.hash = '#' + i;
         dropdown.classList.remove('open');
@@ -288,12 +290,13 @@
       updateChineseButtons();
       const h = window.location.hash.replace('#','');
       if (quizData[h]) {
-        // Vérifier si le niveau est débloqué
         if (getGlobalScore() < requiredChineseUnlock[h]) {
           quizDesc.textContent = `Niveau ${h} verrouillé : ${requiredChineseUnlock[h]} points globaux requis.`;
           quizSetup.style.display = '';
           quizMain.style.display = 'none';
           quizResult.style.display = 'none';
+          // Réinitialise le hash si niveau non débloqué
+          window.location.hash = '';
           return;
         }
         quizDesc.textContent = quizData[h].desc;
@@ -301,6 +304,8 @@
       }
     }
     window.addEventListener('hashchange', checkHash);
+    // Toujours mettre à jour l'état visuel au chargement
+    updateChineseButtons();
     checkHash();
   </script>
 </body>
