@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Quiz Master - Réglages</title>
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #1c1c24, #0f1115);
+    color: #f0f0f0;
+}
+header {
+    width: 100%;
+    background: rgba(20, 20, 28, 0.8);
+    border-bottom: 1px solid #333;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.navbar {
+    max-width: 1100px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+}
+.nav-title {
+    font-size: 1.4em;
+    font-weight: 600;
+    color: #eaeaea;
+    letter-spacing: 1px;
+}
+.settings-container {
+    max-width: 500px;
+    margin: 40px auto;
+    background: #232336;
+    border-radius: 15px;
+    padding: 30px 24px 24px 24px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+.settings-container h2 {
+    text-align: center;
+    margin-top: 0;
+}
+.form-group {
+    margin-bottom: 22px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1em;
+}
+input[type="file"] {
+    color: #f0f0f0;
+}
+.avatar-preview {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+.avatar-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #9c28a7;
+    background: #181824;
+}
+.reward-list {
+    margin-top: 30px;
+    background: #292940;
+    border-radius: 12px;
+    padding: 18px;
+}
+.reward-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+.reward-icon {
+    font-size: 1.6em;
+}
+.btn {
+    padding: 10px 22px;
+    border-radius: 8px;
+    background: #9c28a7;
+    color: white;
+    border: none;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-top: 10px;
+}
+.btn:hover {
+    background: #7d1f85;
+}
+.link-btn {
+    background: #3a3a50;
+    color: #f0f0f0;
+    margin-left: 10px;
+}
+.link-btn:hover {
+    background: #4e4e6a;
+}
+</style>
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <div class="nav-left">
+            <span class="nav-title">🎯 Quiz Master</span>
+        </div>
+        <div class="nav-right">
+            <button class="btn link-btn" onclick="window.location.href='index.html'">Accueil</button>
+        </div>
+    </nav>
+</header>
+<main>
+    <div class="settings-container">
+        <h2>Réglages & Profil</h2>
+        <div class="form-group">
+            <label for="avatar-input">Avatar personnalisé :</label>
+            <div class="avatar-preview">
+                <img id="avatar-img" class="avatar-img" src="images/default-avatar.png" alt="Avatar" />
+                <input type="file" id="avatar-input" accept="image/*" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="pseudo-input">Pseudo :</label>
+            <input type="text" id="pseudo-input" value="" />
+        </div>
+        <button class="btn" id="save-btn">Enregistrer</button>
+        <div id="save-msg" style="margin-top:10px;color:#2ecc71;display:none;">Profil enregistré !</div>
+        <div class="reward-list">
+            <h3>Récompenses débloquées</h3>
+            <div id="rewards-container">
+                <div style="opacity:0.7;">Chargement...</div>
+            </div>
+        </div>
+    </div>
+</main>
+<script type="module">
+// Simule l'accès au profil utilisateur (Firebase ou localStorage)
+const avatarImg = document.getElementById('avatar-img');
+const avatarInput = document.getElementById('avatar-input');
+const pseudoInput = document.getElementById('pseudo-input');
+const saveBtn = document.getElementById('save-btn');
+const saveMsg = document.getElementById('save-msg');
+const rewardsContainer = document.getElementById('rewards-container');
+
+// --- Gestion avatar ---
+// Charge l'avatar depuis localStorage
+function loadAvatar() {
+    const avatarData = localStorage.getItem('quiz_avatar');
+    if (avatarData) {
+        avatarImg.src = avatarData;
+    }
+}
+avatarInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        avatarImg.src = evt.target.result;
+        localStorage.setItem('quiz_avatar', evt.target.result);
+    };
+    reader.readAsDataURL(file);
+});
+
+// --- Gestion pseudo ---
+function loadPseudo() {
+    const pseudo = localStorage.getItem('quiz_pseudo');
+    if (pseudo) pseudoInput.value = pseudo;
+}
+saveBtn.addEventListener('click', () => {
+    localStorage.setItem('quiz_pseudo', pseudoInput.value);
+    saveMsg.style.display = 'block';
+    setTimeout(() => saveMsg.style.display = 'none', 1500);
+});
+
+// --- Récompenses personnalisées ---
+function loadRewards() {
+    // Simule le score global (à remplacer par Firebase si besoin)
+    const score = parseInt(localStorage.getItem('quiz_score') || '0', 10);
+    const rewards = [];
+    if (score >= 10) rewards.push({icon:'🌱', label:'Débutant'});
+    if (score >= 50) rewards.push({icon:'📚', label:'Intermédiaire'});
+    if (score >= 150) rewards.push({icon:'⭐', label:'Avancé'});
+    if (score >= 300) rewards.push({icon:'🏆', label:'Expert'});
+    if (score >= 500) rewards.push({icon:'👑', label:'Maître'});
+    if (rewards.length === 0) {
+        rewardsContainer.innerHTML = '<div style="opacity:0.7;">Aucune récompense débloquée pour le moment.</div>';
+    } else {
+        rewardsContainer.innerHTML = '';
+        rewards.forEach(r => {
+            const div = document.createElement('div');
+            div.className = 'reward-item';
+            div.innerHTML = `<span class="reward-icon">${r.icon}</span> <span>${r.label}</span>`;
+            rewardsContainer.appendChild(div);
+        });
+    }
+}
+
+// --- Navigation depuis la page d'accueil ---
+// (Sur index.html, ajoute un bouton ou lien pour aller ici)
+
+// --- Initialisation ---
+loadAvatar();
+loadPseudo();
+loadRewards();
+</script>
+</body>
+</html>

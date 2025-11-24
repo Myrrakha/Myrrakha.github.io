@@ -486,6 +486,7 @@ header {
 
         <div class="nav-right" id="nav-logged-out">
             <!-- Vide quand déconnecté -->
+            <button class="action-btn" onclick="window.location.href='settings.html'" style="margin-left:10px;">Réglages</button>
         </div>
 
         <div class="nav-right hidden" id="nav-logged-in">
@@ -506,6 +507,7 @@ header {
                         <button class="dropdown-item" data-mode="6">Mode 6 : Mix Total</button>
                     </div>
                 </div>
+                <button class="action-btn" onclick="window.location.href='settings.html'" style="margin-left:10px;">Réglages</button>
                 <button class="logout-btn" onclick="logout()">Déconnexion</button>
             </div>
         </div>
@@ -753,15 +755,15 @@ const departements = [
 ];
 
 const modes = {
-    1: { time: 20, qTime: 3, lives: 5, questionType: "nom_to_num" },
-    2: { time: 20, qTime: 3, lives: 5, questionType: "num_to_nom" },
-    3: { time: 30, qTime: 3, lives: 5, questionType: "shape_to_nom_num" },
-    4: { time: 40, qTime: 4, lives: 5, questionType: "prefecture_to_nom" },
-    5: { time: 40, qTime: 4, lives: 5, questionType: "mix_nom_num_prefecture" },
-    6: { time: 50, qTime: 4, lives: 5, questionType: "mix_all" }
+    1: { time: 40, qTime: 4, lives: 5, questionType: "nom_to_num" },
+    2: { time: 40, qTime: 4, lives: 5, questionType: "num_to_nom" },
+    3: { time: 80, qTime: 8, lives: 8, questionType: "shape_to_nom_num" },
+    4: { time: 70, qTime: 7, lives: 7, questionType: "prefecture_to_nom" },
+    5: { time: 60, qTime: 4, lives: 6, questionType: "mix_nom_num_prefecture" },
+    6: { time: 70, qTime: 4, lives: 7, questionType: "mix_all" }
 };
 
-const requiredModeUnlock = { 2: 10, 3: 10, 4: 10, 5: 10, 6: 15 };
+const requiredModeUnlock = { 2: 10, 3: 30, 4: 60, 5: 90, 6: 125 };
 
 let currentMode = 0, score = 0, lives = 0, timeLeft = 0, qTime = 0;
 let timerInterval = null, qTimerInterval = null, awaitingNext = false;
