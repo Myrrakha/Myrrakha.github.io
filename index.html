@@ -502,17 +502,44 @@ header {
             }
         }
 
+        // Fallback localStorage si Firestore échoue
+        function updateBaseBtnVisibilityFallback() {
+            let globalScore = 0;
+            try {
+                // Essayons de lire le score global du localStorage (utilisé dans quiz-chinois/settings)
+                const localScore = localStorage.getItem('globalScore');
+                if (localScore !== null && !isNaN(parseInt(localScore))) {
+                    globalScore = parseInt(localScore);
+                }
+            } catch (e) {}
+            updateBaseBtnVisibility(globalScore);
+        }
+
+        // Appel initial au chargement de la page pour afficher le bouton Base si localStorage le permet
+        if (typeof updateBaseBtnVisibilityFallback === 'function') {
+            updateBaseBtnVisibilityFallback();
+        }
+
         // Hook sur le chargement des données utilisateur pour mettre à jour le bouton Base
         const _origLoadUserData = window.loadUserData;
         window.loadUserData = async function() {
             const result = await _origLoadUserData.apply(this, arguments);
+            let updated = false;
             try {
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
                 let userData = userDoc.data();
-                if (!userData) return result;
-                updateBaseBtnVisibility(userData.globalScore || 0);
-            } catch (e) {}
+                if (userData) {
+                    updateBaseBtnVisibility(userData.globalScore || 0);
+                    updated = true;
+                }
+            } catch (e) {
+                // Si Firestore échoue, on tente le fallback localStorage
+                updateBaseBtnVisibilityFallback();
+                updated = true;
+            }
+            // Si rien n'a marché, on tente le fallback localStorage
+            if (!updated) updateBaseBtnVisibilityFallback();
             return result;
         };
         </script>
@@ -541,11 +568,11 @@ header {
                         <button class="dropdown-item" data-mode="6">Mode 6 : Mix Total</button>
                         <hr style="margin:10px 0; border:0; border-top:1px solid #444;">
                         <span class="dropdown-subtitle">🇨🇳 Quiz Chinois simplifié</span>
-                        <button class="dropdown-item" onclick="window.location.href='quiz-chinois.html#1'">Niveau 1 : Chiffres 1-10</button>
-                        <button class="dropdown-item" onclick="window.location.href='quiz-chinois.html#2'">Niveau 2 : Jours de la semaine</button>
-                        <button class="dropdown-item" onclick="window.location.href='quiz-chinois.html#3'">Niveau 3 : Couleurs de base</button>
-                        <button class="dropdown-item" onclick="window.location.href='quiz-chinois.html#4'">Niveau 4 : Membres famille</button>
-                        <button class="dropdown-item" onclick="window.location.href='quiz-chinois.html#5'">Niveau 5 : Animaux courants</button>
+                        <button class="dropdown-item quiz-chinois-btn" data-chinois-level="1" onclick="window.location.href='quiz-chinois.html#1'">Niveau 1 : Chiffres 1-10</button>
+                        <button class="dropdown-item quiz-chinois-btn" data-chinois-level="2" onclick="window.location.href='quiz-chinois.html#2'">Niveau 2 : Jours de la semaine</button>
+                        <button class="dropdown-item quiz-chinois-btn" data-chinois-level="3" onclick="window.location.href='quiz-chinois.html#3'">Niveau 3 : Couleurs de base</button>
+                        <button class="dropdown-item quiz-chinois-btn" data-chinois-level="4" onclick="window.location.href='quiz-chinois.html#4'">Niveau 4 : Membres famille</button>
+                        <button class="dropdown-item quiz-chinois-btn" data-chinois-level="5" onclick="window.location.href='quiz-chinois.html#5'">Niveau 5 : Animaux courants</button>
                     </div>
                 </div>
                 <button class="action-btn" onclick="window.location.href='settings.html'" style="margin-left:10px;">Réglages</button>
@@ -669,6 +696,28 @@ header {
 <div id="hover-warning"></div>
 
 <script type="module">
+// Score requis pour chaque niveau quiz chinois
+const chinoisRequired = { 1: 0, 2: 10, 3: 30, 4: 60, 5: 90 };
+
+// Met à jour l'état des boutons quiz chinois selon le globalScore
+function updateChinoisLevelButtons(globalScore) {
+    document.querySelectorAll('.quiz-chinois-btn').forEach(btn => {
+        const level = parseInt(btn.dataset.chinoisLevel);
+        const required = chinoisRequired[level] || 0;
+        if (globalScore < required) {
+            btn.classList.add('disabled');
+            btn.disabled = true;
+            btn.title = `Débloqué à ${required} points globaux`;
+            btn.addEventListener('mouseenter', function(e) {
+                showHoverWarning(`Débloqué à ${required} points globaux`, e.pageX, e.pageY);
+            });
+        } else {
+            btn.classList.remove('disabled');
+            btn.disabled = false;
+            btn.title = '';
+        }
+    });
+}
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -937,9 +986,19 @@ async function loadUserData() {
         
         // Update mode buttons based on global score
         updateModeButtons(userData.globalScore || 0);
+        updateChinoisLevelButtons(userData.globalScore || 0);
     } catch (error) {
         console.error('Erreur chargement données:', error);
         alert('Erreur de chargement. Essayez de vous reconnecter.');
+        // Fallback localStorage pour le globalScore
+        let globalScore = 0;
+        try {
+            const localScore = localStorage.getItem('globalScore');
+            if (localScore !== null && !isNaN(parseInt(localScore))) {
+                globalScore = parseInt(localScore);
+            }
+        } catch (e) {}
+        updateChinoisLevelButtons(globalScore);
     }
 }
 
