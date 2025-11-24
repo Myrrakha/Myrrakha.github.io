@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz Master - Chinois simplifié</title>
+  <link rel="stylesheet" href="index.html">
+  <style>
+    body { background: linear-gradient(135deg, #0f1115, #1c1c24); color: #f0f0f0; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; }
+    .center { max-width: 600px; margin: 60px auto; background: #23233a; border-radius: 16px; padding: 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+    h1 { text-align: center; }
+    .action-btn { margin: 10px; padding: 12px 25px; border-radius: 10px; background: #3a3a50; border: none; cursor: pointer; color: #f0f0f0; transition: 0.25s; }
+    .action-btn:hover { background: #4e4e6a; }
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-btn { padding: 10px 20px; border-radius: 10px; background: #2e2e3d; color: #f0f0f0; border: none; cursor: pointer; font-weight: 500; transition: 0.25s; }
+    .dropdown-content { position: absolute; right: 0; top: 45px; background: #1f1f28; border-radius: 12px; padding: 10px; width: 260px; display: none; flex-direction: column; gap: 8px; border: 1px solid #333; box-shadow: 0 8px 20px rgba(0,0,0,0.4); z-index: 100; }
+    .dropdown.open .dropdown-content { display: flex; }
+    .dropdown-subtitle { font-size: 0.9em; color: #cfcfcf; margin: 5px 0; }
+    .dropdown-item { width: 100%; padding: 10px 15px; border-radius: 8px; border: none; background: #2c2c3a; color: #eaeaea; text-align: left; cursor: pointer; transition: 0.25s; }
+    .dropdown-item:hover { background: #3d3d50; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="nav-left">
+        <span class="nav-title">🎯 Quiz Master</span>
+      </div>
+      <div class="nav-right">
+        <div class="dropdown">
+          <button class="dropdown-btn">Quiz ▾</button>
+          <div class="dropdown-content">
+            <span class="dropdown-subtitle">📍 Quiz Départements</span>
+            <button class="dropdown-item" onclick="window.location.href='index.html'">Retour Quiz Départements</button>
+            <hr style="margin:10px 0; border:0; border-top:1px solid #444;">
+            <span class="dropdown-subtitle">🇨🇳 Quiz Chinois simplifié</span>
+            <button class="dropdown-item" id="btn-chinois-1">Niveau 1 : Chiffres 1-10</button>
+            <button class="dropdown-item" id="btn-chinois-2">Niveau 2 : Jours de la semaine</button>
+            <button class="dropdown-item" id="btn-chinois-3">Niveau 3 : Couleurs de base</button>
+            <button class="dropdown-item" id="btn-chinois-4">Niveau 4 : Membres famille</button>
+            <button class="dropdown-item" id="btn-chinois-5">Niveau 5 : Animaux courants</button>
+          </div>
+        </div>
+        <button class="action-btn" onclick="window.location.href='settings.html'" style="margin-left:10px;">Réglages</button>
+      </div>
+    </nav>
+  </header>
+  <div class="center">
+    <h1>Quiz Chinois simplifié</h1>
+    <div id="quiz-setup">
+      <p id="quiz-desc">Choisissez un niveau dans le menu pour commencer !</p>
+    </div>
+    <div id="quiz-main" style="display:none;">
+      <div id="quiz-question" style="font-size:1.5em;margin-bottom:24px;"></div>
+      <div id="quiz-answers" style="display:flex;flex-direction:column;gap:14px;"></div>
+      <div style="margin:18px 0 0 0;">
+        <span>Score : <span id="quiz-score">0</span></span>
+        <span style="margin-left:30px;">Vies : <span id="quiz-lives">❤❤❤</span></span>
+      </div>
+      <button class="action-btn" id="quiz-next-btn" style="display:none;margin-top:24px;">Question suivante</button>
+      <button class="action-btn" id="quiz-restart-btn" style="display:none;margin-top:24px;">Recommencer</button>
+    </div>
+    <div id="quiz-result" style="display:none;text-align:center;margin-top:30px;">
+      <h2>Fin du quiz !</h2>
+      <div style="font-size:1.2em;margin:18px 0;">Score final : <span id="quiz-final-score">0</span></div>
+      <button class="action-btn" onclick="window.location.reload()">Retour au choix du niveau</button>
+    </div>
+  </div>
+  <script>
+    // Dropdown JS (même logique que index.html)
+    const dropdown = document.querySelector('.dropdown');
+    const dropdownBtn = document.querySelector('.dropdown-btn');
+    dropdownBtn.addEventListener('click', () => dropdown.classList.toggle('open'));
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target)) dropdown.classList.remove('open');
+    });
+
+    // --- Quiz chinois ---
+    const quizData = {
+      1: {
+        desc: "Niveau 1 : Chiffres 1-10",
+        questions: [
+          { q: "Quel est le caractère pour 1 ?", a: "一", opts: ["一", "二", "三", "十"] },
+          { q: "Quel est le caractère pour 2 ?", a: "二", opts: ["二", "五", "八", "六"] },
+          { q: "Quel est le caractère pour 3 ?", a: "三", opts: ["三", "九", "四", "七"] },
+          { q: "Quel est le caractère pour 4 ?", a: "四", opts: ["四", "五", "六", "三"] },
+          { q: "Quel est le caractère pour 5 ?", a: "五", opts: ["五", "八", "一", "十"] },
+          { q: "Quel est le caractère pour 6 ?", a: "六", opts: ["六", "九", "二", "八"] },
+          { q: "Quel est le caractère pour 7 ?", a: "七", opts: ["七", "三", "十", "四"] },
+          { q: "Quel est le caractère pour 8 ?", a: "八", opts: ["八", "五", "六", "九"] },
+          { q: "Quel est le caractère pour 9 ?", a: "九", opts: ["九", "一", "七", "二"] },
+          { q: "Quel est le caractère pour 10 ?", a: "十", opts: ["十", "三", "八", "五"] },
+        ]
+      },
+      2: {
+        desc: "Niveau 2 : Jours de la semaine",
+        questions: [
+          { q: "Comment écrit-on 'lundi' en chinois simplifié ?", a: "星期一", opts: ["星期一", "星期天", "星期三", "星期五"] },
+          { q: "Comment écrit-on 'mardi' ?", a: "星期二", opts: ["星期二", "星期四", "星期日", "星期六"] },
+          { q: "Comment écrit-on 'mercredi' ?", a: "星期三", opts: ["星期三", "星期一", "星期五", "星期天"] },
+          { q: "Comment écrit-on 'jeudi' ?", a: "星期四", opts: ["星期四", "星期二", "星期六", "星期三"] },
+          { q: "Comment écrit-on 'vendredi' ?", a: "星期五", opts: ["星期五", "星期日", "星期一", "星期四"] },
+          { q: "Comment écrit-on 'samedi' ?", a: "星期六", opts: ["星期六", "星期三", "星期五", "星期二"] },
+          { q: "Comment écrit-on 'dimanche' ?", a: "星期天", opts: ["星期天", "星期六", "星期一", "星期五"] },
+        ]
+      },
+      3: {
+        desc: "Niveau 3 : Couleurs de base",
+        questions: [
+          { q: "Comment écrit-on 'rouge' ?", a: "红色", opts: ["红色", "蓝色", "黄色", "白色"] },
+          { q: "Comment écrit-on 'bleu' ?", a: "蓝色", opts: ["蓝色", "绿色", "黑色", "红色"] },
+          { q: "Comment écrit-on 'jaune' ?", a: "黄色", opts: ["黄色", "白色", "蓝色", "黑色"] },
+          { q: "Comment écrit-on 'vert' ?", a: "绿色", opts: ["绿色", "红色", "黄色", "蓝色"] },
+          { q: "Comment écrit-on 'noir' ?", a: "黑色", opts: ["黑色", "白色", "蓝色", "红色"] },
+          { q: "Comment écrit-on 'blanc' ?", a: "白色", opts: ["白色", "黑色", "黄色", "绿色"] },
+        ]
+      },
+      4: {
+        desc: "Niveau 4 : Membres famille",
+        questions: [
+          { q: "Comment écrit-on 'maman' ?", a: "妈妈", opts: ["妈妈", "爸爸", "哥哥", "姐姐"] },
+          { q: "Comment écrit-on 'papa' ?", a: "爸爸", opts: ["爸爸", "妈妈", "弟弟", "妹妹"] },
+          { q: "Comment écrit-on 'grand frère' ?", a: "哥哥", opts: ["哥哥", "弟弟", "姐姐", "妹妹"] },
+          { q: "Comment écrit-on 'petit frère' ?", a: "弟弟", opts: ["弟弟", "哥哥", "爸爸", "妈妈"] },
+          { q: "Comment écrit-on 'grande sœur' ?", a: "姐姐", opts: ["姐姐", "妹妹", "妈妈", "哥哥"] },
+          { q: "Comment écrit-on 'petite sœur' ?", a: "妹妹", opts: ["妹妹", "姐姐", "爸爸", "弟弟"] },
+        ]
+      },
+      5: {
+        desc: "Niveau 5 : Animaux courants",
+        questions: [
+          { q: "Comment écrit-on 'chat' ?", a: "猫", opts: ["猫", "狗", "鸟", "马"] },
+          { q: "Comment écrit-on 'chien' ?", a: "狗", opts: ["狗", "猫", "鱼", "牛"] },
+          { q: "Comment écrit-on 'oiseau' ?", a: "鸟", opts: ["鸟", "马", "狗", "猫"] },
+          { q: "Comment écrit-on 'poisson' ?", a: "鱼", opts: ["鱼", "牛", "猫", "狗"] },
+          { q: "Comment écrit-on 'cheval' ?", a: "马", opts: ["马", "鸟", "鱼", "牛"] },
+          { q: "Comment écrit-on 'vache' ?", a: "牛", opts: ["牛", "马", "猫", "狗"] },
+        ]
+      }
+    };
+
+    let quizLevel = null;
+    let quizQuestions = [];
+    let quizCurrent = 0;
+    let quizScore = 0;
+    let quizLives = 3;
+    let quizAnswered = false;
+
+    const quizSetup = document.getElementById('quiz-setup');
+    const quizMain = document.getElementById('quiz-main');
+    const quizQuestion = document.getElementById('quiz-question');
+    const quizAnswers = document.getElementById('quiz-answers');
+    const quizScoreSpan = document.getElementById('quiz-score');
+    const quizLivesSpan = document.getElementById('quiz-lives');
+    const quizNextBtn = document.getElementById('quiz-next-btn');
+    const quizRestartBtn = document.getElementById('quiz-restart-btn');
+    const quizResult = document.getElementById('quiz-result');
+    const quizFinalScore = document.getElementById('quiz-final-score');
+    const quizDesc = document.getElementById('quiz-desc');
+
+    function startQuiz(level) {
+      quizLevel = level;
+      quizQuestions = [...quizData[level].questions].sort(() => Math.random() - 0.5);
+      quizCurrent = 0;
+      quizScore = 0;
+      quizLives = 3;
+      quizAnswered = false;
+      quizSetup.style.display = 'none';
+      quizResult.style.display = 'none';
+      quizMain.style.display = '';
+      quizScoreSpan.textContent = quizScore;
+      quizLivesSpan.textContent = '❤❤❤';
+      quizRestartBtn.style.display = 'none';
+      showQuestion();
+    }
+
+    function showQuestion() {
+      quizAnswered = false;
+      quizNextBtn.style.display = 'none';
+      quizRestartBtn.style.display = 'none';
+      if (quizCurrent >= quizQuestions.length || quizLives <= 0) {
+        endQuiz();
+        return;
+      }
+      const q = quizQuestions[quizCurrent];
+      quizQuestion.innerHTML = q.q;
+      quizAnswers.innerHTML = '';
+      const opts = [...q.opts].sort(() => Math.random() - 0.5);
+      opts.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'action-btn';
+        btn.textContent = opt;
+        btn.onclick = () => selectAnswer(opt, q.a, btn);
+        quizAnswers.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(selected, correct, btn) {
+      if (quizAnswered) return;
+      quizAnswered = true;
+      Array.from(quizAnswers.children).forEach(b => {
+        b.disabled = true;
+        if (b.textContent === correct) b.style.background = '#2ecc71';
+        if (b.textContent === selected && selected !== correct) b.style.background = '#e74c3c';
+      });
+      if (selected === correct) {
+        quizScore++;
+        quizScoreSpan.textContent = quizScore;
+      } else {
+        quizLives--;
+        quizLivesSpan.textContent = '❤'.repeat(quizLives) + '♡'.repeat(3 - quizLives);
+      }
+      if (quizLives > 0 && quizCurrent < quizQuestions.length - 1) {
+        quizNextBtn.style.display = '';
+      } else {
+        quizRestartBtn.style.display = '';
+      }
+    }
+
+    quizNextBtn.onclick = () => {
+      quizCurrent++;
+      showQuestion();
+    };
+    quizRestartBtn.onclick = () => startQuiz(quizLevel);
+
+    function endQuiz() {
+      quizMain.style.display = 'none';
+      quizResult.style.display = '';
+      quizFinalScore.textContent = quizScore;
+    }
+
+    // Démarrage auto selon l'ancre (niveau)
+    // --- Déblocage des niveaux selon score global ---
+    // Pour la démo, on prend le score global depuis localStorage (clé 'globalScore'), sinon 0
+    const requiredChineseUnlock = { 1: 200, 2: 230, 3: 260, 4: 350, 5: 400 };
+    function getGlobalScore() {
+      // Essayons de lire le score global du localStorage (sauvegardé par settings ou index)
+      let score = 0;
+      try {
+        score = parseInt(localStorage.getItem('globalScore') || '0', 10);
+      } catch(e) {}
+      return isNaN(score) ? 0 : score;
+    }
+
+    function updateChineseButtons() {
+      const globalScore = getGlobalScore();
+      for (let i = 1; i <= 5; i++) {
+        const btn = document.getElementById('btn-chinois-' + i);
+        if (!btn) continue;
+        if (globalScore < requiredChineseUnlock[i]) {
+          btn.classList.add('dropdown-item-disabled');
+          btn.disabled = true;
+          btn.textContent = `Niveau ${i} (🔒 ${requiredChineseUnlock[i]} pts)`;
+        } else {
+          btn.classList.remove('dropdown-item-disabled');
+          btn.disabled = false;
+          // Remettre le texte normal
+          if (i === 1) btn.textContent = 'Niveau 1 : Chiffres 1-10';
+          if (i === 2) btn.textContent = 'Niveau 2 : Jours de la semaine';
+          if (i === 3) btn.textContent = 'Niveau 3 : Couleurs de base';
+          if (i === 4) btn.textContent = 'Niveau 4 : Membres famille';
+          if (i === 5) btn.textContent = 'Niveau 5 : Animaux courants';
+        }
+      }
+    }
+
+    // Ajout listeners pour chaque bouton
+    for (let i = 1; i <= 5; i++) {
+      const btn = document.getElementById('btn-chinois-' + i);
+      if (!btn) continue;
+      btn.onclick = function() {
+        if (btn.disabled) {
+          alert(`Vous devez avoir ${requiredChineseUnlock[i]} points globaux pour débloquer ce niveau !`);
+          return;
+        }
+        window.location.hash = '#' + i;
+        dropdown.classList.remove('open');
+      };
+    }
+
+    // Style pour les boutons désactivés
+    const style = document.createElement('style');
+    style.innerHTML = `.dropdown-item-disabled { opacity: 0.5 !important; cursor: not-allowed !important; }`;
+    document.head.appendChild(style);
+
+    // Vérifie le hash et le score à chaque affichage
+    function checkHash() {
+      updateChineseButtons();
+      const h = window.location.hash.replace('#','');
+      if (quizData[h]) {
+        // Vérifier si le niveau est débloqué
+        if (getGlobalScore() < requiredChineseUnlock[h]) {
+          quizDesc.textContent = `Niveau ${h} verrouillé : ${requiredChineseUnlock[h]} points globaux requis.`;
+          quizSetup.style.display = '';
+          quizMain.style.display = 'none';
+          quizResult.style.display = 'none';
+          return;
+        }
+        quizDesc.textContent = quizData[h].desc;
+        setTimeout(() => startQuiz(h), 500);
+      }
+    }
+    window.addEventListener('hashchange', checkHash);
+    checkHash();
+  </script>
+</body>
+</html>
