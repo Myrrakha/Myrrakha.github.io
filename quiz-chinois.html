@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Quiz Master - Chinois simplifié</title>
   <style>
-    /* === Style global (conserve l'esthétique d'origine) === */
+    /* === Style global === */
     body { background: linear-gradient(135deg, #0f1115, #1c1c24); color: #f0f0f0; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
     .navbar { background: #1a1a24; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
     .nav-title { font-size: 1.2em; font-weight: 600; }
@@ -42,7 +42,7 @@
     #quiz-result { display:none; text-align:center; }
     .final-score { font-size:1.8em; color:#2ecc71; margin:12px 0; }
 
-    /* responsive */
+    /* Responsive */
     @media (max-width:700px) {
       .answers-container { flex-direction:column; }
       #timers-container { flex-direction:column; }
@@ -52,7 +52,6 @@
 </head>
 
 <body>
-  
   <header>
     <nav class="navbar">
       <div class="nav-left"><span class="nav-title">🎯 Quiz Master - Chinois simplifié</span></div>
@@ -87,7 +86,6 @@
         <div class="question-box">
           <div id="quiz-question" class="question-text"></div>
         </div>
-
         <div class="answers-container" id="quiz-answers"></div>
       </div>
 
@@ -107,23 +105,42 @@
       <div class="final-score">Score : <span id="quiz-final-score">0</span></div>
       <p id="result-message" style="font-size:1.05em; margin:8px 0 16px 0;"></p>
 
-      <!-- IMPORTANT : retourne vers index.html (index devrait contenir tes boutons qui ouvrent quiz-chinois.html#level) -->
       <button class="action-btn" onclick="window.location.href='index.html'" style="width:100%; margin-top:8px;">Retour au menu principal</button>
       <button class="action-btn" id="retry-btn" style="width:100%; margin-top:10px;">Recommencer ce niveau</button>
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    import { getFirestore, doc, getDoc, setDoc, updateDoc }
-      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getAuth }
-      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    // ==========================================
+    // CONFIGURATION FIREBASE
+    // ==========================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
+      authDomain: "quiz-master-io.firebaseapp.com",
+      projectId: "quiz-master-io",
+      storageBucket: "quiz-master-io.firebasestorage.app",
+      messagingSenderId: "773382469164",
+      appId: "1:773382469164:web:5e24a9a62ce543f5190389"
+    };
 
-    const db = getFirestore();
-    const auth = getAuth();
-    // === Données complètes : 5 niveaux, 10 questions / niveau, 5 options / question ===
-    // Chaque opts contient la bonne réponse (a) et 4 autres distracteurs.
+    // Initialisation
+    let app, db, auth;
+    try {
+      app = initializeApp(firebaseConfig);
+      db = getFirestore(app);
+      auth = getAuth(app);
+      console.log("✅ Firebase initialisé");
+    } catch (error) {
+      console.error("❌ Erreur Firebase:", error);
+    }
+
+    // ==========================================
+    // DONNÉES DES QUIZ
+    // ==========================================
     const quizData = {
       1: {
         title: "Niveau 1 : Chiffres 1-10",
@@ -141,7 +158,6 @@
           { q: "Quel est le caractère pour <strong>10</strong> ?", a: "十", opts: ["十","三","八","五","九"] }
         ]
       },
-
       2: {
         title: "Niveau 2 : Jours de la semaine",
         subtitle: "Maîtrisez les jours de la semaine en chinois",
@@ -158,7 +174,6 @@
           { q: "Quel est le premier jour de la semaine ?", a: "星期一", opts: ["星期一","星期天","星期日","星期二","星期三"] }
         ]
       },
-
       3: {
         title: "Niveau 3 : Couleurs de base",
         subtitle: "Découvrez les couleurs en chinois simplifié",
@@ -175,7 +190,6 @@
           { q: "Quelle couleur représente 蓝色 ?", a: "Bleu", opts: ["Bleu","Blanc","Vert","Rouge","Jaune"] }
         ]
       },
-
       4: {
         title: "Niveau 4 : Membres de la famille",
         subtitle: "Apprenez à désigner les membres de la famille",
@@ -187,12 +201,11 @@
           { q: "Comment écrit-on <strong>'grande sœur'</strong> ?", a: "姐姐", opts: ["姐姐","妹妹","妈妈","哥哥","阿姨"] },
           { q: "Comment écrit-on <strong>'petite sœur'</strong> ?", a: "妹妹", opts: ["妹妹","姐姐","爸爸","弟弟","奶奶"] },
           { q: "Qui est 爸爸 ?", a: "Papa", opts: ["Papa","Maman","Grand-père","Oncle","Tante"] },
-          { q: "Qui est 姐姐 ?", a: "Grande sœur", opts: ["Grande sœur","Petite sœur","Maman","Tante","Soeur cadette"] },
-          { q: "Comment dit-on 'grand-mère' ?", a: "奶奶", opts: ["奶奶","外婆","爷爷","姥姥","爸爸"] },
-          { q: "Comment dit-on 'oncle' (frère du père) ? ", a: "叔叔", opts: ["叔叔","舅舅","伯伯","阿姨","爷爷"] }
+          { q: "Qui est 姐姐 ?", a: "Grande sœur", opts: ["Grande sœur","Petite sœur","Maman","Tante","Cousine"] },
+          { q: "Comment dit-on 'grand-mère' ?", a: "奶奶", opts: ["奶奶","外婆","爷爷","姥姥","妈妈"] },
+          { q: "Comment dit-on 'oncle' (frère du père) ?", a: "叔叔", opts: ["叔叔","舅舅","伯伯","阿姨","爷爷"] }
         ]
       },
-
       5: {
         title: "Niveau 5 : Animaux courants",
         subtitle: "Découvrez les animaux en chinois simplifié",
@@ -211,17 +224,28 @@
       }
     };
 
-    // === Variables d'état ===
+    // ==========================================
+    // CONSTANTES
+    // ==========================================
+    const TOTAL_TIME_SECONDS = 180; // 3 minutes
+    const QUESTION_TIME_SECONDS = 20; // 20 secondes par question
+    const INITIAL_LIVES = 3;
+
+    // ==========================================
+    // VARIABLES D'ÉTAT
+    // ==========================================
     let currentLevel = null;
     let questions = [];
     let currentQuestionIndex = 0;
     let score = 0;
-    let lives = 3;
+    let lives = INITIAL_LIVES;
     let answered = false;
-    let globalTimer = null;
-    let questionTimer = null;
+    let globalTimerInterval = null;
+    let questionTimerInterval = null;
 
-    // DOM
+    // ==========================================
+    // ÉLÉMENTS DOM
+    // ==========================================
     const loadingEl = document.getElementById('loading');
     const timersContainer = document.getElementById('timers-container');
     const quizMain = document.getElementById('quiz-main');
@@ -244,13 +268,65 @@
     const timerFill = document.getElementById('timer-fill');
     const questionTimerFill = document.getElementById('question-timer-fill');
 
-    // === Initialisation ===
+    // ==========================================
+    // GESTION DES TIMERS
+    // ==========================================
+    function startGlobalTimer() {
+      clearInterval(globalTimerInterval);
+      let remaining = TOTAL_TIME_SECONDS;
+      timerDisplay.textContent = remaining;
+      timerFill.style.width = '0%';
+
+      globalTimerInterval = setInterval(() => {
+        remaining--;
+        timerDisplay.textContent = remaining;
+        const percent = ((TOTAL_TIME_SECONDS - remaining) / TOTAL_TIME_SECONDS) * 100;
+        timerFill.style.width = percent + '%';
+
+        if (remaining <= 0) {
+          clearInterval(globalTimerInterval);
+          endQuiz(true); // timeout global
+        }
+      }, 1000);
+    }
+
+    function startQuestionTimer() {
+      clearInterval(questionTimerInterval);
+      let remaining = QUESTION_TIME_SECONDS;
+      questionTimerDisplay.textContent = remaining;
+      questionTimerFill.style.width = '0%';
+
+      questionTimerInterval = setInterval(() => {
+        remaining--;
+        questionTimerDisplay.textContent = remaining;
+        const percent = ((QUESTION_TIME_SECONDS - remaining) / QUESTION_TIME_SECONDS) * 100;
+        questionTimerFill.style.width = percent + '%';
+
+        if (remaining <= 0) {
+          clearInterval(questionTimerInterval);
+          handleQuestionTimeout();
+        }
+      }, 1000);
+    }
+
+    function stopQuestionTimer() {
+      clearInterval(questionTimerInterval);
+      questionTimerFill.style.width = '0%';
+    }
+
+    function stopAllTimers() {
+      clearInterval(globalTimerInterval);
+      clearInterval(questionTimerInterval);
+    }
+
+    // ==========================================
+    // GESTION DU QUIZ
+    // ==========================================
     function initQuiz() {
-      // read hash
-      const hash = window.location.hash.replace('#','');
+      const hash = window.location.hash.replace('#', '');
       const level = parseInt(hash, 10);
+
       if (!level || !quizData[level]) {
-        // si pas de level valide, retourne au menu principal
         window.location.href = 'index.html';
         return;
       }
@@ -258,16 +334,16 @@
       currentLevel = level;
       const data = quizData[level];
 
-      // setup
+      // Configuration
       quizTitle.textContent = data.title;
       quizSubtitle.textContent = data.subtitle;
-      questions = [...data.questions].sort(() => Math.random() - 0.5); // shuffle questions
+      questions = [...data.questions].sort(() => Math.random() - 0.5);
       currentQuestionIndex = 0;
       score = 0;
-      lives = 3;
+      lives = INITIAL_LIVES;
       answered = false;
 
-      // affichage
+      // Affichage
       loadingEl.style.display = 'none';
       timersContainer.style.display = 'flex';
       quizMain.style.display = 'block';
@@ -275,65 +351,14 @@
 
       updateStats();
       showQuestion();
-
       startGlobalTimer();
     }
 
-    // === Timers ===
-    function startGlobalTimer() {
-      clearInterval(globalTimer);
-      const totalSeconds = 180; // 3 minutes
-      let remaining = totalSeconds;
-      timerDisplay.textContent = remaining;
-      timerFill.style.width = '0%';
-
-      globalTimer = setInterval(() => {
-        if (remaining <= 0) {
-          clearInterval(globalTimer);
-          endQuiz(true);
-          score = correctAnswersCount;
-          return;
-        }
-        timerDisplay.textContent = remaining;
-        const percent = (1 - remaining / totalSeconds) * 100;
-        timerFill.style.width = percent + '%';
-        remaining--;
-      }, 1000);
-    }
-
-    function startQuestionTimer() {
-      clearInterval(questionTimer);
-      const qSeconds = 20;
-      let remaining = qSeconds;
-      questionTimerDisplay.textContent = remaining;
-      questionTimerFill.style.width = '0%';
-
-      questionTimer = setInterval(() => {
-        if (remaining <= 0) {
-          clearInterval(questionTimer);
-          // time's up for this question
-          handleTimeoutForQuestion();
-          return;
-        }
-        questionTimerDisplay.textContent = remaining;
-        questionTimerFill.style.width = (1 - remaining / qSeconds) * 100 + '%';
-        remaining--;
-      }, 1000);
-    }
-
-    function stopQuestionTimer() {
-      clearInterval(questionTimer);
-      questionTimerFill.style.width = '0%';
-    }
-
-    // === Affichage question / réponses ===
     function showQuestion() {
-      // stop previous timers
       stopQuestionTimer();
 
       if (currentQuestionIndex >= questions.length || lives <= 0) {
         endQuiz(false);
-        score = correctAnswersCount;
         return;
       }
 
@@ -341,73 +366,74 @@
       quizNextBtn.style.display = 'none';
       quizRestartBtn.style.display = 'none';
 
-      const q = questions[currentQuestionIndex];
-      quizQuestion.innerHTML = q.q;
+      const question = questions[currentQuestionIndex];
+      quizQuestion.innerHTML = question.q;
 
-      // build options: shuffle to randomize order
-      const shuffled = [...q.opts].sort(() => Math.random() - 0.5);
+      // Mélange des options
+      const shuffledOpts = [...question.opts].sort(() => Math.random() - 0.5);
       quizAnswers.innerHTML = '';
-      shuffled.forEach(opt => {
+
+      shuffledOpts.forEach(opt => {
         const btn = document.createElement('button');
         btn.className = 'answer-btn';
         btn.textContent = opt;
-        btn.onclick = () => selectAnswer(opt, q.a, btn);
+        btn.onclick = () => selectAnswer(opt, question.a);
         quizAnswers.appendChild(btn);
       });
 
-      // update counters
+      // Mise à jour compteurs
       quizIndex.textContent = currentQuestionIndex + 1;
       quizTotal.textContent = questions.length;
 
-      // start question timer
       startQuestionTimer();
     }
 
-    // === Réponse sélectionnée ===
-    function selectAnswer(selected, correct, clickedBtn) {
+    function selectAnswer(selected, correct) {
       if (answered) return;
       answered = true;
-
       stopQuestionTimer();
 
-      // disable all and colorize
-      Array.from(quizAnswers.children).forEach(b => {
-        b.disabled = true;
-        if (b.textContent === correct) {
-          b.style.background = '#2ecc71'; // green
-        }
-        if (b.textContent === selected && selected !== correct) {
-          b.style.background = '#e74c3c'; // red
+      // Colorisation des réponses
+      Array.from(quizAnswers.children).forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent === correct) {
+          btn.style.background = '#2ecc71';
+        } else if (btn.textContent === selected) {
+          btn.style.background = '#e74c3c';
         }
       });
 
+      // Mise à jour score/vies
       if (selected === correct) {
         score++;
       } else {
         lives--;
       }
-      updateStats();
 
-      // show next or finish
-      if (lives > 0 && currentQuestionIndex < questions.length - 1) {
-        quizNextBtn.style.display = 'block';
-      } else {
-        quizRestartBtn.style.display = 'block';
-      }
+      updateStats();
+      showNextButton();
     }
 
-    // === Timeout pour une question ===
-    function handleTimeoutForQuestion() {
-      // mark correct answer and reduce life
-      Array.from(quizAnswers.children).forEach(b => {
-        b.disabled = true;
-        // reveal correct
-        const q = questions[currentQuestionIndex];
-        if (b.textContent === q.a) b.style.background = '#2ecc71';
+    function handleQuestionTimeout() {
+      if (answered) return;
+      answered = true;
+
+      const question = questions[currentQuestionIndex];
+
+      // Révéler la bonne réponse
+      Array.from(quizAnswers.children).forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent === question.a) {
+          btn.style.background = '#2ecc71';
+        }
       });
+
       lives--;
       updateStats();
+      showNextButton();
+    }
 
+    function showNextButton() {
       if (lives > 0 && currentQuestionIndex < questions.length - 1) {
         quizNextBtn.style.display = 'block';
       } else {
@@ -415,109 +441,111 @@
       }
     }
 
-    // === Navigation boutons ===
+    function updateStats() {
+      quizScore.textContent = score;
+      quizLives.textContent = '❤'.repeat(Math.max(0, lives)) + '♡'.repeat(Math.max(0, INITIAL_LIVES - lives));
+    }
+
+    async function endQuiz(timeout = false) {
+      stopAllTimers();
+
+      quizMain.style.display = 'none';
+      quizResult.style.display = 'block';
+
+      quizFinalScore.textContent = score + ' / ' + questions.length;
+
+      // Sauvegarde du score
+      await saveQuizScore(score);
+
+      // Message personnalisé
+      if (timeout) {
+        resultMessage.textContent = '⏳ Temps écoulé ! Essayez encore — vous pouvez recommencer le niveau.';
+      } else {
+        const percentage = questions.length > 0 ? (score / questions.length) * 100 : 0;
+        if (percentage === 100) {
+          resultMessage.textContent = '🏆 Parfait ! Vous maîtrisez ce niveau !';
+        } else if (percentage >= 80) {
+          resultMessage.textContent = '👏 Excellent travail ! Continuez comme ça !';
+        } else if (percentage >= 60) {
+          resultMessage.textContent = '👍 Bon travail ! Encore un peu de pratique !';
+        } else {
+          resultMessage.textContent = '💪 Continuez à pratiquer, vous progressez !';
+        }
+      }
+    }
+
+    // ==========================================
+    // SAUVEGARDE FIREBASE
+    // ==========================================
+    async function saveQuizScore(finalScore) {
+      try {
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+          console.log("Utilisateur non connecté, score non sauvegardé");
+          return;
+        }
+
+        const userDocRef = doc(db, "users", currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        let userData = userDoc.exists() ? userDoc.data() : null;
+
+        // Création du profil si nécessaire
+        if (!userData) {
+          userData = {
+            pseudo: currentUser.email.split("@")[0],
+            email: currentUser.email,
+            globalScore: 0,
+            quizScores: { departements: 0, chinois: 0 },
+            createdAt: new Date().toISOString()
+          };
+          await setDoc(userDocRef, userData);
+        }
+
+        // Mise à jour des scores
+        const oldGlobalScore = userData.globalScore || 0;
+        const newGlobalScore = oldGlobalScore + finalScore;
+        const oldChinoisScore = userData.quizScores?.chinois || 0;
+        const newBestChinoisScore = Math.max(oldChinoisScore, finalScore);
+
+        await updateDoc(userDocRef, {
+          globalScore: newGlobalScore,
+          'quizScores.chinois': newBestChinoisScore,
+          lastQuizDate: new Date().toISOString()
+        });
+
+        console.log("✅ Score sauvegardé:", finalScore);
+      } catch (error) {
+        console.error("❌ Erreur sauvegarde score:", error);
+      }
+    }
+
+    // ==========================================
+    // EVENT LISTENERS
+    // ==========================================
     quizNextBtn.addEventListener('click', () => {
       currentQuestionIndex++;
       showQuestion();
     });
 
     quizRestartBtn.addEventListener('click', () => {
-      // restart same level
-      clearInterval(globalTimer);
-      clearInterval(questionTimer);
+      stopAllTimers();
       initQuiz();
     });
 
     retryBtn.addEventListener('click', () => {
-      // restart same level from results
-      clearInterval(globalTimer);
-      clearInterval(questionTimer);
+      stopAllTimers();
       initQuiz();
     });
 
-    // === Mise à jour stats ===
-    function updateStats() {
-      quizScore.textContent = score;
-      quizLives.textContent = '❤'.repeat(Math.max(0,lives)) + '♡'.repeat(Math.max(0,3-lives));
-    }
-
-    async function saveQuizScore(finalScore) {
-      const currentUser = auth.currentUser;
-      if (!currentUser) return; // non connecté
-
-      const userDocRef = doc(db, "users", currentUser.uid);
-      const userDoc = await getDoc(userDocRef);
-      let userData = userDoc.data();
-
-      // Si le document n’existe pas encore → créer un profil
-      if (!userData) {
-          userData = {
-              pseudo: currentUser.email.split("@")[0],
-              email: currentUser.email,
-              globalScore: 0,
-              quizScores: { departements: 0, chinois: 0 },
-              createdAt: new Date().toISOString()
-          };
-          await setDoc(userDocRef, userData);
-      }
-
-      const oldGlobalScore = userData.globalScore || 0;
-      const newGlobalScore = oldGlobalScore + finalScore;
-
-      // Mets aussi le meilleur score chinois si tu veux :
-      const oldChinoisScore = userData.quizScores?.chinois || 0;
-      const newBestChinoisScore = Math.max(oldChinoisScore, finalScore);
-
-      await updateDoc(userDocRef, {
-          globalScore: newGlobalScore,
-          quizScores: {
-              ...userData.quizScores,
-              chinois: newBestChinoisScore
-          }
-      });
-  }
-
-
-    // === Fin du quiz ===
-    function endQuiz(timeout=false) {
-      clearInterval(globalTimer);
-      clearInterval(questionTimer);
-
-      quizMain.style.display = 'none';
-      quizResult.style.display = 'block';
-
-      // Score final (sur nombre de questions du niveau)
-      quizFinalScore.textContent = score + ' / ' + questions.length;
-      // === Sauvegarde Firebase ===
-      saveQuizScore(score)
-          .catch(err => console.error("Erreur maj score:", err));
-
-
-      if (timeout) {
-        resultMessage.textContent = '⏳ Temps écoulé ! Essayez encore — vous pouvez recommencer le niveau.';
-      } else {
-        const pct = (questions.length > 0) ? (score / questions.length) * 100 : 0;
-        if (pct === 100) resultMessage.textContent = '🏆 Parfait ! Vous maîtrisez ce niveau !';
-        else if (pct >= 80) resultMessage.textContent = '👏 Excellent travail ! Continuez comme ça !';
-        else if (pct >= 60) resultMessage.textContent = '👍 Bon travail ! Encore un peu de pratique !';
-        else resultMessage.textContent = '💪 Continuez à pratiquer, vous progressez !';
-      }
-    }
-
-    // === Hash change listener (changer de niveau depuis index par exemple) ===
     window.addEventListener('hashchange', () => {
-      // restart when hash changes
-      clearInterval(globalTimer);
-      clearInterval(questionTimer);
+      stopAllTimers();
       initQuiz();
     });
 
-    // === Démarrage initial ===
-    // Si la page est chargée sans hash valide, on renvoie vers index.html
-    window.addEventListener('load', () => {
-      initQuiz();
-    });
-
+    // ==========================================
+    // DÉMARRAGE
+    // ==========================================
+    window.addEventListener('load', initQuiz);
   </script>
 </body>
 </html>
