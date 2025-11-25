@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Place du marché</title>
+<style>
+body { background: linear-gradient(135deg,#181a20,#23233a); color:#f0f0f0; font-family:'Segoe UI',Roboto,sans-serif; margin:0; }
+.center { max-width:800px;margin:40px auto;background:#23233a;border-radius:16px;padding:32px;box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+h1{text-align:center;margin-bottom:20px;}
+.tabs { display:flex; gap:10px; margin-bottom:20px; }
+.tab { padding:10px 20px; background:#2e2e3d; border-radius:10px 10px 0 0; cursor:pointer; transition:0.2s; font-weight:500; }
+.tab.active, .tab:hover { background:#45455a; color:#fff; }
+.tab-content { display:none; background:#28284a; padding:20px; border-radius:0 10px 10px 10px; }
+.tab-content.active { display:block; }
+.action-btn { margin:5px 5px 5px 0; padding:8px 18px; border-radius:8px; background:#3a3a50; border:none; cursor:pointer; color:#f0f0f0; transition:0.25s; }
+.action-btn:hover { background:#4e4e6a; }
+.res-item { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+#score-exchange { margin-bottom:20px; background:#3a3a50; padding:12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center; }
+</style>
+</head>
+<body>
+<div class="center">
+  <h1>Place du marché</h1>
+  
+  <!-- Score → Or -->
+  <div id="score-exchange">
+    <span>Échanger 20 points de Score Global → 1 Or</span>
+    <button class="action-btn" id="btn-score-gold">Échanger</button>
+  </div>
+  
+  <!-- Onglets -->
+  <div class="tabs">
+    <div class="tab active" data-tab="nourriture">🍎 Nourriture</div>
+    <div class="tab" data-tab="ressources">⛏ Ressources</div>
+    <div class="tab" data-tab="strat">💎 Ressources stratégiques</div>
+    <div class="tab" data-tab="confort">🛋 Confort</div>
+    <div class="tab" data-tab="militaire">⚔ Militaire</div>
+  </div>
+
+  <!-- Contenus des onglets -->
+  <div id="nourriture" class="tab-content active"></div>
+  <div id="ressources" class="tab-content"></div>
+  <div id="strat" class="tab-content"></div>
+  <div id="confort" class="tab-content"></div>
+  <div id="militaire" class="tab-content"></div>
+</div>
+
+<script>
+const defaultBase = {
+  or:0,
+  globalScore:0,
+  ressources:{
+    carotte:0, tomate:0, salade:0, baies:0, oeuf:0, poulet:0,
+    pierre:0, cuivre:0, fer:0, cristaux:0,
+    cristalMagique:0, chaise:0, soldat:0
+  }
+};
+
+function loadBase() {
+  let base = {};
+  try{ base = JSON.parse(localStorage.getItem('playerBase')||'{}'); } catch(e){ base={}; }
+  return Object.assign({}, defaultBase, base);
+}
+
+function saveBase(base){ localStorage.setItem('playerBase',JSON.stringify(base)); }
+
+// Liste des articles du marché par onglet
+const MARCHANDISES = {
+  nourriture:[
+    {id:'carotte', nom:'Carotte', prix:5, icone:'🥕'},
+    {id:'tomate', nom:'Tomate', prix:3, icone:'🍅'},
+    {id:'salade', nom:'Salade', prix:3, icone:'🥬'},
+    {id:'baies', nom:'Baies', prix:7, icone:'🫐'},
+    {id:'oeuf', nom:'Œuf', prix:6, icone:'🥚'},
+    {id:'poulet', nom:'Poulet', prix:9, icone:'🍗'}
+  ],
+  ressources:[
+    {id:'pierre', nom:'Pierre', prix:2, icone:'🪨'},
+    {id:'cuivre', nom:'Cuivre', prix:3, icone:'🟤'},
+    {id:'fer', nom:'Fer', prix:4, icone:'⚙️'},
+    {id:'cristaux', nom:'Cristaux', prix:8, icone:'💎'}
+  ],
+  strat:[],
+  confort:[
+    {id:'chaise', nom:'Chaise', prix:3, icone:'🪑'}
+  ],
+  militaire:[
+    {id:'soldat', nom:'Soldat', prix:8, icone:'🗡️'}
+  ]
+};
+
+// Affichage du marché
+function afficherMarchandise() {
+  let base = loadBase();
+  for(const onglet in MARCHANDISES){
+    const div = document.getElementById(onglet);
+    div.innerHTML = `<h3>Votre Or : ${base.or}</h3>`;
+    MARCHANDISES[onglet].forEach(item=>{
+      const itemDiv = document.createElement('div');
+      itemDiv.classList.add('res-item');
+      itemDiv.innerHTML = `
+        <span>${item.icone} ${item.nom} - ${item.prix} Or | Possédé : ${base.ressources[item.id]||0}</span>
+        <div>
+          <button class="action-btn" onclick="acheter('${item.id}',${item.prix})">Acheter</button>
+          <button class="action-btn" onclick="vendre('${item.id}',${item.prix})">Vendre</button>
+        </div>
+      `;
+      div.appendChild(itemDiv);
+    });
+  }
+}
+
+function acheter(item, prix){
+  let base = loadBase();
+  if(base.or<prix){ alert("Vous n'avez pas assez d'or !"); return; }
+  base.or-=prix;
+  base.ressources[item]=(base.ressources[item]||0)+1;
+  saveBase(base);
+  afficherMarchandise();
+  alert(`Achat effectué : 1 ${item} pour ${prix} Or`);
+}
+
+function vendre(item, prix){
+  let base = loadBase();
+  if((base.ressources[item]||0)<1){ alert("Vous ne possédez pas cette ressource !"); return; }
+  base.ressources[item]-=1;
+  base.or+=Math.floor(prix/2);
+  saveBase(base);
+  afficherMarchandise();
+  alert(`Vente effectuée : 1 ${item}, vous gagnez ${Math.floor(prix/2)} Or`);
+}
+
+// Échange Score → Or
+document.getElementById('btn-score-gold').onclick=function(){
+  let base=loadBase();
+  if(base.globalScore<20){ alert("Score Global insuffisant !"); return; }
+  base.globalScore-=20;
+  base.or=(base.or||0)+1;
+  saveBase(base);
+  afficherMarchandise();
+  alert("Échange effectué : 20 points de Score → 1 Or !");
+};
+
+// Onglets
+const tabs=document.querySelectorAll('.tab');
+const contents=document.querySelectorAll('.tab-content');
+tabs.forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    tabs.forEach(t=>t.classList.remove('active'));
+    contents.forEach(c=>c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+
+afficherMarchandise();
+</script>
+</body>
+</html>
