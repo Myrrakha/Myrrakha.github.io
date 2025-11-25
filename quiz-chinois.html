@@ -50,7 +50,9 @@
     }
   </style>
 </head>
+
 <body>
+  
   <header>
     <nav class="navbar">
       <div class="nav-left"><span class="nav-title">🎯 Quiz Master - Chinois simplifié</span></div>
@@ -112,6 +114,14 @@
   </div>
 
   <script>
+
+    import { getFirestore, doc, getDoc, setDoc, updateDoc }
+      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth }
+      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const db = getFirestore();
+    const auth = getAuth();
     // === Données complètes : 5 niveaux, 10 questions / niveau, 5 options / question ===
     // Chaque opts contient la bonne réponse (a) et 4 autres distracteurs.
     const quizData = {
@@ -431,6 +441,43 @@
       quizLives.textContent = '❤'.repeat(Math.max(0,lives)) + '♡'.repeat(Math.max(0,3-lives));
     }
 
+    async function saveQuizScore(finalScore) {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return; // non connecté
+
+      const userDocRef = doc(db, "users", currentUser.uid);
+      const userDoc = await getDoc(userDocRef);
+      let userData = userDoc.data();
+
+      // Si le document n’existe pas encore → créer un profil
+      if (!userData) {
+          userData = {
+              pseudo: currentUser.email.split("@")[0],
+              email: currentUser.email,
+              globalScore: 0,
+              quizScores: { departements: 0, chinois: 0 },
+              createdAt: new Date().toISOString()
+          };
+          await setDoc(userDocRef, userData);
+      }
+
+      const oldGlobalScore = userData.globalScore || 0;
+      const newGlobalScore = oldGlobalScore + finalScore;
+
+      // Mets aussi le meilleur score chinois si tu veux :
+      const oldChinoisScore = userData.quizScores?.chinois || 0;
+      const newBestChinoisScore = Math.max(oldChinoisScore, finalScore);
+
+      await updateDoc(userDocRef, {
+          globalScore: newGlobalScore,
+          quizScores: {
+              ...userData.quizScores,
+              chinois: newBestChinoisScore
+          }
+      });
+  }
+
+
     // === Fin du quiz ===
     function endQuiz(timeout=false) {
       clearInterval(globalTimer);
@@ -441,6 +488,10 @@
 
       // Score final (sur nombre de questions du niveau)
       quizFinalScore.textContent = score + ' / ' + questions.length;
+      // === Sauvegarde Firebase ===
+      saveQuizScore(score)
+          .catch(err => console.error("Erreur maj score:", err));
+
 
       if (timeout) {
         resultMessage.textContent = '⏳ Temps écoulé ! Essayez encore — vous pouvez recommencer le niveau.';
