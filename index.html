@@ -154,7 +154,7 @@
             width: auto;
             grid-template-columns: repeat(3, minmax(max-content, 1fr));
             gap: 20px;
-            max-width : 95vw
+            max-width: 95vw
         }
 
         /* Une colonne */
@@ -639,21 +639,46 @@
 
                             <div class="quiz-column">
                                 <span class="dropdown-subtitle">🇨🇳 Quiz Chinois simplifié</span>
-                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="1" onclick="window.location.href='quiz-chinois.html#1'">Niveau 1 : Chiffres 1-10</button>
-                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="2" onclick="window.location.href='quiz-chinois.html#2'">Niveau 2 : Jours de la semaine</button>
-                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="3" onclick="window.location.href='quiz-chinois.html#3'">Niveau 3 : Couleurs de base</button>
-                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="4" onclick="window.location.href='quiz-chinois.html#4'">Niveau 4 : Membres famille</button>
-                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="5" onclick="window.location.href='quiz-chinois.html#5'">Niveau 5 : Animaux courants</button>
+                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="1">Niveau 1 :
+                                    Chiffres 1-10</button>
+                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="2">Niveau 2 : Jours
+                                    de la semaine</button>
+                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="3">Niveau 3 :
+                                    Couleurs de base</button>
+                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="4">Niveau 4 : Membres
+                                    famille</button>
+                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="5">Niveau 5 : Animaux
+                                    courants</button>
                             </div>
 
                             <div class="quiz-column">
                                 <span class="dropdown-subtitle"> 🩺 Quiz Médecine</span>
-                                <button class="dropdown-item quiz-medecine-btn" data-medecine-level="1" onclick="window.location.href='quiz-medecine.html#1'">Niveau 1 : Bases</button>
-                                <button class="dropdown-item quiz-medecine-btn" data-medecine-level="2" onclick="window.location.href='quiz-medecine.html#2'">Niveau 2 : Anatomie</button>
-                                <button class="dropdown-item quiz-medecine-btn" data-medecine-level="3" onclick="window.location.href='quiz-medecine.html#3'">Niveau 3 : Pathologies</button>
-                                <button class="dropdown-item quiz-medecine-btn" data-medecine-level="4" onclick="window.location.href='quiz-medecine.html#4'">Niveau 4 : Médicaments</button>
-                                <button class="dropdown-item quiz-medecine-btn" data-medecine-level="5" onclick="window.location.href='quiz-medecine.html#5'">Niveau 5 : Cas cliniques</button>
+                                <button class="dropdown-item quiz-medecine-btn" data-medecine-level="1">Niveau 1 :
+                                    Bases</button>
+                                <button class="dropdown-item quiz-medecine-btn" data-medecine-level="2">Niveau 2 :
+                                    Anatomie</button>
+                                <button class="dropdown-item quiz-medecine-btn" data-medecine-level="3">Niveau 3 :
+                                    Pathologies</button>
+                                <button class="dropdown-item quiz-medecine-btn" data-medecine-level="4">Niveau 4 :
+                                    Médicaments</button>
+                                <button class="dropdown-item quiz-medecine-btn" data-medecine-level="5">Niveau 5 : Cas
+                                    cliniques</button>
                             </div>
+
+                            <div class="quiz-column">
+                                <span class="dropdown-subtitle"> Mathématiques</span>
+                                <button class="dropdown-item quiz-math-btn" data-math-level="1">Niveau 1 :
+                                    Additions, soustractions</button>
+                                <button class="dropdown-item quiz-math-btn" data-math-level="2">Niveau 2 :
+                                    Divisions, multiplications</button>
+                                <button class="dropdown-item quiz-math-btn" data-math-level="3">Niveau 3 :
+                                    Pathologies</button>
+                                <button class="dropdown-item quiz-math-btn" data-math-level="4">Niveau 4 :
+                                    Médicaments</button>
+                                <button class="dropdown-item quiz-math-btn" data-math-level="5">Niveau 5 : Cas
+                                    cliniques</button>
+                            </div>
+
                         </div>
                     </div>
                     <button class="action-btn" onclick="window.location.href='settings.html'"
@@ -780,8 +805,10 @@
     <div id="hover-warning"></div>
 
     <script type="module">
+
         const chinoisRequired = { 1: 200, 2: 250, 3: 300, 4: 350, 5: 400 };
         const medecineRequired = { 1: 40, 2: 80, 3: 160, 4: 320, 5: 500 };
+        const mathRequired = { 1: 60, 2: 120, 3: 240, 4: 480, 5: 960};
 
         function updateChinoisLevelButtons(globalScore) {
             document.querySelectorAll('.quiz-chinois-btn').forEach(btn => {
@@ -806,6 +833,25 @@
             document.querySelectorAll('.quiz-medecine-btn').forEach(btn => {
                 const level = parseInt(btn.dataset.medecineLevel);
                 const required = medecineRequired[level] || 0;
+                if (globalScore < required) {
+                    btn.classList.add('disabled');
+                    btn.disabled = true;
+                    btn.title = `Débloqué à ${required} points globaux`;
+                    btn.addEventListener('mouseenter', function (e) {
+                        showHoverWarning(`Débloqué à ${required} points globaux`, e.pageX, e.pageY);
+                    });
+                } else {
+                    btn.classList.remove('disabled');
+                    btn.disabled = false;
+                    btn.title = '';
+                }
+            });
+        }
+
+        function updateMathLevelButtons(globalScore) {
+            document.querySelectorAll('.quiz-math-btn').forEach(btn => {
+                const level = parseInt(btn.dataset.mathLevel);
+                const required = mathRequired[level] || 0;
                 if (globalScore < required) {
                     btn.classList.add('disabled');
                     btn.disabled = true;
@@ -1114,6 +1160,9 @@
         }
 
         function updateModeButtons(globalScore) {
+            const dropdown = document.querySelector('.dropdown');
+            const dropdownContent = dropdown.querySelector('.dropdown-content');
+            const modeButtons = dropdownContent.querySelectorAll('.dropdown-item[data-mode]'); // local, pas besoin de réutiliser l'autre
             modeButtons.forEach(btn => {
                 const modeNum = parseInt(btn.dataset.mode);
                 if (modeNum > 1 && globalScore < requiredModeUnlock[modeNum]) {
@@ -1129,10 +1178,14 @@
             leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
 
             try {
-                const q = query(collection(db, 'users'), orderBy('globalScore', 'desc'), limit(10));
+                const q = query(
+                    collection(db, 'users'),
+                    orderBy('globalScore', 'desc'),
+                    limit(10)
+                );
                 const querySnapshot = await getDocs(q);
 
-                if (querySnapshot.empty) {
+                if (!querySnapshot || querySnapshot.empty) {
                     leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
                     return;
                 }
@@ -1141,7 +1194,10 @@
                 let rank = 1;
 
                 querySnapshot.forEach((doc) => {
-                    const data = doc.data();
+                    const data = doc.data() || {};
+                    const pseudo = data.pseudo || 'Anonyme';
+                    const score = typeof data.globalScore === 'number' ? data.globalScore : 0;
+
                     const item = document.createElement('div');
                     item.className = 'leaderboard-item';
 
@@ -1152,23 +1208,24 @@
 
                     item.innerHTML = `
                 <div class="leaderboard-rank">${medal || rank}</div>
-                <div class="leaderboard-name">${data.pseudo}</div>
-                <div class="leaderboard-score">${data.globalScore}</div>
+                <div class="leaderboard-name">${pseudo}</div>
+                <div class="leaderboard-score">${score}</div>
             `;
 
                     leaderboardList.appendChild(item);
                     rank++;
                 });
             } catch (error) {
+                console.error('Erreur loadLeaderboard:', error);
                 leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Erreur de chargement</div>';
             }
         }
+
 
         // QUIZ LOGIC
         const homeSection = document.getElementById('home-section');
         const quizSection = document.getElementById('quiz-section');
         const resultSection = document.getElementById('result-section');
-        const modeButtons = document.querySelectorAll('.dropdown-item');
         const restartBtn = document.getElementById('restart-btn');
         const homeBtn = document.getElementById('home-btn');
         const answerBtns = document.querySelectorAll('.answer-btn');
@@ -1180,51 +1237,71 @@
         const timerFill = document.getElementById('timer-fill');
         const qTimerFill = document.getElementById('question-timer-fill');
         const finalScore = document.getElementById('final-score');
-        const dropdown = document.querySelector('.dropdown');
-        const dropdownBtn = document.querySelector('.dropdown-btn');
 
-        let QuizOpen = false;
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropdown = document.querySelector('.dropdown');
+            const dropdownBtn = dropdown.querySelector('.dropdown-btn');
+            const dropdownContent = dropdown.querySelector('.dropdown-content');
 
-        dropdownBtn.addEventListener('click', () => {
-            QuizOpen = !QuizOpen;
-            if (QuizOpen) {
-                dropdown.classList.add('open');
-            } else {
-                dropdown.classList.remove('open');                
-            }
-        });
-        document.addEventListener('click', (e) => {
-            if (!dropdown.contains(e.target)) dropdown.classList.remove('open');
-            QuizOpen = false;
-        });
+            // Force la fermeture au chargement
+            dropdown.classList.remove('open');
 
-        modeButtons.forEach(btn => {
-            btn.addEventListener('click', async e => {
-                e.preventDefault();
+            // Toggle au clic
+            dropdownBtn.addEventListener('click', e => {
                 e.stopPropagation();
+                dropdown.classList.toggle('open');
+            });
 
-                const selected = parseInt(btn.dataset.mode);
-                if (!selected) return;
+            // Fermer si clic en dehors
+            document.addEventListener('click', () => {
+                dropdown.classList.remove('open');
+            });
 
-                try {
+            // Empêcher fermeture si clic dans le contenu
+            dropdownContent.addEventListener('click', e => e.stopPropagation());
+
+            // Boutons Médecine
+            dropdownContent.querySelectorAll('.quiz-medecine-btn').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    const level = btn.dataset.medecineLevel;
+                    dropdown.classList.remove('open');
+                    window.location.href = `quiz-medecine.html#${level}`;
+                });
+            });
+
+            // Boutons Chinois
+            dropdownContent.querySelectorAll('.quiz-chinois-btn').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    const level = btn.dataset.chinoisLevel;
+                    dropdown.classList.remove('open');
+                    window.location.href = `quiz-chinois.html#${level}`;
+                });
+            });
+
+            // Boutons math
+            dropdownContent.querySelectorAll('.quiz-math-btn').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    const level = btn.dataset.mathLevel;
+                    dropdown.classList.remove('open');
+                    window.location.href = `quiz-math.html#${level}`;
+                });
+            });
+
+            // Boutons Départements
+            const modeButtons = dropdownContent.querySelectorAll('.dropdown-item[data-mode]');
+            modeButtons.forEach(btn => {
+                btn.addEventListener('click', async e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const selected = parseInt(btn.dataset.mode);
+                    if (!selected) return;
+
+                    // Vérification du score global avant de lancer le mode
                     const userDocRef = doc(db, 'users', currentUser.uid);
                     const userDoc = await getDoc(userDocRef);
-                    let userData = userDoc.data();
-
-                    // Créer le profil si manquant
-                    if (!userData) {
-                        const defaultData = {
-                            pseudo: currentUser.email.split('@')[0],
-                            email: currentUser.email,
-                            globalScore: 0,
-                            quizScores: { departements: 0 },
-                            createdAt: new Date().toISOString()
-                        };
-                        await setDoc(userDocRef, defaultData);
-                        userData = defaultData;
-                    }
-
-                    const globalScore = userData.globalScore || 0;
+                    const userData = userDoc.data();
+                    const globalScore = userData?.globalScore || 0;
 
                     if (selected > 1 && globalScore < requiredModeUnlock[selected]) {
                         showHoverWarning(
@@ -1238,10 +1315,7 @@
                     currentMode = selected;
                     dropdown.classList.remove('open');
                     startMode();
-                } catch (error) {
-                    console.error('Erreur lors du lancement du mode:', error);
-                    alert('Erreur lors du chargement. Veuillez réessayer.');
-                }
+                });
             });
         });
 
@@ -1482,6 +1556,8 @@
             homeSection.classList.remove('hidden');
             await loadUserData();
         };
+
+
 
     </script>
 

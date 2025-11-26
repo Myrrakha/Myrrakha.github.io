@@ -862,7 +862,7 @@
         // ==========================================
         let TOTAL_TIME_SECONDS = 300;
         let QUESTION_TIME_SECONDS = 20;
-        let INITIAL_LIVES = 3;
+        let INITIAL_LIVES = 10;
 
         // ==========================================
         // VARIABLES D'ÉTAT
@@ -906,50 +906,29 @@
         // ==========================================
         // GESTION DES TIMERS
         // ==========================================
-        function startGlobalTimer() {
-            clearInterval(globalTimerInterval);
-            globalTimeRemaining = TOTAL_TIME_SECONDS;
-            updateGlobalTimerDisplay();
-
-            globalTimerInterval = setInterval(() => {
-                globalTimeRemaining--;
-                updateGlobalTimerDisplay();
-
-                if (globalTimeRemaining <= 0) {
-                    clearInterval(globalTimerInterval);
-                    endQuiz(true);
-                }
+        function startMainTimer() {
+            timerDisplay.textContent = timeLeft;
+            timerFill.style.width = '100%';
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                timerFill.style.width = (timeLeft / modes[currentMode].time * 100) + '%';
+                if (timeLeft <= 5) timerFill.style.background = '#dc3545';
+                else if (timeLeft <= 10) timerFill.style.background = '#ffa500';
+                else timerFill.style.background = '#9c28a7ff';
+                if (timeLeft <= 0) { clearInterval(timerInterval); endGame(); }
             }, 1000);
         }
 
-        function updateGlobalTimerDisplay() {
-            const minutes = Math.floor(globalTimeRemaining / 60);
-            const seconds = globalTimeRemaining % 60;
-            timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            const percent = ((TOTAL_TIME_SECONDS - globalTimeRemaining) / TOTAL_TIME_SECONDS) * 100;
-            timerFill.style.width = percent + '%';
-        }
-
-        function startQuestionTimer() {
-            clearInterval(questionTimerInterval);
-            questionTimeRemaining = QUESTION_TIME_SECONDS;
-            updateQuestionTimerDisplay();
-
-            questionTimerInterval = setInterval(() => {
-                questionTimeRemaining--;
-                updateQuestionTimerDisplay();
-
-                if (questionTimeRemaining <= 0) {
-                    clearInterval(questionTimerInterval);
-                    handleQuestionTimeout();
-                }
-            }, 1000);
-        }
-
-        function updateQuestionTimerDisplay() {
-            questionTimerDisplay.textContent = questionTimeRemaining + 's';
-            const percent = ((QUESTION_TIME_SECONDS - questionTimeRemaining) / QUESTION_TIME_SECONDS) * 100;
-            questionTimerFill.style.width = percent + '%';
+        function startQTimer() {
+            clearInterval(qTimerInterval);
+            qTimerInterval = setInterval(() => {
+                qTime -= 0.1;
+                qTimerDisplay.textContent = Math.ceil(qTime);
+                qTimerFill.style.width = (qTime / modes[currentMode].qTime * 100) + '%';
+                if (qTime <= 0) { clearInterval(qTimerInterval); if (lives > 0) lives--; updateLives(); handleAnswer(''); }
+            }, 100);
         }
 
         function stopQuestionTimer() {
@@ -978,9 +957,9 @@
             const data = quizData[level];
 
             // Configuration
-            TOTAL_TIME_SECONDS = data.time;
-            QUESTION_TIME_SECONDS = data.qTime;
-            INITIAL_LIVES = data.lives;
+            TOTAL_TIME_SECONDS = 100;
+            QUESTION_TIME_SECONDS = 8;
+            INITIAL_LIVES = 8;
 
             quizTitle.textContent = data.title;
             quizSubtitle.textContent = data.subtitle;
@@ -997,7 +976,7 @@
 
             updateStats();
             showQuestion();
-            startGlobalTimer();
+            startMainTimer();
         }
 
         function showQuestion() {
@@ -1042,7 +1021,7 @@
             quizIndex.textContent = currentQuestionIndex + 1;
             quizTotal.textContent = questions.length;
 
-            startQuestionTimer();
+            startQTimer();
         }
 
         function selectAnswer(selected, correct) {
