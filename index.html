@@ -137,6 +137,9 @@
             text-align: left;
             cursor: pointer;
             transition: 0.25s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
         }
 
         .dropdown-item:hover {
@@ -150,11 +153,14 @@
 
         /* Conteneur en 3 colonnes */
         .dropdown-content.three-columns {
-            display: grid;
             width: auto;
             grid-template-columns: repeat(3, minmax(max-content, 1fr));
             gap: 20px;
             max-width: 95vw
+        }
+
+        .dropdown.open .dropdown-content.three-columns {
+            display: grid
         }
 
         /* Une colonne */
@@ -805,67 +811,6 @@
     <div id="hover-warning"></div>
 
     <script type="module">
-
-        const chinoisRequired = { 1: 200, 2: 250, 3: 300, 4: 350, 5: 400 };
-        const medecineRequired = { 1: 40, 2: 80, 3: 160, 4: 320, 5: 500 };
-        const mathRequired = { 1: 60, 2: 120, 3: 240, 4: 480, 5: 960};
-
-        function updateChinoisLevelButtons(globalScore) {
-            document.querySelectorAll('.quiz-chinois-btn').forEach(btn => {
-                const level = parseInt(btn.dataset.chinoisLevel);
-                const required = chinoisRequired[level] || 0;
-                if (globalScore < required) {
-                    btn.classList.add('disabled');
-                    btn.disabled = true;
-                    btn.title = `Débloqué à ${required} points globaux`;
-                    btn.addEventListener('mouseenter', function (e) {
-                        showHoverWarning(`Débloqué à ${required} points globaux`, e.pageX, e.pageY);
-                    });
-                } else {
-                    btn.classList.remove('disabled');
-                    btn.disabled = false;
-                    btn.title = '';
-                }
-            });
-        }
-
-        function updateMedecineLevelButtons(globalScore) {
-            document.querySelectorAll('.quiz-medecine-btn').forEach(btn => {
-                const level = parseInt(btn.dataset.medecineLevel);
-                const required = medecineRequired[level] || 0;
-                if (globalScore < required) {
-                    btn.classList.add('disabled');
-                    btn.disabled = true;
-                    btn.title = `Débloqué à ${required} points globaux`;
-                    btn.addEventListener('mouseenter', function (e) {
-                        showHoverWarning(`Débloqué à ${required} points globaux`, e.pageX, e.pageY);
-                    });
-                } else {
-                    btn.classList.remove('disabled');
-                    btn.disabled = false;
-                    btn.title = '';
-                }
-            });
-        }
-
-        function updateMathLevelButtons(globalScore) {
-            document.querySelectorAll('.quiz-math-btn').forEach(btn => {
-                const level = parseInt(btn.dataset.mathLevel);
-                const required = mathRequired[level] || 0;
-                if (globalScore < required) {
-                    btn.classList.add('disabled');
-                    btn.disabled = true;
-                    btn.title = `Débloqué à ${required} points globaux`;
-                    btn.addEventListener('mouseenter', function (e) {
-                        showHoverWarning(`Débloqué à ${required} points globaux`, e.pageX, e.pageY);
-                    });
-                } else {
-                    btn.classList.remove('disabled');
-                    btn.disabled = false;
-                    btn.title = '';
-                }
-            });
-        }
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -882,10 +827,13 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
         window.auth = auth;
         window.db = db;
         window.currentUser = null;
+
+        const chinoisRequired = { 1: 200, 2: 250, 3: 300, 4: 350, 5: 400 };
+        const medecineRequired = { 1: 40, 2: 80, 3: 160, 4: 320, 5: 500 };
+        const mathRequired = { 1: 60, 2: 120, 3: 240, 4: 480, 5: 960 };
 
         const departements = [
             { nom: "Ain", numero: "01", prefecture: "Bourg-en-Bresse" },
@@ -1008,143 +956,6 @@
         let correctAnswer;
         let isAuthMode = 'login';
 
-        // AUTH FUNCTIONS
-        window.toggleAuthMode = function () {
-            isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
-            const title = document.getElementById('auth-title');
-            const submitBtn = document.getElementById('auth-submit-btn');
-            const switchText = document.getElementById('auth-switch-text');
-            const switchLink = document.getElementById('auth-switch-link');
-            const pseudoGroup = document.getElementById('pseudo-group');
-
-            if (isAuthMode === 'signup') {
-                title.textContent = 'Inscription';
-                submitBtn.textContent = "S'inscrire";
-                switchText.textContent = 'Déjà un compte ? ';
-                switchLink.textContent = 'Se connecter';
-                pseudoGroup.style.display = 'block';
-            } else {
-                title.textContent = 'Connexion';
-                submitBtn.textContent = 'Se connecter';
-                switchText.textContent = "Pas encore de compte ? ";
-                switchLink.textContent = "S'inscrire";
-                pseudoGroup.style.display = 'none';
-            }
-        };
-
-        document.getElementById('auth-submit-btn').addEventListener('click', async () => {
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-            const pseudo = document.getElementById('auth-pseudo').value;
-            const errorDiv = document.getElementById('auth-error');
-
-            errorDiv.classList.add('hidden');
-
-            try {
-                if (isAuthMode === 'signup') {
-                    if (!pseudo || pseudo.trim().length < 3) {
-                        throw new Error('Le pseudo doit contenir au moins 3 caractères');
-                    }
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-
-                    await setDoc(doc(db, 'users', user.uid), {
-                        pseudo: pseudo.trim(),
-                        email: email,
-                        globalScore: 0,
-                        quizScores: {
-                            departements: 0
-                        },
-                        createdAt: new Date().toISOString()
-                    });
-                } else {
-                    await signInWithEmailAndPassword(auth, email, password);
-                }
-            } catch (error) {
-                errorDiv.textContent = error.message;
-                errorDiv.classList.remove('hidden');
-            }
-        });
-
-        window.logout = async function () {
-            await signOut(auth);
-        };
-
-        onAuthStateChanged(auth, async (user) => {
-            const authSection = document.getElementById('auth-section');
-            const homeSection = document.getElementById('home-section');
-            const navLoggedOut = document.getElementById('nav-logged-out');
-            const navLoggedIn = document.getElementById('nav-logged-in');
-
-            if (user) {
-                window.currentUser = user;
-                authSection.classList.add('hidden');
-                homeSection.classList.remove('hidden');
-                navLoggedOut.classList.add('hidden');
-                navLoggedIn.classList.remove('hidden');
-
-                await loadUserData();
-                await loadLeaderboard();
-            } else {
-                window.currentUser = null;
-                authSection.classList.remove('hidden');
-                homeSection.classList.add('hidden');
-                navLoggedOut.classList.remove('hidden');
-                navLoggedIn.classList.add('hidden');
-            }
-        });
-
-        async function loadUserData() {
-            try {
-                const userDocRef = doc(db, 'users', currentUser.uid);
-                const userDoc = await getDoc(userDocRef);
-                let userData = userDoc.data();
-                console.log('[DEBUG] Firestore userData:', userData);
-                if (!userData) {
-                    console.log('Création du profil utilisateur manquant...');
-                    const defaultData = {
-                        pseudo: currentUser.email.split('@')[0],
-                        email: currentUser.email,
-                        globalScore: 0,
-                        quizScores: {
-                            departements: 0
-                        },
-                        createdAt: new Date().toISOString()
-                    };
-                    await setDoc(userDocRef, defaultData);
-                    userData = defaultData;
-                }
-                console.log('[DEBUG] globalScore Firestore utilisé:', userData.globalScore);
-                updateBaseBtnVisibility(userData.globalScore || 0);
-                document.getElementById('user-pseudo').textContent = userData.pseudo;
-                document.getElementById('welcome-pseudo').textContent = userData.pseudo;
-                document.getElementById('user-global-score').textContent = userData.globalScore || 0;
-                document.getElementById('home-global-score').textContent = userData.globalScore || 0;
-                document.getElementById('home-dept-score').textContent = userData.quizScores?.departements || 0;
-                // Calculate levels
-                const globalLevel = getGlobalLevel(userData.globalScore || 0);
-                const deptLevel = getDeptLevel(userData.quizScores?.departements || 0);
-                document.getElementById('global-level').textContent = globalLevel;
-                document.getElementById('dept-level').textContent = deptLevel;
-                // Update mode buttons based on global score
-                updateModeButtons(userData.globalScore || 0);
-                updateChinoisLevelButtons(userData.globalScore || 0);
-                updateMedecineLevelButtons(userData.globalScore || 0);
-            } catch (error) {
-                console.error('Erreur chargement données:', error);
-                alert('Erreur de chargement. Essayez de vous reconnecter.');
-                // Fallback localStorage pour le globalScore
-                let globalScore = 0;
-                try {
-                    const localScore = localStorage.getItem('globalScore');
-                    if (localScore !== null && !isNaN(parseInt(localScore))) {
-                        globalScore = parseInt(localScore);
-                    }
-                } catch (e) { }
-                console.log('[DEBUG] globalScore localStorage utilisé:', globalScore);
-                updateChinoisLevelButtons(globalScore);
-            }
-        }
 
         function getGlobalLevel(score) {
             if (score >= 500) return '🏆 Expert';
@@ -1157,6 +968,15 @@
         function getDeptLevel(score) {
             const level = Math.floor(score / 50) + 1;
             return `Niveau ${level}`;
+        }
+
+        function showHoverWarning(text, x, y) {
+            const warn = document.getElementById("hover-warning");
+            warn.textContent = text;
+            warn.style.left = (x + 12) + "px";
+            warn.style.top = (y + 12) + "px";
+            warn.style.opacity = 1;
+            setTimeout(() => { warn.style.opacity = 0; }, 1800);
         }
 
         function updateModeButtons(globalScore) {
@@ -1172,53 +992,131 @@
                 }
             });
         }
-
-        async function loadLeaderboard() {
-            const leaderboardList = document.getElementById('leaderboard-list');
-            leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
-
-            try {
-                const q = query(
-                    collection(db, 'users'),
-                    orderBy('globalScore', 'desc'),
-                    limit(10)
-                );
-                const querySnapshot = await getDocs(q);
-
-                if (!querySnapshot || querySnapshot.empty) {
-                    leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
-                    return;
+        function updateChinoisLevelButtons(globalScore) {
+            document.querySelectorAll('.quiz-chinois-btn').forEach(btn => {
+                const level = parseInt(btn.dataset.chinoisLevel);
+                const required = chinoisRequired[level] || 0;
+                if (globalScore < required) {
+                    btn.classList.add('disabled');
+                    btn.disabled = true;
+                    btn.title = `Débloqué à ${required} points globaux`;
+                    btn.addEventListener('mouseenter', function (e) {
+                        showHoverWarning(`Débloqué à ${required} points globaux`, e.pageX, e.pageY);
+                    });
+                } else {
+                    btn.classList.remove('disabled');
+                    btn.disabled = false;
+                    btn.title = '';
                 }
+            });
+        }
 
-                leaderboardList.innerHTML = '';
-                let rank = 1;
+        function updateMedecineLevelButtons(globalScore) {
+            document.querySelectorAll('.quiz-medecine-btn').forEach(btn => {
+                const level = parseInt(btn.dataset.medecineLevel);
+                const required = medecineRequired[level] || 0;
+                if (globalScore < required) {
+                    btn.classList.add('disabled');
+                    btn.disabled = true;
+                    btn.title = `Débloqué à ${required} points globaux`;
+                    btn.addEventListener('mouseenter', function (e) {
+                        showHoverWarning(`Débloqué à ${required} points globaux`, e.pageX, e.pageY);
+                    });
+                } else {
+                    btn.classList.remove('disabled');
+                    btn.disabled = false;
+                    btn.title = '';
+                }
+            });
+        }
 
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data() || {};
-                    const pseudo = data.pseudo || 'Anonyme';
-                    const score = typeof data.globalScore === 'number' ? data.globalScore : 0;
+        function updateMathLevelButtons(globalScore) {
+            document.querySelectorAll('.quiz-math-btn').forEach(btn => {
+                const level = parseInt(btn.dataset.mathLevel);
+                const required = mathRequired[level] || 0;
+                if (globalScore < required) {
+                    btn.classList.add('disabled');
+                    btn.disabled = true;
+                    btn.title = `Débloqué à ${required} points globaux`;
+                    btn.addEventListener('mouseenter', function (e) {
+                        showHoverWarning(`Débloqué à ${required} points globaux`, e.pageX, e.pageY);
+                    });
+                } else {
+                    btn.classList.remove('disabled');
+                    btn.disabled = false;
+                    btn.title = '';
+                }
+            });
+        }
 
-                    const item = document.createElement('div');
-                    item.className = 'leaderboard-item';
+        function initDropdown() {
+            const dropdown = document.querySelector('.dropdown');
+            if (!dropdown) return;
 
-                    let medal = '';
-                    if (rank === 1) medal = '🥇';
-                    else if (rank === 2) medal = '🥈';
-                    else if (rank === 3) medal = '🥉';
+            const dropdownBtn = dropdown.querySelector('.dropdown-btn');
+            if (!dropdownBtn) return;
 
-                    item.innerHTML = `
-                <div class="leaderboard-rank">${medal || rank}</div>
-                <div class="leaderboard-name">${pseudo}</div>
-                <div class="leaderboard-score">${score}</div>
-            `;
-
-                    leaderboardList.appendChild(item);
-                    rank++;
-                });
-            } catch (error) {
-                console.error('Erreur loadLeaderboard:', error);
-                leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Erreur de chargement</div>';
+            function toggleDropdown() {
+                dropdown.classList.toggle('open');
             }
+
+            function closeDropdownOutside(e) {
+                if (!dropdown.contains(e.target)) {
+                    dropdown.classList.remove('open');
+                }
+            }
+
+            // Attacher les listeners une seule fois
+            dropdownBtn.addEventListener('click', toggleDropdown);
+            document.addEventListener('click', closeDropdownOutside);
+            document.addEventListener('touchstart', closeDropdownOutside);
+
+            // Gestion des clics sur les boutons de quiz
+            dropdown.querySelectorAll('.quiz-medecine-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    dropdown.classList.remove('open');
+                    const level = btn.dataset.medecineLevel;
+                    window.location.href = `quiz-medecine.html#${level}`;
+                });
+            });
+
+            dropdown.querySelectorAll('.quiz-chinois-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    dropdown.classList.remove('open');
+                    const level = btn.dataset.chinoisLevel;
+                    window.location.href = `quiz-chinois.html#${level}`;
+                });
+            });
+
+            dropdown.querySelectorAll('.quiz-math-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    dropdown.classList.remove('open');
+                    const level = btn.dataset.mathLevel;
+                    window.location.href = `quiz-math.html#${level}`;
+                });
+            });
+
+            dropdown.querySelectorAll('.dropdown-item[data-mode]').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const selected = parseInt(btn.dataset.mode);
+                    if (!selected || !currentUser) return;
+
+                    const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+                    const globalScore = userDoc.data()?.globalScore || 0;
+                    if (selected > 1 && globalScore < requiredModeUnlock[selected]) {
+                        showHoverWarning(
+                            `Vous devez avoir ${requiredModeUnlock[selected]} points globaux pour débloquer ce mode`,
+                            e.pageX, e.pageY
+                        );
+                        return;
+                    }
+
+                    currentMode = selected;
+                    dropdown.classList.remove('open');
+                    startMode();
+                });
+            });
         }
 
 
@@ -1238,95 +1136,6 @@
         const qTimerFill = document.getElementById('question-timer-fill');
         const finalScore = document.getElementById('final-score');
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const dropdown = document.querySelector('.dropdown');
-            const dropdownBtn = dropdown.querySelector('.dropdown-btn');
-            const dropdownContent = dropdown.querySelector('.dropdown-content');
-
-            // Force la fermeture au chargement
-            dropdown.classList.remove('open');
-
-            // Toggle au clic
-            dropdownBtn.addEventListener('click', e => {
-                e.stopPropagation();
-                dropdown.classList.toggle('open');
-            });
-
-            // Fermer si clic en dehors
-            document.addEventListener('click', () => {
-                dropdown.classList.remove('open');
-            });
-
-            // Empêcher fermeture si clic dans le contenu
-            dropdownContent.addEventListener('click', e => e.stopPropagation());
-
-            // Boutons Médecine
-            dropdownContent.querySelectorAll('.quiz-medecine-btn').forEach(btn => {
-                btn.addEventListener('click', e => {
-                    const level = btn.dataset.medecineLevel;
-                    dropdown.classList.remove('open');
-                    window.location.href = `quiz-medecine.html#${level}`;
-                });
-            });
-
-            // Boutons Chinois
-            dropdownContent.querySelectorAll('.quiz-chinois-btn').forEach(btn => {
-                btn.addEventListener('click', e => {
-                    const level = btn.dataset.chinoisLevel;
-                    dropdown.classList.remove('open');
-                    window.location.href = `quiz-chinois.html#${level}`;
-                });
-            });
-
-            // Boutons math
-            dropdownContent.querySelectorAll('.quiz-math-btn').forEach(btn => {
-                btn.addEventListener('click', e => {
-                    const level = btn.dataset.mathLevel;
-                    dropdown.classList.remove('open');
-                    window.location.href = `quiz-math.html#${level}`;
-                });
-            });
-
-            // Boutons Départements
-            const modeButtons = dropdownContent.querySelectorAll('.dropdown-item[data-mode]');
-            modeButtons.forEach(btn => {
-                btn.addEventListener('click', async e => {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    const selected = parseInt(btn.dataset.mode);
-                    if (!selected) return;
-
-                    // Vérification du score global avant de lancer le mode
-                    const userDocRef = doc(db, 'users', currentUser.uid);
-                    const userDoc = await getDoc(userDocRef);
-                    const userData = userDoc.data();
-                    const globalScore = userData?.globalScore || 0;
-
-                    if (selected > 1 && globalScore < requiredModeUnlock[selected]) {
-                        showHoverWarning(
-                            `Vous devez avoir ${requiredModeUnlock[selected]} points globaux pour débloquer ce mode`,
-                            e.pageX,
-                            e.pageY
-                        );
-                        return;
-                    }
-
-                    currentMode = selected;
-                    dropdown.classList.remove('open');
-                    startMode();
-                });
-            });
-        });
-
-        function showHoverWarning(text, x, y) {
-            const warn = document.getElementById("hover-warning");
-            warn.textContent = text;
-            warn.style.left = (x + 12) + "px";
-            warn.style.top = (y + 12) + "px";
-            warn.style.opacity = 1;
-            setTimeout(() => { warn.style.opacity = 0; }, 1800);
-        }
 
         function startMode() {
             if (!modes[currentMode]) return;
@@ -1557,7 +1366,193 @@
             await loadUserData();
         };
 
+        // AUTH FUNCTIONS
+        window.toggleAuthMode = function () {
+            isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
+            const title = document.getElementById('auth-title');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const switchText = document.getElementById('auth-switch-text');
+            const switchLink = document.getElementById('auth-switch-link');
+            const pseudoGroup = document.getElementById('pseudo-group');
 
+            if (isAuthMode === 'signup') {
+                title.textContent = 'Inscription';
+                submitBtn.textContent = "S'inscrire";
+                switchText.textContent = 'Déjà un compte ? ';
+                switchLink.textContent = 'Se connecter';
+                pseudoGroup.style.display = 'block';
+            } else {
+                title.textContent = 'Connexion';
+                submitBtn.textContent = 'Se connecter';
+                switchText.textContent = "Pas encore de compte ? ";
+                switchLink.textContent = "S'inscrire";
+                pseudoGroup.style.display = 'none';
+            }
+        };
+
+        document.getElementById('auth-submit-btn').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const pseudo = document.getElementById('auth-pseudo').value;
+            const errorDiv = document.getElementById('auth-error');
+
+            errorDiv.classList.add('hidden');
+
+            try {
+                if (isAuthMode === 'signup') {
+                    if (!pseudo || pseudo.trim().length < 3) {
+                        throw new Error('Le pseudo doit contenir au moins 3 caractères');
+                    }
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+
+                    await setDoc(doc(db, 'users', user.uid), {
+                        pseudo: pseudo.trim(),
+                        email: email,
+                        globalScore: 0,
+                        quizScores: {
+                            departements: 0
+                        },
+                        createdAt: new Date().toISOString()
+                    });
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                }
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+            }
+        });
+
+        window.logout = async function () {
+            await signOut(auth);
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            const authSection = document.getElementById('auth-section');
+            const homeSection = document.getElementById('home-section');
+            const navLoggedOut = document.getElementById('nav-logged-out');
+            const navLoggedIn = document.getElementById('nav-logged-in');
+
+            if (user) {
+                window.currentUser = user;
+                authSection.classList.add('hidden');
+                homeSection.classList.remove('hidden');
+                navLoggedOut.classList.add('hidden');
+                navLoggedIn.classList.remove('hidden');
+
+                await loadUserData();
+                await loadLeaderboard();
+            } else {
+                window.currentUser = null;
+                authSection.classList.remove('hidden');
+                homeSection.classList.add('hidden');
+                navLoggedOut.classList.remove('hidden');
+                navLoggedIn.classList.add('hidden');
+            }
+        });
+
+        async function loadUserData() {
+            try {
+                const userDocRef = doc(db, 'users', currentUser.uid);
+                const userDoc = await getDoc(userDocRef);
+                let userData = userDoc.data();
+                console.log('[DEBUG] Firestore userData:', userData);
+                if (!userData) {
+                    console.log('Création du profil utilisateur manquant...');
+                    const defaultData = {
+                        pseudo: currentUser.email.split('@')[0],
+                        email: currentUser.email,
+                        globalScore: 0,
+                        quizScores: {
+                            departements: 0
+                        },
+                        createdAt: new Date().toISOString()
+                    };
+                    await setDoc(userDocRef, defaultData);
+                    userData = defaultData;
+                }
+                console.log('[DEBUG] globalScore Firestore utilisé:', userData.globalScore);
+                updateBaseBtnVisibility(userData.globalScore || 0);
+                document.getElementById('user-pseudo').textContent = userData.pseudo;
+                document.getElementById('welcome-pseudo').textContent = userData.pseudo;
+                document.getElementById('user-global-score').textContent = userData.globalScore || 0;
+                document.getElementById('home-global-score').textContent = userData.globalScore || 0;
+                document.getElementById('home-dept-score').textContent = userData.quizScores?.departements || 0;
+                // Calculate levels
+                const globalLevel = getGlobalLevel(userData.globalScore || 0);
+                const deptLevel = getDeptLevel(userData.quizScores?.departements || 0);
+                document.getElementById('global-level').textContent = globalLevel;
+                document.getElementById('dept-level').textContent = deptLevel;
+                // Update mode buttons based on global score
+                updateModeButtons(userData.globalScore || 0);
+                updateChinoisLevelButtons(userData.globalScore || 0);
+                updateMedecineLevelButtons(userData.globalScore || 0);
+                updateMathLevelButtons(userData.globalScore || 0);
+            } catch (error) {
+                console.error('Erreur chargement données:', error);
+                alert('Erreur de chargement. Essayez de vous reconnecter.');
+                // Fallback localStorage pour le globalScore
+                let globalScore = 0;
+                try {
+                    const localScore = localStorage.getItem('globalScore');
+                    if (localScore !== null && !isNaN(parseInt(localScore))) {
+                        globalScore = parseInt(localScore);
+                    }
+                } catch (e) { }
+                console.log('[DEBUG] globalScore localStorage utilisé:', globalScore);
+                updateChinoisLevelButtons(globalScore);
+            }
+        }
+
+        async function loadLeaderboard() {
+            const leaderboardList = document.getElementById('leaderboard-list');
+            leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
+
+            try {
+                const q = query(
+                    collection(db, 'users'),
+                    orderBy('globalScore', 'desc'),
+                    limit(10)
+                );
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot || querySnapshot.empty) {
+                    leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
+                    return;
+                }
+
+                leaderboardList.innerHTML = '';
+                let rank = 1;
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data() || {};
+                    const pseudo = data.pseudo || 'Anonyme';
+                    const score = typeof data.globalScore === 'number' ? data.globalScore : 0;
+
+                    const item = document.createElement('div');
+                    item.className = 'leaderboard-item';
+
+                    let medal = '';
+                    if (rank === 1) medal = '🥇';
+                    else if (rank === 2) medal = '🥈';
+                    else if (rank === 3) medal = '🥉';
+
+                    item.innerHTML = `
+                <div class="leaderboard-rank">${medal || rank}</div>
+                <div class="leaderboard-name">${pseudo}</div>
+                <div class="leaderboard-score">${score}</div>
+            `;
+
+                    leaderboardList.appendChild(item);
+                    rank++;
+                });
+            } catch (error) {
+                console.error('Erreur loadLeaderboard:', error);
+                leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Erreur de chargement</div>';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', initDropdown);
 
     </script>
 
