@@ -1,52 +1,224 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Quiz Master - Chinois simplifié</title>
   <style>
     /* === Style global === */
-    body { background: linear-gradient(135deg, #0f1115, #1c1c24); color: #f0f0f0; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
-    .navbar { background: #1a1a24; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-    .nav-title { font-size: 1.2em; font-weight: 600; }
-    .nav-right { display: flex; gap: 10px; }
-    .center { max-width: 800px; margin: 40px auto; background: #23233a; border-radius: 16px; padding: 28px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
-    h1 { text-align: center; margin-bottom: 6px; }
-    .subtitle { text-align: center; color: #aaa; margin-bottom: 18px; font-size: 1.05em; }
-    .action-btn { padding: 10px 18px; border-radius: 10px; background: #3a3a50; border: none; cursor: pointer; color: #f0f0f0; transition: 0.20s; font-size: 0.98em; }
-    .action-btn:hover { background: #4e4e6a; }
-    .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .loading { text-align: center; padding: 28px; font-size: 1.1em; color: #aaa; }
+    body {
+      background: linear-gradient(135deg, #0f1115, #1c1c24);
+      color: #f0f0f0;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      background: #1a1a24;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-title {
+      font-size: 1.2em;
+      font-weight: 600;
+    }
+
+    .nav-right {
+      display: flex;
+      gap: 10px;
+    }
+
+    .center {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #23233a;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #aaa;
+      margin-bottom: 18px;
+      font-size: 1.05em;
+    }
+
+    .action-btn {
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: #3a3a50;
+      border: none;
+      cursor: pointer;
+      color: #f0f0f0;
+      transition: 0.20s;
+      font-size: 0.98em;
+    }
+
+    .action-btn:hover {
+      background: #4e4e6a;
+    }
+
+    .action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 28px;
+      font-size: 1.1em;
+      color: #aaa;
+    }
 
     /* Timers */
-    #timers-container { display: flex; gap: 20px; margin-bottom: 18px; align-items: center; }
-    #timer-bar-container, #question-timer-bar-container { display: flex; align-items: center; width: 50%; gap: 10px; }
-    #timer-bar, #question-timer-bar { width: 100%; height: 10px; background-color: #4e4e6a; border-radius: 6px; overflow: hidden; }
-    #timer-fill, #question-timer-fill { height: 100%; width: 0; background-color: #2ecc71; transition: width 0.3s linear; }
+    #timers-container {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+      margin-top: 8px;
+      align-items: center;
+    }
+
+    #timer-bar-container,
+    #question-timer-bar-container {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      gap: 10px;
+    }
+
+    #timer-bar,
+    #question-timer-bar {
+      width: 100%;
+      height: 10px;
+      background-color: #4e4e6a;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    #timer-fill,
+    #question-timer-fill {
+      height: 100%;
+      width: 0;
+      background-color: #2ecc71;
+      transition: width 0.3s linear;
+    }
 
     /* Quiz area */
-    #quiz-main { display: none; }
-    #quiz-section { display:flex; flex-direction:column; gap:14px; align-items:center; }
-    .question-box { width:100%; text-align:center; margin-bottom:6px; }
-    .question-text { font-size:1.35em; line-height:1.4; margin-bottom:8px; }
-    .answers-container { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; width:100%; }
-    .answer-btn { padding:12px 14px; border-radius:10px; background:#3a3a50; border:none; cursor:pointer; color:#f0f0f0; font-size:1em; min-width:150px; text-align:center; transition: transform .12s, background .12s; }
-    .answer-btn:hover:not(:disabled) { transform: translateY(-3px); background: #4e4e6a; }
-    .answer-btn:disabled { opacity:0.85; cursor: default; transform:none; }
+    #quiz-main {
+      display: none;
+    }
 
-    .stats { margin: 12px 0; display:flex; justify-content:space-between; gap:12px; font-size:1.05em; }
-    .stats div { flex:1; text-align:center; font-weight:600; }
+    #quiz-section {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: center;
+      width: 100%;
+    }
 
-    #quiz-next-btn, #quiz-restart-btn { display:none; width:100%; margin-top:6px; }
+    .question-box {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 6px;
+    }
 
-    #quiz-result { display:none; text-align:center; }
-    .final-score { font-size:1.8em; color:#2ecc71; margin:12px 0; }
+    .question-text {
+      font-size: 1.35em;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .answers-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .answer-btn {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #3a3a50;
+      border: none;
+      cursor: pointer;
+      color: #f0f0f0;
+      font-size: 1em;
+      min-width: 150px;
+      text-align: center;
+      transition: transform .12s, background .12s;
+    }
+
+    .answer-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      background: #4e4e6a;
+    }
+
+    .answer-btn:disabled {
+      opacity: 0.85;
+      cursor: default;
+      transform: none;
+    }
+
+    .stats {
+      margin: 12px 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 1.05em;
+    }
+
+    .stats div {
+      flex: 1;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    #quiz-next-btn,
+    #quiz-restart-btn {
+      display: none;
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    #quiz-result {
+      display: none;
+      text-align: center;
+    }
+
+    .final-score {
+      font-size: 1.8em;
+      color: #2ecc71;
+      margin: 12px 0;
+    }
 
     /* Responsive */
     @media (max-width:700px) {
-      .answers-container { flex-direction:column; }
-      #timers-container { flex-direction:column; }
-      #timer-bar-container, #question-timer-bar-container { width:100%; }
+      .answers-container {
+        flex-direction: column;
+      }
+
+      #timers-container {
+        flex-direction: column;
+      }
+
+      #timer-bar-container,
+      #question-timer-bar-container {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -63,18 +235,8 @@
   </header>
 
   <div class="center">
-    <div id="loading" class="loading"><p>Chargement du quiz…</p></div>
-
-    <!-- Timers -->
-    <div id="timers-container" style="display:none;">
-      <div id="timer-bar-container">
-        <span style="white-space:nowrap;">⏱️ Temps restant : <strong id="timer">0</strong>s</span>
-        <div id="timer-bar"><div id="timer-fill"></div></div>
-      </div>
-      <div id="question-timer-bar-container">
-        <span style="white-space:nowrap;">⚡ Question : <strong id="question-timer">0</strong>s</span>
-        <div id="question-timer-bar"><div id="question-timer-fill"></div></div>
-      </div>
+    <div id="loading" class="loading">
+      <p>Chargement du quiz…</p>
     </div>
 
     <!-- Quiz main -->
@@ -87,6 +249,22 @@
           <div id="quiz-question" class="question-text"></div>
         </div>
         <div class="answers-container" id="quiz-answers"></div>
+
+        <!-- ⚡ TIMERS PLACÉS ICI, EN DESSOUS DES RÉPONSES -->
+        <div id="timers-container">
+          <div id="timer-bar-container">
+            <span style="white-space:nowrap;">⏱️ Temps restant : <strong id="timer">0</strong>s</span>
+            <div id="timer-bar">
+              <div id="timer-fill"></div>
+            </div>
+          </div>
+          <div id="question-timer-bar-container">
+            <span style="white-space:nowrap;">⚡ Question : <strong id="question-timer">0</strong>s</span>
+            <div id="question-timer-bar">
+              <div id="question-timer-fill"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="stats">
@@ -95,8 +273,7 @@
         <div>Question : <span id="quiz-index">0</span>/<span id="quiz-total">0</span></div>
       </div>
 
-      <button class="action-btn" id="quiz-next-btn">Question suivante</button>
-      <button class="action-btn" id="quiz-restart-btn">Recommencer ce niveau</button>
+      <!-- Pas de boutons "Suivant" ici -->
     </div>
 
     <!-- Result -->
@@ -104,8 +281,8 @@
       <h1>🎉 Quiz terminé !</h1>
       <div class="final-score">Score : <span id="quiz-final-score">0</span></div>
       <p id="result-message" style="font-size:1.05em; margin:8px 0 16px 0;"></p>
-
-      <button class="action-btn" onclick="window.location.href='index.html'" style="width:100%; margin-top:8px;">Retour au menu principal</button>
+      <button class="action-btn" onclick="window.location.href='index.html'" style="width:100%; margin-top:8px;">Retour
+        au menu principal</button>
       <button class="action-btn" id="retry-btn" style="width:100%; margin-top:10px;">Recommencer ce niveau</button>
     </div>
   </div>
@@ -146,80 +323,80 @@
         title: "Niveau 1 : Chiffres 1-10",
         subtitle: "Apprenez les chiffres de base en chinois simplifié",
         questions: [
-          { q: "Quel est le caractère pour <strong>1</strong> ?", a: "一", opts: ["一","二","三","十","五"] },
-          { q: "Quel est le caractère pour <strong>2</strong> ?", a: "二", opts: ["二","五","八","六","四"] },
-          { q: "Quel est le caractère pour <strong>3</strong> ?", a: "三", opts: ["三","九","四","七","二"] },
-          { q: "Quel est le caractère pour <strong>4</strong> ?", a: "四", opts: ["四","五","六","三","十"] },
-          { q: "Quel est le caractère pour <strong>5</strong> ?", a: "五", opts: ["五","八","一","十","六"] },
-          { q: "Quel est le caractère pour <strong>6</strong> ?", a: "六", opts: ["六","九","二","八","四"] },
-          { q: "Quel est le caractère pour <strong>7</strong> ?", a: "七", opts: ["七","三","十","四","八"] },
-          { q: "Quel est le caractère pour <strong>8</strong> ?", a: "八", opts: ["八","五","六","九","一"] },
-          { q: "Quel est le caractère pour <strong>9</strong> ?", a: "九", opts: ["九","一","七","二","十"] },
-          { q: "Quel est le caractère pour <strong>10</strong> ?", a: "十", opts: ["十","三","八","五","九"] }
+          { q: "Quel est le caractère pour <strong>1</strong> ?", a: "一", opts: ["一", "二", "三", "十", "五"] },
+          { q: "Quel est le caractère pour <strong>2</strong> ?", a: "二", opts: ["二", "五", "八", "六", "四"] },
+          { q: "Quel est le caractère pour <strong>3</strong> ?", a: "三", opts: ["三", "九", "四", "七", "二"] },
+          { q: "Quel est le caractère pour <strong>4</strong> ?", a: "四", opts: ["四", "五", "六", "三", "十"] },
+          { q: "Quel est le caractère pour <strong>5</strong> ?", a: "五", opts: ["五", "八", "一", "十", "六"] },
+          { q: "Quel est le caractère pour <strong>6</strong> ?", a: "六", opts: ["六", "九", "二", "八", "四"] },
+          { q: "Quel est le caractère pour <strong>7</strong> ?", a: "七", opts: ["七", "三", "十", "四", "八"] },
+          { q: "Quel est le caractère pour <strong>8</strong> ?", a: "八", opts: ["八", "五", "六", "九", "一"] },
+          { q: "Quel est le caractère pour <strong>9</strong> ?", a: "九", opts: ["九", "一", "七", "二", "十"] },
+          { q: "Quel est le caractère pour <strong>10</strong> ?", a: "十", opts: ["十", "三", "八", "五", "九"] }
         ]
       },
       2: {
         title: "Niveau 2 : Jours de la semaine",
         subtitle: "Maîtrisez les jours de la semaine en chinois",
         questions: [
-          { q: "Comment écrit-on <strong>'lundi'</strong> ?", a: "星期一", opts: ["星期一","星期天","星期三","星期五","星期四"] },
-          { q: "Comment écrit-on <strong>'mardi'</strong> ?", a: "星期二", opts: ["星期二","星期四","星期日","星期六","星期三"] },
-          { q: "Comment écrit-on <strong>'mercredi'</strong> ?", a: "星期三", opts: ["星期三","星期一","星期五","星期天","星期二"] },
-          { q: "Comment écrit-on <strong>'jeudi'</strong> ?", a: "星期四", opts: ["星期四","星期二","星期六","星期三","星期五"] },
-          { q: "Comment écrit-on <strong>'vendredi'</strong> ?", a: "星期五", opts: ["星期五","星期日","星期一","星期四","星期六"] },
-          { q: "Comment écrit-on <strong>'samedi'</strong> ?", a: "星期六", opts: ["星期六","星期三","星期五","星期二","星期天"] },
-          { q: "Comment écrit-on <strong>'dimanche'</strong> ?", a: "星期天", opts: ["星期天","星期日","星期一","星期五","星期六"] },
-          { q: "Quel jour vient après 星期三 ?", a: "星期四", opts: ["星期四","星期二","星期五","星期六","星期天"] },
-          { q: "Quel jour vient avant 星期天 ?", a: "星期六", opts: ["星期六","星期五","星期一","星期日","星期四"] },
-          { q: "Quel est le premier jour de la semaine ?", a: "星期一", opts: ["星期一","星期天","星期日","星期二","星期三"] }
+          { q: "Comment écrit-on <strong>'lundi'</strong> ?", a: "星期一", opts: ["星期一", "星期天", "星期三", "星期五", "星期四"] },
+          { q: "Comment écrit-on <strong>'mardi'</strong> ?", a: "星期二", opts: ["星期二", "星期四", "星期日", "星期六", "星期三"] },
+          { q: "Comment écrit-on <strong>'mercredi'</strong> ?", a: "星期三", opts: ["星期三", "星期一", "星期五", "星期天", "星期二"] },
+          { q: "Comment écrit-on <strong>'jeudi'</strong> ?", a: "星期四", opts: ["星期四", "星期二", "星期六", "星期三", "星期五"] },
+          { q: "Comment écrit-on <strong>'vendredi'</strong> ?", a: "星期五", opts: ["星期五", "星期日", "星期一", "星期四", "星期六"] },
+          { q: "Comment écrit-on <strong>'samedi'</strong> ?", a: "星期六", opts: ["星期六", "星期三", "星期五", "星期二", "星期天"] },
+          { q: "Comment écrit-on <strong>'dimanche'</strong> ?", a: "星期天", opts: ["星期天", "星期日", "星期一", "星期五", "星期六"] },
+          { q: "Quel jour vient après 星期三 ?", a: "星期四", opts: ["星期四", "星期二", "星期五", "星期六", "星期天"] },
+          { q: "Quel jour vient avant 星期天 ?", a: "星期六", opts: ["星期六", "星期五", "星期一", "星期日", "星期四"] },
+          { q: "Quel est le premier jour de la semaine ?", a: "星期一", opts: ["星期一", "星期天", "星期日", "星期二", "星期三"] }
         ]
       },
       3: {
         title: "Niveau 3 : Couleurs de base",
         subtitle: "Découvrez les couleurs en chinois simplifié",
         questions: [
-          { q: "Comment écrit-on <strong>'rouge'</strong> ?", a: "红色", opts: ["红色","蓝色","黄色","白色","绿色"] },
-          { q: "Comment écrit-on <strong>'bleu'</strong> ?", a: "蓝色", opts: ["蓝色","绿色","黑色","红色","白色"] },
-          { q: "Comment écrit-on <strong>'jaune'</strong> ?", a: "黄色", opts: ["黄色","白色","蓝色","黑色","红色"] },
-          { q: "Comment écrit-on <strong>'vert'</strong> ?", a: "绿色", opts: ["绿色","红色","黄色","蓝色","黑色"] },
-          { q: "Comment écrit-on <strong>'noir'</strong> ?", a: "黑色", opts: ["黑色","白色","蓝色","红色","灰色"] },
-          { q: "Comment écrit-on <strong>'blanc'</strong> ?", a: "白色", opts: ["白色","黑色","黄色","绿色","蓝色"] },
-          { q: "Quelle couleur représente 红色 ?", a: "Rouge", opts: ["Rouge","Bleu","Jaune","Vert","Noir"] },
-          { q: "Quelle couleur représente 黑色 ?", a: "Noir", opts: ["Noir","Blanc","Gris","Bleu","Vert"] },
-          { q: "Quelle couleur représente 绿色 ?", a: "Vert", opts: ["Vert","Rouge","Bleu","Jaune","Noir"] },
-          { q: "Quelle couleur représente 蓝色 ?", a: "Bleu", opts: ["Bleu","Blanc","Vert","Rouge","Jaune"] }
+          { q: "Comment écrit-on <strong>'rouge'</strong> ?", a: "红色", opts: ["红色", "蓝色", "黄色", "白色", "绿色"] },
+          { q: "Comment écrit-on <strong>'bleu'</strong> ?", a: "蓝色", opts: ["蓝色", "绿色", "黑色", "红色", "白色"] },
+          { q: "Comment écrit-on <strong>'jaune'</strong> ?", a: "黄色", opts: ["黄色", "白色", "蓝色", "黑色", "红色"] },
+          { q: "Comment écrit-on <strong>'vert'</strong> ?", a: "绿色", opts: ["绿色", "红色", "黄色", "蓝色", "黑色"] },
+          { q: "Comment écrit-on <strong>'noir'</strong> ?", a: "黑色", opts: ["黑色", "白色", "蓝色", "红色", "灰色"] },
+          { q: "Comment écrit-on <strong>'blanc'</strong> ?", a: "白色", opts: ["白色", "黑色", "黄色", "绿色", "蓝色"] },
+          { q: "Quelle couleur représente 红色 ?", a: "Rouge", opts: ["Rouge", "Bleu", "Jaune", "Vert", "Noir"] },
+          { q: "Quelle couleur représente 黑色 ?", a: "Noir", opts: ["Noir", "Blanc", "Gris", "Bleu", "Vert"] },
+          { q: "Quelle couleur représente 绿色 ?", a: "Vert", opts: ["Vert", "Rouge", "Bleu", "Jaune", "Noir"] },
+          { q: "Quelle couleur représente 蓝色 ?", a: "Bleu", opts: ["Bleu", "Blanc", "Vert", "Rouge", "Jaune"] }
         ]
       },
       4: {
         title: "Niveau 4 : Membres de la famille",
         subtitle: "Apprenez à désigner les membres de la famille",
         questions: [
-          { q: "Comment écrit-on <strong>'maman'</strong> ?", a: "妈妈", opts: ["妈妈","爸爸","哥哥","姐姐","妹妹"] },
-          { q: "Comment écrit-on <strong>'papa'</strong> ?", a: "爸爸", opts: ["爸爸","妈妈","弟弟","妹妹","哥哥"] },
-          { q: "Comment écrit-on <strong>'grand frère'</strong> ?", a: "哥哥", opts: ["哥哥","弟弟","姐姐","妹妹","爸爸"] },
-          { q: "Comment écrit-on <strong>'petit frère'</strong> ?", a: "弟弟", opts: ["弟弟","哥哥","爸爸","妈妈","叔叔"] },
-          { q: "Comment écrit-on <strong>'grande sœur'</strong> ?", a: "姐姐", opts: ["姐姐","妹妹","妈妈","哥哥","阿姨"] },
-          { q: "Comment écrit-on <strong>'petite sœur'</strong> ?", a: "妹妹", opts: ["妹妹","姐姐","爸爸","弟弟","奶奶"] },
-          { q: "Qui est 爸爸 ?", a: "Papa", opts: ["Papa","Maman","Grand-père","Oncle","Tante"] },
-          { q: "Qui est 姐姐 ?", a: "Grande sœur", opts: ["Grande sœur","Petite sœur","Maman","Tante","Cousine"] },
-          { q: "Comment dit-on 'grand-mère' ?", a: "奶奶", opts: ["奶奶","外婆","爷爷","姥姥","妈妈"] },
-          { q: "Comment dit-on 'oncle' (frère du père) ?", a: "叔叔", opts: ["叔叔","舅舅","伯伯","阿姨","爷爷"] }
+          { q: "Comment écrit-on <strong>'maman'</strong> ?", a: "妈妈", opts: ["妈妈", "爸爸", "哥哥", "姐姐", "妹妹"] },
+          { q: "Comment écrit-on <strong>'papa'</strong> ?", a: "爸爸", opts: ["爸爸", "妈妈", "弟弟", "妹妹", "哥哥"] },
+          { q: "Comment écrit-on <strong>'grand frère'</strong> ?", a: "哥哥", opts: ["哥哥", "弟弟", "姐姐", "妹妹", "爸爸"] },
+          { q: "Comment écrit-on <strong>'petit frère'</strong> ?", a: "弟弟", opts: ["弟弟", "哥哥", "爸爸", "妈妈", "叔叔"] },
+          { q: "Comment écrit-on <strong>'grande sœur'</strong> ?", a: "姐姐", opts: ["姐姐", "妹妹", "妈妈", "哥哥", "阿姨"] },
+          { q: "Comment écrit-on <strong>'petite sœur'</strong> ?", a: "妹妹", opts: ["妹妹", "姐姐", "爸爸", "弟弟", "奶奶"] },
+          { q: "Qui est 爸爸 ?", a: "Papa", opts: ["Papa", "Maman", "Grand-père", "Oncle", "Tante"] },
+          { q: "Qui est 姐姐 ?", a: "Grande sœur", opts: ["Grande sœur", "Petite sœur", "Maman", "Tante", "Cousine"] },
+          { q: "Comment dit-on 'grand-mère' ?", a: "奶奶", opts: ["奶奶", "外婆", "爷爷", "姥姥", "妈妈"] },
+          { q: "Comment dit-on 'oncle' (frère du père) ?", a: "叔叔", opts: ["叔叔", "舅舅", "伯伯", "阿姨", "爷爷"] }
         ]
       },
       5: {
         title: "Niveau 5 : Animaux courants",
         subtitle: "Découvrez les animaux en chinois simplifié",
         questions: [
-          { q: "Comment écrit-on <strong>'chat'</strong> ?", a: "猫", opts: ["猫","狗","鸟","马","牛"] },
-          { q: "Comment écrit-on <strong>'chien'</strong> ?", a: "狗", opts: ["狗","猫","鱼","牛","马"] },
-          { q: "Comment écrit-on <strong>'oiseau'</strong> ?", a: "鸟", opts: ["鸟","马","狗","猫","猪"] },
-          { q: "Comment écrit-on <strong>'poisson'</strong> ?", a: "鱼", opts: ["鱼","牛","猫","狗","鸟"] },
-          { q: "Comment écrit-on <strong>'cheval'</strong> ?", a: "马", opts: ["马","鸟","鱼","牛","羊"] },
-          { q: "Comment écrit-on <strong>'vache'</strong> ?", a: "牛", opts: ["牛","马","猫","狗","羊"] },
-          { q: "Quel animal représente 猫 ?", a: "Chat", opts: ["Chat","Chien","Tigre","Lapin","Oiseau"] },
-          { q: "Quel animal représente 鱼 ?", a: "Poisson", opts: ["Poisson","Oiseau","Grenouille","Serpent","Chien"] },
-          { q: "Quel animal représente 马 ?", a: "Cheval", opts: ["Cheval","Vache","Âne","Zèbre","Chèvre"] },
-          { q: "Quel animal représente 牛 ?", a: "Vache", opts: ["Vache","Cheval","Chien","Chat","Mouton"] }
+          { q: "Comment écrit-on <strong>'chat'</strong> ?", a: "猫", opts: ["猫", "狗", "鸟", "马", "牛"] },
+          { q: "Comment écrit-on <strong>'chien'</strong> ?", a: "狗", opts: ["狗", "猫", "鱼", "牛", "马"] },
+          { q: "Comment écrit-on <strong>'oiseau'</strong> ?", a: "鸟", opts: ["鸟", "马", "狗", "猫", "猪"] },
+          { q: "Comment écrit-on <strong>'poisson'</strong> ?", a: "鱼", opts: ["鱼", "牛", "猫", "狗", "鸟"] },
+          { q: "Comment écrit-on <strong>'cheval'</strong> ?", a: "马", opts: ["马", "鸟", "鱼", "牛", "羊"] },
+          { q: "Comment écrit-on <strong>'vache'</strong> ?", a: "牛", opts: ["牛", "马", "猫", "狗", "羊"] },
+          { q: "Quel animal représente 猫 ?", a: "Chat", opts: ["Chat", "Chien", "Tigre", "Lapin", "Oiseau"] },
+          { q: "Quel animal représente 鱼 ?", a: "Poisson", opts: ["Poisson", "Oiseau", "Grenouille", "Serpent", "Chien"] },
+          { q: "Quel animal représente 马 ?", a: "Cheval", opts: ["Cheval", "Vache", "Âne", "Zèbre", "Chèvre"] },
+          { q: "Quel animal représente 牛 ?", a: "Vache", opts: ["Vache", "Cheval", "Chien", "Chat", "Mouton"] }
         ]
       }
     };
@@ -334,20 +511,17 @@
       currentLevel = level;
       const data = quizData[level];
 
-      // Configuration
       quizTitle.textContent = data.title;
       quizSubtitle.textContent = data.subtitle;
       questions = [...data.questions].sort(() => Math.random() - 0.5);
       currentQuestionIndex = 0;
       score = 0;
       lives = INITIAL_LIVES;
-      answered = false;
 
-      // Affichage
       loadingEl.style.display = 'none';
-      timersContainer.style.display = 'flex';
       quizMain.style.display = 'block';
       quizResult.style.display = 'none';
+      timersContainer.style.display = 'flex';
 
       updateStats();
       showQuestion();
@@ -362,14 +536,9 @@
         return;
       }
 
-      answered = false;
-      quizNextBtn.style.display = 'none';
-      quizRestartBtn.style.display = 'none';
-
       const question = questions[currentQuestionIndex];
       quizQuestion.innerHTML = question.q;
 
-      // Mélange des options
       const shuffledOpts = [...question.opts].sort(() => Math.random() - 0.5);
       quizAnswers.innerHTML = '';
 
@@ -381,7 +550,6 @@
         quizAnswers.appendChild(btn);
       });
 
-      // Mise à jour compteurs
       quizIndex.textContent = currentQuestionIndex + 1;
       quizTotal.textContent = questions.length;
 
@@ -393,7 +561,6 @@
       answered = true;
       stopQuestionTimer();
 
-      // Colorisation des réponses
       Array.from(quizAnswers.children).forEach(btn => {
         btn.disabled = true;
         if (btn.textContent === correct) {
@@ -403,7 +570,6 @@
         }
       });
 
-      // Mise à jour score/vies
       if (selected === correct) {
         score++;
       } else {
@@ -411,7 +577,7 @@
       }
 
       updateStats();
-      showNextButton();
+      setTimeout(nextQuestion, 800); // 🔁 800ms avant la question suivante
     }
 
     function handleQuestionTimeout() {
@@ -419,8 +585,6 @@
       answered = true;
 
       const question = questions[currentQuestionIndex];
-
-      // Révéler la bonne réponse
       Array.from(quizAnswers.children).forEach(btn => {
         btn.disabled = true;
         if (btn.textContent === question.a) {
@@ -430,15 +594,13 @@
 
       lives--;
       updateStats();
-      showNextButton();
+      setTimeout(nextQuestion, 800); // 🔁 800ms
     }
 
-    function showNextButton() {
-      if (lives > 0 && currentQuestionIndex < questions.length - 1) {
-        quizNextBtn.style.display = 'block';
-      } else {
-        quizRestartBtn.style.display = 'block';
-      }
+    function nextQuestion() {
+      currentQuestionIndex++;
+      answered = false;
+      showQuestion();
     }
 
     function updateStats() {
@@ -519,19 +681,6 @@
       }
     }
 
-    // ==========================================
-    // EVENT LISTENERS
-    // ==========================================
-    quizNextBtn.addEventListener('click', () => {
-      currentQuestionIndex++;
-      showQuestion();
-    });
-
-    quizRestartBtn.addEventListener('click', () => {
-      stopAllTimers();
-      initQuiz();
-    });
-
     retryBtn.addEventListener('click', () => {
       stopAllTimers();
       initQuiz();
@@ -548,4 +697,5 @@
     window.addEventListener('load', initQuiz);
   </script>
 </body>
+
 </html>
