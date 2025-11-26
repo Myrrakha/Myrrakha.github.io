@@ -17,6 +17,7 @@
             color: #f0f0f0;
         }
 
+
         #hover-warning {
             position: absolute;
             padding: 8px 14px;
@@ -146,6 +147,38 @@
             opacity: 0.4;
             cursor: not-allowed;
         }
+
+        /* Conteneur en 3 colonnes */
+        .dropdown-content.three-columns {
+            display: grid;
+            width: auto;
+            grid-template-columns: repeat(3, minmax(max-content, 1fr));
+            gap: 20px;
+            max-width : 95vw
+        }
+
+        /* Une colonne */
+        .quiz-column {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Titre */
+        .quiz-column .dropdown-subtitle {
+            font-weight: bold;
+            text-align: center;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #444;
+        }
+
+        /* Mobile : revenir en 1 colonne */
+        @media (max-width: 750px) {
+            .dropdown-content.three-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+
 
         /* AUTH SECTION */
         #auth-section {
@@ -521,7 +554,7 @@
                             baseBtn.title = 'Débloqué à 200 points globaux';
                             baseBtn.style.background = '';
                         }
-                    }       
+                    }
                     function updateBaseBtnVisibilityFallback() {
                         let globalScore = 0;
                         try {
@@ -529,7 +562,7 @@
                             if (localScore !== null && !isNaN(parseInt(localScore))) {
                                 globalScore = parseInt(localScore);
                             }
-                        } catch (e) {}
+                        } catch (e) { }
                         updateBaseBtnVisibility(globalScore);
                     }
 
@@ -542,42 +575,42 @@
                             console.error("[PATCH] Impossible de surcharger loadUserData : fonction introuvable");
                             return;
                         }
-                    
-                    const _origLoadUserData = window.loadUserData;
 
-                    window.loadUserData = async function () {
-                        const result = await _origLoadUserData.apply(this, arguments);
-                        let updated = false;
+                        const _origLoadUserData = window.loadUserData;
 
-                        try {
-                            // Firestore
-                            const userDocRef = doc(db, 'users', currentUser.uid);
-                            const userDoc = await getDoc(userDocRef);
-                            let userData = userDoc.data();
+                        window.loadUserData = async function () {
+                            const result = await _origLoadUserData.apply(this, arguments);
+                            let updated = false;
 
-                            if (userData) {
-                                console.log("[PATCH] Firestore globalScore =", userData.globalScore);
-                                // MAJ bouton Base
-                                updateBaseBtnVisibility(userData.globalScore || 0);
-                                // Stockage dans localStorage pour quiz chinois
-                                localStorage.setItem('globalScore', userData.globalScore || 0);
+                            try {
+                                // Firestore
+                                const userDocRef = doc(db, 'users', currentUser.uid);
+                                const userDoc = await getDoc(userDocRef);
+                                let userData = userDoc.data();
+
+                                if (userData) {
+                                    console.log("[PATCH] Firestore globalScore =", userData.globalScore);
+                                    // MAJ bouton Base
+                                    updateBaseBtnVisibility(userData.globalScore || 0);
+                                    // Stockage dans localStorage pour quiz chinois
+                                    localStorage.setItem('globalScore', userData.globalScore || 0);
+                                    updated = true;
+                                }
+                            } catch (e) {
+                                console.warn("[PATCH] Firestore erreur → fallback localStorage");
+                                updateBaseBtnVisibilityFallback();
                                 updated = true;
                             }
-                        } catch (e) {
-                            console.warn("[PATCH] Firestore erreur → fallback localStorage");
-                            updateBaseBtnVisibilityFallback();
-                            updated = true;
-                        }
 
-                        if (!updated) updateBaseBtnVisibilityFallback();
+                            if (!updated) updateBaseBtnVisibilityFallback();
 
-                        return result;
-                    };
+                            return result;
+                        };
 
-                    console.log("[PATCH] loadUserData surchargé proprement ✔️");
-                });
-            </script>
-        </div>
+                        console.log("[PATCH] loadUserData surchargé proprement ✔️");
+                    });
+                </script>
+            </div>
 
             <div class="nav-right" id="nav-logged-out">
                 <!-- Vide quand déconnecté -->
@@ -593,29 +626,35 @@
                     </div>
                     <div class="dropdown">
                         <button class="dropdown-btn">Quiz ▾</button>
-                        <div class="dropdown-content">
-                            <span class="dropdown-subtitle">📍 Quiz Départements</span>
-                            <button class="dropdown-item" data-mode="1">Mode 1 : Nom → Numéro</button>
-                            <button class="dropdown-item" data-mode="2">Mode 2 : Numéro → Nom</button>
-                            <button class="dropdown-item" data-mode="3">Mode 3 : Forme → Nom/Num</button>
-                            <button class="dropdown-item" data-mode="4">Mode 4 : Préfecture → Dépt</button>
-                            <button class="dropdown-item" data-mode="5">Mode 5 : Mix Nom/Num/Préf</button>
-                            <button class="dropdown-item" data-mode="6">Mode 6 : Mix Total</button>
-                            <hr style="margin:10px 0; border:0; border-top:1px solid #444;">
-                            <span class="dropdown-subtitle">🇨🇳 Quiz Chinois simplifié</span>
-                            <button class="dropdown-item quiz-chinois-btn" data-chinois-level="1"
-                                onclick="window.location.href='quiz-chinois.html#1'">Niveau 1 : Chiffres 1-10</button>
-                            <button class="dropdown-item quiz-chinois-btn" data-chinois-level="2"
-                                onclick="window.location.href='quiz-chinois.html#2'">Niveau 2 : Jours de la
-                                semaine</button>
-                            <button class="dropdown-item quiz-chinois-btn" data-chinois-level="3"
-                                onclick="window.location.href='quiz-chinois.html#3'">Niveau 3 : Couleurs de
-                                base</button>
-                            <button class="dropdown-item quiz-chinois-btn" data-chinois-level="4"
-                                onclick="window.location.href='quiz-chinois.html#4'">Niveau 4 : Membres famille</button>
-                            <button class="dropdown-item quiz-chinois-btn" data-chinois-level="5"
-                                onclick="window.location.href='quiz-chinois.html#5'">Niveau 5 : Animaux
-                                courants</button>
+                        <div class="dropdown-content three-columns">
+
+                            <div class="quiz-column">
+                                <span class="dropdown-subtitle">📍 Quiz Départements</span>
+                                <button class="dropdown-item" data-mode="1">Mode 1 : Nom → Numéro</button>
+                                <button class="dropdown-item" data-mode="2">Mode 2 : Numéro → Nom</button>
+                                <button class="dropdown-item" data-mode="3">Mode 3 : Forme → Nom/Num</button>
+                                <button class="dropdown-item" data-mode="4">Mode 4 : Préfecture → Dépt</button>
+                                <button class="dropdown-item" data-mode="5">Mode 5 : Mix Nom/Num/Préf</button>
+                                <button class="dropdown-item" data-mode="6">Mode 6 : Mix Total</button>
+                            </div>
+
+                            <div class="quiz-column">
+                                <span class="dropdown-subtitle">🇨🇳 Quiz Chinois simplifié</span>
+                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="1" onclick="window.location.href='quiz-chinois.html#1'">Niveau 1 : Chiffres 1-10</button>
+                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="2" onclick="window.location.href='quiz-chinois.html#2'">Niveau 2 : Jours de la semaine</button>
+                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="3" onclick="window.location.href='quiz-chinois.html#3'">Niveau 3 : Couleurs de base</button>
+                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="4" onclick="window.location.href='quiz-chinois.html#4'">Niveau 4 : Membres famille</button>
+                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="5" onclick="window.location.href='quiz-chinois.html#5'">Niveau 5 : Animaux courants</button>
+                            </div>
+
+                            <div class="quiz-column">
+                                <span class="dropdown-subtitle"> 🩺 Quiz Médecine</span>
+                                <button class="dropdown-item quiz-medecine-btn" onclick="window.location.href='quiz-medecine.html#1'">Niveau 1 : Bases</button>
+                                <button class="dropdown-item quiz-medecine-btn" onclick="window.location.href='quiz-medecine.html#2'">Niveau 2 : Anatomie</button>
+                                <button class="dropdown-item quiz-medecine-btn" onclick="window.location.href='quiz-medecine.html#3'">Niveau 3 : Pathologies</button>
+                                <button class="dropdown-item quiz-medecine-btn" onclick="window.location.href='quiz-medecine.html#4'">Niveau 4 : Médicaments</button>
+                                <button class="dropdown-item quiz-medecine-btn" onclick="window.location.href='quiz-medecine.html#5'">Niveau 5 : Cas cliniques</button>
+                            </div>
                         </div>
                     </div>
                     <button class="action-btn" onclick="window.location.href='settings.html'"
@@ -746,12 +785,32 @@
     <script type="module">
         // Score requis pour chaque niveau quiz chinois
         const chinoisRequired = { 1: 200, 2: 250, 3: 300, 4: 350, 5: 400 };
+        const medecineRequired = { 1: 40, 2: 80, 3: 160, 4: 320, 5: 500 };
 
         // Met à jour l'état des boutons quiz chinois selon le globalScore
         function updateChinoisLevelButtons(globalScore) {
             document.querySelectorAll('.quiz-chinois-btn').forEach(btn => {
                 const level = parseInt(btn.dataset.chinoisLevel);
                 const required = chinoisRequired[level] || 0;
+                if (globalScore < required) {
+                    btn.classList.add('disabled');
+                    btn.disabled = true;
+                    btn.title = `Débloqué à ${required} points globaux`;
+                    btn.addEventListener('mouseenter', function (e) {
+                        showHoverWarning(`Débloqué à ${required} points globaux`, e.pageX, e.pageY);
+                    });
+                } else {
+                    btn.classList.remove('disabled');
+                    btn.disabled = false;
+                    btn.title = '';
+                }
+            });
+        }
+
+        function updateMedecineLevelButtons(globalScore) {
+            document.querySelectorAll('.quiz-medecine-btn').forEach(btn => {
+                const level = parseInt(btn.dataset.chinoisLevel);
+                const required = medecineRequired[level] || 0;
                 if (globalScore < required) {
                     btn.classList.add('disabled');
                     btn.disabled = true;
@@ -1032,6 +1091,7 @@
                 // Update mode buttons based on global score
                 updateModeButtons(userData.globalScore || 0);
                 updateChinoisLevelButtons(userData.globalScore || 0);
+                updateMedecineLevelButtons(userDate.globalScore || 0);
             } catch (error) {
                 console.error('Erreur chargement données:', error);
                 alert('Erreur de chargement. Essayez de vous reconnecter.');
