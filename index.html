@@ -154,7 +154,7 @@
         /* Conteneur en 3 colonnes */
         .dropdown-content.three-columns {
             width: auto;
-            grid-template-columns: repeat(3, minmax(max-content, 1fr));
+            grid-template-columns: repeat(3, minmax(max-content, 2fr));
             gap: 20px;
             max-width: 95vw
         }
@@ -179,9 +179,9 @@
         }
 
         /* Mobile : revenir en 1 colonne */
-        @media (max-width: 1600px) {
+        @media (max-width: 2000px) {
             .dropdown-content.three-columns {
-                grid-template-columns: 1fr;
+                grid-template-columns: 2fr;
             }
         }
 
