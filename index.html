@@ -154,7 +154,7 @@
         /* Conteneur en 3 colonnes */
         .dropdown-content.three-columns {
             width: auto;
-            grid-template-columns: repeat(3, minmax(max-content, 2fr));
+            grid-template-columns: repeat(3, minmax(max-content, 1fr));
             gap: 20px;
             max-width: 95vw
         }
@@ -178,10 +178,40 @@
             border-bottom: 1px solid #444;
         }
 
-        /* Mobile : revenir en 1 colonne */
-        @media (max-width: 2000px) {
+        @media (max-width: 750px) {
             .dropdown-content.three-columns {
-                grid-template-columns: 2fr;
+                grid-template-columns: 1fr 1fr;
+                /* 2 colonnes */
+                width: 90vw;
+                /* occupe 90% de la largeur de l'écran */
+                max-width: 500px;
+                /* évite que ce soit trop large sur tablette */
+                right: 5vw;
+                /* centre approximativement */
+                padding: 12px;
+                gap: 16px;
+            }
+
+            /* Optionnel : réduire la taille du texte */
+            .dropdown-item {
+                font-size: 0.92em;
+                padding: 9px 12px;
+            }
+
+            .dropdown-subtitle {
+                font-size: 0.85em;
+                padding-bottom: 4px;
+            }
+
+            .dropdown {
+                position: static;
+                /* désactive position: relative pour simplifier */
+            }
+
+            .dropdown-content {
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%);
             }
         }
 
