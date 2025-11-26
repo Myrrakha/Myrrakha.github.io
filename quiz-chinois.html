@@ -505,11 +505,11 @@
         const oldGlobalScore = userData.globalScore || 0;
         const newGlobalScore = oldGlobalScore + finalScore;
         const oldChinoisScore = userData.quizScores?.chinois || 0;
-        const newBestChinoisScore = Math.max(oldChinoisScore, finalScore);
+        const newChinoisScore = oldChinoisScore + finalScore;
 
         await updateDoc(userDocRef, {
           globalScore: newGlobalScore,
-          'quizScores.chinois': newBestChinoisScore,
+          'quizScores.chinois': newChinoisScore,
           lastQuizDate: new Date().toISOString()
         });
 
