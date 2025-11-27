@@ -82,25 +82,29 @@
       color: #aaa;
     }
 
-    /* Timers */
+    /* Timers empilés verticalement */
     #timers-container {
       display: flex;
-      gap: 20px;
+      flex-direction: column;
       width: 100%;
-      margin-top: 8px;
-      align-items: center;
+      margin-top: 12px;
+      gap: 8px;
     }
 
-    #timer-bar-container,
-    #question-timer-bar-container {
+    .timer-bar-container {
       display: flex;
       align-items: center;
-      flex: 1;
       gap: 10px;
+      width: 100%;
     }
 
-    #timer-bar,
-    #question-timer-bar {
+    .timer-label {
+      white-space: nowrap;
+      font-size: 0.95em;
+      color: #ccc;
+    }
+
+    .timer-bar {
       width: 100%;
       height: 10px;
       background-color: #4e4e6a;
@@ -108,12 +112,21 @@
       overflow: hidden;
     }
 
-    #timer-fill,
-    #question-timer-fill {
+    .timer-fill {
       height: 100%;
-      width: 0;
-      background-color: #2ecc71;
+      width: 100%;
+      /* commence plein */
       transition: width 0.3s linear;
+    }
+
+    #timer-fill {
+      background-color: #9c28a7;
+      /* violet */
+    }
+
+    #question-timer-fill {
+      background-color: #2ecc71;
+      /* vert */
     }
 
     /* Quiz area */
@@ -205,6 +218,63 @@
       margin: 12px 0;
     }
 
+    .quiz-main-container {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+      align-items: flex-start;
+    }
+
+    .leaderboard-container {
+      background: #2c2c3a;
+      padding: 14px;
+      border-radius: 10px;
+      width: 180px;
+      max-height: 300px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .leaderboard-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      font-size: 0.9em;
+    }
+
+    .leaderboard-item .rank {
+      font-weight: bold;
+      color: #ffcc00;
+      width: 24px;
+    }
+
+    .leaderboard-item .name {
+      flex: 1;
+      text-align: right;
+      padding-right: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .leaderboard-item .score {
+      font-weight: bold;
+      color: #2ecc71;
+      margin-left: 6px;
+    }
+
+    @media (max-width: 750px) {
+      .quiz-main-container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .leaderboard-container {
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+
     /* Responsive */
     @media (max-width:700px) {
       .answers-container {
@@ -218,6 +288,12 @@
       #timer-bar-container,
       #question-timer-bar-container {
         width: 100%;
+      }
+    }
+
+    @media (max-width: 700px) {
+      #timers-container {
+        flex-direction: column;
       }
     }
   </style>
@@ -248,20 +324,26 @@
         <div class="question-box">
           <div id="quiz-question" class="question-text"></div>
         </div>
-        <div class="answers-container" id="quiz-answers"></div>
+        <div class="quiz-main-container">
+          <div class="answers-container" id="quiz-answers"></div>
+          <div class="leaderboard-container" id="chinois-leaderboard">
+            <h3 style="margin: 0 0 12px 0; font-size: 1.1em; text-align: center;">🏆 Top 5 Chinois</h3>
+            <div id="chinois-leaderboard-list" style="font-size: 0.95em;"></div>
+          </div>
+        </div>
 
         <!-- ⚡ TIMERS PLACÉS ICI, EN DESSOUS DES RÉPONSES -->
         <div id="timers-container">
-          <div id="timer-bar-container">
-            <span style="white-space:nowrap;">⏱️ Temps restant : <strong id="timer">0</strong>s</span>
-            <div id="timer-bar">
-              <div id="timer-fill"></div>
+          <div class="timer-bar-container">
+            <span class="timer-label">⏱️ Temps restant : <strong id="timer">0</strong>s</span>
+            <div class="timer-bar">
+              <div id="timer-fill" class="timer-fill"></div>
             </div>
           </div>
-          <div id="question-timer-bar-container">
-            <span style="white-space:nowrap;">⚡ Question : <strong id="question-timer">0</strong>s</span>
-            <div id="question-timer-bar">
-              <div id="question-timer-fill"></div>
+          <div class="question-timer-bar-container">
+            <span class="timer-label">⚡ Question : <strong id="question-timer">0</strong>s</span>
+            <div class="timer-bar">
+              <div id="question-timer-fill" class="timer-fill"></div>
             </div>
           </div>
         </div>
@@ -404,9 +486,9 @@
     // ==========================================
     // CONSTANTES
     // ==========================================
-    const TOTAL_TIME_SECONDS = 180; // 3 minutes
-    const QUESTION_TIME_SECONDS = 20; // 20 secondes par question
-    const INITIAL_LIVES = 3;
+    const TOTAL_TIME_SECONDS = 90; // 3 minutes
+    const QUESTION_TIME_SECONDS = 10; // 20 secondes par question
+    const INITIAL_LIVES = 10;
 
     // ==========================================
     // VARIABLES D'ÉTAT
@@ -452,43 +534,44 @@
       clearInterval(globalTimerInterval);
       let remaining = TOTAL_TIME_SECONDS;
       timerDisplay.textContent = remaining;
-      timerFill.style.width = '0%';
+      timerFill.style.width = '100%';
 
       globalTimerInterval = setInterval(() => {
         remaining--;
         timerDisplay.textContent = remaining;
-        const percent = ((TOTAL_TIME_SECONDS - remaining) / TOTAL_TIME_SECONDS) * 100;
-        timerFill.style.width = percent + '%';
+        const percentElapsed = ((TOTAL_TIME_SECONDS - remaining) / TOTAL_TIME_SECONDS) * 100;
+        const percentRemaining = 100 - percentElapsed;
+        timerFill.style.width = percentRemaining + '%';
 
         if (remaining <= 0) {
           clearInterval(globalTimerInterval);
           endQuiz(true); // timeout global
         }
-      }, 1000);
+      }, 2000);
     }
 
     function startQuestionTimer() {
       clearInterval(questionTimerInterval);
       let remaining = QUESTION_TIME_SECONDS;
       questionTimerDisplay.textContent = remaining;
-      questionTimerFill.style.width = '0%';
+      questionTimerFill.style.width = '100%';
 
       questionTimerInterval = setInterval(() => {
         remaining--;
         questionTimerDisplay.textContent = remaining;
-        const percent = ((QUESTION_TIME_SECONDS - remaining) / QUESTION_TIME_SECONDS) * 100;
-        questionTimerFill.style.width = percent + '%';
+        const percentElapsed = ((QUESTION_TIME_SECONDS - remaining) / QUESTION_TIME_SECONDS) * 100;
+        const percentRemaining = 100 - percentElapsed;
+        questionTimerFill.style.width = percentRemaining + '%';
 
         if (remaining <= 0) {
           clearInterval(questionTimerInterval);
           handleQuestionTimeout();
         }
-      }, 1000);
+      }, 2000);
     }
 
     function stopQuestionTimer() {
       clearInterval(questionTimerInterval);
-      questionTimerFill.style.width = '0%';
     }
 
     function stopAllTimers() {
@@ -499,7 +582,7 @@
     // ==========================================
     // GESTION DU QUIZ
     // ==========================================
-    function initQuiz() {
+    async function initQuiz() {
       const hash = window.location.hash.replace('#', '');
       const level = parseInt(hash, 10);
 
@@ -526,6 +609,7 @@
       updateStats();
       showQuestion();
       startGlobalTimer();
+      await loadChinoisLeaderboard();
     }
 
     function showQuestion() {
@@ -577,7 +661,7 @@
       }
 
       updateStats();
-      setTimeout(nextQuestion, 800); // 🔁 800ms avant la question suivante
+      setTimeout(nextQuestion, 2000); // 🔁 800ms avant la question suivante
     }
 
     function handleQuestionTimeout() {
@@ -594,7 +678,7 @@
 
       lives--;
       updateStats();
-      setTimeout(nextQuestion, 800); // 🔁 800ms
+      setTimeout(nextQuestion, 2000); // 🔁 800ms
     }
 
     function nextQuestion() {
@@ -618,6 +702,7 @@
 
       // Sauvegarde du score
       await saveQuizScore(score);
+      await loadChinoisLeaderboard();
 
       // Message personnalisé
       if (timeout) {
@@ -678,6 +763,56 @@
         console.log("✅ Score sauvegardé:", finalScore);
       } catch (error) {
         console.error("❌ Erreur sauvegarde score:", error);
+      }
+    }
+
+    async function loadChinoisLeaderboard() {
+      const listEl = document.getElementById('chinois-leaderboard-list');
+      if (!listEl) return;
+
+      listEl.innerHTML = '<div style="text-align:center; opacity:0.6;">Chargement...</div>';
+
+      try {
+        // Requête Firestore : top 5 par quizScores.chinois
+        const q = query(
+          collection(db, 'users'),
+          orderBy('quizScores.chinois', 'desc'),
+          limit(5)
+        );
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          listEl.innerHTML = '<div style="text-align:center; opacity:0.6;">Aucun score</div>';
+          return;
+        }
+
+        let html = '';
+        let rank = 1;
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const pseudo = (data.pseudo || 'Anonyme').substring(0, 12);
+          const score = data.quizScores?.chinois || 0;
+
+          // Emoji pour le top 3
+          let rankText = `${rank}.`;
+          if (rank === 1) rankText = '🥇';
+          else if (rank === 2) rankText = '🥈';
+          else if (rank === 3) rankText = '🥉';
+
+          html += `
+        <div class="leaderboard-item">
+          <span class="rank">${rankText}</span>
+          <span class="name">${pseudo}</span>
+          <span class="score">${score}</span>
+        </div>
+      `;
+          rank++;
+        });
+
+        listEl.innerHTML = html;
+      } catch (error) {
+        console.error("Erreur chargement leaderboard chinois:", error);
+        listEl.innerHTML = '<div style="text-align:center; opacity:0.6;">Erreur</div>';
       }
     }
 
