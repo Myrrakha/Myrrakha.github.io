@@ -84,49 +84,51 @@
 
     /* Timers empilés verticalement */
     #timers-container {
+      width: 92%;
+      max-width: 1000px;
+      margin: 25px auto 0;
+      /* centré + espace en haut */
       display: flex;
       flex-direction: column;
-      width: 100%;
-      margin-top: 12px;
-      gap: 8px;
+      gap: 16px;
     }
 
-    .timer-bar-container {
+    .timer-item {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      flex-direction: column;
       width: 100%;
     }
 
     .timer-label {
-      white-space: nowrap;
       font-size: 0.95em;
       color: #ccc;
+      margin-bottom: 6px;
+      text-align: left;
     }
 
     .timer-bar {
       width: 100%;
-      height: 10px;
-      background-color: #4e4e6a;
-      border-radius: 6px;
+      height: 28px;
+      background: #2b2b3a;
+      border-radius: 10px;
       overflow: hidden;
     }
 
     .timer-fill {
       height: 100%;
       width: 100%;
-      /* commence plein */
-      transition: width 0.3s linear;
+      border-radius: 10px;
+      transition: width 0.15s linear;
     }
 
     #timer-fill {
-      background-color: #9c28a7;
-      /* violet */
+      background: #9c28a7ff;
+      /* violet principal */
     }
 
     #question-timer-fill {
-      background-color: #2ecc71;
-      /* vert */
+      background: #a832d6;
+      /* violet secondaire (comme dans départements) */
     }
 
     /* Quiz area */
@@ -334,15 +336,15 @@
 
         <!-- ⚡ TIMERS PLACÉS ICI, EN DESSOUS DES RÉPONSES -->
         <div id="timers-container">
-          <div class="timer-bar-container">
-            <span class="timer-label">⏱️ Temps restant : <strong id="timer">0</strong>s</span>
-            <div class="timer-bar">
+          <div class="timer-item">
+            <div class="timer-label">⏱️ Temps restant : <strong id="timer">0</strong>s</div>
+            <div id="timer-bar" class="timer-bar">
               <div id="timer-fill" class="timer-fill"></div>
             </div>
           </div>
-          <div class="question-timer-bar-container">
-            <span class="timer-label">⚡ Question : <strong id="question-timer">0</strong>s</span>
-            <div class="timer-bar">
+          <div class="timer-item">
+            <div class="timer-label">⚡ Question : <strong id="question-timer">0</strong>s</div>
+            <div id="question-timer-bar" class="timer-bar">
               <div id="question-timer-fill" class="timer-fill"></div>
             </div>
           </div>
@@ -458,12 +460,24 @@
       // ------------------------- (1) Quel est le caractère pour XX ? -------------------------
       if (type === 1) {
         const n = Math.floor(Math.random() * 100) + 1;
+        const correct = numberToChinese(n);
+
+        const wrong = new Set();
+        while (wrong.size < 5) {
+          const r = Math.floor(Math.random() * 100) + 1;
+          if (r !== n) wrong.add(numberToChinese(r));
+        }
+
+        const allOpts = [correct, ...wrong];
+        const shuffleOpts = [...allOpts].sort(() => Math.random() - 0.5);
+
         return {
           q: `Quel est le caractère pour <br><span style="font-size:4rem;font-weight:800;display:block;">${n}</span> ?`,
-          a: numberToChinese(n),
-          opts: ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "百", "千"].map(
-            o => ({ raw: o, display: `<span style="font-size: calc(1rem + 3px);">${o}</span>` })
-          )
+          a: correct,
+          opts: shuffleOpts.map(char => ({
+            raw: char,
+            display: `<spawn style ="font-size: calc(1rem + 3px);">${char}</span>`
+          }))
         };
       }
 
@@ -673,7 +687,18 @@
           clearInterval(globalTimerInterval);
           endQuiz(true); // timeout global
         }
-      }, 2000);
+      }, 1000);
+    }
+
+    function highlightAnswers(correctAnswer, selectedAnswer = null) {
+      Array.from(quizAnswers.children).forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent === correctAnswer) {
+          btn.style.background = '#2ecc71'; // vert
+        } else if (selectedAnswer !== null && btn.textContent === selectedAnswer) {
+          btn.style.background = '#e74c3c'; // rouge
+        }
+      });
     }
 
     function startQuestionTimer() {
@@ -693,7 +718,7 @@
           clearInterval(questionTimerInterval);
           handleQuestionTimeout();
         }
-      }, 2000);
+      }, 1000);
     }
 
     function stopQuestionTimer() {
@@ -755,8 +780,13 @@
       shuffledOpts.forEach(opt => {
         const btn = document.createElement('button');
         btn.className = 'answer-btn';
-        btn.textContent = opt;
-        btn.onclick = () => selectAnswer(opt, question.a);
+
+        const value = typeof opt === 'object' ? String(opt.raw) : opt;
+        const display = typeof opt === 'object' ? opt.display : opt;
+
+        btn.innerHTML = typeof opt === 'object' ? opt.display : opt;
+        btn.onclick = () => selectAnswer(
+          typeof opt === 'object' ? String(opt.raw) : opt, question.a);
         quizAnswers.appendChild(btn);
       });
 
@@ -771,14 +801,7 @@
       answered = true;
       stopQuestionTimer();
 
-      Array.from(quizAnswers.children).forEach(btn => {
-        btn.disabled = true;
-        if (btn.textContent === correct) {
-          btn.style.background = '#2ecc71';
-        } else if (btn.textContent === selected) {
-          btn.style.background = '#e74c3c';
-        }
-      });
+      highlightAnswers(correct, selected);
 
       if (selected === correct) {
         score++;
@@ -787,24 +810,17 @@
       }
 
       updateStats();
-      setTimeout(nextQuestion, 2000); // 🔁 800ms avant la question suivante
+      setTimeout(nextQuestion, 1000); // 🔁 800ms avant la question suivante
     }
 
     function handleQuestionTimeout() {
       if (answered) return;
       answered = true;
-
       const question = questions[currentQuestionIndex];
-      Array.from(quizAnswers.children).forEach(btn => {
-        btn.disabled = true;
-        if (btn.textContent === question.a) {
-          btn.style.background = '#2ecc71';
-        }
-      });
-
+      highlightAnswers(question.a);
       lives--;
       updateStats();
-      setTimeout(nextQuestion, 2000); // 🔁 800ms
+      setTimeout(nextQuestion, 1000); // 🔁 800ms
     }
 
     function nextQuestion() {
