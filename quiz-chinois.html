@@ -428,7 +428,61 @@
       { q: "Combien de secondes dans une minute ?", a: "60" },
       { q: "Combien de mois dans une année ?", a: "12" },
       { q: "Combien de jours dans une année ?", a: "365" },
+      { q: "Combien y a-t-il de continents ?", a: "7" },
+      { q: "Combien y a-t-il d’océans sur Terre ?", a: "5" },
+      { q: "Combien de jours dans une semaine ?", a: "7" },
+      { q: "Combien de minutes dans une heure ?", a: "60" },
+      { q: "Combien de secondes dans une minute ?", a: "60" },
+      { q: "Combien de mois dans une année ?", a: "12" },
+      { q: "Combien de jours dans une année ?", a: "365" },
+      { q: "Combien de semaines dans une année ?", a: "52" },
+      { q: "Combien de jours dans un mois de février non bissextile ?", a: "28" },
+      { q: "Combien de jours dans un mois de février bissextile ?", a: "29" },
+      { q: "Combien d’heures dans une journée ?", a: "24" },
+      { q: "Combien de minutes dans une demi-heure ?", a: "30" },
+      { q: "Combien de secondes dans une demi-minute ?", a: "30" },
+      { q: "Combien de mois ont 31 jours ?", a: "7" },
+      { q: "Combien de mois ont 30 jours ?", a: "4" },
+      { q: "Quelle est la distance moyenne Terre-Lune (en km) ?", a: "384400" },
+      { q: "Quelle est la distance moyenne Terre-Soleil (en km) ?", a: "149600000" },
+      { q: "Combien de fuseaux horaires existe-t-il dans le monde ?", a: "24" },
+      { q: "Combien de jours dure une révolution complète de Mercure autour du Soleil ?", a: "88" },
+      { q: "Combien de kilomètres font un marathon ?", a: "42.195" },
+      { q: "Quelle est la vitesse de la lumière dans le vide (en km/s) ?", a: "299792" },
+      { q: "Combien de minutes font une demi-journée ?", a: "720" },
+      { q: "Combien de secondes font une heure ?", a: "3600" },
+      { q: "Combien de semaines font 3 mois ?", a: "13" },
+      { q: "Combien de kilomètres fait la circonférence de la Terre à l’équateur ?", a: "40075" },
+      { q: "Combien de jours dure un cycle lunaire complet ?", a: "29.53" },
+      { q: "Combien de jours dure un siècle ?", a: "36525" },
+      { q: "Combien de secondes dans une journée ?", a: "86400" },
+      { q: "Combien de minutes dans une année non bissextile ?", a: "525600" },
+      { q: "Combien de kilomètres séparent Paris et New York à vol d’oiseau ?", a: "5837" },
+      { q: "Quelle est la profondeur maximale connue de l’océan Pacifique (Fosse des Mariannes, en m) ?", a: "10994" },
+      { q: "Combien de rotations complètes la Terre effectue-t-elle en une année ?", a: "365" },
+      { q: "Combien de rotations complètes la Lune effectue-t-elle sur elle-même en une année terrestre ?", a: "13" },
+      { q: "Combien de minutes faut-il pour que la lumière du Soleil atteigne la Terre ?", a: "8" },
+      { q: "Quelle est la vitesse moyenne d’un train TGV (en km/h) ?", a: "320" },
+      { q: "Combien de kilomètres parcourt la Terre autour du Soleil en une année ?", a: "940000000" },
+      { q: "Combien de kilomètres parcourt un astronaute sur la Lune en 1 heure en marchant ?", a: "5" },
+      { q: "Combien de jours contient une décennie ?", a: "3650" },
+      { q: "Quelle est la distance approximative entre la Terre et Mars au plus proche (en km) ?", a: "54600000" },
+      { q: "Combien de secondes contient une année bissextile ?", a: "31622400" },
+      { q: "Combien de mètres fait un kilomètre ?", a: "1000" },
+      { q: "Combien de centimètres fait un mètre ?", a: "100" },
+      { q: "Combien de millimètres fait un centimètre ?", a: "10" },
+      { q: "Combien de jours dure un mandat présidentiel français ?", a: "1826" },
+      { q: "Combien de kilomètres parcourt un marathonien moyen en 1 an s’il court 3 fois par semaine ?", a: "6600" },
+      { q: "Combien de mois font 5 ans ?", a: "60" },
+      { q: "Combien de semaines font 2 ans ?", a: "104" },
+      { q: "Combien de jours dure un mois lunaire moyen ?", a: "29.53" },
+      { q: "Combien de minutes met un train à grande vitesse pour parcourir 100 km à 300 km/h ?", a: "20" },
+      { q: "Combien de jours met la lumière pour parcourir 1 année-lumière ?", a: "365" },
+      { q: "Combien de kilomètres fait la circonférence d’une roue de vélo de 0,7 m de diamètre ?", a: "2.2" },
+      { q: "Combien de secondes met un son pour parcourir 1 km dans l’air ?", a: "2.9" },
+      { q: "Combien de kilomètres fait la circonférence de la Lune ?", a: "10921" }
     ];
+
 
 
     // --- Génère des options FR + CH aléatoires
@@ -450,6 +504,22 @@
       }));
 
       return opts.sort(() => Math.random() - 0.5);
+    }
+
+    function generateType3RndOpts(correctAnswer, count = 6) {
+      const values = new Set();
+      values.add(Number(correctAnswer));
+
+      while (values.size < count) {
+        let v = Number(correctAnswer) + Math.floor(Math.random() * 21) - 10;
+        if (v < 0 || v > 100) v = Math.floor(Math.random() * 101);
+        values.add(v);
+      }
+
+      return [...values].map(v => ({
+        raw: v,
+        display: `<span style="font-size: calc(1rem + 3px);">${numberToChinese(v)}</span>`
+      })).sort(() => Math.random() - 0.5);
     }
 
 
@@ -476,10 +546,11 @@
           a: correct,
           opts: shuffleOpts.map(char => ({
             raw: char,
-            display: `<spawn style ="font-size: calc(1rem + 3px);">${char}</span>`
+            display: `<span style="font-size: calc(1rem + 3px);">${char}</span>`
           }))
         };
       }
+
 
 
       // ------------------------- (2) Calcul XX - YY = ? -------------------------
@@ -488,17 +559,18 @@
         let b = Math.floor(Math.random() * 100) + 1;
         if (b > a) [a, b] = [b, a];
 
-        const aCH = numberToChinese(a);
-        const bCH = numberToChinese(b);
         const result = a - b;
 
+        // Décide aléatoirement comment afficher a et b
+        const displayA = Math.random() > 0.5 ? String(a) : numberToChinese(a);
+        const displayB = Math.random() > 0.5 ? String(b) : numberToChinese(b);
+
         return {
-          q: `${a} (${aCH}) − ${b} (${bCH}) = ?`,
-          a: String(result),
-          opts: generateRandomOpts(result, 6)
+          q: `${displayA} − ${displayB} = ?`,
+          a: String(result), // toujours stocké en string numérique pour comparaison
+          opts: generateRandomOpts(result, 6) // on garde le système existant
         };
       }
-
 
       // ------------------------- (3) Questions culturelles -------------------------
       if (type === 3) {
@@ -508,7 +580,7 @@
         return {
           q: item.q,
           a: item.a,
-          opts: generateRandomOpts(correct, 6)
+          opts: generateType3RndOpts(correct, 6)
         };
       }
 
@@ -518,27 +590,34 @@
         const n = Math.floor(Math.random() * 100) + 1;
         const ch = numberToChinese(n);
 
-        const opts = Array.from({ length: 12 }, () =>
-          Math.floor(Math.random() * 100) + 1
-        ).map(v => ({
-          raw: v,
-          display: `<span style="font-size: calc(1rem + 3px);">${v}</span>`
-        }));
+        // Génère 5 mauvaises réponses
+        const wrong = new Set();
+        while (wrong.size < 5) {
+          const r = Math.floor(Math.random() * 100) + 1;
+          if (r !== n) wrong.add(r);
+        }
+
+        // Combine bonne + mauvaises
+        const allOpts = [n, ...wrong];
+        const shuffledOpts = [...allOpts].sort(() => Math.random() - 0.5);
 
         return {
           q: `Quel est ce caractère : <br><span style="font-size:4rem;font-weight:800;display:block;">${ch}</span>`,
           a: String(n),
-          opts
+          opts: shuffledOpts.map(v => ({
+            raw: v,
+            display: `<span style="font-size: calc(1rem + 3px);">${v}</span>`
+          }))
         };
       }
     }
 
 
 
-    // --- Génération de 25 questions ---
+    // --- Génération de 50 questions ---
     function generateQuiz() {
       const questions = [];
-      for (let i = 0; i < 25; i++) {
+      for (let i = 0; i < 50; i++) {
         questions.push(generateRandomQuestion());
       }
 
@@ -555,8 +634,10 @@
     console.log(window.quizNiveau1);
 
 
+
+
     const quizData = {
-      1: window.quizNiveau1,
+      1: generateQuiz(),
       2: {
         title: "Niveau 2 : Jours de la semaine",
         subtitle: "Maîtrisez les jours de la semaine en chinois",
@@ -693,13 +774,14 @@
     function highlightAnswers(correctAnswer, selectedAnswer = null) {
       Array.from(quizAnswers.children).forEach(btn => {
         btn.disabled = true;
-        if (btn.textContent === correctAnswer) {
-          btn.style.background = '#2ecc71'; // vert
-        } else if (selectedAnswer !== null && btn.textContent === selectedAnswer) {
-          btn.style.background = '#e74c3c'; // rouge
+        const btnValue = btn.dataset.value;
+        if (btnValue === correctAnswer) {
+          btn.style.background = '#2ecc71'; // ✅ toujours vert
+        } else if (selectedAnswer !== null && btnValue === selectedAnswer) {
+          btn.style.background = '#e74c3c'; // rouge seulement si sélectionné
         }
       });
-    }
+    };
 
     function startQuestionTimer() {
       clearInterval(questionTimerInterval);
@@ -781,12 +863,18 @@
         const btn = document.createElement('button');
         btn.className = 'answer-btn';
 
-        const value = typeof opt === 'object' ? String(opt.raw) : opt;
-        const display = typeof opt === 'object' ? opt.display : opt;
+        let value, display;
+        if (typeof opt === 'object') {
+          value = String(opt.raw);
+          display = opt.display;
+        } else {
+          value = opt;
+          display = opt;
+        }
 
-        btn.innerHTML = typeof opt === 'object' ? opt.display : opt;
-        btn.onclick = () => selectAnswer(
-          typeof opt === 'object' ? String(opt.raw) : opt, question.a);
+        btn.innerHTML = display;
+        btn.dataset.value = value; // ✅ stocke la valeur brute
+        btn.onclick = () => selectAnswer(value, question.a);
         quizAnswers.appendChild(btn);
       });
 
