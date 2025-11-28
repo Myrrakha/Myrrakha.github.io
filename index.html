@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,15 +8,12 @@
         .hidden {
             display: none !important;
         }
-
         body {
             margin: 0;
             font-family: 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #0f1115, #1c1c24);
             color: #f0f0f0;
         }
-
-
         #hover-warning {
             position: absolute;
             padding: 8px 14px;
@@ -30,7 +26,6 @@
             transition: opacity 0.4s ease;
             z-index: 9999;
         }
-
         header {
             width: 100%;
             background: rgba(20, 20, 28, 0.8);
@@ -40,7 +35,6 @@
             top: 0;
             z-index: 1000;
         }
-
         .navbar {
             max-width: 1100px;
             margin: auto;
@@ -49,25 +43,21 @@
             align-items: center;
             padding: 12px 20px;
         }
-
         .nav-title {
             font-size: 1.4em;
             font-weight: 600;
             color: #eaeaea;
             letter-spacing: 1px;
         }
-
         .user-info {
             display: flex;
             gap: 15px;
             align-items: center;
         }
-
         .user-stats {
             font-size: 0.9em;
             text-align: right;
         }
-
         .logout-btn {
             padding: 8px 16px;
             background: #dc3545;
@@ -77,15 +67,12 @@
             cursor: pointer;
             transition: 0.25s;
         }
-
         .logout-btn:hover {
             background: #c82333;
         }
-
         .dropdown {
             position: relative;
         }
-
         .dropdown-btn {
             padding: 10px 20px;
             border-radius: 10px;
@@ -96,11 +83,9 @@
             font-weight: 500;
             transition: 0.25s;
         }
-
         .dropdown-btn:hover {
             background: #45455a;
         }
-
         .dropdown-content {
             position: absolute;
             right: 0;
@@ -116,19 +101,17 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
             z-index: 100;
         }
-
         .dropdown.open .dropdown-content {
             display: flex;
         }
-
         .dropdown-subtitle {
-            font-size: 0.9em;
+            font-size: 0.85em;
             color: #cfcfcf;
             margin: 5px 0;
         }
-
         .dropdown-item {
-            width: 100%;
+            width: 240px;
+            flex-direction: column;
             padding: 10px 15px;
             border-radius: 8px;
             border: none;
@@ -141,81 +124,13 @@
             -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
         }
-
         .dropdown-item:hover {
             background: #3d3d50;
         }
-
         .dropdown-item.disabled {
             opacity: 0.4;
             cursor: not-allowed;
         }
-
-        /* Conteneur en 3 colonnes */
-        .dropdown-content.three-columns {
-            width: auto;
-            grid-template-columns: repeat(3, minmax(max-content, 1fr));
-            gap: 20px;
-            max-width: 95vw
-        }
-
-        .dropdown.open .dropdown-content.three-columns {
-            display: grid
-        }
-
-        /* Une colonne */
-        .quiz-column {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        /* Titre */
-        .quiz-column .dropdown-subtitle {
-            font-weight: bold;
-            text-align: center;
-            padding-bottom: 6px;
-            border-bottom: 1px solid #444;
-        }
-
-        @media (max-width: 750px) {
-            .dropdown-content.three-columns {
-                grid-template-columns: 1fr 1fr;
-                /* 2 colonnes */
-                width: 90vw;
-                /* occupe 90% de la largeur de l'écran */
-                max-width: 500px;
-                /* évite que ce soit trop large sur tablette */
-                right: 5vw;
-                /* centre approximativement */
-                padding: 12px;
-                gap: 16px;
-            }
-
-            /* Optionnel : réduire la taille du texte */
-            .dropdown-item {
-                font-size: 0.92em;
-                padding: 9px 12px;
-            }
-
-            .dropdown-subtitle {
-                font-size: 0.85em;
-                padding-bottom: 4px;
-            }
-
-            .dropdown {
-                position: static;
-                /* désactive position: relative pour simplifier */
-            }
-
-            .dropdown-content {
-                left: 50%;
-                right: auto;
-                transform: translateX(-50%);
-            }
-        }
-
-
         /* AUTH SECTION */
         #auth-section {
             display: flex;
@@ -223,7 +138,6 @@
             align-items: center;
             min-height: 80vh;
         }
-
         .auth-container {
             background: #1f1f28;
             padding: 40px;
@@ -232,22 +146,18 @@
             max-width: 400px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
-
         .auth-container h2 {
             margin-top: 0;
             text-align: center;
         }
-
         .form-group {
             margin-bottom: 20px;
         }
-
         .form-group label {
             display: block;
             margin-bottom: 8px;
             font-size: 0.95em;
         }
-
         .form-group input {
             width: 100%;
             padding: 12px;
@@ -258,7 +168,6 @@
             font-size: 1em;
             box-sizing: border-box;
         }
-
         .auth-btn {
             width: 100%;
             padding: 12px;
@@ -272,23 +181,19 @@
             transition: 0.25s;
             margin-top: 10px;
         }
-
         .auth-btn:hover {
             background: #7d1f85;
         }
-
         .auth-switch {
             text-align: center;
             margin-top: 20px;
             font-size: 0.9em;
         }
-
         .auth-switch a {
             color: #9c28a7;
             cursor: pointer;
             text-decoration: underline;
         }
-
         .error-msg {
             background: #dc3545;
             padding: 10px;
@@ -296,44 +201,70 @@
             margin-bottom: 15px;
             text-align: center;
         }
-
         /* HOME SECTION */
         #home-section {
-            padding: 80px 20px;
+            padding: 40px 20px 20px;
             text-align: center;
         }
-
         .home-center h2 {
             font-size: 2.2em;
             margin-bottom: 10px;
         }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            max-width: 800px;
-            margin: 40px auto;
+        .home-content {
+            display: flex;
+            flex-direction: column;
+            max-width: 1100px;
+            margin: 0 auto;
+            gap: 30px;
         }
-
+        @media (min-width: 900px) {
+            .home-content {
+                flex-direction: row;
+            }
+            .stats-grid-container {
+                flex: 2;
+            }
+            #leaderboard-section {
+                flex: 1;
+                margin-top: 0;
+            }
+        }
+        .stats-grid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+        }
+        .stats-grid-container {
+            width: 100%;
+        }
         .stat-card {
             background: #262633;
             padding: 25px;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.25s;
+            width: 100%;
         }
-
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
         .stat-card h3 {
             margin-top: 0;
             color: #9c28a7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
         }
-
         .stat-value {
             font-size: 2.5em;
             font-weight: bold;
             color: #f0f0f0;
         }
-
         .level-badge {
             display: inline-block;
             padding: 8px 16px;
@@ -342,65 +273,163 @@
             font-weight: 600;
             margin-top: 10px;
         }
-
+        .levels-dropdown {
+            background: linear-gradient(135deg, #0f1115, #1c1c24);
+            border-radius: 12px;
+            padding: 0 15px;
+            width: 96%;
+            margin: 15px auto;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        .levels-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #9c28a7, #7d1f85);
+            z-index: -1;
+            border-radius: 14px;
+            opacity: 0.8;
+        }
+        .levels-dropdown.visible {
+            max-height: 600px;
+            padding: 15px;
+        }
+        .levels-grid-dropdown {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .level-card-dropdown {
+            background: #2c2c3a;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .level-card-dropdown:hover {
+            background: #3a3a4a;
+        }
+        .level-card-dropdown.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .level-number-dropdown {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #9c28a7;
+        }
+        .level-name-dropdown {
+            font-size: 0.9em;
+            margin-bottom: 4px;
+        }
+        .level-requirement-dropdown {
+            font-size: 0.8em;
+            color: #ff4b4b;
+            opacity: 0.8;
+        }
+        .unlock-status-dropdown {
+            font-size: 0.8em;
+            color: #2ecc71;
+            margin-top: 3px;
+        }
+        .unlock-icon {
+            color: #2ecc71;
+            margin-right: 3px;
+        }
         /* LEADERBOARD */
         #leaderboard-section {
             max-width: 800px;
-            margin: 40px auto;
+            margin: 0 auto;
             padding: 0 20px;
         }
-
         .leaderboard-container {
             background: #262633;
             border-radius: 15px;
-            padding: 30px;
+            padding: 25px;
         }
-
+        .leaderboard-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #9c28a7;
+        }
         .leaderboard-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
-            margin: 10px 0;
+            padding: 12px 15px;
+            margin: 8px 0;
             background: #2c2c3a;
-            border-radius: 10px;
+            border-radius: 8px;
         }
-
         .leaderboard-rank {
-            font-size: 1.5em;
+            font-size: 1.3em;
             font-weight: bold;
-            width: 50px;
+            width: 40px;
         }
-
         .leaderboard-name {
             flex: 1;
             font-weight: 500;
         }
-
         .leaderboard-score {
-            font-size: 1.2em;
+            font-size: 1.1em;
             color: #9c28a7;
             font-weight: bold;
         }
-
+        /* DEPARTEMENT LEADERBOARD */
+        #dept-leaderboard-section {
+            background: #262633;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        #dept-leaderboard-section .leaderboard-title {
+            margin-bottom: 15px;
+        }
+        #dept-leaderboard-section .leaderboard-item {
+            padding: 8px 12px;
+            margin: 6px 0;
+        }
         /* QUIZ SECTION */
         #quiz-section {
             display: flex;
             flex-direction: column;
             align-items: center;
             margin-top: 40px;
+            padding: 0 20px;
         }
-
         .quiz-container {
             display: flex;
-            gap: 35px;
-            width: 90%;
-            max-width: 1000px;
+            gap: 25px;
+            width: 100%;
+            max-width: 1200px;
             justify-content: center;
         }
-
+        @media (min-width: 900px) {
+            .question-box {
+                flex: 2;
+            }
+            .answers-container {
+                flex: 1;
+            }
+            #dept-leaderboard-section {
+                flex: 1;
+                margin-top: 0;
+                max-height: 500px;
+            }
+        }
         .question-box {
-            flex: 2;
             background: #262633;
             padding: 30px;
             border-radius: 15px;
@@ -413,14 +442,11 @@
             text-align: center;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.35);
         }
-
         .answers-container {
-            flex: 1;
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
-
         .answer-btn {
             padding: 15px;
             font-size: 1.2em;
@@ -431,37 +457,30 @@
             border: none;
             transition: 0.18s;
         }
-
         .answer-btn:hover:not(:disabled) {
             transform: scale(1.04);
             background: #4a4a65;
         }
-
         .answer-btn:disabled {
             cursor: not-allowed;
         }
-
         .correct {
             background-color: #2ecc71 !important;
         }
-
         .incorrect {
             background-color: #e74c3c !important;
         }
-
         #timers-container {
-            width: 92%;
+            width: 100%;
             max-width: 1000px;
             margin-top: 25px;
         }
-
         #timer-bar-container,
         #question-timer-bar-container {
             margin: 10px 0;
             text-align: left;
             font-size: 0.95em;
         }
-
         #timer-bar,
         #question-timer-bar {
             width: 100%;
@@ -471,7 +490,6 @@
             margin-top: 6px;
             overflow: hidden;
         }
-
         #timer-fill,
         #question-timer-fill {
             height: 100%;
@@ -479,15 +497,12 @@
             border-radius: 10px;
             transition: width 0.15s linear;
         }
-
         #timer-fill {
             background: #9c28a7ff;
         }
-
         #question-timer-fill {
             background: #a832d6;
         }
-
         #score-lives {
             margin-top: 20px;
             display: flex;
@@ -495,18 +510,15 @@
             justify-content: center;
             font-size: 1.3em;
         }
-
         #lives {
             color: #ff4b4b;
             font-size: 1.4em;
         }
-
         /* RESULT SECTION */
         #result-section {
             margin-top: 60px;
             text-align: center;
         }
-
         .result-stats {
             background: #262633;
             padding: 30px;
@@ -514,12 +526,10 @@
             max-width: 500px;
             margin: 30px auto;
         }
-
         .result-stats h3 {
             color: #9c28a7;
             margin-top: 0;
         }
-
         .action-btn {
             margin: 10px;
             padding: 12px 25px;
@@ -530,40 +540,48 @@
             color: #f0f0f0;
             transition: 0.25s;
         }
-
         .action-btn:hover {
             background: #4e4e6a;
         }
-
-        @media screen and (max-width: 750px) {
+        /* MOBILE DESIGN */
+        @media (max-width: 899px) {
+            .levels-grid-dropdown {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                width: 95%;
+            }
+            
             .quiz-container {
                 flex-direction: column;
             }
-
             .question-box {
                 font-size: 1.8em;
             }
-
             #score-lives {
                 flex-direction: column;
                 gap: 15px;
             }
-
-            .dropdown-content {
-                width: 200px;
-                right: -20px;
+            
+            .levels-dropdown {
+                width: 95%;
+            }
+            
+            #leaderboard-section {
+                order: -1;
+                max-width: 100%;
             }
         }
     </style>
 </head>
-
 <body>
-
     <header>
         <nav class="navbar">
             <div class="nav-left">
                 <span class="nav-title">🎯 Quiz Master</span>
-                <!-- Le bouton Quiz principal n'est pas affiché sur index.html, seulement dans batiment.html -->
+                <button id="back-btn" class="action-btn hidden" style="margin-left:10px;">Retour</button>
+                <!-- Le bouton Base -->
                 <button class="action-btn" id="base-btn" onclick="window.location.href='base.html'"
                     style="margin-left:8px; background: #2c2c3a; display:none;">Base</button>
                 <script>
@@ -601,121 +619,19 @@
                         } catch (e) { }
                         updateBaseBtnVisibility(globalScore);
                     }
-
                     updateBaseBtnVisibilityFallback();
-
-                    // --- Surcharge propre de loadUserData pour Firestore ---
-                    window.addEventListener("load", () => {
-                        if (typeof window.loadUserData !== "function") {
-                            console.error("[PATCH] Impossible de surcharger loadUserData : fonction introuvable");
-                            return;
-                        }
-
-                        const _origLoadUserData = window.loadUserData;
-
-                        window.loadUserData = async function () {
-                            const result = await _origLoadUserData.apply(this, arguments);
-                            let updated = false;
-
-                            try {
-                                // Firestore
-                                const userDocRef = doc(db, 'users', currentUser.uid);
-                                const userDoc = await getDoc(userDocRef);
-                                let userData = userDoc.data();
-
-                                if (userData) {
-                                    console.log("[PATCH] Firestore globalScore =", userData.globalScore);
-                                    // MAJ bouton Base
-                                    updateBaseBtnVisibility(userData.globalScore || 0);
-                                    // Stockage dans localStorage pour quiz chinois
-                                    localStorage.setItem('globalScore', userData.globalScore || 0);
-                                    updated = true;
-                                }
-                            } catch (e) {
-                                console.warn("[PATCH] Firestore erreur → fallback localStorage");
-                                updateBaseBtnVisibilityFallback();
-                                updated = true;
-                            }
-
-                            if (!updated) updateBaseBtnVisibilityFallback();
-
-                            return result;
-                        };
-
-                        console.log("[PATCH] loadUserData surchargé proprement ✔️");
-                    });
                 </script>
             </div>
-
             <div class="nav-right" id="nav-logged-out">
                 <!-- Vide quand déconnecté -->
                 <button class="action-btn" onclick="window.location.href='settings.html'"
                     style="margin-left:10px;">Réglages</button>
             </div>
-
             <div class="nav-right hidden" id="nav-logged-in">
                 <div class="user-info">
                     <div class="user-stats">
                         <div><strong id="user-pseudo">Joueur</strong></div>
                         <div>Score Global: <strong id="user-global-score">0</strong></div>
-                    </div>
-                    <div class="dropdown">
-                        <button class="dropdown-btn">Quiz ▾</button>
-                        <div class="dropdown-content three-columns">
-
-                            <div class="quiz-column">
-                                <span class="dropdown-subtitle">📍 Quiz Départements</span>
-                                <button class="dropdown-item" data-mode="1">Mode 1 : Nom → Numéro</button>
-                                <button class="dropdown-item" data-mode="2">Mode 2 : Numéro → Nom</button>
-                                <button class="dropdown-item" data-mode="3">Mode 3 : Forme → Nom/Num</button>
-                                <button class="dropdown-item" data-mode="4">Mode 4 : Préfecture → Dépt</button>
-                                <button class="dropdown-item" data-mode="5">Mode 5 : Mix Nom/Num/Préf</button>
-                                <button class="dropdown-item" data-mode="6">Mode 6 : Mix Total</button>
-                            </div>
-
-                            <div class="quiz-column">
-                                <span class="dropdown-subtitle">🇨🇳 Quiz Chinois simplifié</span>
-                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="1">Niveau 1 :
-                                    Chiffres 1-10</button>
-                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="2">Niveau 2 : Jours
-                                    de la semaine</button>
-                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="3">Niveau 3 :
-                                    Couleurs de base</button>
-                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="4">Niveau 4 : Membres
-                                    famille</button>
-                                <button class="dropdown-item quiz-chinois-btn" data-chinois-level="5">Niveau 5 : Animaux
-                                    courants</button>
-                            </div>
-
-                            <div class="quiz-column">
-                                <span class="dropdown-subtitle"> 🩺 Quiz Médecine</span>
-                                <button class="dropdown-item quiz-medecine-btn" data-medecine-level="1">Niveau 1 :
-                                    Bases</button>
-                                <button class="dropdown-item quiz-medecine-btn" data-medecine-level="2">Niveau 2 :
-                                    Anatomie</button>
-                                <button class="dropdown-item quiz-medecine-btn" data-medecine-level="3">Niveau 3 :
-                                    Pathologies</button>
-                                <button class="dropdown-item quiz-medecine-btn" data-medecine-level="4">Niveau 4 :
-                                    Médicaments</button>
-                                <button class="dropdown-item quiz-medecine-btn" data-medecine-level="5">Niveau 5 : Cas
-                                    cliniques</button>
-                            </div>
-
-                            <div class="quiz-column">
-                                <span class="dropdown-subtitle"> Mathématiques</span>
-                                <button class="dropdown-item quiz-math-btn" data-math-level="1">Niveau 1 :
-                                    Additions, soustractions</button>
-                                <button class="dropdown-item quiz-math-btn" data-math-level="2">Niveau 2 :
-                                    Divisions, multiplications</button>
-                                <button class="dropdown-item quiz-math-btn" data-math-level="3">Niveau 3 :
-                                    Pathologies</button>
-                                <button class="dropdown-item quiz-math-btn" data-math-level="4">Niveau 4 :
-                                    Médicaments</button>
-                                <button class="dropdown-item quiz-math-btn" data-math-level="5">Niveau 5 : Cas
-                                    cliniques</button>
-                            </div>
-
-                        </div>
                     </div>
                     <button class="action-btn" onclick="window.location.href='settings.html'"
                         style="margin-left:10px;">Réglages</button>
@@ -724,14 +640,12 @@
             </div>
         </nav>
     </header>
-
     <main>
         <!-- SECTION AUTHENTIFICATION -->
         <section id="auth-section">
             <div class="auth-container">
                 <h2 id="auth-title">Connexion</h2>
                 <div id="auth-error" class="error-msg hidden"></div>
-
                 <form id="auth-form" onsubmit="return false;">
                     <div class="form-group" id="pseudo-group" style="display:none;">
                         <label>Pseudo</label>
@@ -747,46 +661,64 @@
                     </div>
                     <button class="auth-btn" id="auth-submit-btn">Se connecter</button>
                 </form>
-
                 <div class="auth-switch">
                     <span id="auth-switch-text">Pas encore de compte ? </span>
                     <a id="auth-switch-link" onclick="toggleAuthMode()">S'inscrire</a>
                 </div>
             </div>
         </section>
-
         <!-- SECTION ACCUEIL -->
         <section id="home-section" class="hidden">
             <div class="home-center">
                 <h2>Bienvenue <span id="welcome-pseudo">Joueur</span> ! 👋</h2>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>🌍 Score Global</h3>
-                        <div class="stat-value" id="home-global-score">0</div>
-                        <div class="level-badge" id="global-level">Débutant</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>🗺️ Quiz Départements</h3>
-                        <div class="stat-value" id="home-dept-score">0</div>
-                        <div class="level-badge" id="dept-level">Niveau 1</div>
+            </div>
+            <div class="home-content">
+                <div class="stats-grid-container">
+                    <div class="stats-grid">
+                        <div class="stat-card" id="dept-card">
+                            <h3>🗺️ Quiz Départements</h3>
+                            <div class="stat-value" id="home-dept-score">0</div>
+                            <div class="level-badge" id="dept-level">Niveau 1</div>
+                            <div class="levels-dropdown" id="departements-dropdown">
+                                <div class="levels-grid-dropdown" id="departements-levels"></div>
+                            </div>
+                        </div>
+                        <div class="stat-card" id="chinois-card">
+                            <h3>🇨🇳 Quiz Chinois</h3>
+                            <div class="stat-value" id="home-chinois-score">0</div>
+                            <div class="level-badge" id="chinois-level">Niveau 1</div>
+                            <div class="levels-dropdown" id="chinois-dropdown">
+                                <div class="levels-grid-dropdown" id="chinois-levels"></div>
+                            </div>
+                        </div>
+                        <div class="stat-card" id="medecine-card">
+                            <h3>🩺 Quiz Médecine</h3>
+                            <div class="stat-value" id="home-medecine-score">0</div>
+                            <div class="level-badge" id="medecine-level">Niveau 1</div>
+                            <div class="levels-dropdown" id="medecine-dropdown">
+                                <div class="levels-grid-dropdown" id="medecine-levels"></div>
+                            </div>
+                        </div>
+                        <div class="stat-card" id="math-card">
+                            <h3>➗ Quiz Mathématiques</h3>
+                            <div class="stat-value" id="home-math-score">0</div>
+                            <div class="level-badge" id="math-level">Niveau 1</div>
+                            <div class="levels-dropdown" id="math-dropdown">
+                                <div class="levels-grid-dropdown" id="math-levels"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <p style="opacity: 0.8; margin-top: 30px;">Sélectionne un quiz dans le menu pour commencer !</p>
-            </div>
-
-            <!-- CLASSEMENT -->
-            <div id="leaderboard-section">
-                <div class="leaderboard-container">
-                    <h2 style="text-align: center;">🏆 Classement Mondial</h2>
-                    <div id="leaderboard-list">
-                        <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+                <div id="leaderboard-section">
+                    <div class="leaderboard-container">
+                        <h2 class="leaderboard-title">🏆 Classement Mondial</h2>
+                        <div id="leaderboard-list">
+                            <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
-
         <section id="quiz-section" class="hidden">
             <div class="quiz-container">
                 <div class="question-box">
@@ -799,8 +731,13 @@
                     <button class="answer-btn"></button>
                     <button class="answer-btn"></button>
                 </div>
+                <div id="dept-leaderboard-section">
+                    <h3 class="leaderboard-title">🏆 Top Départements</h3>
+                    <div id="dept-leaderboard-list">
+                        <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+                    </div>
+                </div>
             </div>
-
             <div id="timers-container">
                 <div id="timer-bar-container">
                     <span>⏱️ Temps restant : <span id="timer">0</span>s</span>
@@ -815,13 +752,11 @@
                     </div>
                 </div>
             </div>
-
             <div id="score-lives">
                 <div>Score : <span id="score">0</span></div>
                 <div id="lives">❤❤❤❤❤</div>
             </div>
         </section>
-
         <section id="result-section" class="hidden">
             <h2>Partie terminée ! 🎉</h2>
             <div class="result-stats">
@@ -837,14 +772,11 @@
             <button id="home-btn" class="action-btn">Accueil</button>
         </section>
     </main>
-
     <div id="hover-warning"></div>
-
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
             authDomain: "quiz-master-io.firebaseapp.com",
@@ -853,18 +785,15 @@
             messagingSenderId: "773382469164",
             appId: "1:773382469164:web:5e24a9a62ce543f5190389"
         };
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         window.auth = auth;
         window.db = db;
         window.currentUser = null;
-
         const chinoisRequired = { 1: 200, 2: 250, 3: 300, 4: 350, 5: 400 };
         const medecineRequired = { 1: 40, 2: 80, 3: 160, 4: 320, 5: 500 };
         const mathRequired = { 1: 60, 2: 120, 3: 240, 4: 480, 5: 960 };
-
         const departements = [
             { nom: "Ain", numero: "01", prefecture: "Bourg-en-Bresse" },
             { nom: "Aisne", numero: "02", prefecture: "Laon" },
@@ -968,25 +897,20 @@
             { nom: "La Réunion", numero: "974", prefecture: "Saint-Denis" },
             { nom: "Mayotte", numero: "976", prefecture: "Mamoudzou" }
         ];
-
         const modes = {
-            1: { time: 40, qTime: 4, lives: 5, questionType: "nom_to_num" },
-            2: { time: 40, qTime: 4, lives: 5, questionType: "num_to_nom" },
+            1: { time: 60, qTime: 6, lives: 5, questionType: "nom_to_num" },
+            2: { time: 60, qTime: 6, lives: 5, questionType: "num_to_nom" },
             3: { time: 80, qTime: 8, lives: 8, questionType: "shape_to_nom_num" },
             4: { time: 70, qTime: 7, lives: 7, questionType: "prefecture_to_nom" },
-            5: { time: 60, qTime: 4, lives: 6, questionType: "mix_nom_num_prefecture" },
+            5: { time: 60, qTime: 5, lives: 6, questionType: "mix_nom_num_prefecture" },
             6: { time: 70, qTime: 4, lives: 7, questionType: "mix_all" }
         };
-
         const requiredModeUnlock = { 2: 10, 3: 30, 4: 60, 5: 90, 6: 125 };
-
         let currentMode = 0, score = 0, lives = 0, timeLeft = 0, qTime = 0;
         let timerInterval = null, qTimerInterval = null, awaitingNext = false;
         let previousQuestions = [];
         let correctAnswer;
         let isAuthMode = 'login';
-
-
         function getGlobalLevel(score) {
             if (score >= 500) return '🏆 Expert';
             if (score >= 300) return '⭐ Avancé';
@@ -994,12 +918,10 @@
             if (score >= 50) return '🌱 Apprenti';
             return '🆕 Débutant';
         }
-
         function getDeptLevel(score) {
             const level = Math.floor(score / 50) + 1;
             return `Niveau ${level}`;
         }
-
         function showHoverWarning(text, x, y) {
             const warn = document.getElementById("hover-warning");
             warn.textContent = text;
@@ -1008,147 +930,126 @@
             warn.style.opacity = 1;
             setTimeout(() => { warn.style.opacity = 0; }, 1800);
         }
-
-        function updateModeButtons(globalScore) {
-            const dropdown = document.querySelector('.dropdown');
-            const dropdownContent = dropdown.querySelector('.dropdown-content');
-            const modeButtons = dropdownContent.querySelectorAll('.dropdown-item[data-mode]'); // local, pas besoin de réutiliser l'autre
-            modeButtons.forEach(btn => {
-                const modeNum = parseInt(btn.dataset.mode);
-                if (modeNum > 1 && globalScore < requiredModeUnlock[modeNum]) {
-                    btn.classList.add('disabled');
-                } else {
-                    btn.classList.remove('disabled');
+        // NOUVEAU CODE POUR LES NIVEAUX
+        function renderLevels(category, globalScore) {
+            const container = document.getElementById(`${category}-levels`);
+            container.innerHTML = '';
+            
+            // Définir les niveaux par catégorie
+            const levels = {
+                departements: [
+                    { id: 1, name: "Nom → Numéro", required: 0 },
+                    { id: 2, name: "Numéro → Nom", required: 10 },
+                    { id: 3, name: "Forme → Nom/Num", required: 30 },
+                    { id: 4, name: "Préfecture → Dépt", required: 60 },
+                    { id: 5, name: "Mix Nom/Num/Préf", required: 90 },
+                    { id: 6, name: "Mix Total", required: 125 }
+                ],
+                chinois: [
+                    { id: 1, name: "Chiffres 1-10", required: 0 },
+                    { id: 2, name: "Jours de la semaine", required: 250 },
+                    { id: 3, name: "Couleurs de base", required: 300 },
+                    { id: 4, name: "Membres famille", required: 350 },
+                    { id: 5, name: "Animaux courants", required: 400 }
+                ],
+                medecine: [
+                    { id: 1, name: "Bases", required: 40 },
+                    { id: 2, name: "Anatomie", required: 80 },
+                    { id: 3, name: "Pathologies", required: 160 },
+                    { id: 4, name: "Médicaments", required: 320 },
+                    { id: 5, name: "Cas cliniques", required: 500 }
+                ],
+                math: [
+                    { id: 1, name: "Additions, soustractions", required: 60 },
+                    { id: 2, name: "Divisions, multiplications", required: 120 },
+                    { id: 3, name: "Fractions", required: 240 },
+                    { id: 4, name: "Algèbre basique", required: 480 },
+                    { id: 5, name: "Géométrie", required: 960 }
+                ]
+            };
+            
+            // Générer les cartes de niveau
+            levels[category].forEach(level => {
+                const isUnlocked = globalScore >= level.required;
+                const card = document.createElement('div');
+                card.className = `level-card-dropdown ${isUnlocked ? '' : 'locked'}`;
+                
+                if (!isUnlocked) {
+                    card.title = `Débloqué à ${level.required} points globaux`;
                 }
-            });
-        }
-        function updateChinoisLevelButtons(globalScore) {
-            document.querySelectorAll('.quiz-chinois-btn').forEach(btn => {
-                const level = parseInt(btn.dataset.chinoisLevel);
-                const required = chinoisRequired[level] || 0;
-                if (globalScore < required) {
-                    btn.classList.add('disabled');
-                    btn.disabled = true;
-                    btn.title = `Débloqué à ${required} points globaux`;
-                    btn.addEventListener('mouseenter', function (e) {
-                        showHoverWarning(`Débloqué à ${required} points globaux`, e.pageX, e.pageY);
-                    });
-                } else {
-                    btn.classList.remove('disabled');
-                    btn.disabled = false;
-                    btn.title = '';
-                }
-            });
-        }
-
-        function updateMedecineLevelButtons(globalScore) {
-            document.querySelectorAll('.quiz-medecine-btn').forEach(btn => {
-                const level = parseInt(btn.dataset.medecineLevel);
-                const required = medecineRequired[level] || 0;
-                if (globalScore < required) {
-                    btn.classList.add('disabled');
-                    btn.disabled = true;
-                    btn.title = `Débloqué à ${required} points globaux`;
-                    btn.addEventListener('mouseenter', function (e) {
-                        showHoverWarning(`Débloqué à ${required} points globaux`, e.pageX, e.pageY);
-                    });
-                } else {
-                    btn.classList.remove('disabled');
-                    btn.disabled = false;
-                    btn.title = '';
-                }
-            });
-        }
-
-        function updateMathLevelButtons(globalScore) {
-            document.querySelectorAll('.quiz-math-btn').forEach(btn => {
-                const level = parseInt(btn.dataset.mathLevel);
-                const required = mathRequired[level] || 0;
-                if (globalScore < required) {
-                    btn.classList.add('disabled');
-                    btn.disabled = true;
-                    btn.title = `Débloqué à ${required} points globaux`;
-                    btn.addEventListener('mouseenter', function (e) {
-                        showHoverWarning(`Débloqué à ${required} points globaux`, e.pageX, e.pageY);
-                    });
-                } else {
-                    btn.classList.remove('disabled');
-                    btn.disabled = false;
-                    btn.title = '';
-                }
-            });
-        }
-
-        function initDropdown() {
-            const dropdown = document.querySelector('.dropdown');
-            if (!dropdown) return;
-
-            const dropdownBtn = dropdown.querySelector('.dropdown-btn');
-            if (!dropdownBtn) return;
-
-            function toggleDropdown() {
-                dropdown.classList.toggle('open');
-            }
-
-            function closeDropdownOutside(e) {
-                if (!dropdown.contains(e.target)) {
-                    dropdown.classList.remove('open');
-                }
-            }
-
-            // Attacher les listeners une seule fois
-            dropdownBtn.addEventListener('click', toggleDropdown);
-            document.addEventListener('click', closeDropdownOutside);
-            document.addEventListener('touchstart', closeDropdownOutside);
-
-            // Gestion des clics sur les boutons de quiz
-            dropdown.querySelectorAll('.quiz-medecine-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    dropdown.classList.remove('open');
-                    const level = btn.dataset.medecineLevel;
-                    window.location.href = `quiz-medecine.html#${level}`;
-                });
-            });
-
-            dropdown.querySelectorAll('.quiz-chinois-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    dropdown.classList.remove('open');
-                    const level = btn.dataset.chinoisLevel;
-                    window.location.href = `quiz-chinois.html#${level}`;
-                });
-            });
-
-            dropdown.querySelectorAll('.quiz-math-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    dropdown.classList.remove('open');
-                    const level = btn.dataset.mathLevel;
-                    window.location.href = `quiz-math.html#${level}`;
-                });
-            });
-
-            dropdown.querySelectorAll('.dropdown-item[data-mode]').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    const selected = parseInt(btn.dataset.mode);
-                    if (!selected || !currentUser) return;
-
-                    const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-                    const globalScore = userDoc.data()?.globalScore || 0;
-                    if (selected > 1 && globalScore < requiredModeUnlock[selected]) {
-                        showHoverWarning(
-                            `Vous devez avoir ${requiredModeUnlock[selected]} points globaux pour débloquer ce mode`,
-                            e.pageX, e.pageY
-                        );
-                        return;
+                
+                card.innerHTML = `
+                    <div class="level-number-dropdown">${level.id}</div>
+                    <div class="level-name-dropdown">${level.name}</div>
+                    ${isUnlocked ? 
+                        '<div class="unlock-status-dropdown"><span class="unlock-icon">✓</span>Débloqué</div>' : 
+                        `<div class="level-requirement-dropdown">Requis: ${level.required} pts</div>`
                     }
-
-                    currentMode = selected;
-                    dropdown.classList.remove('open');
-                    startMode();
-                });
+                `;
+                
+                if (isUnlocked) {
+                    card.addEventListener('click', () => startLevel(category, level.id));
+                } else {
+                    card.addEventListener('mouseenter', function(e) {
+                        showHoverWarning(`Débloqué à ${level.required} points globaux`, e.pageX, e.pageY);
+                    });
+                }
+                
+                container.appendChild(card);
             });
         }
 
+        function startLevel(category, levelId) {
+            // Masquer tous les dropdowns
+            document.querySelectorAll('.levels-dropdown').forEach(dropdown => {
+                dropdown.classList.remove('visible');
+            });
+            
+            if (category === 'departements') {
+                currentMode = levelId;
+                startMode();
+            } else if (category === 'chinois') {
+                window.location.href = `quiz-chinois.html#${levelId}`;
+            } else if (category === 'medecine') {
+                window.location.href = `quiz-medecine.html#${levelId}`;
+            } else if (category === 'math') {
+                window.location.href = `quiz-math.html#${levelId}`;
+            }
+        }
+
+        // Gestion des clics sur les cartes
+        document.getElementById('dept-card').addEventListener('click', function(e) {
+            if (!e.target.closest('.level-card-dropdown')) {
+                document.getElementById('departements-dropdown').classList.toggle('visible');
+            }
+        });
+        
+        document.getElementById('chinois-card').addEventListener('click', function(e) {
+            if (!e.target.closest('.level-card-dropdown')) {
+                document.getElementById('chinois-dropdown').classList.toggle('visible');
+            }
+        });
+        
+        document.getElementById('medecine-card').addEventListener('click', function(e) {
+            if (!e.target.closest('.level-card-dropdown')) {
+                document.getElementById('medecine-dropdown').classList.toggle('visible');
+            }
+        });
+        
+        document.getElementById('math-card').addEventListener('click', function(e) {
+            if (!e.target.closest('.level-card-dropdown')) {
+                document.getElementById('math-dropdown').classList.toggle('visible');
+            }
+        });
+
+        // Cacher les dropdowns quand on clique en dehors
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.stat-card') && !e.target.closest('.level-card-dropdown')) {
+                document.querySelectorAll('.levels-dropdown').forEach(dropdown => {
+                    dropdown.classList.remove('visible');
+                });
+            }
+        });
 
         // QUIZ LOGIC
         const homeSection = document.getElementById('home-section');
@@ -1156,6 +1057,7 @@
         const resultSection = document.getElementById('result-section');
         const restartBtn = document.getElementById('restart-btn');
         const homeBtn = document.getElementById('home-btn');
+        const backBtn = document.getElementById('back-btn');
         const answerBtns = document.querySelectorAll('.answer-btn');
         const questionBox = document.getElementById('question');
         const scoreDisplay = document.getElementById('score');
@@ -1165,8 +1067,15 @@
         const timerFill = document.getElementById('timer-fill');
         const qTimerFill = document.getElementById('question-timer-fill');
         const finalScore = document.getElementById('final-score');
-
-
+        
+        // Gérer le bouton retour
+        backBtn.onclick = function() {
+            stopAllTimers();
+            quizSection.classList.add('hidden');
+            homeSection.classList.remove('hidden');
+            backBtn.classList.add('hidden');
+        };
+        
         function startMode() {
             if (!modes[currentMode]) return;
             stopAllTimers();
@@ -1182,10 +1091,11 @@
             homeSection.classList.add('hidden');
             resultSection.classList.add('hidden');
             quizSection.classList.remove('hidden');
+            backBtn.classList.remove('hidden');
+            loadDeptLeaderboard();
             generateQuestion();
             startMainTimer();
         }
-
         function generateQuestion() {
             if (awaitingNext) return;
             let dep;
@@ -1193,11 +1103,9 @@
             while (previousQuestions.includes(dep.numero) && previousQuestions.length < departements.length);
             previousQuestions.push(dep.numero);
             if (previousQuestions.length > 20) previousQuestions.shift();
-
             qTime = modes[currentMode].qTime;
             qTimerDisplay.textContent = qTime;
             qTimerFill.style.width = '100%';
-
             let questionText;
             switch (modes[currentMode].questionType) {
                 case "nom_to_num":
@@ -1247,10 +1155,8 @@
                     break;
             }
             questionBox.innerHTML = questionText;
-
             let wrongAnswers = [];
             const otherDeps = departements.filter(d => d !== dep).sort(() => Math.random() - 0.5);
-
             if (modes[currentMode].questionType === "nom_to_num" || (correctAnswer === dep.numero)) {
                 wrongAnswers = otherDeps.slice(0, 4).map(d => d.numero);
             } else if (modes[currentMode].questionType === "num_to_nom" || modes[currentMode].questionType === "prefecture_to_nom" || correctAnswer === dep.nom) {
@@ -1258,7 +1164,6 @@
             } else {
                 wrongAnswers = otherDeps.slice(0, 4).map(d => Math.random() > 0.5 ? d.nom : d.numero);
             }
-
             let options = [...wrongAnswers, correctAnswer].sort(() => Math.random() - 0.5);
             answerBtns.forEach((btn, i) => {
                 btn.textContent = options[i];
@@ -1268,7 +1173,6 @@
             });
             startQTimer();
         }
-
         function handleAnswer(selected) {
             if (awaitingNext) return;
             awaitingNext = true;
@@ -1288,15 +1192,13 @@
                 awaitingNext = false;
                 if (lives <= 0) endGame();
                 else generateQuestion();
-            }, 800);
+            }, 1000);
         }
-
         function updateLives() {
             const safeLives = Math.max(0, lives);
             const maxLives = modes[currentMode].lives;
             livesDisplay.textContent = '❤'.repeat(safeLives) + '♡'.repeat(Math.max(0, maxLives - safeLives));
         }
-
         function startMainTimer() {
             timerDisplay.textContent = timeLeft;
             timerFill.style.width = '100%';
@@ -1311,7 +1213,6 @@
                 if (timeLeft <= 0) { clearInterval(timerInterval); endGame(); }
             }, 1000);
         }
-
         function startQTimer() {
             clearInterval(qTimerInterval);
             qTimerInterval = setInterval(() => {
@@ -1321,18 +1222,16 @@
                 if (qTime <= 0) { clearInterval(qTimerInterval); if (lives > 0) lives--; updateLives(); handleAnswer(''); }
             }, 100);
         }
-
         async function endGame() {
             quizSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
+            backBtn.classList.add('hidden');
             finalScore.textContent = score;
             stopAllTimers();
-
             try {
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
                 let userData = userDoc.data();
-
                 if (!userData) {
                     userData = {
                         pseudo: currentUser.email.split('@')[0],
@@ -1343,59 +1242,50 @@
                     };
                     await setDoc(userDocRef, userData);
                 }
-
                 const oldGlobalScore = userData.globalScore || 0;
                 const oldDeptScore = userData.quizScores?.departements || 0;
-
                 const newGlobalScore = oldGlobalScore + score;
                 const newDeptScore = oldDeptScore + score;
-
                 await updateDoc(userDocRef, {
                     globalScore: newGlobalScore,
                     'quizScores.departements': newDeptScore
                 });
-
                 document.getElementById('new-global-score').textContent = newGlobalScore;
                 document.getElementById('new-dept-score').textContent = newDeptScore;
                 document.getElementById('user-global-score').textContent = newGlobalScore;
-                document.getElementById('home-global-score').textContent = newGlobalScore;
                 document.getElementById('home-dept-score').textContent = newDeptScore;
-
-                document.getElementById('global-level').textContent = getGlobalLevel(newGlobalScore);
                 document.getElementById('dept-level').textContent = getDeptLevel(newDeptScore);
-
-                updateModeButtons(newGlobalScore);
-
+                // Update all levels displays
+                renderLevels('departements', newGlobalScore);
+                renderLevels('chinois', newGlobalScore);
+                renderLevels('medecine', newGlobalScore);
+                renderLevels('math', newGlobalScore);
                 const oldLevel = Math.floor(oldDeptScore / 50);
                 const newLevel = Math.floor(newDeptScore / 50);
-
                 if (newLevel > oldLevel) {
                     document.getElementById('level-up-msg').classList.remove('hidden');
                 } else {
                     document.getElementById('level-up-msg').classList.add('hidden');
                 }
-
                 await loadLeaderboard();
             } catch (error) {
                 console.error('Erreur sauvegarde scores:', error);
                 alert('Erreur lors de la sauvegarde des scores. Vérifiez votre connexion.');
             }
         }
-
         function stopAllTimers() {
             clearInterval(timerInterval);
             clearInterval(qTimerInterval);
         }
-
         restartBtn.onclick = startMode;
         homeBtn.onclick = async () => {
             stopAllTimers();
             quizSection.classList.add('hidden');
             resultSection.classList.add('hidden');
             homeSection.classList.remove('hidden');
+            backBtn.classList.add('hidden');
             await loadUserData();
         };
-
         // AUTH FUNCTIONS
         window.toggleAuthMode = function () {
             isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
@@ -1404,7 +1294,6 @@
             const switchText = document.getElementById('auth-switch-text');
             const switchLink = document.getElementById('auth-switch-link');
             const pseudoGroup = document.getElementById('pseudo-group');
-
             if (isAuthMode === 'signup') {
                 title.textContent = 'Inscription';
                 submitBtn.textContent = "S'inscrire";
@@ -1419,15 +1308,12 @@
                 pseudoGroup.style.display = 'none';
             }
         };
-
         document.getElementById('auth-submit-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
             const pseudo = document.getElementById('auth-pseudo').value;
             const errorDiv = document.getElementById('auth-error');
-
             errorDiv.classList.add('hidden');
-
             try {
                 if (isAuthMode === 'signup') {
                     if (!pseudo || pseudo.trim().length < 3) {
@@ -1435,7 +1321,6 @@
                     }
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
-
                     await setDoc(doc(db, 'users', user.uid), {
                         pseudo: pseudo.trim(),
                         email: email,
@@ -1453,24 +1338,20 @@
                 errorDiv.classList.remove('hidden');
             }
         });
-
         window.logout = async function () {
             await signOut(auth);
         };
-
         onAuthStateChanged(auth, async (user) => {
             const authSection = document.getElementById('auth-section');
             const homeSection = document.getElementById('home-section');
             const navLoggedOut = document.getElementById('nav-logged-out');
             const navLoggedIn = document.getElementById('nav-logged-in');
-
             if (user) {
                 window.currentUser = user;
                 authSection.classList.add('hidden');
                 homeSection.classList.remove('hidden');
                 navLoggedOut.classList.add('hidden');
                 navLoggedIn.classList.remove('hidden');
-
                 await loadUserData();
                 await loadLeaderboard();
             } else {
@@ -1481,7 +1362,6 @@
                 navLoggedIn.classList.add('hidden');
             }
         });
-
         async function loadUserData() {
             try {
                 const userDocRef = doc(db, 'users', currentUser.uid);
@@ -1495,7 +1375,10 @@
                         email: currentUser.email,
                         globalScore: 0,
                         quizScores: {
-                            departements: 0
+                            departements: 0,
+                            chinois: 0,
+                            medecine: 0,
+                            math: 0
                         },
                         createdAt: new Date().toISOString()
                     };
@@ -1507,18 +1390,29 @@
                 document.getElementById('user-pseudo').textContent = userData.pseudo;
                 document.getElementById('welcome-pseudo').textContent = userData.pseudo;
                 document.getElementById('user-global-score').textContent = userData.globalScore || 0;
-                document.getElementById('home-global-score').textContent = userData.globalScore || 0;
-                document.getElementById('home-dept-score').textContent = userData.quizScores?.departements || 0;
+                
+                // Mise à jour des scores pour chaque quiz
+                const chinoisScore = userData.quizScores?.chinois || 0;
+                const medecineScore = userData.quizScores?.medecine || 0;
+                const mathScore = userData.quizScores?.math || 0;
+                const deptScore = userData.quizScores?.departements || 0;
+                
+                document.getElementById('home-dept-score').textContent = deptScore;
+                document.getElementById('home-chinois-score').textContent = chinoisScore;
+                document.getElementById('home-medecine-score').textContent = medecineScore;
+                document.getElementById('home-math-score').textContent = mathScore;
+                
                 // Calculate levels
-                const globalLevel = getGlobalLevel(userData.globalScore || 0);
-                const deptLevel = getDeptLevel(userData.quizScores?.departements || 0);
-                document.getElementById('global-level').textContent = globalLevel;
-                document.getElementById('dept-level').textContent = deptLevel;
-                // Update mode buttons based on global score
-                updateModeButtons(userData.globalScore || 0);
-                updateChinoisLevelButtons(userData.globalScore || 0);
-                updateMedecineLevelButtons(userData.globalScore || 0);
-                updateMathLevelButtons(userData.globalScore || 0);
+                document.getElementById('dept-level').textContent = getDeptLevel(deptScore);
+                document.getElementById('chinois-level').textContent = getDeptLevel(chinoisScore);
+                document.getElementById('medecine-level').textContent = getDeptLevel(medecineScore);
+                document.getElementById('math-level').textContent = getDeptLevel(mathScore);
+                
+                // Render levels for all categories
+                renderLevels('departements', userData.globalScore || 0);
+                renderLevels('chinois', userData.globalScore || 0);
+                renderLevels('medecine', userData.globalScore || 0);
+                renderLevels('math', userData.globalScore || 0);
             } catch (error) {
                 console.error('Erreur chargement données:', error);
                 alert('Erreur de chargement. Essayez de vous reconnecter.');
@@ -1531,14 +1425,16 @@
                     }
                 } catch (e) { }
                 console.log('[DEBUG] globalScore localStorage utilisé:', globalScore);
-                updateChinoisLevelButtons(globalScore);
+                // Render levels with fallback score
+                renderLevels('departements', globalScore);
+                renderLevels('chinois', globalScore);
+                renderLevels('medecine', globalScore);
+                renderLevels('math', globalScore);
             }
         }
-
         async function loadLeaderboard() {
             const leaderboardList = document.getElementById('leaderboard-list');
             leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
-
             try {
                 const q = query(
                     collection(db, 'users'),
@@ -1546,34 +1442,27 @@
                     limit(10)
                 );
                 const querySnapshot = await getDocs(q);
-
                 if (!querySnapshot || querySnapshot.empty) {
                     leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
                     return;
                 }
-
                 leaderboardList.innerHTML = '';
                 let rank = 1;
-
                 querySnapshot.forEach((doc) => {
                     const data = doc.data() || {};
                     const pseudo = data.pseudo || 'Anonyme';
                     const score = typeof data.globalScore === 'number' ? data.globalScore : 0;
-
                     const item = document.createElement('div');
                     item.className = 'leaderboard-item';
-
                     let medal = '';
                     if (rank === 1) medal = '🥇';
                     else if (rank === 2) medal = '🥈';
                     else if (rank === 3) medal = '🥉';
-
                     item.innerHTML = `
                 <div class="leaderboard-rank">${medal || rank}</div>
                 <div class="leaderboard-name">${pseudo}</div>
                 <div class="leaderboard-score">${score}</div>
             `;
-
                     leaderboardList.appendChild(item);
                     rank++;
                 });
@@ -1582,10 +1471,46 @@
                 leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Erreur de chargement</div>';
             }
         }
-        document.addEventListener('DOMContentLoaded', initDropdown);
-
+        async function loadDeptLeaderboard() {
+            const leaderboardList = document.getElementById('dept-leaderboard-list');
+            leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
+            try {
+                const q = query(
+                    collection(db, 'users'),
+                    orderBy('quizScores.departements', 'desc'),
+                    limit(10)
+                );
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot || querySnapshot.empty) {
+                    leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
+                    return;
+                }
+                leaderboardList.innerHTML = '';
+                let rank = 1;
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data() || {};
+                    const pseudo = data.pseudo || 'Anonyme';
+                    const score = typeof data.quizScores?.departements === 'number' ? data.quizScores.departements : 0;
+                    const item = document.createElement('div');
+                    item.className = 'leaderboard-item';
+                    let medal = '';
+                    if (rank === 1) medal = '🥇';
+                    else if (rank === 2) medal = '🥈';
+                    else if (rank === 3) medal = '🥉';
+                    item.innerHTML = `
+                <div class="leaderboard-rank">${medal || rank}</div>
+                <div class="leaderboard-name">${pseudo}</div>
+                <div class="leaderboard-score">${score}</div>
+            `;
+                    leaderboardList.appendChild(item);
+                    rank++;
+                });
+            } catch (error) {
+                console.error('Erreur loadDeptLeaderboard:', error);
+                leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Erreur de chargement</div>';
+            }
+        }
     </script>
-
 </body>
-
 </html>
+
