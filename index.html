@@ -431,11 +431,11 @@
         }
         .question-box {
             background: #262633;
-            padding: 30px;
+            padding: 24px; /* Réduit de 30px → 24px */
             border-radius: 15px;
-            font-size: 1.8em;
+            font-size: 1.6em; /* Réduit légèrement */
             font-weight: 600;
-            min-height: 140px;
+            min-height: 120px; /* Réduit de 140px → 120px */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -445,11 +445,11 @@
         .answers-container {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px; /* Réduit de 15px → 12px */
         }
         .answer-btn {
-            padding: 15px;
-            font-size: 1.2em;
+            padding: 13px; /* Réduit de 15px → 13px */
+            font-size: 1.15em; /* Légèrement réduit */
             border-radius: 12px;
             background: #323248;
             color: #f0f0f0;
@@ -473,21 +473,21 @@
         #timers-container {
             width: 100%;
             max-width: 1000px;
-            margin-top: 25px;
+            margin-top: 20px; /* Réduit de 25px → 20px */
         }
         #timer-bar-container,
         #question-timer-bar-container {
-            margin: 10px 0;
+            margin: 8px 0; /* Réduit de 10px → 8px */
             text-align: left;
             font-size: 0.95em;
         }
         #timer-bar,
         #question-timer-bar {
             width: 100%;
-            height: 28px;
+            height: 26px; /* Réduit de 28px → 26px */
             background: #2b2b3a;
             border-radius: 10px;
-            margin-top: 6px;
+            margin-top: 5px; /* Réduit de 6px → 5px */
             overflow: hidden;
         }
         #timer-fill,
@@ -504,15 +504,15 @@
             background: #a832d6;
         }
         #score-lives {
-            margin-top: 20px;
+            margin-top: 18px; /* Réduit de 20px → 18px */
             display: flex;
-            gap: 80px;
+            gap: 70px; /* Réduit de 80px → 70px */
             justify-content: center;
-            font-size: 1.3em;
+            font-size: 1.25em; /* Légèrement réduit */
         }
         #lives {
             color: #ff4b4b;
-            font-size: 1.4em;
+            font-size: 1.35em; /* Légèrement réduit */
         }
         /* RESULT SECTION */
         #result-section {
@@ -548,29 +548,39 @@
             .levels-grid-dropdown {
                 grid-template-columns: 1fr;
             }
-            
             .stats-grid {
                 width: 95%;
             }
-            
             .quiz-container {
                 flex-direction: column;
             }
             .question-box {
-                font-size: 1.8em;
+                font-size: 1.5em; /* Réduit sur mobile */
+                min-height: 110px; /* Encore un peu réduit */
+                padding: 20px; /* Réduit davantage */
+            }
+            .answers-container {
+                gap: 10px; /* Réduit */
+            }
+            .answer-btn {
+                padding: 12px; /* Réduit de 13px → 12px */
+                font-size: 1.1em; /* Un peu plus petit sur mobile */
             }
             #score-lives {
                 flex-direction: column;
-                gap: 15px;
+                gap: 12px; /* Réduit de 15px → 12px */
             }
-            
             .levels-dropdown {
                 width: 95%;
             }
-            
             #leaderboard-section {
                 order: -1;
                 max-width: 100%;
+            }
+            /* Déplacer le leaderboard département sous les timers sur mobile */
+            #dept-leaderboard-section {
+                order: 2;
+                margin-top: 25px;
             }
         }
     </style>
@@ -934,7 +944,6 @@
         function renderLevels(category, globalScore) {
             const container = document.getElementById(`${category}-levels`);
             container.innerHTML = '';
-            
             // Définir les niveaux par catégorie
             const levels = {
                 departements: [
@@ -967,17 +976,14 @@
                     { id: 5, name: "Géométrie", required: 960 }
                 ]
             };
-            
             // Générer les cartes de niveau
             levels[category].forEach(level => {
                 const isUnlocked = globalScore >= level.required;
                 const card = document.createElement('div');
                 card.className = `level-card-dropdown ${isUnlocked ? '' : 'locked'}`;
-                
                 if (!isUnlocked) {
                     card.title = `Débloqué à ${level.required} points globaux`;
                 }
-                
                 card.innerHTML = `
                     <div class="level-number-dropdown">${level.id}</div>
                     <div class="level-name-dropdown">${level.name}</div>
@@ -986,7 +992,6 @@
                         `<div class="level-requirement-dropdown">Requis: ${level.required} pts</div>`
                     }
                 `;
-                
                 if (isUnlocked) {
                     card.addEventListener('click', () => startLevel(category, level.id));
                 } else {
@@ -994,17 +999,14 @@
                         showHoverWarning(`Débloqué à ${level.required} points globaux`, e.pageX, e.pageY);
                     });
                 }
-                
                 container.appendChild(card);
             });
         }
-
         function startLevel(category, levelId) {
             // Masquer tous les dropdowns
             document.querySelectorAll('.levels-dropdown').forEach(dropdown => {
                 dropdown.classList.remove('visible');
             });
-            
             if (category === 'departements') {
                 currentMode = levelId;
                 startMode();
@@ -1016,32 +1018,27 @@
                 window.location.href = `quiz-math.html#${levelId}`;
             }
         }
-
         // Gestion des clics sur les cartes
         document.getElementById('dept-card').addEventListener('click', function(e) {
             if (!e.target.closest('.level-card-dropdown')) {
                 document.getElementById('departements-dropdown').classList.toggle('visible');
             }
         });
-        
         document.getElementById('chinois-card').addEventListener('click', function(e) {
             if (!e.target.closest('.level-card-dropdown')) {
                 document.getElementById('chinois-dropdown').classList.toggle('visible');
             }
         });
-        
         document.getElementById('medecine-card').addEventListener('click', function(e) {
             if (!e.target.closest('.level-card-dropdown')) {
                 document.getElementById('medecine-dropdown').classList.toggle('visible');
             }
         });
-        
         document.getElementById('math-card').addEventListener('click', function(e) {
             if (!e.target.closest('.level-card-dropdown')) {
                 document.getElementById('math-dropdown').classList.toggle('visible');
             }
         });
-
         // Cacher les dropdowns quand on clique en dehors
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.stat-card') && !e.target.closest('.level-card-dropdown')) {
@@ -1050,7 +1047,6 @@
                 });
             }
         });
-
         // QUIZ LOGIC
         const homeSection = document.getElementById('home-section');
         const quizSection = document.getElementById('quiz-section');
@@ -1067,7 +1063,6 @@
         const timerFill = document.getElementById('timer-fill');
         const qTimerFill = document.getElementById('question-timer-fill');
         const finalScore = document.getElementById('final-score');
-        
         // Gérer le bouton retour
         backBtn.onclick = function() {
             stopAllTimers();
@@ -1075,7 +1070,6 @@
             homeSection.classList.remove('hidden');
             backBtn.classList.add('hidden');
         };
-        
         function startMode() {
             if (!modes[currentMode]) return;
             stopAllTimers();
@@ -1390,24 +1384,20 @@
                 document.getElementById('user-pseudo').textContent = userData.pseudo;
                 document.getElementById('welcome-pseudo').textContent = userData.pseudo;
                 document.getElementById('user-global-score').textContent = userData.globalScore || 0;
-                
                 // Mise à jour des scores pour chaque quiz
                 const chinoisScore = userData.quizScores?.chinois || 0;
                 const medecineScore = userData.quizScores?.medecine || 0;
                 const mathScore = userData.quizScores?.math || 0;
                 const deptScore = userData.quizScores?.departements || 0;
-                
                 document.getElementById('home-dept-score').textContent = deptScore;
                 document.getElementById('home-chinois-score').textContent = chinoisScore;
                 document.getElementById('home-medecine-score').textContent = medecineScore;
                 document.getElementById('home-math-score').textContent = mathScore;
-                
                 // Calculate levels
                 document.getElementById('dept-level').textContent = getDeptLevel(deptScore);
                 document.getElementById('chinois-level').textContent = getDeptLevel(chinoisScore);
                 document.getElementById('medecine-level').textContent = getDeptLevel(medecineScore);
                 document.getElementById('math-level').textContent = getDeptLevel(mathScore);
-                
                 // Render levels for all categories
                 renderLevels('departements', userData.globalScore || 0);
                 renderLevels('chinois', userData.globalScore || 0);
