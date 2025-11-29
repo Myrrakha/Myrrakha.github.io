@@ -510,10 +510,17 @@
             gap: 80px;
             justify-content: center;
             font-size: 1.3em;
+            position: relative;
         }
         #lives {
             color: #ff4b4b;
             font-size: 1.4em;
+        }
+        /* MOBILE-SPECIFIC QUIZ HEADER HIDING */
+        @media (max-width: 899px) {
+            body.quiz-active header {
+                display: none;
+            }
         }
         /* RESULT SECTION */
         #result-section {
@@ -554,7 +561,7 @@
             }
             .quiz-container {
                 flex-direction: column;
-                gap: 15px; /* Réduit l'espacement entre question et réponses */
+                gap: 15px;
             }
             .question-box {
                 font-size: 1.6em;
@@ -562,15 +569,15 @@
                 min-height: 90px;
             }
             .answers-container {
-                gap: 10px; /* Réduit espacement entre boutons */
+                gap: 10px;
             }
             .answer-btn {
-                padding: 12px; /* Légèrement réduit */
+                padding: 12px;
                 font-size: 1.1em;
             }
             #score-lives {
                 flex-direction: column;
-                gap: 10px; /* Réduit espacement entre score et vies */
+                gap: 10px;
                 margin-top: 15px;
             }
             .levels-dropdown {
@@ -580,22 +587,57 @@
                 order: -1;
                 max-width: 100%;
             }
-            /* Cacher le leaderboard dans le quiz-container sur mobile */
             #dept-leaderboard-section.desktop {
                 display: none;
             }
-            /* Afficher le leaderboard mobile en dessous des timers */
-            #dept-leaderboard-section.mobile {
-                display: block;
-                margin-top: 15px; /* Réduit l'espacement avant le leaderboard */
-            }
             #timers-container {
-                margin-top: 15px; /* Réduit l'espacement après les réponses */
+                margin-top: 15px;
+            }
+
+            /* Nouveau layout pour leaderboard + bouton retour sur mobile */
+            #mobile-quiz-ui-row {
+                display: flex;
+                gap: 12px;
+                justify-content: center;
+                margin-top: 15px;
+                padding: 0 20px;
+                width: 100%;
+                max-width: 1200px;
+            }
+
+            #dept-leaderboard-section.mobile {
+                margin: 0;
+                flex: 1;
+                max-width: 220px;
+            }
+
+            #mobile-back-container {
+                background: #262633;
+                padding: 20px 16px;
+                border-radius: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+                min-width: 60px;
+                height: fit-content;
+            }
+
+            #mobile-back-container .action-btn {
+                padding: 8px 12px;
+                font-size: 1.2em;
+                display: block;
+                width: 100%;
+                text-align: center;
             }
         }
-        /* Cacher le leaderboard mobile sur desktop */
+
         @media (min-width: 900px) {
-            #dept-leaderboard-section.mobile {
+            #dept-leaderboard-section.mobile,
+            #mobile-quiz-ui-row {
+                display: none !important;
+            }
+            #mobile-back-btn {
                 display: none !important;
             }
         }
@@ -611,28 +653,23 @@
                 <button class="action-btn" id="base-btn" onclick="window.location.href='base.html'"
                     style="margin-left:8px; background: #2c2c3a; display:none;">Base</button>
                 <script>
-                    // --- Fonctions pour le bouton Base ---
                     function updateBaseBtnVisibility(globalScore) {
                         const baseBtn = document.getElementById('base-btn');
                         if (!baseBtn) {
                             console.warn('[DEBUG] Bouton Base introuvable dans le DOM');
                             return;
                         }
-                        // Toujours nettoyer le style display à chaque appel
                         baseBtn.style.display = '';
-                        console.log(`[DEBUG] updateBaseBtnVisibility appelé avec globalScore=`, globalScore);
                         if (globalScore >= 200) {
                             baseBtn.style.display = 'inline-block';
                             baseBtn.disabled = false;
                             baseBtn.classList.remove('disabled');
                             baseBtn.title = '';
-                            baseBtn.style.background = '#2c2c3a'; // DEBUG visuel
                         } else {
                             baseBtn.style.display = 'none';
                             baseBtn.disabled = true;
                             baseBtn.classList.add('disabled');
                             baseBtn.title = 'Débloqué à 200 points globaux';
-                            baseBtn.style.background = '';
                         }
                     }
                     function updateBaseBtnVisibilityFallback() {
@@ -649,7 +686,6 @@
                 </script>
             </div>
             <div class="nav-right" id="nav-logged-out">
-                <!-- Vide quand déconnecté -->
                 <button class="action-btn" onclick="window.location.href='settings.html'"
                     style="margin-left:10px;">Réglages</button>
             </div>
@@ -757,7 +793,6 @@
                     <button class="answer-btn"></button>
                     <button class="answer-btn"></button>
                 </div>
-                <!-- Version desktop du leaderboard (dans la colonne droite) -->
                 <div id="dept-leaderboard-section" class="desktop">
                     <h3 class="leaderboard-title">🏆 Top Départements</h3>
                     <div id="dept-leaderboard-list">
@@ -783,11 +818,16 @@
                 <div>Score : <span id="score">0</span></div>
                 <div id="lives">❤❤❤❤❤</div>
             </div>
-            <!-- Version mobile du leaderboard (sous les timers & vies) -->
-            <div id="dept-leaderboard-section" class="mobile">
-                <h3 class="leaderboard-title">🏆 Top Départements</h3>
-                <div id="dept-leaderboard-list">
-                    <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+            <!-- Deux cadres indépendants sur mobile -->
+            <div id="mobile-quiz-ui-row">
+                <div id="dept-leaderboard-section" class="mobile">
+                    <h3 class="leaderboard-title">🏆 Top Départements</h3>
+                    <div id="dept-leaderboard-list">
+                        <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+                    </div>
+                </div>
+                <div id="mobile-back-container">
+                    <button id="mobile-back-btn" class="action-btn">←</button>
                 </div>
             </div>
         </section>
@@ -829,7 +869,7 @@
         const medecineRequired = { 1: 40, 2: 80, 3: 160, 4: 320, 5: 500 };
         const mathRequired = { 1: 60, 2: 120, 3: 240, 4: 480, 5: 960 };
         const departements = [
-            { nom: "Ain", numero: "01", prefecture: "Bourg-en-Bresse" },
+          { nom: "Ain", numero: "01", prefecture: "Bourg-en-Bresse" },
             { nom: "Aisne", numero: "02", prefecture: "Laon" },
             { nom: "Allier", numero: "03", prefecture: "Moulins" },
             { nom: "Alpes-de-Haute-Provence", numero: "04", prefecture: "Digne-les-Bains" },
@@ -930,14 +970,14 @@
             { nom: "Guyane", numero: "973", prefecture: "Cayenne" },
             { nom: "La Réunion", numero: "974", prefecture: "Saint-Denis" },
             { nom: "Mayotte", numero: "976", prefecture: "Mamoudzou" }
-        ];
+         ];
         const modes = {
             1: { time: 60, qTime: 6, lives: 5, questionType: "nom_to_num" },
             2: { time: 60, qTime: 6, lives: 5, questionType: "num_to_nom" },
             3: { time: 80, qTime: 8, lives: 8, questionType: "shape_to_nom_num" },
             4: { time: 70, qTime: 7, lives: 7, questionType: "prefecture_to_nom" },
-            5: { time: 60, qTime: 5, lives: 6, questionType: "mix_nom_num_prefecture" },
-            6: { time: 70, qTime: 4, lives: 7, questionType: "mix_all" }
+            5: { time: 70, qTime: 4, lives: 7, questionType: "mix_all" },
+            6: { redirect: "quiz-departement-2.html" }
         };
         const requiredModeUnlock = { 2: 10, 3: 30, 4: 60, 5: 90, 6: 125 };
         let currentMode = 0, score = 0, lives = 0, timeLeft = 0, qTime = 0;
@@ -964,19 +1004,17 @@
             warn.style.opacity = 1;
             setTimeout(() => { warn.style.opacity = 0; }, 1800);
         }
-        // NOUVEAU CODE POUR LES NIVEAUX
         function renderLevels(category, globalScore) {
             const container = document.getElementById(`${category}-levels`);
             container.innerHTML = '';
-            // Définir les niveaux par catégorie
             const levels = {
                 departements: [
                     { id: 1, name: "Nom → Numéro", required: 0 },
                     { id: 2, name: "Numéro → Nom", required: 10 },
                     { id: 3, name: "Forme → Nom/Num", required: 30 },
                     { id: 4, name: "Préfecture → Dépt", required: 60 },
-                    { id: 5, name: "Mix Nom/Num/Préf", required: 90 },
-                    { id: 6, name: "Mix Total", required: 125 }
+                    { id: 5, name: "Mix", required: 90 },
+                    { id: 6, name: "Niveaux Suivants", required: 125 }
                 ],
                 chinois: [
                     { id: 1, name: "Chiffres 1-10", required: 200 },
@@ -1000,7 +1038,6 @@
                     { id: 5, name: "Géométrie", required: 960 }
                 ]
             };
-            // Générer les cartes de niveau
             levels[category].forEach(level => {
                 const isUnlocked = globalScore >= level.required;
                 const card = document.createElement('div');
@@ -1027,13 +1064,18 @@
             });
         }
         function startLevel(category, levelId) {
-            // Masquer tous les dropdowns
             document.querySelectorAll('.levels-dropdown').forEach(dropdown => {
                 dropdown.classList.remove('visible');
             });
+            window.scrollTo(0, 0);
             if (category === 'departements') {
-                currentMode = levelId;
-                startMode();
+                const mode = modes[levelId];
+                if (mode && mode.redirect) {
+                    window.location.href = mode.redirect;
+                } else {
+                    currentMode = levelId;
+                    startMode();
+                }
             } else if (category === 'chinois') {
                 window.location.href = `quiz-chinois.html#${levelId}`;
             } else if (category === 'medecine') {
@@ -1042,7 +1084,6 @@
                 window.location.href = `quiz-math.html#${levelId}`;
             }
         }
-        // Gestion des clics sur les cartes
         document.getElementById('dept-card').addEventListener('click', function(e) {
             if (!e.target.closest('.level-card-dropdown')) {
                 document.getElementById('departements-dropdown').classList.toggle('visible');
@@ -1063,7 +1104,6 @@
                 document.getElementById('math-dropdown').classList.toggle('visible');
             }
         });
-        // Cacher les dropdowns quand on clique en dehors
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.stat-card') && !e.target.closest('.level-card-dropdown')) {
                 document.querySelectorAll('.levels-dropdown').forEach(dropdown => {
@@ -1071,13 +1111,13 @@
                 });
             }
         });
-        // QUIZ LOGIC
         const homeSection = document.getElementById('home-section');
         const quizSection = document.getElementById('quiz-section');
         const resultSection = document.getElementById('result-section');
         const restartBtn = document.getElementById('restart-btn');
         const homeBtn = document.getElementById('home-btn');
         const backBtn = document.getElementById('back-btn');
+        const mobileBackBtn = document.getElementById('mobile-back-btn');
         const answerBtns = document.querySelectorAll('.answer-btn');
         const questionBox = document.getElementById('question');
         const scoreDisplay = document.getElementById('score');
@@ -1087,13 +1127,23 @@
         const timerFill = document.getElementById('timer-fill');
         const qTimerFill = document.getElementById('question-timer-fill');
         const finalScore = document.getElementById('final-score');
-        // Gérer le bouton retour
+        function updateQuizHeaderVisibility(isQuizActive) {
+            if (window.innerWidth <= 899) {
+                document.body.classList.toggle('quiz-active', isQuizActive);
+                mobileBackBtn.classList.toggle('hidden', !isQuizActive);
+            } else {
+                mobileBackBtn.classList.add('hidden');
+            }
+        }
         backBtn.onclick = function() {
             stopAllTimers();
             quizSection.classList.add('hidden');
             homeSection.classList.remove('hidden');
             backBtn.classList.add('hidden');
+            updateQuizHeaderVisibility(false);
+            window.scrollTo(0, 0);
         };
+        mobileBackBtn.onclick = backBtn.onclick;
         function startMode() {
             if (!modes[currentMode]) return;
             stopAllTimers();
@@ -1110,9 +1160,11 @@
             resultSection.classList.add('hidden');
             quizSection.classList.remove('hidden');
             backBtn.classList.remove('hidden');
+            updateQuizHeaderVisibility(true);
             loadDeptLeaderboard();
             generateQuestion();
             startMainTimer();
+            window.scrollTo(0, 0);
         }
         function generateQuestion() {
             if (awaitingNext) return;
@@ -1141,19 +1193,6 @@
                 case "prefecture_to_nom":
                     questionText = `Dans quel département se trouve cette préfecture ?<br><span style="font-size:1.4em;">${dep.prefecture}</span>`;
                     correctAnswer = dep.nom;
-                    break;
-                case "mix_nom_num_prefecture":
-                    const randType = Math.random();
-                    if (randType < 0.33) {
-                        questionText = `Quel est le numéro du département ?<br><span style="font-size:1.4em;">${dep.nom}</span>`;
-                        correctAnswer = dep.numero;
-                    } else if (randType < 0.66) {
-                        questionText = `Quel est le nom du département ?<br><span style="font-size:1.4em;">${dep.numero}</span>`;
-                        correctAnswer = dep.nom;
-                    } else {
-                        questionText = `Dans quel département se trouve cette préfecture ?<br><span style="font-size:1.4em;">${dep.prefecture}</span>`;
-                        correctAnswer = dep.nom;
-                    }
                     break;
                 case "mix_all":
                     const allTypes = Math.random();
@@ -1203,7 +1242,6 @@
             if (selected === correctAnswer) {
                 score++;
             } else {
-                // Ne décrémente qu'une seule fois, même si la réponse est vide (pas de réponse)
                 if (lives > 0) {
                     lives--;
                 }
@@ -1246,8 +1284,6 @@
                 qTimerFill.style.width = (qTime / modes[currentMode].qTime * 100) + '%';
                 if (qTime <= 0) {
                     clearInterval(qTimerInterval);
-                    // Correction ici : on appelle handleAnswer avec une réponse vide,
-                    // mais handleAnswer ne décrémente qu'une seule fois.
                     handleAnswer('');
                 }
             }, 100);
@@ -1256,8 +1292,10 @@
             quizSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
             backBtn.classList.add('hidden');
+            updateQuizHeaderVisibility(false);
             finalScore.textContent = score;
             stopAllTimers();
+            window.scrollTo(0, 0);
             try {
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
@@ -1285,7 +1323,6 @@
                 document.getElementById('user-global-score').textContent = newGlobalScore;
                 document.getElementById('home-dept-score').textContent = newDeptScore;
                 document.getElementById('dept-level').textContent = getDeptLevel(newDeptScore);
-                // Update all levels displays
                 renderLevels('departements', newGlobalScore);
                 renderLevels('chinois', newGlobalScore);
                 renderLevels('medecine', newGlobalScore);
@@ -1314,9 +1351,10 @@
             resultSection.classList.add('hidden');
             homeSection.classList.remove('hidden');
             backBtn.classList.add('hidden');
+            updateQuizHeaderVisibility(false);
             await loadUserData();
+            window.scrollTo(0, 0);
         };
-        // AUTH FUNCTIONS
         window.toggleAuthMode = function () {
             isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
             const title = document.getElementById('auth-title');
@@ -1384,6 +1422,7 @@
                 navLoggedIn.classList.remove('hidden');
                 await loadUserData();
                 await loadLeaderboard();
+                window.scrollTo(0, 0);
             } else {
                 window.currentUser = null;
                 authSection.classList.remove('hidden');
@@ -1397,9 +1436,7 @@
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
                 let userData = userDoc.data();
-                console.log('[DEBUG] Firestore userData:', userData);
                 if (!userData) {
-                    console.log('Création du profil utilisateur manquant...');
                     const defaultData = {
                         pseudo: currentUser.email.split('@')[0],
                         email: currentUser.email,
@@ -1415,12 +1452,10 @@
                     await setDoc(userDocRef, defaultData);
                     userData = defaultData;
                 }
-                console.log('[DEBUG] globalScore Firestore utilisé:', userData.globalScore);
                 updateBaseBtnVisibility(userData.globalScore || 0);
                 document.getElementById('user-pseudo').textContent = userData.pseudo;
                 document.getElementById('welcome-pseudo').textContent = userData.pseudo;
                 document.getElementById('user-global-score').textContent = userData.globalScore || 0;
-                // Mise à jour des scores pour chaque quiz
                 const chinoisScore = userData.quizScores?.chinois || 0;
                 const medecineScore = userData.quizScores?.medecine || 0;
                 const mathScore = userData.quizScores?.math || 0;
@@ -1429,12 +1464,10 @@
                 document.getElementById('home-chinois-score').textContent = chinoisScore;
                 document.getElementById('home-medecine-score').textContent = medecineScore;
                 document.getElementById('home-math-score').textContent = mathScore;
-                // Calculate levels
                 document.getElementById('dept-level').textContent = getDeptLevel(deptScore);
                 document.getElementById('chinois-level').textContent = getDeptLevel(chinoisScore);
                 document.getElementById('medecine-level').textContent = getDeptLevel(medecineScore);
                 document.getElementById('math-level').textContent = getDeptLevel(mathScore);
-                // Render levels for all categories
                 renderLevels('departements', userData.globalScore || 0);
                 renderLevels('chinois', userData.globalScore || 0);
                 renderLevels('medecine', userData.globalScore || 0);
@@ -1442,7 +1475,6 @@
             } catch (error) {
                 console.error('Erreur chargement données:', error);
                 alert('Erreur de chargement. Essayez de vous reconnecter.');
-                // Fallback localStorage pour le globalScore
                 let globalScore = 0;
                 try {
                     const localScore = localStorage.getItem('globalScore');
@@ -1450,8 +1482,6 @@
                         globalScore = parseInt(localScore);
                     }
                 } catch (e) { }
-                console.log('[DEBUG] globalScore localStorage utilisé:', globalScore);
-                // Render levels with fallback score
                 renderLevels('departements', globalScore);
                 renderLevels('chinois', globalScore);
                 renderLevels('medecine', globalScore);
@@ -1462,11 +1492,7 @@
             const leaderboardList = document.getElementById('leaderboard-list');
             leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
             try {
-                const q = query(
-                    collection(db, 'users'),
-                    orderBy('globalScore', 'desc'),
-                    limit(10)
-                );
+                const q = query(collection(db, 'users'), orderBy('globalScore', 'desc'), limit(10));
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot || querySnapshot.empty) {
                     leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
@@ -1484,11 +1510,7 @@
                     if (rank === 1) medal = '🥇';
                     else if (rank === 2) medal = '🥈';
                     else if (rank === 3) medal = '🥉';
-                    item.innerHTML = `
-                <div class="leaderboard-rank">${medal || rank}</div>
-                <div class="leaderboard-name">${pseudo}</div>
-                <div class="leaderboard-score">${score}</div>
-            `;
+                    item.innerHTML = `<div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${pseudo}</div><div class="leaderboard-score">${score}</div>`;
                     leaderboardList.appendChild(item);
                     rank++;
                 });
@@ -1498,17 +1520,12 @@
             }
         }
         async function loadDeptLeaderboard() {
-            // Met à jour les deux versions du leaderboard (desktop et mobile)
             const mobileList = document.querySelector('#dept-leaderboard-section.mobile #dept-leaderboard-list');
             const desktopList = document.querySelector('#dept-leaderboard-section.desktop #dept-leaderboard-list');
             mobileList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
             desktopList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
             try {
-                const q = query(
-                    collection(db, 'users'),
-                    orderBy('quizScores.departements', 'desc'),
-                    limit(10)
-                );
+                const q = query(collection(db, 'users'), orderBy('quizScores.departements', 'desc'), limit(10));
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot || querySnapshot.empty) {
                     const emptyMsg = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
@@ -1527,13 +1544,7 @@
                     if (rank === 1) medal = '🥇';
                     else if (rank === 2) medal = '🥈';
                     else if (rank === 3) medal = '🥉';
-                    const itemHtml = `
-                        <div class="leaderboard-item">
-                            <div class="leaderboard-rank">${medal || rank}</div>
-                            <div class="leaderboard-name">${pseudo}</div>
-                            <div class="leaderboard-score">${score}</div>
-                        </div>
-                    `;
+                    const itemHtml = `<div class="leaderboard-item"><div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${pseudo}</div><div class="leaderboard-score">${score}</div></div>`;
                     mobileHtml += itemHtml;
                     desktopHtml += itemHtml;
                     rank++;

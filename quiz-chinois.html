@@ -400,9 +400,26 @@
     }
 
     // ==========================================
+    // UTILITAIRES
+    // ==========================================
+    function shuffle(array) {
+      return [...array].sort(() => Math.random() - 0.5);
+    }
+
+    function pickWrong(pool, correctItem, key) {
+      const wrong = new Set();
+      while (wrong.size < 4) {
+        const r = pool[Math.floor(Math.random() * pool.length)];
+        if (r[key] !== correctItem[key]) {
+          wrong.add(r);
+        }
+      }
+      return Array.from(wrong);
+    }
+
+    // ==========================================
     // DONNÉES DES QUIZ
     // ==========================================
-
 
     // --- Génération chinois 1 → 100 ---
     const digits = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
@@ -418,8 +435,7 @@
       return "";
     }
 
-
-    // --- Types de questions disponibles ---
+    // --- Questions culturelles enrichies (Niveau 1 & Niveau 2) ---
     const type3Questions = [
       { q: "Combien y a-t-il de continents ?", a: "7" },
       { q: "Combien y a-t-il d’océans sur Terre ?", a: "5" },
@@ -483,45 +499,236 @@
       { q: "Combien de kilomètres fait la montée principale de la Grande Muraille à Badaling (aller simple) ?", a: "3" }
     ];
 
-    // --- Génère des options FR + CH aléatoires
-    function generateRandomOpts(correctAnswer, count = 6) {
+    // =======================================
+    // LEXIQUE NIVEAU 2
+    // =======================================
+    const vocabulaireN2 = [
+        // Temps
+        { fr: "Hier", ch: "昨天", py: "zuótiān" },
+        { fr: "Aujourd'hui", ch: "今天", py: "jīntiān" },
+        { fr: "Demain", ch: "明天", py: "míngtiān" },
+        { fr: "Matin", ch: "早上", py: "zǎoshang" },
+        { fr: "Après-midi", ch: "下午", py: "xiàwǔ" },
+        { fr: "Soir", ch: "晚上", py: "wǎnshang" },
+        { fr: "Maintenant", ch: "现在", py: "xiànzài" },
+        { fr: "Plus tard", ch: "以后", py: "yǐhòu" },
 
-      const values = new Set();
-      values.add(Number(correctAnswer));
+        // Lieux / spatial
+        { fr: "Ici", ch: "这里", py: "zhèlǐ" },
+        { fr: "Là-bas", ch: "那里", py: "nàlǐ" },
+        { fr: "À droite", ch: "右边", py: "yòubiān" },
+        { fr: "À gauche", ch: "左边", py: "zuǒbiān" },
+        { fr: "Devant", ch: "前面", py: "qiánmiàn" },
+        { fr: "Derrière", ch: "后面", py: "hòumiàn" },
+        { fr: "À côté", ch: "旁边", py: "pángbiān" },
 
-      while (values.size < count) {
-        let v = Number(correctAnswer) + Math.floor(Math.random() * 21) - 10;
-        if (v < 0 || v > 100) v = Math.floor(Math.random() * 101);
-        values.add(v);
-      }
+        // Expressions utiles
+        { fr: "Bonjour", ch: "你好", py: "nǐ hǎo" },
+        { fr: "Bonsoir", ch: "晚上好", py: "wǎnshang hǎo" },
+        { fr: "Merci", ch: "谢谢", py: "xièxiè" },
+        { fr: "Excusez-moi", ch: "对不起", py: "duìbuqǐ" },
+        { fr: "Je comprends", ch: "我懂了", py: "wǒ dǒng le" },
+        { fr: "Je ne comprends pas", ch: "我不懂", py: "wǒ bù dǒng" },
+        { fr: "Au revoir", ch: "再见", py: "zàijiàn" },
+        { fr: "À demain", ch: "明天见", py: "míngtiān jiàn" },
 
-      // Formatte les options avec style + taille augmentée
-      const opts = [...values].map(v => ({
-        raw: v,
-        display: `<span style="font-size: calc(1rem + 3px);">${v} (${numberToChinese(v)})</span>`
-      }));
+        // Jours / calendrier
+        { fr: "Lundi", ch: "星期一", py: "xīngqī yī" },
+        { fr: "Mardi", ch: "星期二", py: "xīngqī èr" },
+        { fr: "Mercredi", ch: "星期三", py: "xīngqī sān" },
+        { fr: "Jeudi", ch: "星期四", py: "xīngqī sì" },
+        { fr: "Vendredi", ch: "星期五", py: "xīngqī wǔ" },
+        { fr: "Samedi", ch: "星期六", py: "xīngqī liù" },
+        { fr: "Dimanche", ch: "星期天", py: "xīngqī tiān" },
+        { fr: "Week-end", ch: "周末", py: "zhōumò" },
 
-      return opts.sort(() => Math.random() - 0.5);
+        // Fêtes
+        { fr: "Nouvel an chinois", ch: "春节", py: "Chūnjié" },
+        { fr: "Fête de la Lune", ch: "中秋节", py: "Zhōngqiūjié" },
+        { fr: "Fête nationale", ch: "国庆节", py: "Guóqìngjié" }
+    ];
+
+    // --- Patterns pour les phrases contextuelles ---
+    const n2Patterns = [
+        ["Je suis ici maintenant", "我现在在这里", "wǒ xiànzài zài zhèlǐ"],
+        ["Je vais là-bas demain", "我明天去那里", "wǒ míngtiān qù nàlǐ"],
+        ["Je viens ce soir", "我晚上来", "wǒ wǎnshang lái"],
+        ["Nous partons après-demain", "我们后天走", "wǒmen hòutiān zǒu"],
+        ["Elle arrive demain matin", "她明天早上到", "tā míngtiān zǎoshang dào"],
+        ["Ils sont derrière toi", "他们在你后面", "tāmen zài nǐ hòumiàn"],
+        ["Il est à côté de moi", "他在我的旁边", "tā zài wǒ de pángbiān"],
+        ["Je ne comprends pas", "我不懂", "wǒ bù dǒng"]
+    ];
+
+    // =======================================
+    // LEXIQUE NIVEAU 3
+    // =======================================
+    const vocabulaireN3 = [
+        // Verbes fréquents
+        { fr: "vouloir", ch: "想", py: "xiǎng" },
+        { fr: "pouvoir (capacité)", ch: "会", py: "huì" },
+        { fr: "pouvoir (permission)", ch: "可以", py: "kěyǐ" },
+        { fr: "devoir", ch: "要", py: "yào" },
+        { fr: "aller", ch: "去", py: "qù" },
+        { fr: "venir", ch: "来", py: "lái" },
+        { fr: "manger", ch: "吃", py: "chī" },
+        { fr: "boire", ch: "喝", py: "hē" },
+        { fr: "voir", ch: "看", py: "kàn" },
+
+        // Phrases utiles
+        { fr: "Je veux manger", ch: "我想吃饭", py: "wǒ xiǎng chī fàn" },
+        { fr: "Je ne comprends pas", ch: "我不懂", py: "wǒ bù dǒng" },
+        { fr: "Peux-tu m'aider ?", ch: "你可以帮我吗？", py: "nǐ kěyǐ bāng wǒ ma?" },
+        { fr: "Où vas-tu ?", ch: "你去哪儿？", py: "nǐ qù nǎr?" },
+        { fr: "Je suis occupé", ch: "我很忙", py: "wǒ hěn máng" },
+        { fr: "J'arrive bientôt", ch: "我马上来", py: "wǒ mǎshàng lái" },
+        { fr: "Attends-moi un moment", ch: "等我一下", py: "děng wǒ yíxià" },
+
+        // Expressions + particules
+        { fr: "C'est vrai ?", ch: "真的吗？", py: "zhēn de ma?" },
+        { fr: "D'accord", ch: "好的", py: "hǎo de" },
+        { fr: "Pas de problème", ch: "没问题", py: "méi wèntí" },
+        { fr: "Très bien", ch: "很好", py: "hěn hǎo" },
+
+        // Temporalité plus avancée
+        { fr: "Je suis en train de manger", ch: "我正在吃饭", py: "wǒ zhèngzài chī fàn" },
+        { fr: "Je viens de finir", ch: "我刚刚结束", py: "wǒ gānggāng jiéshù" },
+    ];
+
+    // --- Fonctions de génération Niveau 3 ---
+    function qN3_type1() {
+        const item = vocabulaireN3[Math.floor(Math.random() * vocabulaireN3.length)];
+
+        const wrong = pickWrong(vocabulaireN3, item, "ch");
+        const opts = shuffle([...wrong, item].map(o => ({ raw: o.ch, display: `${o.ch} (${o.py})` })));
+
+        return {
+            q: `Comment dit-on : <b>${item.fr}</b> ?`,
+            a: item.ch,
+            opts
+        };
     }
 
-    function generateType3RndOpts(correctAnswer, count = 6) {
-      const values = new Set();
-      values.add(Number(correctAnswer));
+    function qN3_type2() {
+        const item = vocabulaireN3[Math.floor(Math.random() * vocabulaireN3.length)];
 
-      while (values.size < count) {
-        let v = Number(correctAnswer) + Math.floor(Math.random() * 21) - 10;
-        if (v < 0 || v > 100) v = Math.floor(Math.random() * 101);
-        values.add(v);
-      }
+        const wrong = pickWrong(vocabulaireN3, item, "fr");
+        const opts = shuffle([...wrong, item].map(o => ({ raw: o.fr, display: o.fr })));
 
-      return [...values].map(v => ({
-        raw: v,
-        display: `<span style="font-size: calc(1rem + 3px);">${numberToChinese(v)}</span>`
-      })).sort(() => Math.random() - 0.5);
+        return {
+            q: `Que signifie : <b>${item.ch}</b> (${item.py}) ?`,
+            a: item.fr,
+            opts
+        };
     }
 
+    function qN3_type3() {
+        const item = vocabulaireN3[Math.floor(Math.random() * vocabulaireN3.length)];
 
-    // --- Générateur d'une question aléatoire ---
+        const wrong = pickWrong(vocabulaireN3, item, "ch");
+        const opts = shuffle([...wrong, item].map(o => ({ raw: o.ch, display: `${o.ch}` })));
+
+        return {
+            q: `Quel est l'écriture chinoise de : <b>${item.py}</b> ?`,
+            a: item.ch,
+            opts
+        };
+    }
+
+    function qN3_type4() {
+        const candidates = vocabulaireN3.filter(o => /想|会|要|可以|正在/.test(o.ch));
+        const item = candidates[Math.floor(Math.random() * candidates.length)];
+
+        const missing = item.ch.match(/想|会|要|可以|正在/)[0];
+        const question = item.ch.replace(missing, "___");
+
+        const opts = shuffle([
+            { raw: missing, display: missing },
+            { raw: "不", display: "不" },
+            { raw: "很", display: "很" },
+            { raw: "在", display: "在" },
+            { raw: "吗", display: "吗" }
+        ]);
+
+        return {
+            q: `Complète la phrase : <b>${question}</b>`,
+            a: missing,
+            opts
+        };
+    }
+
+    function qN3_type5() {
+        const sentences = [
+            ["我", "想", "去", "北京"],
+            ["你", "会", "说", "中文"],
+            ["我", "正在", "吃饭"],
+            ["他", "明天", "来", "这里"]
+        ];
+
+        const s = sentences[Math.floor(Math.random() * sentences.length)];
+        const shuffled = shuffle([...s]);
+
+        const allVariants = new Set([s.join(" ")]);
+        while (allVariants.size < 5) {
+            const variant = shuffle([...s]).join(" ");
+            allVariants.add(variant);
+        }
+
+        const opts = shuffle(Array.from(allVariants).map(o => ({ raw: o, display: o }))).slice(0, 5);
+
+        return {
+            q: `Remets la phrase en ordre : <b>${shuffled.join(" / ")}</b>`,
+            a: s.join(" "),
+            opts
+        };
+    }
+
+    function qN3_type6() {
+        const bank = [
+            { q: "你吃___饭吗？", a: "过" },
+            { q: "你去北京___？", a: "吗" },
+            { q: "我们走___！", a: "吧" },
+            { q: "我吃___了饭", a: "" }
+        ];
+
+        const item = bank[Math.floor(Math.random() * bank.length)];
+
+        const allOpts = new Set(["了", "吗", "吧", "过", "不", "", item.a]);
+        const opts = shuffle(Array.from(allOpts).map(o => ({ raw: o, display: o || "∅" }))).slice(0, 5);
+
+        return {
+            q: `Complète : <b>${item.q}</b>`,
+            a: item.a,
+            opts
+        };
+    }
+
+    function qN3_type7() {
+        const base = [
+            { fr: "Je mange maintenant", ch: "我现在吃饭" },
+            { fr: "Je veux aller en Chine", ch: "我想去中国" },
+            { fr: "Je peux venir demain", ch: "我明天可以来" }
+        ];
+
+        const item = base[Math.floor(Math.random() * base.length)];
+
+        const wrong = [
+            "我吃饭现在",
+            "现在我饭吃",
+            "我马上吃饭",
+            "我今天吃饭"
+        ];
+
+        const opts = shuffle([item.ch, ...wrong].slice(0, 5).map(o => ({ raw: o, display: o })));
+
+        return {
+            q: `Comment dire : <b>${item.fr}</b> ?`,
+            a: item.ch,
+            opts
+        };
+    }
+
+    // --- Générateur d'une question aléatoire pour niveau 1 ---
     function generateRandomQuestion() {
       const type = Math.floor(Math.random() * 4) + 1;
 
@@ -549,8 +756,6 @@
         };
       }
 
-
-
       // ------------------------- (2) Calcul XX - YY = ? -------------------------
       if (type === 2) {
         let a = Math.floor(Math.random() * 100) + 1;
@@ -559,14 +764,13 @@
 
         const result = a - b;
 
-        // Décide aléatoirement comment afficher a et b
         const displayA = Math.random() > 0.5 ? String(a) : numberToChinese(a);
         const displayB = Math.random() > 0.5 ? String(b) : numberToChinese(b);
 
         return {
           q: `${displayA} − ${displayB} = ?`,
-          a: String(result), // toujours stocké en string numérique pour comparaison
-          opts: generateRandomOpts(result, 6) // on garde le système existant
+          a: String(result),
+          opts: generateRandomOpts(result, 6)
         };
       }
 
@@ -582,20 +786,17 @@
         };
       }
 
-
       // ------------------------- (4) Quel est ce caractère ? -------------------------
       if (type === 4) {
         const n = Math.floor(Math.random() * 100) + 1;
         const ch = numberToChinese(n);
 
-        // Génère 5 mauvaises réponses
         const wrong = new Set();
         while (wrong.size < 5) {
           const r = Math.floor(Math.random() * 100) + 1;
           if (r !== n) wrong.add(r);
         }
 
-        // Combine bonne + mauvaises
         const allOpts = [n, ...wrong];
         const shuffledOpts = [...allOpts].sort(() => Math.random() - 0.5);
 
@@ -610,10 +811,142 @@
       }
     }
 
+    // --- Génère des options FR + CH aléatoires ---
+    function generateRandomOpts(correctAnswer, count = 6) {
+      const values = new Set();
+      values.add(Number(correctAnswer));
 
+      while (values.size < count) {
+        let v = Number(correctAnswer) + Math.floor(Math.random() * 21) - 10;
+        if (v < 0 || v > 100) v = Math.floor(Math.random() * 101);
+        values.add(v);
+      }
 
-    // --- Génération de 50 questions ---
-    function generateQuiz() {
+      const opts = [...values].map(v => ({
+        raw: v,
+        display: `<span style="font-size: calc(1rem + 3px);">${v} (${numberToChinese(v)})</span>`
+      }));
+
+      return opts.sort(() => Math.random() - 0.5);
+    }
+
+    function generateType3RndOpts(correctAnswer, count = 6) {
+      const values = new Set();
+      values.add(Number(correctAnswer));
+
+      while (values.size < count) {
+        let v = Number(correctAnswer) + Math.floor(Math.random() * 21) - 10;
+        if (v < 0 || v > 100) v = Math.floor(Math.random() * 101);
+        values.add(v);
+      }
+
+      return [...values].map(v => ({
+        raw: v,
+        display: `<span style="font-size: calc(1rem + 3px);">${numberToChinese(v)}</span>`
+      })).sort(() => Math.random() - 0.5);
+    }
+
+    // --- Générateur de question pour niveau 2 ---
+    function generateN2Question() {
+      const type = Math.floor(Math.random() * 3) + 1;
+
+      // ----------------------------------------------------------
+      // TYPE 1 — FR → CH + PINYIN (25% des questions en FR)
+      // ----------------------------------------------------------
+      if (type === 1) {
+        const item = vocabulaireN2[Math.floor(Math.random() * vocabulaireN2.length)];
+
+        const wrong = new Set();
+        while (wrong.size < 4) {
+          const r = vocabulaireN2[Math.floor(Math.random() * vocabulaireN2.length)];
+          if (r.ch !== item.ch) wrong.add(r);
+        }
+
+        const opts = [...wrong, item]
+          .sort(() => Math.random() - 0.5)
+          .map(o => ({
+            raw: o.ch,
+            display: `${o.ch} (${o.py})`
+          }));
+
+        return {
+          q: `Comment s'écrit : <b>${item.fr}</b> ?`,
+          a: item.ch,
+          opts
+        };
+      }
+
+      // ----------------------------------------------------------
+      // TYPE 2 — CH → FR + PINYIN (75% des questions en CH)
+      // ----------------------------------------------------------
+      if (type === 2) {
+        const item = vocabulaireN2[Math.floor(Math.random() * vocabulaireN2.length)];
+
+        const wrong = new Set();
+        while (wrong.size < 4) {
+          const r = vocabulaireN2[Math.floor(Math.random() * vocabulaireN2.length)];
+          if (r.fr !== item.fr) wrong.add(r);
+        }
+
+        const opts = [...wrong, item]
+          .sort(() => Math.random() - 0.5)
+          .map(o => ({
+            raw: o.fr,
+            display: o.fr
+          }));
+
+        return {
+          q: `Que signifie : <b>${item.ch}</b> (${item.py}) ?`,
+          a: item.fr,
+          opts
+        };
+      }
+
+      // ----------------------------------------------------------
+      // TYPE 3 — Contexte temporel/spatial (CH + PINYIN)
+      // ----------------------------------------------------------
+      if (type === 3) {
+        const item = n2Patterns[Math.floor(Math.random() * n2Patterns.length)];
+
+        const wrong = new Set();
+        while (wrong.size < 4) {
+          const r = n2Patterns[Math.floor(Math.random() * n2Patterns.length)];
+          if (r[1] !== item[1]) wrong.add(r);
+        }
+
+        const opts = [...wrong, item]
+          .sort(() => Math.random() - 0.5)
+          .map(o => ({
+            raw: o[1],
+            display: `${o[1]} (${o[2]})`
+          }));
+
+        return {
+          q: `Comment dit-on : <b>${item[0]}</b> ?`,
+          a: item[1],
+          opts
+        };
+      }
+    }
+
+    // --- Générateur de question pour niveau 3 ---
+    function generateN3Question() {
+      const type = Math.floor(Math.random() * 7) + 1;
+
+      switch (type) {
+        case 1: return qN3_type1();
+        case 2: return qN3_type2();
+        case 3: return qN3_type3();
+        case 4: return qN3_type4();
+        case 5: return qN3_type5();
+        case 6: return qN3_type6();
+        case 7: return qN3_type7();
+        default: return qN3_type1();
+      }
+    }
+
+    // --- Génération de 50 questions pour niveau 1 ---
+    function generateQuizN1() {
       const questions = [];
       for (let i = 0; i < 50; i++) {
         questions.push(generateRandomQuestion());
@@ -626,48 +959,39 @@
       };
     }
 
+    // --- Génération de 50 questions pour niveau 2 ---
+    function generateQuizN2() {
+      const questions = [];
+      for (let i = 0; i < 50; i++) {
+        questions.push(generateN2Question());
+      }
 
-    // --- EXPORT ---
-    window.quizNiveau1 = generateQuiz();
-    console.log(window.quizNiveau1);
+      return {
+        title: "Niveau 2 : Vocabulaire quotidien",
+        subtitle: "Temps, lieux, expressions, jours et fêtes en chinois simplifié",
+        questions
+      };
+    }
 
+    // --- Génération de 50 questions pour niveau 3 ---
+    function generateQuizN3() {
+      const questions = [];
+      for (let i = 0; i < 50; i++) {
+        questions.push(generateN3Question());
+      }
 
+      return {
+        title: "Niveau 3 : Verbes et constructions",
+        subtitle: "Verbes, particules, ordre des mots et phrases complexes en chinois",
+        questions
+      };
+    }
 
-
+    // --- Données des quiz ---
     const quizData = {
-      1: generateQuiz(),
-      2: {
-        title: "Niveau 2 : Jours de la semaine",
-        subtitle: "Maîtrisez les jours de la semaine en chinois",
-        questions: [
-          { q: "Comment écrit-on <strong>'lundi'</strong> ?", a: "星期一", opts: ["星期一", "星期天", "星期三", "星期五", "星期四"] },
-          { q: "Comment écrit-on <strong>'mardi'</strong> ?", a: "星期二", opts: ["星期二", "星期四", "星期日", "星期六", "星期三"] },
-          { q: "Comment écrit-on <strong>'mercredi'</strong> ?", a: "星期三", opts: ["星期三", "星期一", "星期五", "星期天", "星期二"] },
-          { q: "Comment écrit-on <strong>'jeudi'</strong> ?", a: "星期四", opts: ["星期四", "星期二", "星期六", "星期三", "星期五"] },
-          { q: "Comment écrit-on <strong>'vendredi'</strong> ?", a: "星期五", opts: ["星期五", "星期日", "星期一", "星期四", "星期六"] },
-          { q: "Comment écrit-on <strong>'samedi'</strong> ?", a: "星期六", opts: ["星期六", "星期三", "星期五", "星期二", "星期天"] },
-          { q: "Comment écrit-on <strong>'dimanche'</strong> ?", a: "星期天", opts: ["星期天", "星期日", "星期一", "星期五", "星期六"] },
-          { q: "Quel jour vient après 星期三 ?", a: "星期四", opts: ["星期四", "星期二", "星期五", "星期六", "星期天"] },
-          { q: "Quel jour vient avant 星期天 ?", a: "星期六", opts: ["星期六", "星期五", "星期一", "星期日", "星期四"] },
-          { q: "Quel est le premier jour de la semaine ?", a: "星期一", opts: ["星期一", "星期天", "星期日", "星期二", "星期三"] }
-        ]
-      },
-      3: {
-        title: "Niveau 3 : Couleurs de base",
-        subtitle: "Découvrez les couleurs en chinois simplifié",
-        questions: [
-          { q: "Comment écrit-on <strong>'rouge'</strong> ?", a: "红色", opts: ["红色", "蓝色", "黄色", "白色", "绿色"] },
-          { q: "Comment écrit-on <strong>'bleu'</strong> ?", a: "蓝色", opts: ["蓝色", "绿色", "黑色", "红色", "白色"] },
-          { q: "Comment écrit-on <strong>'jaune'</strong> ?", a: "黄色", opts: ["黄色", "白色", "蓝色", "黑色", "红色"] },
-          { q: "Comment écrit-on <strong>'vert'</strong> ?", a: "绿色", opts: ["绿色", "红色", "黄色", "蓝色", "黑色"] },
-          { q: "Comment écrit-on <strong>'noir'</strong> ?", a: "黑色", opts: ["黑色", "白色", "蓝色", "红色", "灰色"] },
-          { q: "Comment écrit-on <strong>'blanc'</strong> ?", a: "白色", opts: ["白色", "黑色", "黄色", "绿色", "蓝色"] },
-          { q: "Quelle couleur représente 红色 ?", a: "Rouge", opts: ["Rouge", "Bleu", "Jaune", "Vert", "Noir"] },
-          { q: "Quelle couleur représente 黑色 ?", a: "Noir", opts: ["Noir", "Blanc", "Gris", "Bleu", "Vert"] },
-          { q: "Quelle couleur représente 绿色 ?", a: "Vert", opts: ["Vert", "Rouge", "Bleu", "Jaune", "Noir"] },
-          { q: "Quelle couleur représente 蓝色 ?", a: "Bleu", opts: ["Bleu", "Blanc", "Vert", "Rouge", "Jaune"] }
-        ]
-      },
+      1: generateQuizN1(),
+      2: generateQuizN2(),
+      3: generateQuizN3(),
       4: {
         title: "Niveau 4 : Membres de la famille",
         subtitle: "Apprenez à désigner les membres de la famille",
@@ -705,8 +1029,8 @@
     // ==========================================
     // CONSTANTES
     // ==========================================
-    const TOTAL_TIME_SECONDS = 90; // 3 minutes
-    const QUESTION_TIME_SECONDS = 10; // 20 secondes par question
+    const TOTAL_TIME_SECONDS = 90;
+    const QUESTION_TIME_SECONDS = 10;
     const INITIAL_LIVES = 10;
 
     // ==========================================
@@ -764,7 +1088,7 @@
 
         if (remaining <= 0) {
           clearInterval(globalTimerInterval);
-          endQuiz(true); // timeout global
+          endQuiz(true);
         }
       }, 1000);
     }
@@ -774,9 +1098,9 @@
         btn.disabled = true;
         const btnValue = btn.dataset.value;
         if (btnValue === correctAnswer) {
-          btn.style.background = '#2ecc71'; // ✅ toujours vert
+          btn.style.background = '#2ecc71';
         } else if (selectedAnswer !== null && btnValue === selectedAnswer) {
-          btn.style.background = '#e74c3c'; // rouge seulement si sélectionné
+          btn.style.background = '#e74c3c';
         }
       });
     };
@@ -871,7 +1195,7 @@
         }
 
         btn.innerHTML = display;
-        btn.dataset.value = value; // ✅ stocke la valeur brute
+        btn.dataset.value = value;
         btn.onclick = () => selectAnswer(value, question.a);
         quizAnswers.appendChild(btn);
       });
@@ -896,7 +1220,7 @@
       }
 
       updateStats();
-      setTimeout(nextQuestion, 1000); // 🔁 800ms avant la question suivante
+      setTimeout(nextQuestion, 1000);
     }
 
     function handleQuestionTimeout() {
@@ -906,7 +1230,7 @@
       highlightAnswers(question.a);
       lives--;
       updateStats();
-      setTimeout(nextQuestion, 1000); // 🔁 800ms
+      setTimeout(nextQuestion, 1000);
     }
 
     function nextQuestion() {
@@ -928,11 +1252,10 @@
 
       quizFinalScore.textContent = score + ' / ' + questions.length;
 
-      // Sauvegarde du score
+      // Sauvegarde du score réel via Firebase
       await saveQuizScore(score);
       await loadChinoisLeaderboard();
 
-      // Message personnalisé
       if (timeout) {
         resultMessage.textContent = '⏳ Temps écoulé ! Essayez encore — vous pouvez recommencer le niveau.';
       } else {
@@ -950,7 +1273,7 @@
     }
 
     // ==========================================
-    // SAUVEGARDE FIREBASE
+    // SAUVEGARDE FIREBASE (originale, non simulée)
     // ==========================================
     async function saveQuizScore(finalScore) {
       try {
@@ -1028,12 +1351,12 @@
           else if (rank === 3) rankText = '🥉';
 
           html += `
-        <div class="leaderboard-item">
-          <span class="rank">${rankText}</span>
-          <span class="name">${pseudo}</span>
-          <span class="score">${score}</span>
-        </div>
-      `;
+            <div class="leaderboard-item">
+              <span class="rank">${rankText}</span>
+              <span class="name">${pseudo}</span>
+              <span class="score">${score}</span>
+            </div>
+          `;
           rank++;
         });
 
@@ -1062,3 +1385,4 @@
 </body>
 
 </html>
+
