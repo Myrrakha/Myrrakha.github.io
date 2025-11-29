@@ -423,7 +423,8 @@
             .answers-container {
                 flex: 1;
             }
-            #dept-leaderboard-section {
+            #dept-leaderboard-section.desktop {
+                display: block;
                 flex: 1;
                 margin-top: 0;
                 max-height: 500px;
@@ -431,11 +432,11 @@
         }
         .question-box {
             background: #262633;
-            padding: 24px; /* Réduit de 30px → 24px */
+            padding: 30px;
             border-radius: 15px;
-            font-size: 1.6em; /* Réduit légèrement */
+            font-size: 1.8em;
             font-weight: 600;
-            min-height: 120px; /* Réduit de 140px → 120px */
+            min-height: 140px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -445,11 +446,11 @@
         .answers-container {
             display: flex;
             flex-direction: column;
-            gap: 12px; /* Réduit de 15px → 12px */
+            gap: 15px;
         }
         .answer-btn {
-            padding: 13px; /* Réduit de 15px → 13px */
-            font-size: 1.15em; /* Légèrement réduit */
+            padding: 15px;
+            font-size: 1.2em;
             border-radius: 12px;
             background: #323248;
             color: #f0f0f0;
@@ -473,21 +474,21 @@
         #timers-container {
             width: 100%;
             max-width: 1000px;
-            margin-top: 20px; /* Réduit de 25px → 20px */
+            margin-top: 25px;
         }
         #timer-bar-container,
         #question-timer-bar-container {
-            margin: 8px 0; /* Réduit de 10px → 8px */
+            margin: 10px 0;
             text-align: left;
             font-size: 0.95em;
         }
         #timer-bar,
         #question-timer-bar {
             width: 100%;
-            height: 26px; /* Réduit de 28px → 26px */
+            height: 28px;
             background: #2b2b3a;
             border-radius: 10px;
-            margin-top: 5px; /* Réduit de 6px → 5px */
+            margin-top: 6px;
             overflow: hidden;
         }
         #timer-fill,
@@ -504,15 +505,15 @@
             background: #a832d6;
         }
         #score-lives {
-            margin-top: 18px; /* Réduit de 20px → 18px */
+            margin-top: 20px;
             display: flex;
-            gap: 70px; /* Réduit de 80px → 70px */
+            gap: 80px;
             justify-content: center;
-            font-size: 1.25em; /* Légèrement réduit */
+            font-size: 1.3em;
         }
         #lives {
             color: #ff4b4b;
-            font-size: 1.35em; /* Légèrement réduit */
+            font-size: 1.4em;
         }
         /* RESULT SECTION */
         #result-section {
@@ -553,22 +554,24 @@
             }
             .quiz-container {
                 flex-direction: column;
+                gap: 15px; /* Réduit l'espacement entre question et réponses */
             }
             .question-box {
-                font-size: 1.5em; /* Réduit sur mobile */
-                min-height: 110px; /* Encore un peu réduit */
-                padding: 20px; /* Réduit davantage */
+                font-size: 1.6em;
+                padding: 16px;
+                min-height: 90px;
             }
             .answers-container {
-                gap: 10px; /* Réduit */
+                gap: 10px; /* Réduit espacement entre boutons */
             }
             .answer-btn {
-                padding: 12px; /* Réduit de 13px → 12px */
-                font-size: 1.1em; /* Un peu plus petit sur mobile */
+                padding: 12px; /* Légèrement réduit */
+                font-size: 1.1em;
             }
             #score-lives {
                 flex-direction: column;
-                gap: 12px; /* Réduit de 15px → 12px */
+                gap: 10px; /* Réduit espacement entre score et vies */
+                margin-top: 15px;
             }
             .levels-dropdown {
                 width: 95%;
@@ -577,10 +580,23 @@
                 order: -1;
                 max-width: 100%;
             }
-            /* Déplacer le leaderboard département sous les timers sur mobile */
-            #dept-leaderboard-section {
-                order: 2;
-                margin-top: 25px;
+            /* Cacher le leaderboard dans le quiz-container sur mobile */
+            #dept-leaderboard-section.desktop {
+                display: none;
+            }
+            /* Afficher le leaderboard mobile en dessous des timers */
+            #dept-leaderboard-section.mobile {
+                display: block;
+                margin-top: 15px; /* Réduit l'espacement avant le leaderboard */
+            }
+            #timers-container {
+                margin-top: 15px; /* Réduit l'espacement après les réponses */
+            }
+        }
+        /* Cacher le leaderboard mobile sur desktop */
+        @media (min-width: 900px) {
+            #dept-leaderboard-section.mobile {
+                display: none !important;
             }
         }
     </style>
@@ -741,7 +757,8 @@
                     <button class="answer-btn"></button>
                     <button class="answer-btn"></button>
                 </div>
-                <div id="dept-leaderboard-section">
+                <!-- Version desktop du leaderboard (dans la colonne droite) -->
+                <div id="dept-leaderboard-section" class="desktop">
                     <h3 class="leaderboard-title">🏆 Top Départements</h3>
                     <div id="dept-leaderboard-list">
                         <div style="text-align: center; opacity: 0.6;">Chargement...</div>
@@ -765,6 +782,13 @@
             <div id="score-lives">
                 <div>Score : <span id="score">0</span></div>
                 <div id="lives">❤❤❤❤❤</div>
+            </div>
+            <!-- Version mobile du leaderboard (sous les timers & vies) -->
+            <div id="dept-leaderboard-section" class="mobile">
+                <h3 class="leaderboard-title">🏆 Top Départements</h3>
+                <div id="dept-leaderboard-list">
+                    <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+                </div>
             </div>
         </section>
         <section id="result-section" class="hidden">
@@ -1176,16 +1200,23 @@
                 if (btn.textContent === correctAnswer) btn.classList.add("correct");
                 if (btn.textContent === selected && selected !== correctAnswer) btn.classList.add("incorrect");
             });
-            if (selected === correctAnswer) score++;
-            else
-                if (lives > 0) lives--;
-                else lives = 0;
+            if (selected === correctAnswer) {
+                score++;
+            } else {
+                // Ne décrémente qu'une seule fois, même si la réponse est vide (pas de réponse)
+                if (lives > 0) {
+                    lives--;
+                }
+            }
             updateLives();
             scoreDisplay.textContent = score;
             setTimeout(() => {
                 awaitingNext = false;
-                if (lives <= 0) endGame();
-                else generateQuestion();
+                if (lives <= 0) {
+                    endGame();
+                } else {
+                    generateQuestion();
+                }
             }, 1000);
         }
         function updateLives() {
@@ -1213,7 +1244,12 @@
                 qTime -= 0.1;
                 qTimerDisplay.textContent = Math.ceil(qTime);
                 qTimerFill.style.width = (qTime / modes[currentMode].qTime * 100) + '%';
-                if (qTime <= 0) { clearInterval(qTimerInterval); if (lives > 0) lives--; updateLives(); handleAnswer(''); }
+                if (qTime <= 0) {
+                    clearInterval(qTimerInterval);
+                    // Correction ici : on appelle handleAnswer avec une réponse vide,
+                    // mais handleAnswer ne décrémente qu'une seule fois.
+                    handleAnswer('');
+                }
             }, 100);
         }
         async function endGame() {
@@ -1462,8 +1498,11 @@
             }
         }
         async function loadDeptLeaderboard() {
-            const leaderboardList = document.getElementById('dept-leaderboard-list');
-            leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
+            // Met à jour les deux versions du leaderboard (desktop et mobile)
+            const mobileList = document.querySelector('#dept-leaderboard-section.mobile #dept-leaderboard-list');
+            const desktopList = document.querySelector('#dept-leaderboard-section.desktop #dept-leaderboard-list');
+            mobileList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
+            desktopList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
             try {
                 const q = query(
                     collection(db, 'users'),
@@ -1472,32 +1511,40 @@
                 );
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot || querySnapshot.empty) {
-                    leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
+                    const emptyMsg = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
+                    mobileList.innerHTML = emptyMsg;
+                    desktopList.innerHTML = emptyMsg;
                     return;
                 }
-                leaderboardList.innerHTML = '';
                 let rank = 1;
+                let mobileHtml = '';
+                let desktopHtml = '';
                 querySnapshot.forEach((doc) => {
                     const data = doc.data() || {};
                     const pseudo = data.pseudo || 'Anonyme';
                     const score = typeof data.quizScores?.departements === 'number' ? data.quizScores.departements : 0;
-                    const item = document.createElement('div');
-                    item.className = 'leaderboard-item';
                     let medal = '';
                     if (rank === 1) medal = '🥇';
                     else if (rank === 2) medal = '🥈';
                     else if (rank === 3) medal = '🥉';
-                    item.innerHTML = `
-                <div class="leaderboard-rank">${medal || rank}</div>
-                <div class="leaderboard-name">${pseudo}</div>
-                <div class="leaderboard-score">${score}</div>
-            `;
-                    leaderboardList.appendChild(item);
+                    const itemHtml = `
+                        <div class="leaderboard-item">
+                            <div class="leaderboard-rank">${medal || rank}</div>
+                            <div class="leaderboard-name">${pseudo}</div>
+                            <div class="leaderboard-score">${score}</div>
+                        </div>
+                    `;
+                    mobileHtml += itemHtml;
+                    desktopHtml += itemHtml;
                     rank++;
                 });
+                mobileList.innerHTML = mobileHtml;
+                desktopList.innerHTML = desktopHtml;
             } catch (error) {
                 console.error('Erreur loadDeptLeaderboard:', error);
-                leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Erreur de chargement</div>';
+                const errorMsg = '<div style="text-align: center; opacity: 0.6;">Erreur de chargement</div>';
+                mobileList.innerHTML = errorMsg;
+                desktopList.innerHTML = errorMsg;
             }
         }
     </script>
