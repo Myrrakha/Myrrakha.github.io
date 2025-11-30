@@ -6,29 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- SEO de la page d'accueil -->
     <title>Quiz des Départements Français – Niveau facile à expert</title>
-
     <meta name="description"
         content="Testez vos connaissances avec notre quiz des départements français. 5 niveaux de difficulté, corrections instantanées et progression suivie.">
-
     <meta name="keywords"
         content="quiz, départements, france, géographie, jeu, apprendre les départements, quiz france, test géographie">
-
     <link rel="canonical" href="https://www.tonsite.com/">
-
     <!-- OpenGraph pour réseaux sociaux -->
     <meta property="og:title" content="Quiz des Départements Français">
     <meta property="og:description" content="Saurez-vous reconnaître les 101 départements ? 5 niveaux de difficulté.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.tonsite.com/">
     <meta property="og:image" content="https://www.tonsite.com/images/preview.jpg">
-
     <!-- Twitter card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Quiz des Départements Français">
     <meta name="twitter:description"
         content="Mettez votre connaissance de la France à l'épreuve avec nos quiz niveaux 1 à 5.">
     <meta name="twitter:image" content="https://www.tonsite.com/images/preview.jpg">
-
     <title>Quiz Master - Accueil</title>
     <style>
         .hidden {
@@ -87,11 +81,6 @@
             align-items: center;
         }
 
-        .user-stats {
-            font-size: 0.9em;
-            text-align: right;
-        }
-
         .logout-btn {
             padding: 8px 16px;
             background: #dc3545;
@@ -124,6 +113,12 @@
         .action-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        .auth-required {
+            opacity: 0.5;
+            cursor: not-allowed !important;
+            pointer-events: none;
         }
 
         .dropdown {
@@ -196,96 +191,10 @@
             cursor: not-allowed;
         }
 
-        /* AUTH SECTION */
-        #auth-section {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 80vh;
-        }
-
-        .auth-container {
-            background: #1f1f28;
-            padding: 40px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .auth-container h2 {
-            margin-top: 0;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.95em;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            background: #2c2c3a;
-            color: #f0f0f0;
-            font-size: 1em;
-            box-sizing: border-box;
-        }
-
-        .auth-btn {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
-            background: #9c28a7;
-            color: white;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.25s;
-            margin-top: 10px;
-        }
-
-        .auth-btn:hover {
-            background: #7d1f85;
-        }
-
-        .auth-switch {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 0.9em;
-        }
-
-        .auth-switch a {
-            color: #9c28a7;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        .error-msg {
-            background: #dc3545;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
         /* HOME SECTION */
         #home-section {
             padding: 40px 20px 20px;
             text-align: center;
-        }
-
-        .home-center h2 {
-            font-size: 2.2em;
-            margin-bottom: 10px;
         }
 
         .home-content {
@@ -508,6 +417,224 @@
                 max-width: 100%;
             }
         }
+
+        /* Auth modal */
+        #auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        #auth-modal.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .auth-modal-container {
+            background: #1f1f28;
+            padding: 40px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: #fff;
+        }
+
+        .auth-container h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #2c2c3a;
+            color: #f0f0f0;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: #9c28a7;
+            color: white;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.25s;
+            margin-top: 10px;
+        }
+
+        .auth-btn:hover {
+            background: #7d1f85;
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+
+        .auth-switch a {
+            color: #9c28a7;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .error-msg {
+            background: #dc3545;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* Stats display - compact table */
+        .user-stats-table {
+            max-width: 700px;
+            margin: 0 auto 30px;
+            background: #262633;
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .user-stats-title {
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            color: #9c28a7;
+            text-align: center;
+        }
+
+        .stats-columns {
+            display: flex;
+            gap: 20px;
+            position: relative;
+        }
+
+        .stats-column {
+            flex: 1;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .stats-label {
+            color: #cfcfcf;
+            margin-right: 8px;
+        }
+
+        .stats-value {
+            color: #f0f0f0;
+            font-weight: 600;
+            text-align: right;
+            min-width: 60px;
+        }
+
+        /* Divider between columns - PC only */
+        @media (min-width: 601px) {
+            .stats-columns::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 2px;
+                background: #3a3a50;
+                z-index: 1;
+            }
+        }
+
+        /* Mobile: keep columns side by side with adjusted styling + vertical bar */
+        @media (max-width: 600px) {
+            .stats-columns {
+                flex-wrap: wrap;
+                gap: 15px;
+                justify-content: space-between;
+                position: relative;
+            }
+
+            .stats-column {
+                flex: 48%;
+                min-width: 140px;
+            }
+
+            .stats-row {
+                font-size: 0.85em;
+            }
+
+            .stats-label {
+                flex: 1.8;
+                margin-right: 6px;
+            }
+
+            .stats-value {
+                flex: 1;
+                text-align: right;
+            }
+
+            .user-stats-title {
+                font-size: 1.4em;
+            }
+
+            /* Mobile-only vertical bar */
+            .stats-columns::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 50%;
+                width: 1px;
+                background: #3a3a50;
+                z-index: 1;
+                transform: translateX(-50%);
+            }
+        }
     </style>
 </head>
 
@@ -517,88 +644,73 @@
             <div class="nav-left">
                 <span class="nav-title">🎯 Quiz Master</span>
                 <!-- Le bouton Base -->
-                <button class="action-btn" id="base-btn" onclick="window.location.href='base.html'"
-                    style="margin-left:8px; display:none;">Base</button>
-                <script>
-                    function updateBaseBtnVisibility(globalScore) {
-                        const baseBtn = document.getElementById('base-btn');
-                        if (!baseBtn) {
-                            console.warn('[DEBUG] Bouton Base introuvable dans le DOM');
-                            return;
-                        }
-                        if (globalScore >= 200) {
-                            baseBtn.style.display = 'inline-block';
-                            baseBtn.disabled = false;
-                            baseBtn.classList.remove('disabled');
-                            baseBtn.title = '';
-                        } else {
-                            baseBtn.style.display = 'none';
-                            baseBtn.disabled = true;
-                            baseBtn.classList.add('disabled');
-                            baseBtn.title = 'Débloqué à 200 points globaux';
-                        }
-                    }
-                    function updateBaseBtnVisibilityFallback() {
-                        let globalScore = 0;
-                        try {
-                            const localScore = localStorage.getItem('globalScore');
-                            if (localScore !== null && !isNaN(parseInt(localScore))) {
-                                globalScore = parseInt(localScore);
-                            }
-                        } catch (e) { }
-                        updateBaseBtnVisibility(globalScore);
-                    }
-                    updateBaseBtnVisibilityFallback();
-                </script>
+                <button class="action-btn" id="base-btn">Base</button>
             </div>
             <div class="nav-right" id="nav-logged-out">
-                <button class="action-btn" onclick="window.location.href='settings.html'"
-                    style="margin-left:10px;">Réglages</button>
+                <button class="action-btn" onclick="window.location.href='statistiques.html'">Statistiques</button>
+                <button class="action-btn" onclick="window.location.href='settings.html'">Réglages</button>
+                <button class="action-btn" id="login-btn">Connexion</button>
             </div>
             <div class="nav-right hidden" id="nav-logged-in">
                 <div class="user-info">
-                    <div class="user-stats">
-                        <div><strong id="user-pseudo">Joueur</strong></div>
-                        <div>Score Global: <strong id="user-global-score">0</strong></div>
-                    </div>
-                    <button class="action-btn" onclick="window.location.href='settings.html'"
-                        style="margin-left:10px;">Réglages</button>
-                    <button class="logout-btn" onclick="logout()">Déconnexion</button>
+                    <button class="action-btn" onclick="window.location.href='statistiques.html'">Statistiques</button>
+                    <button class="action-btn" onclick="window.location.href='settings.html'">Réglages</button>
+                    <button class="logout-btn" id="logout-btn">Déconnexion</button>
                 </div>
             </div>
         </nav>
     </header>
     <main>
-        <!-- SECTION AUTHENTIFICATION -->
-        <section id="auth-section">
-            <div class="auth-container">
-                <h2 id="auth-title">Connexion</h2>
-                <div id="auth-error" class="error-msg hidden"></div>
-                <form id="auth-form" onsubmit="return false;">
-                    <div class="form-group" id="pseudo-group" style="display:none;">
-                        <label>Pseudo</label>
-                        <input type="text" id="auth-pseudo" placeholder="Ton pseudo">
-                    </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="auth-email" placeholder="ton@email.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Mot de passe</label>
-                        <input type="password" id="auth-password" placeholder="••••••••" required>
-                    </div>
-                    <button class="auth-btn" id="auth-submit-btn">Se connecter</button>
-                </form>
-                <div class="auth-switch">
-                    <span id="auth-switch-text">Pas encore de compte ? </span>
-                    <a id="auth-switch-link" onclick="toggleAuthMode()">S'inscrire</a>
-                </div>
-            </div>
-        </section>
         <!-- SECTION ACCUEIL -->
-        <section id="home-section" class="hidden">
-            <div class="home-center">
-                <h2>Bienvenue <span id="welcome-pseudo">Joueur</span> ! 👋</h2>
+        <section id="home-section">
+            <div class="user-stats-table hidden" id="user-stats-display">
+                <h2 class="user-stats-title" id="user-stats-title">Bonjour, Joueur !</h2>
+                <div class="stats-columns">
+                    <div class="stats-column">
+                        <div class="stats-row">
+                            <span class="stats-label">Rang :</span>
+                            <span class="stats-value" id="user-rank">#1</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Quiz complété :</span>
+                            <span class="stats-value" id="user-quizzes-completed">0</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Quiz Bilan complété :</span>
+                            <span class="stats-value" id="user-bilan-completed">0</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Réponses justes :</span>
+                            <span class="stats-value" id="user-correct-answers">0</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Réponses fausses :</span>
+                            <span class="stats-value" id="user-wrong-answers">0</span>
+                        </div>
+                    </div>
+                    <div class="stats-column">
+                        <div class="stats-row">
+                            <span class="stats-label">Titre :</span>
+                            <span class="stats-value" id="user-title">Apprenti</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Point de score :</span>
+                            <span class="stats-value" id="user-score-points">0</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Thème préféré :</span>
+                            <span class="stats-value" id="user-favorite-theme">-</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Département préféré :</span>
+                            <span class="stats-value" id="user-favorite-dept">-</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Ratio juste/faux :</span>
+                            <span class="stats-value" id="user-ratio">0:0</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="home-content">
                 <div class="stats-grid-container">
@@ -648,8 +760,36 @@
             </div>
         </section>
     </main>
+    <!-- Auth Modal -->
+    <div id="auth-modal">
+        <div class="auth-modal-container">
+            <button class="close-modal">&times;</button>
+            <h2 id="auth-title">Connexion</h2>
+            <div id="auth-error" class="error-msg hidden"></div>
+            <form id="auth-form" onsubmit="return false;">
+                <div class="form-group" id="pseudo-group" style="display:none;">
+                    <label>Pseudo</label>
+                    <input type="text" id="auth-pseudo" placeholder="Ton pseudo">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="auth-email" placeholder="ton@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="auth-password" placeholder="••••••••" required>
+                </div>
+                <button class="auth-btn" id="auth-submit-btn">Se connecter</button>
+            </form>
+            <div class="auth-switch">
+                <span id="auth-switch-text">Pas encore de compte ? </span>
+                <a id="auth-switch-link">S'inscrire</a>
+            </div>
+        </div>
+    </div>
     <div id="hover-warning"></div>
     <script type="module">
+        // Firebase SDK URLs corrected (extra spaces removed)
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -672,12 +812,27 @@
         const mathRequired = { 1: 60, 2: 120, 3: 240, 4: 480, 5: 960 };
         const requiredModeUnlock = { 2: 10, 3: 30, 4: 60, 5: 90, 6: 125 };
         let isAuthMode = 'login';
+        let authCheckComplete = false;
+        // Initial rendering for all users (connected or not)
+        renderLevels('departements', 0);
+        loadLeaderboard();
+        // Set up click handlers for non-departement cards and buttons
+        document.getElementById('chinois-card').addEventListener('click', showAuthModalIfNeeded);
+        document.getElementById('medecine-card').addEventListener('click', showAuthModalIfNeeded);
+        document.getElementById('math-card').addEventListener('click', showAuthModalIfNeeded);
+        document.getElementById('base-btn').addEventListener('click', showAuthModalIfNeeded);
+        document.getElementById('login-btn').addEventListener('click', showAuthModal);
+        document.getElementById('logout-btn').addEventListener('click', logoutUser);
+        // Set up close button handler
+        document.querySelector('.close-modal').addEventListener('click', hideAuthModal);
+        // Set up auth switch link
+        document.getElementById('auth-switch-link').addEventListener('click', toggleAuthMode);
         function getGlobalLevel(score) {
             if (score >= 500) return '🏆 Expert';
-            if (score >= 300) return '⭐ Avancé';
-            if (score >= 150) return '📚 Intermédiaire';
-            if (score >= 50) return '🌱 Apprenti';
-            return '🆕 Débutant';
+            else if (score >= 300) return '⭐ Avancé';
+            else if (score >= 150) return '📚 Intermédiaire';
+            else if (score >= 50) return '🌱 Apprenti';
+            else return '🆕 Débutant';
         }
         function getDeptLevel(score) {
             const level = Math.floor(score / 50) + 1;
@@ -693,6 +848,7 @@
         }
         function renderLevels(category, globalScore) {
             const container = document.getElementById(`${category}-levels`);
+            if (!container) return;
             container.innerHTML = '';
             const levels = {
                 departements: [
@@ -702,29 +858,9 @@
                     { id: 4, name: "Préfecture → Dépt", required: 60 },
                     { id: 5, name: "Mix", required: 90 },
                     { id: 6, name: "Niveaux Suivants", required: 125 }
-                ],
-                chinois: [
-                    { id: 1, name: "Chiffres 1-10", required: 200 },
-                    { id: 2, name: "Jours de la semaine", required: 250 },
-                    { id: 3, name: "Couleurs de base", required: 300 },
-                    { id: 4, name: "Membres famille", required: 350 },
-                    { id: 5, name: "Animaux courants", required: 400 }
-                ],
-                medecine: [
-                    { id: 1, name: "Bases", required: 40 },
-                    { id: 2, name: "Anatomie", required: 80 },
-                    { id: 3, name: "Pathologies", required: 160 },
-                    { id: 4, name: "Médicaments", required: 320 },
-                    { id: 5, name: "Cas cliniques", required: 500 }
-                ],
-                math: [
-                    { id: 1, name: "Additions, soustractions", required: 60 },
-                    { id: 2, name: "Divisions, multiplications", required: 120 },
-                    { id: 3, name: "Fractions", required: 240 },
-                    { id: 4, name: "Algèbre basique", required: 480 },
-                    { id: 5, name: "Géométrie", required: 960 }
                 ]
             };
+            if (!levels[category]) return;
             levels[category].forEach(level => {
                 const isUnlocked = globalScore >= level.required;
                 const card = document.createElement('div');
@@ -757,12 +893,6 @@
             window.scrollTo(0, 0);
             if (category === 'departements') {
                 window.location.href = `quiz-departement.html#${levelId}`;
-            } else if (category === 'chinois') {
-                window.location.href = `quiz-chinois.html#${levelId}`;
-            } else if (category === 'medecine') {
-                window.location.href = `quiz-medecine.html#${levelId}`;
-            } else if (category === 'math') {
-                window.location.href = `quiz-math.html#${levelId}`;
             }
         }
         document.getElementById('dept-card').addEventListener('click', function (e) {
@@ -792,22 +922,8 @@
                 });
             }
         });
-        const homeSection = document.getElementById('home-section');
-        const authSection = document.getElementById('auth-section');
-        const restartBtn = document.getElementById('restart-btn');
-        const homeBtn = document.getElementById('home-btn');
-        const backBtn = document.getElementById('back-btn');
-        const mobileBackBtn = document.getElementById('mobile-back-btn');
-        const answerBtns = document.querySelectorAll('.answer-btn');
-        const questionBox = document.getElementById('question');
-        const scoreDisplay = document.getElementById('score');
-        const livesDisplay = document.getElementById('lives');
-        const timerDisplay = document.getElementById('timer');
-        const qTimerDisplay = document.getElementById('question-timer');
-        const timerFill = document.getElementById('timer-fill');
-        const qTimerFill = document.getElementById('question-timer-fill');
-        const finalScore = document.getElementById('final-score');
-        window.toggleAuthMode = function () {
+        
+        function toggleAuthMode() {
             isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
             const title = document.getElementById('auth-title');
             const submitBtn = document.getElementById('auth-submit-btn');
@@ -827,7 +943,7 @@
                 switchLink.textContent = "S'inscrire";
                 pseudoGroup.style.display = 'none';
             }
-        };
+        }
         document.getElementById('auth-submit-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
@@ -850,38 +966,63 @@
                         },
                         createdAt: new Date().toISOString()
                     });
+                    // Fermer le modal après inscription réussie
+                    hideAuthModal();
                 } else {
                     await signInWithEmailAndPassword(auth, email, password);
+                    // Fermer le modal après connexion réussie
+                    hideAuthModal();
                 }
             } catch (error) {
                 errorDiv.textContent = error.message;
                 errorDiv.classList.remove('hidden');
             }
         });
-        window.logout = async function () {
-            await signOut(auth);
-        };
+        function logoutUser() {
+            signOut(auth)
+                .then(() => {
+                    // Déconnexion réussie
+                    console.log('Déconnexion réussie');
+                })
+                .catch((error) => {
+                    console.error('Erreur lors de la déconnexion:', error);
+                });
+        }
+        function showAuthModal() {
+            document.getElementById('auth-modal').classList.add('visible');
+        }
+        function hideAuthModal() {
+            document.getElementById('auth-modal').classList.remove('visible');
+        }
+        function showAuthModalIfNeeded() {
+            if (!window.currentUser) {
+                showAuthModal();
+            } else {
+                // Si déjà connecté, ne rien faire (départements se gère autrement)
+                // Si on voulait rediriger vers un quiz autre, on le ferait ici
+            }
+        }
         onAuthStateChanged(auth, async (user) => {
-            const authSection = document.getElementById('auth-section');
-            const homeSection = document.getElementById('home-section');
             const navLoggedOut = document.getElementById('nav-logged-out');
             const navLoggedIn = document.getElementById('nav-logged-in');
+            const userStatsDisplay = document.getElementById('user-stats-display');
             if (user) {
                 window.currentUser = user;
-                authSection.classList.add('hidden');
-                homeSection.classList.remove('hidden');
                 navLoggedOut.classList.add('hidden');
                 navLoggedIn.classList.remove('hidden');
+                userStatsDisplay.classList.remove('hidden');
                 await loadUserData();
-                await loadLeaderboard();
                 window.scrollTo(0, 0);
+                // Fermer automatiquement le modal si l'utilisateur est connecté
+                hideAuthModal();
             } else {
                 window.currentUser = null;
-                authSection.classList.remove('hidden');
-                homeSection.classList.add('hidden');
                 navLoggedOut.classList.remove('hidden');
                 navLoggedIn.classList.add('hidden');
+                userStatsDisplay.classList.add('hidden');
             }
+            // Met à jour l'état d'authentification pour les click handlers
+            authCheckComplete = true;
         });
         async function loadUserData() {
             try {
@@ -904,10 +1045,19 @@
                     await setDoc(userDocRef, defaultData);
                     userData = defaultData;
                 }
-                updateBaseBtnVisibility(userData.globalScore || 0);
-                document.getElementById('user-pseudo').textContent = userData.pseudo;
-                document.getElementById('welcome-pseudo').textContent = userData.pseudo;
-                document.getElementById('user-global-score').textContent = userData.globalScore || 0;
+                // Update user stats display
+                document.getElementById('user-stats-title').textContent = `Bonjour, ${userData.pseudo} !`;
+                document.getElementById('user-score-points').textContent = userData.globalScore || 0;
+                // Set title based on global score
+                document.getElementById('user-title').textContent = getGlobalLevel(userData.globalScore || 0);
+                // Default values for stats
+                document.getElementById('user-quizzes-completed').textContent = "0";
+                document.getElementById('user-bilan-completed').textContent = "0";
+                document.getElementById('user-correct-answers').textContent = "0";
+                document.getElementById('user-wrong-answers').textContent = "0";
+                document.getElementById('user-favorite-theme').textContent = "Départements";
+                document.getElementById('user-favorite-dept').textContent = "Paris (75)";
+                document.getElementById('user-ratio').textContent = "0:0";
                 const chinoisScore = userData.quizScores?.chinois || 0;
                 const medecineScore = userData.quizScores?.medecine || 0;
                 const mathScore = userData.quizScores?.math || 0;
@@ -924,20 +1074,19 @@
                 renderLevels('chinois', userData.globalScore || 0);
                 renderLevels('medecine', userData.globalScore || 0);
                 renderLevels('math', userData.globalScore || 0);
+                // Get user rank
+                const rankQuery = query(collection(db, 'users'), orderBy('globalScore', 'desc'));
+                const rankSnapshot = await getDocs(rankQuery);
+                let userRank = 1;
+                for (const doc of rankSnapshot.docs) {
+                    if (doc.id === currentUser.uid) {
+                        break;
+                    }
+                    userRank++;
+                }
+                document.getElementById('user-rank').textContent = `#${userRank}`;
             } catch (error) {
                 console.error('Erreur chargement données:', error);
-                alert('Erreur de chargement. Essayez de vous reconnecter.');
-                let globalScore = 0;
-                try {
-                    const localScore = localStorage.getItem('globalScore');
-                    if (localScore !== null && !isNaN(parseInt(localScore))) {
-                        globalScore = parseInt(localScore);
-                    }
-                } catch (e) { }
-                renderLevels('departements', globalScore);
-                renderLevels('chinois', globalScore);
-                renderLevels('medecine', globalScore);
-                renderLevels('math', globalScore);
             }
         }
         async function loadLeaderboard() {
@@ -971,6 +1120,12 @@
                 leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Erreur de chargement</div>';
             }
         }
+        // Close modal when clicking outside
+        document.getElementById('auth-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('auth-modal')) {
+                hideAuthModal();
+            }
+        });
     </script>
 </body>
 
