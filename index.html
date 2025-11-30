@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -27,12 +28,14 @@
         .hidden {
             display: none !important;
         }
+
         body {
             margin: 0;
             font-family: 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #0f1115, #1c1c24);
             color: #f0f0f0;
         }
+
         #hover-warning {
             position: absolute;
             padding: 8px 14px;
@@ -45,6 +48,7 @@
             transition: opacity 0.4s ease;
             z-index: 9999;
         }
+
         header {
             width: 100%;
             background: rgba(20, 20, 28, 0.8);
@@ -54,6 +58,7 @@
             top: 0;
             z-index: 1000;
         }
+
         .navbar {
             max-width: 1100px;
             margin: auto;
@@ -62,17 +67,20 @@
             align-items: center;
             padding: 12px 20px;
         }
+
         .nav-title {
             font-size: 1.4em;
             font-weight: 600;
             color: #eaeaea;
             letter-spacing: 1px;
         }
+
         .user-info {
             display: flex;
             gap: 15px;
             align-items: center;
         }
+
         .logout-btn {
             padding: 8px 16px;
             background: #dc3545;
@@ -82,9 +90,11 @@
             cursor: pointer;
             transition: 0.25s;
         }
+
         .logout-btn:hover {
             background: #c82333;
         }
+
         .action-btn {
             padding: 8px 16px;
             border-radius: 8px;
@@ -95,21 +105,26 @@
             transition: 0.25s;
             font-size: 0.95em;
         }
+
         .action-btn:hover {
             background: #4e4e6a;
         }
+
         .action-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
+
         .auth-required {
             opacity: 0.5;
             cursor: not-allowed !important;
             pointer-events: none;
         }
+
         .dropdown {
             position: relative;
         }
+
         .dropdown-btn {
             padding: 10px 20px;
             border-radius: 10px;
@@ -120,9 +135,11 @@
             font-weight: 500;
             transition: 0.25s;
         }
+
         .dropdown-btn:hover {
             background: #45455a;
         }
+
         .dropdown-content {
             position: absolute;
             right: 0;
@@ -138,14 +155,17 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
             z-index: 100;
         }
+
         .dropdown.open .dropdown-content {
             display: flex;
         }
+
         .dropdown-subtitle {
             font-size: 0.85em;
             color: #cfcfcf;
             margin: 5px 0;
         }
+
         .dropdown-item {
             width: 240px;
             flex-direction: column;
@@ -161,18 +181,22 @@
             -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
         }
+
         .dropdown-item:hover {
             background: #3d3d50;
         }
+
         .dropdown-item.disabled {
             opacity: 0.4;
             cursor: not-allowed;
         }
+
         /* HOME SECTION */
         #home-section {
             padding: 40px 20px 20px;
             text-align: center;
         }
+
         .home-content {
             display: flex;
             flex-direction: column;
@@ -180,18 +204,22 @@
             margin: 0 auto;
             gap: 30px;
         }
+
         @media (min-width: 900px) {
             .home-content {
                 flex-direction: row;
             }
+
             .stats-grid-container {
                 flex: 2;
             }
+
             #leaderboard-section {
                 flex: 1;
                 margin-top: 0;
             }
         }
+
         .stats-grid {
             display: flex;
             flex-direction: column;
@@ -199,9 +227,11 @@
             gap: 20px;
             width: 100%;
         }
+
         .stats-grid-container {
             width: 100%;
         }
+
         .stat-card {
             background: #262633;
             padding: 25px;
@@ -212,9 +242,11 @@
             transition: transform 0.25s;
             width: 100%;
         }
+
         .stat-card:hover {
             transform: translateY(-3px);
         }
+
         .stat-card h3 {
             margin-top: 0;
             color: #9c28a7;
@@ -223,11 +255,13 @@
             align-items: center;
             gap: 8px;
         }
+
         .stat-value {
             font-size: 2.5em;
             font-weight: bold;
             color: #f0f0f0;
         }
+
         .level-badge {
             display: inline-block;
             padding: 8px 16px;
@@ -236,6 +270,7 @@
             font-weight: 600;
             margin-top: 10px;
         }
+
         .levels-dropdown {
             background: linear-gradient(135deg, #0f1115, #1c1c24);
             border-radius: 12px;
@@ -249,6 +284,7 @@
             border: 2px solid transparent;
             position: relative;
         }
+
         .levels-dropdown::before {
             content: '';
             position: absolute;
@@ -261,15 +297,18 @@
             border-radius: 14px;
             opacity: 0.8;
         }
+
         .levels-dropdown.visible {
             max-height: 600px;
             padding: 15px;
         }
+
         .levels-grid-dropdown {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
         }
+
         .level-card-dropdown {
             background: #2c2c3a;
             padding: 12px;
@@ -278,53 +317,64 @@
             cursor: pointer;
             transition: all 0.2s;
         }
+
         .level-card-dropdown:hover {
             background: #3a3a4a;
         }
+
         .level-card-dropdown.locked {
             opacity: 0.6;
             cursor: not-allowed;
         }
+
         .level-number-dropdown {
             font-size: 1.2em;
             font-weight: bold;
             margin-bottom: 4px;
             color: #9c28a7;
         }
+
         .level-name-dropdown {
             font-size: 0.9em;
             margin-bottom: 4px;
         }
+
         .level-requirement-dropdown {
             font-size: 0.8em;
             color: #ff4b4b;
             opacity: 0.8;
         }
+
         .unlock-status-dropdown {
             font-size: 0.8em;
             color: #2ecc71;
             margin-top: 3px;
         }
+
         .unlock-icon {
             color: #2ecc71;
             margin-right: 3px;
         }
+
         /* LEADERBOARD */
         #leaderboard-section {
             max-width: 800px;
             margin: 0 auto;
             padding: 0 20px;
         }
+
         .leaderboard-container {
             background: #262633;
             border-radius: 15px;
             padding: 25px;
         }
+
         .leaderboard-title {
             text-align: center;
             margin-bottom: 20px;
             color: #9c28a7;
         }
+
         .leaderboard-item {
             display: flex;
             justify-content: space-between;
@@ -334,33 +384,40 @@
             background: #2c2c3a;
             border-radius: 8px;
         }
+
         .leaderboard-rank {
             font-size: 1.3em;
             font-weight: bold;
             width: 40px;
         }
+
         .leaderboard-name {
             flex: 1;
             font-weight: 500;
         }
+
         .leaderboard-score {
             font-size: 1.1em;
             color: #9c28a7;
             font-weight: bold;
         }
+
         /* MOBILE DESIGN */
         @media (max-width: 899px) {
             .levels-grid-dropdown {
                 grid-template-columns: 1fr;
             }
+
             .stats-grid {
                 width: 95%;
             }
+
             #leaderboard-section {
                 order: -1;
                 max-width: 100%;
             }
         }
+
         /* Auth modal */
         #auth-modal {
             position: fixed;
@@ -377,10 +434,12 @@
             visibility: hidden;
             transition: opacity 0.3s, visibility 0.3s;
         }
+
         #auth-modal.visible {
             opacity: 1;
             visibility: visible;
         }
+
         .auth-modal-container {
             background: #1f1f28;
             padding: 40px;
@@ -390,6 +449,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             position: relative;
         }
+
         .close-modal {
             position: absolute;
             top: 15px;
@@ -400,21 +460,26 @@
             font-size: 1.5em;
             cursor: pointer;
         }
+
         .close-modal:hover {
             color: #fff;
         }
+
         .auth-container h2 {
             margin-top: 0;
             text-align: center;
         }
+
         .form-group {
             margin-bottom: 20px;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
             font-size: 0.95em;
         }
+
         .form-group input {
             width: 100%;
             padding: 12px;
@@ -425,6 +490,7 @@
             font-size: 1em;
             box-sizing: border-box;
         }
+
         .auth-btn {
             width: 100%;
             padding: 12px;
@@ -438,19 +504,23 @@
             transition: 0.25s;
             margin-top: 10px;
         }
+
         .auth-btn:hover {
             background: #7d1f85;
         }
+
         .auth-switch {
             text-align: center;
             margin-top: 20px;
             font-size: 0.9em;
         }
+
         .auth-switch a {
             color: #9c28a7;
             cursor: pointer;
             text-decoration: underline;
         }
+
         .error-msg {
             background: #dc3545;
             padding: 10px;
@@ -460,6 +530,7 @@
         }
     </style>
 </head>
+
 <body>
     <header>
         <nav class="navbar">
@@ -797,7 +868,7 @@
             if (category === 'departements') {
                 window.location.href = `quiz-departement.html#${levelId}`;
             } else if (category === 'chinois') {
-                window.location.href = `quiz-chinois.html#${levelId}`;
+                window.location.href = `quiz-chinois-n${levelId}.html`;
             } else if (category === 'medecine') {
                 window.location.href = `quiz-medecine.html#${levelId}`;
             } else if (category === 'math') {
@@ -993,11 +1064,30 @@
             // Met à jour l'état d'authentification pour les click handlers
             authCheckComplete = true;
         });
+        // 🔁 Rafraîchir les données si la page est restaurée depuis le cache (ex: retour navigateur)
+        window.addEventListener('pageshow', async (event) => {
+            if (event.persisted && window.currentUser) {
+                console.log("[INFO] Rechargement des données utilisateur après retour en arrière");
+                await loadUserData();
+                await loadLeaderboard();
+            }
+        });
         // 🔢 Helper to compute globalScore from all quizScores
         function computeGlobalScore(quizScores) {
-            const keys = ['departements', 'chinois', 'medecine', 'math', 'anglais', 'neerlandais', 'allemand', 'italien', 'espagnol', 'geographie', 'animaux'];
-            return keys.reduce((sum, key) => sum + (quizScores[key] || 0), 0);
+            const keys = [
+                'departements', 'chinois', 'medecine', 'math', 'anglais',
+                'neerlandais', 'allemand', 'italien', 'espagnol',
+                'geographie', 'animaux'
+            ];
+
+            const globalScore = keys.reduce((sum, key) => sum + (quizScores[key] || 0), 0);
+
+            // --- Sauvegarde dans le localStorage ---
+            localStorage.setItem('globalScore', globalScore);
+
+            return globalScore;
         }
+
         async function loadUserData() {
             try {
                 const userDocRef = doc(db, 'users', currentUser.uid);
@@ -1120,5 +1210,5 @@
         });
     </script>
 </body>
-</html>
 
+</html>
