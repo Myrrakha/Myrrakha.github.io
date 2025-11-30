@@ -555,7 +555,17 @@
         window.db = db;
         window.currentUser = null;
 
-        // 🔢 Helper to compute globalScore from all quizScores (identical to index.html)
+        // 🔑 Niveaux & points requis
+        const levelRequirements = {
+            1: 0,
+            2: 10,
+            3: 30,
+            4: 60,
+            5: 90,
+            6: 125
+        };
+
+        // 🔢 Helper identique à index.html — NE JAMAIS stocker globalScore dans Firestore
         function computeGlobalScore(quizScores) {
             const keys = [
                 'departements', 'chinois', 'medecine', 'math', 'anglais',
@@ -563,6 +573,11 @@
                 'geographie', 'animaux'
             ];
             return keys.reduce((sum, key) => sum + (quizScores[key] || 0), 0);
+        }
+
+        function canAccessLevel(level, globalScore) {
+            const required = levelRequirements[level];
+            return globalScore >= required;
         }
 
         onAuthStateChanged(auth, async (user) => {
@@ -574,13 +589,10 @@
                 quizSection.style.display = "block";
                 navLoggedOut.classList.add('hidden');
                 navLoggedIn.classList.remove('hidden');
-
-                // 🔁 Charger les données utilisateur réelles (sans supposer globalScore)
                 const userDocRef = doc(db, 'users', user.uid);
                 const userDoc = await getDoc(userDocRef);
                 const pseudoEl = document.getElementById('user-pseudo');
                 const scoreEl = document.getElementById('user-global-score');
-
                 let globalScore = 0;
                 if (userDoc.exists()) {
                     const data = userDoc.data();
@@ -594,10 +606,16 @@
                 scoreEl.textContent = globalScore;
                 localStorage.setItem('globalScore', globalScore);
 
-                // Démarrer le quiz
                 const hash = window.location.hash.substring(1);
                 const level = parseInt(hash) || 1;
-                currentMode = Math.min(5, Math.max(1, level));
+
+                if (!canAccessLevel(level, globalScore)) {
+                    alert(`Niveau ${level} verrouillé. Vous avez besoin de ${levelRequirements[level]} points de score global.`);
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                currentMode = Math.min(6, Math.max(1, level)); // supporte maintenant jusqu'au niveau 6
                 startMode();
             } else {
                 window.currentUser = null;
@@ -708,23 +726,27 @@
             { nom: "La Réunion", numero: "974", prefecture: "Saint-Denis" },
             { nom: "Mayotte", numero: "976", prefecture: "Mamoudzou" }
         ];
+
         const modes = {
             1: { time: 60, qTime: 7, lives: 6, questionType: "nom_to_num" },
             2: { time: 60, qTime: 6, lives: 5, questionType: "num_to_nom" },
             3: { time: 90, qTime: 9, lives: 8, questionType: "shape_to_nom_num" },
             4: { time: 60, qTime: 7, lives: 7, questionType: "prefecture_to_nom" },
-            5: { time: 80, qTime: 4, lives: 6, questionType: "mix_all" }
+            5: { time: 80, qTime: 4, lives: 6, questionType: "mix_all" },
+            6: { time: 60, qTime: 3, lives: 5, questionType: "mix_all" } // Nouveau niveau 6
         };
+
         let currentMode = 1, score = 0, lives = 0, timeLeft = 0, qTime = 0;
         let timerInterval = null, qTimerInterval = null, awaitingNext = false;
         let previousQuestions = [];
         let correctAnswer;
         let isAuthMode = 'login';
+
         function getDeptLevel(score) {
             const level = Math.floor(score / 50) + 1;
             return `Niveau ${level}`;
         }
-        const homeSection = document.getElementById('home-section');
+
         const authSection = document.getElementById('auth-section');
         const quizSection = document.getElementById('quiz-section');
         const resultSection = document.getElementById('result-section');
@@ -740,6 +762,7 @@
         const qTimerDisplay = document.getElementById('question-timer');
         const timerFill = document.getElementById('timer-fill');
         const qTimerFill = document.getElementById('question-timer-fill');
+
         function updateQuizHeaderVisibility(isQuizActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('quiz-active', isQuizActive);
@@ -747,19 +770,6 @@
             } else {
                 mobileBackBtn.classList.add('hidden');
             }
-        }
-
-        // 🔄 Met à jour le score global localement et dans localStorage
-        async function loadAndUpdateGlobalScore(userId) {
-            const userDocRef = doc(db, 'users', userId);
-            const userDoc = await getDoc(userDocRef);
-            let quizScores = {};
-            if (userDoc.exists()) {
-                quizScores = userDoc.data().quizScores || {};
-            }
-            const globalScore = computeGlobalScore(quizScores);
-            localStorage.setItem('globalScore', globalScore);
-            return globalScore;
         }
 
         async function saveCurrentScore() {
@@ -790,15 +800,12 @@
                     };
                     await setDoc(userDocRef, userData);
                 }
-
                 const quizScores = { ...(userData.quizScores || defaultQuizScores) };
                 const oldDeptScore = quizScores.departements || 0;
                 const newDeptScore = oldDeptScore + score;
                 quizScores.departements = newDeptScore;
-
                 const newGlobalScore = computeGlobalScore(quizScores);
                 await updateDoc(userDocRef, { quizScores });
-
                 localStorage.setItem('globalScore', newGlobalScore);
                 document.getElementById('user-global-score').textContent = newGlobalScore;
                 updateBaseBtnVisibility(newGlobalScore);
@@ -806,14 +813,15 @@
                 console.error('Erreur sauvegarde scores au retour:', error);
             }
         }
+
         backBtn.onclick = async function () {
             await saveCurrentScore();
             stopAllTimers();
             quizSection.classList.add('hidden');
-            authSection.classList.remove('hidden');
             window.location.href = 'index.html';
         };
         mobileBackBtn.onclick = backBtn.onclick;
+
         function startMode() {
             if (!modes[currentMode]) return;
             stopAllTimers();
@@ -835,6 +843,7 @@
             startMainTimer();
             window.scrollTo(0, 0);
         }
+
         function generateQuestion() {
             if (awaitingNext) return;
             let dep;
@@ -843,9 +852,11 @@
             } while (previousQuestions.includes(dep.numero) && previousQuestions.length < departements.length);
             previousQuestions.push(dep.numero);
             if (previousQuestions.length > 20) previousQuestions.shift();
+
             qTime = modes[currentMode].qTime;
             qTimerDisplay.textContent = qTime;
             qTimerFill.style.width = '100%';
+
             let questionText;
             switch (modes[currentMode].questionType) {
                 case "nom_to_num":
@@ -900,6 +911,7 @@
             });
             startQTimer();
         }
+
         function handleAnswer(selected) {
             if (awaitingNext) return;
             awaitingNext = true;
@@ -927,11 +939,13 @@
                 }
             }, 1000);
         }
+
         function updateLives() {
             const safeLives = Math.max(0, lives);
             const maxLives = modes[currentMode].lives;
             livesDisplay.textContent = '❤'.repeat(safeLives) + '♡'.repeat(Math.max(0, maxLives - safeLives));
         }
+
         function startMainTimer() {
             timerDisplay.textContent = timeLeft;
             timerFill.style.width = '100%';
@@ -949,6 +963,7 @@
                 }
             }, 1000);
         }
+
         function startQTimer() {
             clearInterval(qTimerInterval);
             qTimerInterval = setInterval(() => {
@@ -961,15 +976,14 @@
                 }
             }, 1000);
         }
+
         async function endGame() {
             quizSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
             updateQuizHeaderVisibility(false);
-            const finalScoreEl = document.getElementById('final-score');
-            finalScoreEl.textContent = score;
+            document.getElementById('final-score').textContent = score;
             stopAllTimers();
             window.scrollTo(0, 0);
-
             try {
                 if (!window.currentUser) throw new Error('Utilisateur non connecté');
                 const userDocRef = doc(db, 'users', currentUser.uid);
@@ -997,20 +1011,15 @@
                     };
                     await setDoc(userDocRef, userData);
                 }
-
                 const quizScores = { ...(userData.quizScores || defaultQuizScores) };
                 const oldDeptScore = quizScores.departements || 0;
                 const newDeptScore = oldDeptScore + score;
                 quizScores.departements = newDeptScore;
-
                 const newGlobalScore = computeGlobalScore(quizScores);
                 await updateDoc(userDocRef, { quizScores });
-
                 localStorage.setItem('globalScore', newGlobalScore);
-
                 document.getElementById('new-global-score').textContent = newGlobalScore;
                 document.getElementById('new-dept-score').textContent = newDeptScore;
-
                 const oldLevel = Math.floor(oldDeptScore / 50);
                 const newLevel = Math.floor(newDeptScore / 50);
                 if (newLevel > oldLevel) {
@@ -1018,25 +1027,27 @@
                 } else {
                     document.getElementById('level-up-msg').classList.add('hidden');
                 }
-
                 updateBaseBtnVisibility(newGlobalScore);
             } catch (error) {
                 console.error('Erreur sauvegarde scores:', error);
                 alert('Erreur lors de la sauvegarde des scores. Connectez-vous à nouveau.');
             }
         }
+
         function stopAllTimers() {
             clearInterval(timerInterval);
             clearInterval(qTimerInterval);
         }
+
         restartBtn.onclick = startMode;
+
         homeBtn.onclick = async function () {
-            await saveCurrentScore(); // Sauvegarde même si on quitte via Accueil
+            await saveCurrentScore();
             stopAllTimers();
             resultSection.classList.add('hidden');
-            authSection.classList.remove('hidden');
             window.location.href = 'index.html';
         };
+
         window.toggleAuthMode = function () {
             isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
             const title = document.getElementById('auth-title');
@@ -1058,6 +1069,7 @@
                 pseudoGroup.style.display = 'none';
             }
         };
+
         document.getElementById('auth-submit-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
@@ -1098,13 +1110,11 @@
                 errorDiv.classList.remove('hidden');
             }
         });
+
         window.logout = async function () {
             await signOut(auth);
             window.location.href = 'index.html';
         };
-
-        // Supprimer le doublon onAuthStateChanged
-        // (déjà défini en haut — celui-ci est redondant)
 
         async function loadDeptLeaderboard() {
             const mobileList = document.querySelector('#dept-leaderboard-section.mobile #dept-leaderboard-list');
@@ -1120,7 +1130,7 @@
                 querySnapshot.forEach((doc) => {
                     const data = doc.data() || {};
                     const pseudo = data.pseudo || 'Anonyme';
-                    const score = typeof data.quizScores?.departements === 'number' ? data.quizScores.departements : 0;
+                    const score = data.quizScores?.departements || 0;
                     let medal = '';
                     if (rank === 1) medal = '🥇';
                     else if (rank === 2) medal = '🥈';
