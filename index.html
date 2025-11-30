@@ -817,10 +817,6 @@
         renderLevels('departements', 0);
         loadLeaderboard();
         // Set up click handlers for non-departement cards and buttons
-        document.getElementById('chinois-card').addEventListener('click', showAuthModalIfNeeded);
-        document.getElementById('medecine-card').addEventListener('click', showAuthModalIfNeeded);
-        document.getElementById('math-card').addEventListener('click', showAuthModalIfNeeded);
-        document.getElementById('base-btn').addEventListener('click', showAuthModalIfNeeded);
         document.getElementById('login-btn').addEventListener('click', showAuthModal);
         document.getElementById('logout-btn').addEventListener('click', logoutUser);
         // Set up close button handler
@@ -849,7 +845,10 @@
         function renderLevels(category, globalScore) {
             const container = document.getElementById(`${category}-levels`);
             if (!container) return;
+
             container.innerHTML = '';
+
+            // 🔧 AJOUTEZ LES NIVEAUX POUR TOUTES LES CATÉGORIES
             const levels = {
                 departements: [
                     { id: 1, name: "Nom → Numéro", required: 0 },
@@ -858,9 +857,32 @@
                     { id: 4, name: "Préfecture → Dépt", required: 60 },
                     { id: 5, name: "Mix", required: 90 },
                     { id: 6, name: "Niveaux Suivants", required: 125 }
+                ],
+                chinois: [
+                    { id: 1, name: "Pinyin → Caractère", required: 200 },
+                    { id: 2, name: "Caractère → Sens", required: 250 },
+                    { id: 3, name: "Écriture", required: 300 },
+                    { id: 4, name: "Grammaire", required: 350 },
+                    { id: 5, name: "Conversation", required: 400 }
+                ],
+                medecine: [
+                    { id: 1, name: "Anatomie", required: 40 },
+                    { id: 2, name: "Physiologie", required: 80 },
+                    { id: 3, name: "Pathologies", required: 160 },
+                    { id: 4, name: "Pharmacologie", required: 320 },
+                    { id: 5, name: "Cas cliniques", required: 500 }
+                ],
+                math: [
+                    { id: 1, name: "Algèbre", required: 60 },
+                    { id: 2, name: "Géométrie", required: 120 },
+                    { id: 3, name: "Analyse", required: 240 },
+                    { id: 4, name: "Probas/Stat", required: 480 },
+                    { id: 5, name: "Maths avancées", required: 960 }
                 ]
             };
+
             if (!levels[category]) return;
+
             levels[category].forEach(level => {
                 const isUnlocked = globalScore >= level.required;
                 const card = document.createElement('div');
@@ -869,13 +891,13 @@
                     card.title = `Débloqué à ${level.required} points globaux`;
                 }
                 card.innerHTML = `
-                    <div class="level-number-dropdown">${level.id}</div>
-                    <div class="level-name-dropdown">${level.name}</div>
-                    ${isUnlocked ?
+            <div class="level-number-dropdown">${level.id}</div>
+            <div class="level-name-dropdown">${level.name}</div>
+            ${isUnlocked ?
                         '<div class="unlock-status-dropdown"><span class="unlock-icon">✓</span>Débloqué</div>' :
                         `<div class="level-requirement-dropdown">Requis: ${level.required} pts</div>`
                     }
-                `;
+        `;
                 if (isUnlocked) {
                     card.addEventListener('click', () => startLevel(category, level.id));
                 } else {
@@ -922,7 +944,7 @@
                 });
             }
         });
-        
+
         function toggleAuthMode() {
             isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
             const title = document.getElementById('auth-title');
