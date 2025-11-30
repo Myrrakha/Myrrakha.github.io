@@ -9,13 +9,13 @@
         content="Testez vos connaissances avec notre quiz des départements français. 5 niveaux de difficulté, corrections instantanées et progression suivie.">
     <meta name="keywords"
         content="quiz, départements, france, géographie, jeu, apprendre les départements, quiz france, test géographie">
-    <link rel="canonical" href="https://www.tonsite.com/">
+    <link rel="canonical" href="https://myrrakha.github.io/index.html">
     <!-- OpenGraph pour réseaux sociaux -->
     <meta property="og:title" content="Quiz des Départements Français">
     <meta property="og:description" content="Saurez-vous reconnaître les 101 départements ? 5 niveaux de difficulté.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.tonsite.com/">
-    <meta property="og:image" content="https://www.tonsite.com/images/preview.jpg">
+    <meta property="og:url" content="https://myrrakha.github.io/index.html">
+    <meta property="og:image" content="https://myrrakha.github.io/images/logo.jpg">
     <!-- Twitter card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Quiz des Départements Français">
@@ -458,98 +458,6 @@
             margin-bottom: 15px;
             text-align: center;
         }
-        /* Stats display - compact table */
-        .user-stats-table {
-            max-width: 700px;
-            margin: 0 auto 30px;
-            background: #262633;
-            border-radius: 15px;
-            padding: 20px;
-            position: relative;
-        }
-        .user-stats-title {
-            font-size: 1.6em;
-            margin-bottom: 20px;
-            color: #9c28a7;
-            text-align: center;
-        }
-        .stats-columns {
-            display: flex;
-            gap: 20px;
-            position: relative;
-        }
-        .stats-column {
-            flex: 1;
-        }
-        .stats-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 0.95em;
-        }
-        .stats-label {
-            color: #cfcfcf;
-            margin-right: 8px;
-        }
-        .stats-value {
-            color: #f0f0f0;
-            font-weight: 600;
-            text-align: right;
-            min-width: 60px;
-        }
-        /* Divider between columns - PC only */
-        @media (min-width: 601px) {
-            .stats-columns::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 2px;
-                background: #3a3a50;
-                z-index: 1;
-            }
-        }
-        /* Mobile: keep columns side by side with adjusted styling + vertical bar */
-        @media (max-width: 600px) {
-            .stats-columns {
-                flex-wrap: wrap;
-                gap: 15px;
-                justify-content: space-between;
-                position: relative;
-            }
-            .stats-column {
-                flex: 48%;
-                min-width: 140px;
-            }
-            .stats-row {
-                font-size: 0.85em;
-            }
-            .stats-label {
-                flex: 1.8;
-                margin-right: 6px;
-            }
-            .stats-value {
-                flex: 1;
-                text-align: right;
-            }
-            .user-stats-title {
-                font-size: 1.4em;
-            }
-            /* Mobile-only vertical bar */
-            .stats-columns::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                left: 50%;
-                width: 1px;
-                background: #3a3a50;
-                z-index: 1;
-                transform: translateX(-50%);
-            }
-        }
     </style>
 </head>
 <body>
@@ -577,55 +485,6 @@
     <main>
         <!-- SECTION ACCUEIL -->
         <section id="home-section">
-            <div class="user-stats-table hidden" id="user-stats-display">
-                <h2 class="user-stats-title" id="user-stats-title">Bonjour, Joueur !</h2>
-                <div class="stats-columns">
-                    <div class="stats-column">
-                        <div class="stats-row">
-                            <span class="stats-label">Rang :</span>
-                            <span class="stats-value" id="user-rank">#1</span>
-                        </div>
-                        <div class="stats-row">
-                            <span class="stats-label">Quiz complété :</span>
-                            <span class="stats-value" id="user-quizzes-completed">0</span>
-                        </div>
-                        <div class="stats-row">
-                            <span class="stats-label">Quiz Bilan complété :</span>
-                            <span class="stats-value" id="user-bilan-completed">0</span>
-                        </div>
-                        <div class="stats-row">
-                            <span class="stats-label">Réponses justes :</span>
-                            <span class="stats-value" id="user-correct-answers">0</span>
-                        </div>
-                        <div class="stats-row">
-                            <span class="stats-label">Réponses fausses :</span>
-                            <span class="stats-value" id="user-wrong-answers">0</span>
-                        </div>
-                    </div>
-                    <div class="stats-column">
-                        <div class="stats-row">
-                            <span class="stats-label">Titre :</span>
-                            <span class="stats-value" id="user-title">Apprenti</span>
-                        </div>
-                        <div class="stats-row">
-                            <span class="stats-label">Point de score :</span>
-                            <span class="stats-value" id="user-score-points">0</span>
-                        </div>
-                        <div class="stats-row">
-                            <span class="stats-label">Thème préféré :</span>
-                            <span class="stats-value" id="user-favorite-theme">-</span>
-                        </div>
-                        <div class="stats-row">
-                            <span class="stats-label">Département préféré :</span>
-                            <span class="stats-value" id="user-favorite-dept">-</span>
-                        </div>
-                        <div class="stats-row">
-                            <span class="stats-label">Ratio juste/faux :</span>
-                            <span class="stats-value" id="user-ratio">0:0</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="home-content">
                 <div class="stats-grid-container">
                     <div class="stats-grid">
@@ -762,7 +621,7 @@
         // Firebase SDK URLs corrected (extra spaces removed)
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
             authDomain: "quiz-master-io.firebaseapp.com",
@@ -958,7 +817,6 @@
             } else if (category === 'animaux') {
                 window.location.href = `quiz-animaux.html#${levelId}`;
             }
-            
         }
         document.getElementById('dept-card').addEventListener('click', function (e) {
             if (!e.target.closest('.level-card-dropdown')) {
@@ -1059,9 +917,11 @@
                     await setDoc(doc(db, 'users', user.uid), {
                         pseudo: pseudo.trim(),
                         email: email,
-                        globalScore: 0,
                         quizScores: {
                             departements: 0,
+                            chinois: 0,
+                            medecine: 0,
+                            math: 0,
                             anglais: 0,
                             neerlandais: 0,
                             allemand: 0,
@@ -1108,15 +968,19 @@
                 // Si on voulait rediriger vers un quiz autre, on le ferait ici
             }
         }
+        // 🔁 Ajout de l'écouteur pageshow pour rafraîchir les données au retour
+        window.addEventListener('pageshow', async (event) => {
+            if (event.persisted && window.currentUser) {
+                await loadUserData();
+            }
+        });
         onAuthStateChanged(auth, async (user) => {
             const navLoggedOut = document.getElementById('nav-logged-out');
             const navLoggedIn = document.getElementById('nav-logged-in');
-            const userStatsDisplay = document.getElementById('user-stats-display');
             if (user) {
                 window.currentUser = user;
                 navLoggedOut.classList.add('hidden');
                 navLoggedIn.classList.remove('hidden');
-                userStatsDisplay.classList.remove('hidden');
                 await loadUserData();
                 window.scrollTo(0, 0);
                 // Fermer automatiquement le modal si l'utilisateur est connecté
@@ -1125,11 +989,15 @@
                 window.currentUser = null;
                 navLoggedOut.classList.remove('hidden');
                 navLoggedIn.classList.add('hidden');
-                userStatsDisplay.classList.add('hidden');
             }
             // Met à jour l'état d'authentification pour les click handlers
             authCheckComplete = true;
         });
+        // 🔢 Helper to compute globalScore from all quizScores
+        function computeGlobalScore(quizScores) {
+            const keys = ['departements', 'chinois', 'medecine', 'math', 'anglais', 'neerlandais', 'allemand', 'italien', 'espagnol', 'geographie', 'animaux'];
+            return keys.reduce((sum, key) => sum + (quizScores[key] || 0), 0);
+        }
         async function loadUserData() {
             try {
                 const userDocRef = doc(db, 'users', currentUser.uid);
@@ -1139,7 +1007,6 @@
                     const defaultData = {
                         pseudo: currentUser.email.split('@')[0],
                         email: currentUser.email,
-                        globalScore: 0,
                         quizScores: {
                             departements: 0,
                             chinois: 0,
@@ -1158,30 +1025,21 @@
                     await setDoc(userDocRef, defaultData);
                     userData = defaultData;
                 }
-                // Update user stats display
-                document.getElementById('user-stats-title').textContent = `Bonjour, ${userData.pseudo} !`;
-                document.getElementById('user-score-points').textContent = userData.globalScore || 0;
-                // Set title based on global score
-                document.getElementById('user-title').textContent = getGlobalLevel(userData.globalScore || 0);
-                // Default values for stats
-                document.getElementById('user-quizzes-completed').textContent = "0";
-                document.getElementById('user-bilan-completed').textContent = "0";
-                document.getElementById('user-correct-answers').textContent = "0";
-                document.getElementById('user-wrong-answers').textContent = "0";
-                document.getElementById('user-favorite-theme').textContent = "Départements";
-                document.getElementById('user-favorite-dept').textContent = "Paris (75)";
-                document.getElementById('user-ratio').textContent = "0:0";
-                const chinoisScore = userData.quizScores?.chinois || 0;
-                const medecineScore = userData.quizScores?.medecine || 0;
-                const mathScore = userData.quizScores?.math || 0;
-                const deptScore = userData.quizScores?.departements || 0;
-                const anglaisScore = userData.quizScores?.anglais || 0;
-                const neerlandaisScore = userData.quizScores?.neerlandais || 0;
-                const allemandScore = userData.quizScores?.allemand || 0;
-                const italienScore = userData.quizScores?.italien || 0;
-                const espagnolScore = userData.quizScores?.espagnol || 0;
-                const geographieScore = userData.quizScores?.geographie || 0;
-                const animauxScore = userData.quizScores?.animaux || 0;
+                // Update score displays
+                const quizScores = userData.quizScores || {};
+                const deptScore = quizScores.departements || 0;
+                const chinoisScore = quizScores.chinois || 0;
+                const medecineScore = quizScores.medecine || 0;
+                const mathScore = quizScores.math || 0;
+                const anglaisScore = quizScores.anglais || 0;
+                const neerlandaisScore = quizScores.neerlandais || 0;
+                const allemandScore = quizScores.allemand || 0;
+                const italienScore = quizScores.italien || 0;
+                const espagnolScore = quizScores.espagnol || 0;
+                const geographieScore = quizScores.geographie || 0;
+                const animauxScore = quizScores.animaux || 0;
+                // 💡 Calcul du globalScore à partir des quizScores
+                const globalScore = computeGlobalScore(quizScores);
                 document.getElementById('home-dept-score').textContent = deptScore;
                 document.getElementById('home-chinois-score').textContent = chinoisScore;
                 document.getElementById('home-medecine-score').textContent = medecineScore;
@@ -1204,28 +1062,18 @@
                 document.getElementById('espagnol-level').textContent = getDeptLevel(espagnolScore);
                 document.getElementById('geographie-level').textContent = getDeptLevel(geographieScore);
                 document.getElementById('animaux-level').textContent = getDeptLevel(animauxScore);
-                renderLevels('departements', userData.globalScore || 0);
-                renderLevels('chinois', userData.globalScore || 0);
-                renderLevels('medecine', userData.globalScore || 0);
-                renderLevels('math', userData.globalScore || 0);
-                renderLevels('anglais', userData.globalScore || 0);
-                renderLevels('neerlandais', userData.globalScore || 0);
-                renderLevels('allemand', userData.globalScore || 0);
-                renderLevels('italien', userData.globalScore || 0);
-                renderLevels('espagnol', userData.globalScore || 0);
-                renderLevels('geographie', userData.globalScore || 0);
-                renderLevels('animaux', userData.globalScore || 0);
-                // Get user rank
-                const rankQuery = query(collection(db, 'users'), orderBy('globalScore', 'desc'));
-                const rankSnapshot = await getDocs(rankQuery);
-                let userRank = 1;
-                for (const doc of rankSnapshot.docs) {
-                    if (doc.id === currentUser.uid) {
-                        break;
-                    }
-                    userRank++;
-                }
-                document.getElementById('user-rank').textContent = `#${userRank}`;
+                // 🔑 Utilisation du globalScore calculé pour afficher les niveaux
+                renderLevels('departements', globalScore);
+                renderLevels('chinois', globalScore);
+                renderLevels('medecine', globalScore);
+                renderLevels('math', globalScore);
+                renderLevels('anglais', globalScore);
+                renderLevels('neerlandais', globalScore);
+                renderLevels('allemand', globalScore);
+                renderLevels('italien', globalScore);
+                renderLevels('espagnol', globalScore);
+                renderLevels('geographie', globalScore);
+                renderLevels('animaux', globalScore);
             } catch (error) {
                 console.error('Erreur chargement données:', error);
             }
@@ -1234,27 +1082,30 @@
             const leaderboardList = document.getElementById('leaderboard-list');
             leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
             try {
-                const q = query(collection(db, 'users'), orderBy('globalScore', 'desc'), limit(10));
-                const querySnapshot = await getDocs(q);
-                if (!querySnapshot || querySnapshot.empty) {
+                const usersSnapshot = await getDocs(collection(db, 'users'));
+                const leaderboard = [];
+                usersSnapshot.forEach((doc) => {
+                    const data = doc.data() || {};
+                    const quizScores = data.quizScores || {};
+                    const globalScore = computeGlobalScore(quizScores);
+                    const pseudo = data.pseudo || 'Anonyme';
+                    leaderboard.push({ pseudo, globalScore });
+                });
+                // Tri par score global décroissant
+                leaderboard.sort((a, b) => b.globalScore - a.globalScore);
+                leaderboardList.innerHTML = '';
+                const top10 = leaderboard.slice(0, 10);
+                if (top10.length === 0) {
                     leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
                     return;
                 }
-                leaderboardList.innerHTML = '';
-                let rank = 1;
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data() || {};
-                    const pseudo = data.pseudo || 'Anonyme';
-                    const score = typeof data.globalScore === 'number' ? data.globalScore : 0;
-                    const item = document.createElement('div');
-                    item.className = 'leaderboard-item';
-                    let medal = '';
-                    if (rank === 1) medal = '🥇';
-                    else if (rank === 2) medal = '🥈';
-                    else if (rank === 3) medal = '🥉';
-                    item.innerHTML = `<div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${pseudo}</div><div class="leaderboard-score">${score}</div>`;
-                    leaderboardList.appendChild(item);
-                    rank++;
+                top10.forEach((item, index) => {
+                    const rank = index + 1;
+                    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+                    const li = document.createElement('div');
+                    li.className = 'leaderboard-item';
+                    li.innerHTML = `<div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${item.pseudo}</div><div class="leaderboard-score">${item.globalScore}</div>`;
+                    leaderboardList.appendChild(li);
                 });
             } catch (error) {
                 console.error('Erreur loadLeaderboard:', error);

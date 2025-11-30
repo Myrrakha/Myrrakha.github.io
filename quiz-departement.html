@@ -767,11 +767,11 @@
             { nom: "Mayotte", numero: "976", prefecture: "Mamoudzou" }
         ];
         const modes = {
-            1: { time: 60, qTime: 7, lives: 5, questionType: "nom_to_num" },
+            1: { time: 60, qTime: 7, lives: 6, questionType: "nom_to_num" },
             2: { time: 60, qTime: 6, lives: 5, questionType: "num_to_nom" },
             3: { time: 90, qTime: 9, lives: 8, questionType: "shape_to_nom_num" },
             4: { time: 60, qTime: 7, lives: 7, questionType: "prefecture_to_nom" },
-            5: { time: 70, qTime: 4, lives: 7, questionType: "mix_all" }
+            5: { time: 80, qTime: 4, lives: 6, questionType: "mix_all" }
         };
         let currentMode = 1, score = 0, lives = 0, timeLeft = 0, qTime = 0;
         let timerInterval = null, qTimerInterval = null, awaitingNext = false;
@@ -989,7 +989,7 @@
                     clearInterval(qTimerInterval);
                     handleAnswer('');
                 }
-            }, 100);
+            }, 1000);
         }
         async function endGame() {
             quizSection.classList.add('hidden');
