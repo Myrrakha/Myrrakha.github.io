@@ -1,19 +1,47 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Quiz Master - Départements</title>
+    <!-- SEO de la page d'accueil -->
+    <title>Quiz des Départements Français – Niveau facile à expert</title>
+
+    <meta name="description"
+        content="Testez vos connaissances avec notre quiz des départements français. 5 niveaux de difficulté, corrections instantanées et progression suivie.">
+
+    <meta name="keywords"
+        content="quiz, départements, france, géographie, jeu, apprendre les départements, quiz france, test géographie">
+
+    <link rel="canonical" href="https://www.tonsite.com/">
+
+    <!-- OpenGraph pour réseaux sociaux -->
+    <meta property="og:title" content="Quiz des Départements Français">
+    <meta property="og:description" content="Saurez-vous reconnaître les 101 départements ? 5 niveaux de difficulté.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.tonsite.com/">
+    <meta property="og:image" content="https://www.tonsite.com/images/preview.jpg">
+
+    <!-- Twitter card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Quiz des Départements Français">
+    <meta name="twitter:description"
+        content="Mettez votre connaissance de la France à l'épreuve avec nos quiz niveaux 1 à 5.">
+    <meta name="twitter:image" content="https://www.tonsite.com/images/preview.jpg">
+
+    <title>Quiz Master - Accueil</title>
     <style>
         .hidden {
             display: none !important;
         }
+
         body {
             margin: 0;
             font-family: 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #0f1115, #1c1c24);
             color: #f0f0f0;
         }
+
         #hover-warning {
             position: absolute;
             padding: 8px 14px;
@@ -26,6 +54,7 @@
             transition: opacity 0.4s ease;
             z-index: 9999;
         }
+
         header {
             width: 100%;
             background: rgba(20, 20, 28, 0.8);
@@ -35,6 +64,7 @@
             top: 0;
             z-index: 1000;
         }
+
         .navbar {
             max-width: 1100px;
             margin: auto;
@@ -43,21 +73,25 @@
             align-items: center;
             padding: 12px 20px;
         }
+
         .nav-title {
             font-size: 1.4em;
             font-weight: 600;
             color: #eaeaea;
             letter-spacing: 1px;
         }
+
         .user-info {
             display: flex;
             gap: 15px;
             align-items: center;
         }
+
         .user-stats {
             font-size: 0.9em;
             text-align: right;
         }
+
         .logout-btn {
             padding: 8px 16px;
             background: #dc3545;
@@ -67,12 +101,35 @@
             cursor: pointer;
             transition: 0.25s;
         }
+
         .logout-btn:hover {
             background: #c82333;
         }
+
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: #3a3a50;
+            color: #f0f0f0;
+            border: none;
+            cursor: pointer;
+            transition: 0.25s;
+            font-size: 0.95em;
+        }
+
+        .action-btn:hover {
+            background: #4e4e6a;
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .dropdown {
             position: relative;
         }
+
         .dropdown-btn {
             padding: 10px 20px;
             border-radius: 10px;
@@ -83,9 +140,11 @@
             font-weight: 500;
             transition: 0.25s;
         }
+
         .dropdown-btn:hover {
             background: #45455a;
         }
+
         .dropdown-content {
             position: absolute;
             right: 0;
@@ -101,14 +160,17 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
             z-index: 100;
         }
+
         .dropdown.open .dropdown-content {
             display: flex;
         }
+
         .dropdown-subtitle {
             font-size: 0.85em;
             color: #cfcfcf;
             margin: 5px 0;
         }
+
         .dropdown-item {
             width: 240px;
             flex-direction: column;
@@ -124,13 +186,16 @@
             -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
         }
+
         .dropdown-item:hover {
             background: #3d3d50;
         }
+
         .dropdown-item.disabled {
             opacity: 0.4;
             cursor: not-allowed;
         }
+
         /* AUTH SECTION */
         #auth-section {
             display: flex;
@@ -138,6 +203,7 @@
             align-items: center;
             min-height: 80vh;
         }
+
         .auth-container {
             background: #1f1f28;
             padding: 40px;
@@ -146,18 +212,22 @@
             max-width: 400px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
+
         .auth-container h2 {
             margin-top: 0;
             text-align: center;
         }
+
         .form-group {
             margin-bottom: 20px;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
             font-size: 0.95em;
         }
+
         .form-group input {
             width: 100%;
             padding: 12px;
@@ -168,6 +238,7 @@
             font-size: 1em;
             box-sizing: border-box;
         }
+
         .auth-btn {
             width: 100%;
             padding: 12px;
@@ -181,19 +252,23 @@
             transition: 0.25s;
             margin-top: 10px;
         }
+
         .auth-btn:hover {
             background: #7d1f85;
         }
+
         .auth-switch {
             text-align: center;
             margin-top: 20px;
             font-size: 0.9em;
         }
+
         .auth-switch a {
             color: #9c28a7;
             cursor: pointer;
             text-decoration: underline;
         }
+
         .error-msg {
             background: #dc3545;
             padding: 10px;
@@ -201,15 +276,18 @@
             margin-bottom: 15px;
             text-align: center;
         }
+
         /* HOME SECTION */
         #home-section {
             padding: 40px 20px 20px;
             text-align: center;
         }
+
         .home-center h2 {
             font-size: 2.2em;
             margin-bottom: 10px;
         }
+
         .home-content {
             display: flex;
             flex-direction: column;
@@ -217,18 +295,22 @@
             margin: 0 auto;
             gap: 30px;
         }
+
         @media (min-width: 900px) {
             .home-content {
                 flex-direction: row;
             }
+
             .stats-grid-container {
                 flex: 2;
             }
+
             #leaderboard-section {
                 flex: 1;
                 margin-top: 0;
             }
         }
+
         .stats-grid {
             display: flex;
             flex-direction: column;
@@ -236,9 +318,11 @@
             gap: 20px;
             width: 100%;
         }
+
         .stats-grid-container {
             width: 100%;
         }
+
         .stat-card {
             background: #262633;
             padding: 25px;
@@ -249,9 +333,11 @@
             transition: transform 0.25s;
             width: 100%;
         }
+
         .stat-card:hover {
             transform: translateY(-3px);
         }
+
         .stat-card h3 {
             margin-top: 0;
             color: #9c28a7;
@@ -260,11 +346,13 @@
             align-items: center;
             gap: 8px;
         }
+
         .stat-value {
             font-size: 2.5em;
             font-weight: bold;
             color: #f0f0f0;
         }
+
         .level-badge {
             display: inline-block;
             padding: 8px 16px;
@@ -273,6 +361,7 @@
             font-weight: 600;
             margin-top: 10px;
         }
+
         .levels-dropdown {
             background: linear-gradient(135deg, #0f1115, #1c1c24);
             border-radius: 12px;
@@ -286,6 +375,7 @@
             border: 2px solid transparent;
             position: relative;
         }
+
         .levels-dropdown::before {
             content: '';
             position: absolute;
@@ -298,15 +388,18 @@
             border-radius: 14px;
             opacity: 0.8;
         }
+
         .levels-dropdown.visible {
             max-height: 600px;
             padding: 15px;
         }
+
         .levels-grid-dropdown {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
         }
+
         .level-card-dropdown {
             background: #2c2c3a;
             padding: 12px;
@@ -315,53 +408,64 @@
             cursor: pointer;
             transition: all 0.2s;
         }
+
         .level-card-dropdown:hover {
             background: #3a3a4a;
         }
+
         .level-card-dropdown.locked {
             opacity: 0.6;
             cursor: not-allowed;
         }
+
         .level-number-dropdown {
             font-size: 1.2em;
             font-weight: bold;
             margin-bottom: 4px;
             color: #9c28a7;
         }
+
         .level-name-dropdown {
             font-size: 0.9em;
             margin-bottom: 4px;
         }
+
         .level-requirement-dropdown {
             font-size: 0.8em;
             color: #ff4b4b;
             opacity: 0.8;
         }
+
         .unlock-status-dropdown {
             font-size: 0.8em;
             color: #2ecc71;
             margin-top: 3px;
         }
+
         .unlock-icon {
             color: #2ecc71;
             margin-right: 3px;
         }
+
         /* LEADERBOARD */
         #leaderboard-section {
             max-width: 800px;
             margin: 0 auto;
             padding: 0 20px;
         }
+
         .leaderboard-container {
             background: #262633;
             border-radius: 15px;
             padding: 25px;
         }
+
         .leaderboard-title {
             text-align: center;
             margin-bottom: 20px;
             color: #9c28a7;
         }
+
         .leaderboard-item {
             display: flex;
             justify-content: space-between;
@@ -371,287 +475,50 @@
             background: #2c2c3a;
             border-radius: 8px;
         }
+
         .leaderboard-rank {
             font-size: 1.3em;
             font-weight: bold;
             width: 40px;
         }
+
         .leaderboard-name {
             flex: 1;
             font-weight: 500;
         }
+
         .leaderboard-score {
             font-size: 1.1em;
             color: #9c28a7;
             font-weight: bold;
         }
-        /* DEPARTEMENT LEADERBOARD */
-        #dept-leaderboard-section {
-            background: #262633;
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        #dept-leaderboard-section .leaderboard-title {
-            margin-bottom: 15px;
-        }
-        #dept-leaderboard-section .leaderboard-item {
-            padding: 8px 12px;
-            margin: 6px 0;
-        }
-        /* QUIZ SECTION */
-        #quiz-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 40px;
-            padding: 0 20px;
-        }
-        .quiz-container {
-            display: flex;
-            gap: 25px;
-            width: 100%;
-            max-width: 1200px;
-            justify-content: center;
-        }
-        @media (min-width: 900px) {
-            .question-box {
-                flex: 2;
-            }
-            .answers-container {
-                flex: 1;
-            }
-            #dept-leaderboard-section.desktop {
-                display: block;
-                flex: 1;
-                margin-top: 0;
-                max-height: 500px;
-            }
-        }
-        .question-box {
-            background: #262633;
-            padding: 30px;
-            border-radius: 15px;
-            font-size: 1.8em;
-            font-weight: 600;
-            min-height: 140px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.35);
-        }
-        .answers-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .answer-btn {
-            padding: 15px;
-            font-size: 1.2em;
-            border-radius: 12px;
-            background: #323248;
-            color: #f0f0f0;
-            cursor: pointer;
-            border: none;
-            transition: 0.18s;
-        }
-        .answer-btn:hover:not(:disabled) {
-            transform: scale(1.04);
-            background: #4a4a65;
-        }
-        .answer-btn:disabled {
-            cursor: not-allowed;
-        }
-        .correct {
-            background-color: #2ecc71 !important;
-        }
-        .incorrect {
-            background-color: #e74c3c !important;
-        }
-        #timers-container {
-            width: 100%;
-            max-width: 1000px;
-            margin-top: 25px;
-        }
-        #timer-bar-container,
-        #question-timer-bar-container {
-            margin: 10px 0;
-            text-align: left;
-            font-size: 0.95em;
-        }
-        #timer-bar,
-        #question-timer-bar {
-            width: 100%;
-            height: 28px;
-            background: #2b2b3a;
-            border-radius: 10px;
-            margin-top: 6px;
-            overflow: hidden;
-        }
-        #timer-fill,
-        #question-timer-fill {
-            height: 100%;
-            width: 100%;
-            border-radius: 10px;
-            transition: width 0.15s linear;
-        }
-        #timer-fill {
-            background: #9c28a7ff;
-        }
-        #question-timer-fill {
-            background: #a832d6;
-        }
-        #score-lives {
-            margin-top: 20px;
-            display: flex;
-            gap: 80px;
-            justify-content: center;
-            font-size: 1.3em;
-            position: relative;
-        }
-        #lives {
-            color: #ff4b4b;
-            font-size: 1.4em;
-        }
-        /* MOBILE-SPECIFIC QUIZ HEADER HIDING */
-        @media (max-width: 899px) {
-            body.quiz-active header {
-                display: none;
-            }
-        }
-        /* RESULT SECTION */
-        #result-section {
-            margin-top: 60px;
-            text-align: center;
-        }
-        .result-stats {
-            background: #262633;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 500px;
-            margin: 30px auto;
-        }
-        .result-stats h3 {
-            color: #9c28a7;
-            margin-top: 0;
-        }
-        .action-btn {
-            margin: 10px;
-            padding: 12px 25px;
-            border-radius: 10px;
-            background: #3a3a50;
-            border: none;
-            cursor: pointer;
-            color: #f0f0f0;
-            transition: 0.25s;
-        }
-        .action-btn:hover {
-            background: #4e4e6a;
-        }
+
         /* MOBILE DESIGN */
         @media (max-width: 899px) {
             .levels-grid-dropdown {
                 grid-template-columns: 1fr;
             }
+
             .stats-grid {
                 width: 95%;
             }
-            .quiz-container {
-                flex-direction: column;
-                gap: 15px;
-            }
-            .question-box {
-                font-size: 1.6em;
-                padding: 16px;
-                min-height: 90px;
-            }
-            .answers-container {
-                gap: 10px;
-            }
-            .answer-btn {
-                padding: 12px;
-                font-size: 1.1em;
-            }
-            #score-lives {
-                flex-direction: column;
-                gap: 10px;
-                margin-top: 15px;
-            }
-            .levels-dropdown {
-                width: 95%;
-            }
+
             #leaderboard-section {
                 order: -1;
                 max-width: 100%;
             }
-            #dept-leaderboard-section.desktop {
-                display: none;
-            }
-            #timers-container {
-                margin-top: 15px;
-            }
-
-            /* Nouveau layout pour leaderboard + bouton retour sur mobile */
-            #mobile-quiz-ui-row {
-                display: flex;
-                gap: 12px;
-                justify-content: center;
-                margin-top: 15px;
-                padding: 0 20px;
-                width: 100%;
-                max-width: 1200px;
-            }
-
-            #dept-leaderboard-section.mobile {
-                margin: 0;
-                flex: 1;
-                max-width: 220px;
-            }
-
-            #mobile-back-container {
-                background: #262633;
-                padding: 20px 16px;
-                border-radius: 15px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-                min-width: 60px;
-                height: fit-content;
-            }
-
-            #mobile-back-container .action-btn {
-                padding: 8px 12px;
-                font-size: 1.2em;
-                display: block;
-                width: 100%;
-                text-align: center;
-            }
-        }
-
-        @media (min-width: 900px) {
-            #dept-leaderboard-section.mobile,
-            #mobile-quiz-ui-row {
-                display: none !important;
-            }
-            #mobile-back-btn {
-                display: none !important;
-            }
         }
     </style>
 </head>
+
 <body>
     <header>
         <nav class="navbar">
             <div class="nav-left">
                 <span class="nav-title">🎯 Quiz Master</span>
-                <button id="back-btn" class="action-btn hidden" style="margin-left:10px;">Retour</button>
                 <!-- Le bouton Base -->
                 <button class="action-btn" id="base-btn" onclick="window.location.href='base.html'"
-                    style="margin-left:8px; background: #2c2c3a; display:none;">Base</button>
+                    style="margin-left:8px; display:none;">Base</button>
                 <script>
                     function updateBaseBtnVisibility(globalScore) {
                         const baseBtn = document.getElementById('base-btn');
@@ -659,7 +526,6 @@
                             console.warn('[DEBUG] Bouton Base introuvable dans le DOM');
                             return;
                         }
-                        baseBtn.style.display = '';
                         if (globalScore >= 200) {
                             baseBtn.style.display = 'inline-block';
                             baseBtn.disabled = false;
@@ -781,70 +647,6 @@
                 </div>
             </div>
         </section>
-        <section id="quiz-section" class="hidden">
-            <div class="quiz-container">
-                <div class="question-box">
-                    <div id="question"></div>
-                </div>
-                <div class="answers-container">
-                    <button class="answer-btn"></button>
-                    <button class="answer-btn"></button>
-                    <button class="answer-btn"></button>
-                    <button class="answer-btn"></button>
-                    <button class="answer-btn"></button>
-                </div>
-                <div id="dept-leaderboard-section" class="desktop">
-                    <h3 class="leaderboard-title">🏆 Top Départements</h3>
-                    <div id="dept-leaderboard-list">
-                        <div style="text-align: center; opacity: 0.6;">Chargement...</div>
-                    </div>
-                </div>
-            </div>
-            <div id="timers-container">
-                <div id="timer-bar-container">
-                    <span>⏱️ Temps restant : <span id="timer">0</span>s</span>
-                    <div id="timer-bar">
-                        <div id="timer-fill"></div>
-                    </div>
-                </div>
-                <div id="question-timer-bar-container">
-                    <span>⚡ Question : <span id="question-timer">0</span>s</span>
-                    <div id="question-timer-bar">
-                        <div id="question-timer-fill"></div>
-                    </div>
-                </div>
-            </div>
-            <div id="score-lives">
-                <div>Score : <span id="score">0</span></div>
-                <div id="lives">❤❤❤❤❤</div>
-            </div>
-            <!-- Deux cadres indépendants sur mobile -->
-            <div id="mobile-quiz-ui-row">
-                <div id="dept-leaderboard-section" class="mobile">
-                    <h3 class="leaderboard-title">🏆 Top Départements</h3>
-                    <div id="dept-leaderboard-list">
-                        <div style="text-align: center; opacity: 0.6;">Chargement...</div>
-                    </div>
-                </div>
-                <div id="mobile-back-container">
-                    <button id="mobile-back-btn" class="action-btn">←</button>
-                </div>
-            </div>
-        </section>
-        <section id="result-section" class="hidden">
-            <h2>Partie terminée ! 🎉</h2>
-            <div class="result-stats">
-                <h3>Résumé</h3>
-                <p>Score de la partie : <strong id="final-score">0</strong></p>
-                <p>Nouveau score global : <strong id="new-global-score">0</strong></p>
-                <p>Score départements : <strong id="new-dept-score">0</strong></p>
-                <div id="level-up-msg" class="hidden" style="color: #2ecc71; margin-top: 15px; font-weight: bold;">
-                    🎊 NIVEAU SUPÉRIEUR ATTEINT !
-                </div>
-            </div>
-            <button id="restart-btn" class="action-btn">Rejouer</button>
-            <button id="home-btn" class="action-btn">Accueil</button>
-        </section>
     </main>
     <div id="hover-warning"></div>
     <script type="module">
@@ -868,122 +670,7 @@
         const chinoisRequired = { 1: 200, 2: 250, 3: 300, 4: 350, 5: 400 };
         const medecineRequired = { 1: 40, 2: 80, 3: 160, 4: 320, 5: 500 };
         const mathRequired = { 1: 60, 2: 120, 3: 240, 4: 480, 5: 960 };
-        const departements = [
-          { nom: "Ain", numero: "01", prefecture: "Bourg-en-Bresse" },
-            { nom: "Aisne", numero: "02", prefecture: "Laon" },
-            { nom: "Allier", numero: "03", prefecture: "Moulins" },
-            { nom: "Alpes-de-Haute-Provence", numero: "04", prefecture: "Digne-les-Bains" },
-            { nom: "Hautes-Alpes", numero: "05", prefecture: "Gap" },
-            { nom: "Alpes-Maritimes", numero: "06", prefecture: "Nice" },
-            { nom: "Ardèche", numero: "07", prefecture: "Privas" },
-            { nom: "Ardennes", numero: "08", prefecture: "Charleville-Mézières" },
-            { nom: "Ariège", numero: "09", prefecture: "Foix" },
-            { nom: "Aube", numero: "10", prefecture: "Troyes" },
-            { nom: "Aude", numero: "11", prefecture: "Carcassonne" },
-            { nom: "Aveyron", numero: "12", prefecture: "Rodez" },
-            { nom: "Bouches-du-Rhône", numero: "13", prefecture: "Marseille" },
-            { nom: "Calvados", numero: "14", prefecture: "Caen" },
-            { nom: "Cantal", numero: "15", prefecture: "Aurillac" },
-            { nom: "Charente", numero: "16", prefecture: "Angoulême" },
-            { nom: "Charente-Maritime", numero: "17", prefecture: "La Rochelle" },
-            { nom: "Cher", numero: "18", prefecture: "Bourges" },
-            { nom: "Corrèze", numero: "19", prefecture: "Tulle" },
-            { nom: "Corse-du-Sud", numero: "2A", prefecture: "Ajaccio" },
-            { nom: "Haute-Corse", numero: "2B", prefecture: "Bastia" },
-            { nom: "Côte-d'Or", numero: "21", prefecture: "Dijon" },
-            { nom: "Côtes-d'Armor", numero: "22", prefecture: "Saint-Brieuc" },
-            { nom: "Creuse", numero: "23", prefecture: "Guéret" },
-            { nom: "Dordogne", numero: "24", prefecture: "Périgueux" },
-            { nom: "Doubs", numero: "25", prefecture: "Besançon" },
-            { nom: "Drôme", numero: "26", prefecture: "Valence" },
-            { nom: "Eure", numero: "27", prefecture: "Évreux" },
-            { nom: "Eure-et-Loir", numero: "28", prefecture: "Chartres" },
-            { nom: "Finistère", numero: "29", prefecture: "Quimper" },
-            { nom: "Gard", numero: "30", prefecture: "Nîmes" },
-            { nom: "Haute-Garonne", numero: "31", prefecture: "Toulouse" },
-            { nom: "Gers", numero: "32", prefecture: "Auch" },
-            { nom: "Gironde", numero: "33", prefecture: "Bordeaux" },
-            { nom: "Hérault", numero: "34", prefecture: "Montpellier" },
-            { nom: "Ille-et-Vilaine", numero: "35", prefecture: "Rennes" },
-            { nom: "Indre", numero: "36", prefecture: "Châteauroux" },
-            { nom: "Indre-et-Loire", numero: "37", prefecture: "Tours" },
-            { nom: "Isère", numero: "38", prefecture: "Grenoble" },
-            { nom: "Jura", numero: "39", prefecture: "Lons-le-Saunier" },
-            { nom: "Landes", numero: "40", prefecture: "Mont-de-Marsan" },
-            { nom: "Loir-et-Cher", numero: "41", prefecture: "Blois" },
-            { nom: "Loire", numero: "42", prefecture: "Saint-Étienne" },
-            { nom: "Haute-Loire", numero: "43", prefecture: "Le Puy-en-Velay" },
-            { nom: "Loire-Atlantique", numero: "44", prefecture: "Nantes" },
-            { nom: "Loiret", numero: "45", prefecture: "Orléans" },
-            { nom: "Lot", numero: "46", prefecture: "Cahors" },
-            { nom: "Lot-et-Garonne", numero: "47", prefecture: "Agen" },
-            { nom: "Lozère", numero: "48", prefecture: "Mende" },
-            { nom: "Maine-et-Loire", numero: "49", prefecture: "Angers" },
-            { nom: "Manche", numero: "50", prefecture: "Saint-Lô" },
-            { nom: "Marne", numero: "51", prefecture: "Châlons-en-Champagne" },
-            { nom: "Haute-Marne", numero: "52", prefecture: "Chaumont" },
-            { nom: "Mayenne", numero: "53", prefecture: "Laval" },
-            { nom: "Meurthe-et-Moselle", numero: "54", prefecture: "Nancy" },
-            { nom: "Meuse", numero: "55", prefecture: "Bar-le-Duc" },
-            { nom: "Morbihan", numero: "56", prefecture: "Vannes" },
-            { nom: "Moselle", numero: "57", prefecture: "Metz" },
-            { nom: "Nièvre", numero: "58", prefecture: "Nevers" },
-            { nom: "Nord", numero: "59", prefecture: "Lille" },
-            { nom: "Oise", numero: "60", prefecture: "Beauvais" },
-            { nom: "Orne", numero: "61", prefecture: "Alençon" },
-            { nom: "Pas-de-Calais", numero: "62", prefecture: "Arras" },
-            { nom: "Puy-de-Dôme", numero: "63", prefecture: "Clermont-Ferrand" },
-            { nom: "Pyrénées-Atlantiques", numero: "64", prefecture: "Pau" },
-            { nom: "Hautes-Pyrénées", numero: "65", prefecture: "Tarbes" },
-            { nom: "Pyrénées-Orientales", numero: "66", prefecture: "Perpignan" },
-            { nom: "Bas-Rhin", numero: "67", prefecture: "Strasbourg" },
-            { nom: "Haut-Rhin", numero: "68", prefecture: "Colmar" },
-            { nom: "Rhône", numero: "69", prefecture: "Lyon" },
-            { nom: "Haute-Saône", numero: "70", prefecture: "Vesoul" },
-            { nom: "Saône-et-Loire", numero: "71", prefecture: "Mâcon" },
-            { nom: "Sarthe", numero: "72", prefecture: "Le Mans" },
-            { nom: "Savoie", numero: "73", prefecture: "Chambéry" },
-            { nom: "Haute-Savoie", numero: "74", prefecture: "Annecy" },
-            { nom: "Paris", numero: "75", prefecture: "Paris" },
-            { nom: "Seine-Maritime", numero: "76", prefecture: "Rouen" },
-            { nom: "Seine-et-Marne", numero: "77", prefecture: "Melun" },
-            { nom: "Yvelines", numero: "78", prefecture: "Versailles" },
-            { nom: "Deux-Sèvres", numero: "79", prefecture: "Niort" },
-            { nom: "Somme", numero: "80", prefecture: "Amiens" },
-            { nom: "Tarn", numero: "81", prefecture: "Albi" },
-            { nom: "Tarn-et-Garonne", numero: "82", prefecture: "Montauban" },
-            { nom: "Var", numero: "83", prefecture: "Toulon" },
-            { nom: "Vaucluse", numero: "84", prefecture: "Avignon" },
-            { nom: "Vendée", numero: "85", prefecture: "La Roche-sur-Yon" },
-            { nom: "Vienne", numero: "86", prefecture: "Poitiers" },
-            { nom: "Haute-Vienne", numero: "87", prefecture: "Limoges" },
-            { nom: "Vosges", numero: "88", prefecture: "Épinal" },
-            { nom: "Yonne", numero: "89", prefecture: "Auxerre" },
-            { nom: "Territoire de Belfort", numero: "90", prefecture: "Belfort" },
-            { nom: "Essonne", numero: "91", prefecture: "Évry-Courcouronnes" },
-            { nom: "Hauts-de-Seine", numero: "92", prefecture: "Nanterre" },
-            { nom: "Seine-Saint-Denis", numero: "93", prefecture: "Bobigny" },
-            { nom: "Val-de-Marne", numero: "94", prefecture: "Créteil" },
-            { nom: "Val-d'Oise", numero: "95", prefecture: "Cergy" },
-            { nom: "Guadeloupe", numero: "971", prefecture: "Basse-Terre" },
-            { nom: "Martinique", numero: "972", prefecture: "Fort-de-France" },
-            { nom: "Guyane", numero: "973", prefecture: "Cayenne" },
-            { nom: "La Réunion", numero: "974", prefecture: "Saint-Denis" },
-            { nom: "Mayotte", numero: "976", prefecture: "Mamoudzou" }
-         ];
-        const modes = {
-            1: { time: 60, qTime: 6, lives: 5, questionType: "nom_to_num" },
-            2: { time: 60, qTime: 6, lives: 5, questionType: "num_to_nom" },
-            3: { time: 80, qTime: 8, lives: 8, questionType: "shape_to_nom_num" },
-            4: { time: 70, qTime: 7, lives: 7, questionType: "prefecture_to_nom" },
-            5: { time: 70, qTime: 4, lives: 7, questionType: "mix_all" },
-            6: { redirect: "quiz-departement-2.html" }
-        };
         const requiredModeUnlock = { 2: 10, 3: 30, 4: 60, 5: 90, 6: 125 };
-        let currentMode = 0, score = 0, lives = 0, timeLeft = 0, qTime = 0;
-        let timerInterval = null, qTimerInterval = null, awaitingNext = false;
-        let previousQuestions = [];
-        let correctAnswer;
         let isAuthMode = 'login';
         function getGlobalLevel(score) {
             if (score >= 500) return '🏆 Expert';
@@ -1048,15 +735,15 @@
                 card.innerHTML = `
                     <div class="level-number-dropdown">${level.id}</div>
                     <div class="level-name-dropdown">${level.name}</div>
-                    ${isUnlocked ? 
-                        '<div class="unlock-status-dropdown"><span class="unlock-icon">✓</span>Débloqué</div>' : 
+                    ${isUnlocked ?
+                        '<div class="unlock-status-dropdown"><span class="unlock-icon">✓</span>Débloqué</div>' :
                         `<div class="level-requirement-dropdown">Requis: ${level.required} pts</div>`
                     }
                 `;
                 if (isUnlocked) {
                     card.addEventListener('click', () => startLevel(category, level.id));
                 } else {
-                    card.addEventListener('mouseenter', function(e) {
+                    card.addEventListener('mouseenter', function (e) {
                         showHoverWarning(`Débloqué à ${level.required} points globaux`, e.pageX, e.pageY);
                     });
                 }
@@ -1069,13 +756,7 @@
             });
             window.scrollTo(0, 0);
             if (category === 'departements') {
-                const mode = modes[levelId];
-                if (mode && mode.redirect) {
-                    window.location.href = mode.redirect;
-                } else {
-                    currentMode = levelId;
-                    startMode();
-                }
+                window.location.href = `quiz-departement.html#${levelId}`;
             } else if (category === 'chinois') {
                 window.location.href = `quiz-chinois.html#${levelId}`;
             } else if (category === 'medecine') {
@@ -1084,27 +765,27 @@
                 window.location.href = `quiz-math.html#${levelId}`;
             }
         }
-        document.getElementById('dept-card').addEventListener('click', function(e) {
+        document.getElementById('dept-card').addEventListener('click', function (e) {
             if (!e.target.closest('.level-card-dropdown')) {
                 document.getElementById('departements-dropdown').classList.toggle('visible');
             }
         });
-        document.getElementById('chinois-card').addEventListener('click', function(e) {
+        document.getElementById('chinois-card').addEventListener('click', function (e) {
             if (!e.target.closest('.level-card-dropdown')) {
                 document.getElementById('chinois-dropdown').classList.toggle('visible');
             }
         });
-        document.getElementById('medecine-card').addEventListener('click', function(e) {
+        document.getElementById('medecine-card').addEventListener('click', function (e) {
             if (!e.target.closest('.level-card-dropdown')) {
                 document.getElementById('medecine-dropdown').classList.toggle('visible');
             }
         });
-        document.getElementById('math-card').addEventListener('click', function(e) {
+        document.getElementById('math-card').addEventListener('click', function (e) {
             if (!e.target.closest('.level-card-dropdown')) {
                 document.getElementById('math-dropdown').classList.toggle('visible');
             }
         });
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (!e.target.closest('.stat-card') && !e.target.closest('.level-card-dropdown')) {
                 document.querySelectorAll('.levels-dropdown').forEach(dropdown => {
                     dropdown.classList.remove('visible');
@@ -1112,8 +793,7 @@
             }
         });
         const homeSection = document.getElementById('home-section');
-        const quizSection = document.getElementById('quiz-section');
-        const resultSection = document.getElementById('result-section');
+        const authSection = document.getElementById('auth-section');
         const restartBtn = document.getElementById('restart-btn');
         const homeBtn = document.getElementById('home-btn');
         const backBtn = document.getElementById('back-btn');
@@ -1127,234 +807,6 @@
         const timerFill = document.getElementById('timer-fill');
         const qTimerFill = document.getElementById('question-timer-fill');
         const finalScore = document.getElementById('final-score');
-        function updateQuizHeaderVisibility(isQuizActive) {
-            if (window.innerWidth <= 899) {
-                document.body.classList.toggle('quiz-active', isQuizActive);
-                mobileBackBtn.classList.toggle('hidden', !isQuizActive);
-            } else {
-                mobileBackBtn.classList.add('hidden');
-            }
-        }
-        backBtn.onclick = function() {
-            stopAllTimers();
-            quizSection.classList.add('hidden');
-            homeSection.classList.remove('hidden');
-            backBtn.classList.add('hidden');
-            updateQuizHeaderVisibility(false);
-            window.scrollTo(0, 0);
-        };
-        mobileBackBtn.onclick = backBtn.onclick;
-        function startMode() {
-            if (!modes[currentMode]) return;
-            stopAllTimers();
-            const mode = modes[currentMode];
-            score = 0;
-            lives = mode.lives;
-            timeLeft = mode.time;
-            qTime = mode.qTime;
-            awaitingNext = false;
-            previousQuestions = [];
-            updateLives();
-            scoreDisplay.textContent = score;
-            homeSection.classList.add('hidden');
-            resultSection.classList.add('hidden');
-            quizSection.classList.remove('hidden');
-            backBtn.classList.remove('hidden');
-            updateQuizHeaderVisibility(true);
-            loadDeptLeaderboard();
-            generateQuestion();
-            startMainTimer();
-            window.scrollTo(0, 0);
-        }
-        function generateQuestion() {
-            if (awaitingNext) return;
-            let dep;
-            do { dep = departements[Math.floor(Math.random() * departements.length)]; }
-            while (previousQuestions.includes(dep.numero) && previousQuestions.length < departements.length);
-            previousQuestions.push(dep.numero);
-            if (previousQuestions.length > 20) previousQuestions.shift();
-            qTime = modes[currentMode].qTime;
-            qTimerDisplay.textContent = qTime;
-            qTimerFill.style.width = '100%';
-            let questionText;
-            switch (modes[currentMode].questionType) {
-                case "nom_to_num":
-                    questionText = `Quel est le numéro du département ?<br><span style="font-size:1.4em;">${dep.nom}</span>`;
-                    correctAnswer = dep.numero;
-                    break;
-                case "num_to_nom":
-                    questionText = `Quel est le nom du département ?<br><span style="font-size:1.4em;">${dep.numero}</span>`;
-                    correctAnswer = dep.nom;
-                    break;
-                case "shape_to_nom_num":
-                    questionText = `<img src="images/${dep.numero}.png" alt="${dep.nom}" style="width:100%;max-height:200px;">`;
-                    correctAnswer = Math.random() > 0.5 ? dep.nom : dep.numero;
-                    break;
-                case "prefecture_to_nom":
-                    questionText = `Dans quel département se trouve cette préfecture ?<br><span style="font-size:1.4em;">${dep.prefecture}</span>`;
-                    correctAnswer = dep.nom;
-                    break;
-                case "mix_all":
-                    const allTypes = Math.random();
-                    if (allTypes < 0.25) {
-                        questionText = `Quel est le numéro du département ?<br><span style="font-size:1.4em;">${dep.nom}</span>`;
-                        correctAnswer = dep.numero;
-                    } else if (allTypes < 0.5) {
-                        questionText = `Quel est le nom du département ?<br><span style="font-size:1.4em;">${dep.numero}</span>`;
-                        correctAnswer = dep.nom;
-                    } else if (allTypes < 0.75) {
-                        questionText = `Dans quel département se trouve cette préfecture ?<br><span style="font-size:1.4em;">${dep.prefecture}</span>`;
-                        correctAnswer = dep.nom;
-                    } else {
-                        questionText = `<img src="images/${dep.numero}.png" alt="${dep.nom}" style="width:100%;max-height:200px;">`;
-                        correctAnswer = Math.random() > 0.5 ? dep.nom : dep.numero;
-                    }
-                    break;
-            }
-            questionBox.innerHTML = questionText;
-            let wrongAnswers = [];
-            const otherDeps = departements.filter(d => d !== dep).sort(() => Math.random() - 0.5);
-            if (modes[currentMode].questionType === "nom_to_num" || (correctAnswer === dep.numero)) {
-                wrongAnswers = otherDeps.slice(0, 4).map(d => d.numero);
-            } else if (modes[currentMode].questionType === "num_to_nom" || modes[currentMode].questionType === "prefecture_to_nom" || correctAnswer === dep.nom) {
-                wrongAnswers = otherDeps.slice(0, 4).map(d => d.nom);
-            } else {
-                wrongAnswers = otherDeps.slice(0, 4).map(d => Math.random() > 0.5 ? d.nom : d.numero);
-            }
-            let options = [...wrongAnswers, correctAnswer].sort(() => Math.random() - 0.5);
-            answerBtns.forEach((btn, i) => {
-                btn.textContent = options[i];
-                btn.disabled = false;
-                btn.classList.remove("correct", "incorrect");
-                btn.onclick = () => handleAnswer(options[i]);
-            });
-            startQTimer();
-        }
-        function handleAnswer(selected) {
-            if (awaitingNext) return;
-            awaitingNext = true;
-            clearInterval(qTimerInterval);
-            answerBtns.forEach(btn => {
-                btn.disabled = true;
-                if (btn.textContent === correctAnswer) btn.classList.add("correct");
-                if (btn.textContent === selected && selected !== correctAnswer) btn.classList.add("incorrect");
-            });
-            if (selected === correctAnswer) {
-                score++;
-            } else {
-                if (lives > 0) {
-                    lives--;
-                }
-            }
-            updateLives();
-            scoreDisplay.textContent = score;
-            setTimeout(() => {
-                awaitingNext = false;
-                if (lives <= 0) {
-                    endGame();
-                } else {
-                    generateQuestion();
-                }
-            }, 1000);
-        }
-        function updateLives() {
-            const safeLives = Math.max(0, lives);
-            const maxLives = modes[currentMode].lives;
-            livesDisplay.textContent = '❤'.repeat(safeLives) + '♡'.repeat(Math.max(0, maxLives - safeLives));
-        }
-        function startMainTimer() {
-            timerDisplay.textContent = timeLeft;
-            timerFill.style.width = '100%';
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                timerDisplay.textContent = timeLeft;
-                timerFill.style.width = (timeLeft / modes[currentMode].time * 100) + '%';
-                if (timeLeft <= 5) timerFill.style.background = '#dc3545';
-                else if (timeLeft <= 10) timerFill.style.background = '#ffa500';
-                else timerFill.style.background = '#9c28a7ff';
-                if (timeLeft <= 0) { clearInterval(timerInterval); endGame(); }
-            }, 1000);
-        }
-        function startQTimer() {
-            clearInterval(qTimerInterval);
-            qTimerInterval = setInterval(() => {
-                qTime -= 0.1;
-                qTimerDisplay.textContent = Math.ceil(qTime);
-                qTimerFill.style.width = (qTime / modes[currentMode].qTime * 100) + '%';
-                if (qTime <= 0) {
-                    clearInterval(qTimerInterval);
-                    handleAnswer('');
-                }
-            }, 100);
-        }
-        async function endGame() {
-            quizSection.classList.add('hidden');
-            resultSection.classList.remove('hidden');
-            backBtn.classList.add('hidden');
-            updateQuizHeaderVisibility(false);
-            finalScore.textContent = score;
-            stopAllTimers();
-            window.scrollTo(0, 0);
-            try {
-                const userDocRef = doc(db, 'users', currentUser.uid);
-                const userDoc = await getDoc(userDocRef);
-                let userData = userDoc.data();
-                if (!userData) {
-                    userData = {
-                        pseudo: currentUser.email.split('@')[0],
-                        email: currentUser.email,
-                        globalScore: 0,
-                        quizScores: { departements: 0, chinois: 0 },
-                        createdAt: new Date().toISOString()
-                    };
-                    await setDoc(userDocRef, userData);
-                }
-                const oldGlobalScore = userData.globalScore || 0;
-                const oldDeptScore = userData.quizScores?.departements || 0;
-                const newGlobalScore = oldGlobalScore + score;
-                const newDeptScore = oldDeptScore + score;
-                await updateDoc(userDocRef, {
-                    globalScore: newGlobalScore,
-                    'quizScores.departements': newDeptScore
-                });
-                document.getElementById('new-global-score').textContent = newGlobalScore;
-                document.getElementById('new-dept-score').textContent = newDeptScore;
-                document.getElementById('user-global-score').textContent = newGlobalScore;
-                document.getElementById('home-dept-score').textContent = newDeptScore;
-                document.getElementById('dept-level').textContent = getDeptLevel(newDeptScore);
-                renderLevels('departements', newGlobalScore);
-                renderLevels('chinois', newGlobalScore);
-                renderLevels('medecine', newGlobalScore);
-                renderLevels('math', newGlobalScore);
-                const oldLevel = Math.floor(oldDeptScore / 50);
-                const newLevel = Math.floor(newDeptScore / 50);
-                if (newLevel > oldLevel) {
-                    document.getElementById('level-up-msg').classList.remove('hidden');
-                } else {
-                    document.getElementById('level-up-msg').classList.add('hidden');
-                }
-                await loadLeaderboard();
-            } catch (error) {
-                console.error('Erreur sauvegarde scores:', error);
-                alert('Erreur lors de la sauvegarde des scores. Vérifiez votre connexion.');
-            }
-        }
-        function stopAllTimers() {
-            clearInterval(timerInterval);
-            clearInterval(qTimerInterval);
-        }
-        restartBtn.onclick = startMode;
-        homeBtn.onclick = async () => {
-            stopAllTimers();
-            quizSection.classList.add('hidden');
-            resultSection.classList.add('hidden');
-            homeSection.classList.remove('hidden');
-            backBtn.classList.add('hidden');
-            updateQuizHeaderVisibility(false);
-            await loadUserData();
-            window.scrollTo(0, 0);
-        };
         window.toggleAuthMode = function () {
             isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
             const title = document.getElementById('auth-title');
@@ -1519,46 +971,7 @@
                 leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Erreur de chargement</div>';
             }
         }
-        async function loadDeptLeaderboard() {
-            const mobileList = document.querySelector('#dept-leaderboard-section.mobile #dept-leaderboard-list');
-            const desktopList = document.querySelector('#dept-leaderboard-section.desktop #dept-leaderboard-list');
-            mobileList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
-            desktopList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
-            try {
-                const q = query(collection(db, 'users'), orderBy('quizScores.departements', 'desc'), limit(10));
-                const querySnapshot = await getDocs(q);
-                if (!querySnapshot || querySnapshot.empty) {
-                    const emptyMsg = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
-                    mobileList.innerHTML = emptyMsg;
-                    desktopList.innerHTML = emptyMsg;
-                    return;
-                }
-                let rank = 1;
-                let mobileHtml = '';
-                let desktopHtml = '';
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data() || {};
-                    const pseudo = data.pseudo || 'Anonyme';
-                    const score = typeof data.quizScores?.departements === 'number' ? data.quizScores.departements : 0;
-                    let medal = '';
-                    if (rank === 1) medal = '🥇';
-                    else if (rank === 2) medal = '🥈';
-                    else if (rank === 3) medal = '🥉';
-                    const itemHtml = `<div class="leaderboard-item"><div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${pseudo}</div><div class="leaderboard-score">${score}</div></div>`;
-                    mobileHtml += itemHtml;
-                    desktopHtml += itemHtml;
-                    rank++;
-                });
-                mobileList.innerHTML = mobileHtml;
-                desktopList.innerHTML = desktopHtml;
-            } catch (error) {
-                console.error('Erreur loadDeptLeaderboard:', error);
-                const errorMsg = '<div style="text-align: center; opacity: 0.6;">Erreur de chargement</div>';
-                mobileList.innerHTML = errorMsg;
-                desktopList.innerHTML = errorMsg;
-            }
-        }
     </script>
 </body>
-</html>
 
+</html>
