@@ -527,6 +527,7 @@
                 <p>Score de la partie : <strong id="final-score">0</strong></p>
                 <p>Nouveau score global : <strong id="new-global-score">0</strong></p>
                 <p>Score départements : <strong id="new-dept-score">0</strong></p>
+                <p>Quiz complétés : <strong id="new-quiz-completed">0</strong></p>
                 <div id="level-up-msg" class="hidden" style="color: #2ecc71; margin-top: 15px; font-weight: bold;">
                     🎊 NIVEAU SUPÉRIEUR ATTEINT !
                 </div>
@@ -554,7 +555,6 @@
         window.auth = auth;
         window.db = db;
         window.currentUser = null;
-
         // 🔑 Niveaux & points requis
         const levelRequirements = {
             1: 0,
@@ -564,7 +564,6 @@
             5: 90,
             6: 125
         };
-
         // 🔢 Helper identique à index.html — NE JAMAIS stocker globalScore dans Firestore
         function computeGlobalScore(quizScores) {
             const keys = [
@@ -574,12 +573,10 @@
             ];
             return keys.reduce((sum, key) => sum + (quizScores[key] || 0), 0);
         }
-
         function canAccessLevel(level, globalScore) {
             const required = levelRequirements[level];
             return globalScore >= required;
         }
-
         onAuthStateChanged(auth, async (user) => {
             const quizSection = document.getElementById('quiz-section');
             const navLoggedIn = document.getElementById('nav-logged-in');
@@ -594,27 +591,28 @@
                 const pseudoEl = document.getElementById('user-pseudo');
                 const scoreEl = document.getElementById('user-global-score');
                 let globalScore = 0;
+                let quizCompleted = 0;
                 if (userDoc.exists()) {
                     const data = userDoc.data();
                     const quizScores = data.quizScores || {};
                     pseudoEl.textContent = data.pseudo || user.email.split('@')[0];
                     globalScore = computeGlobalScore(quizScores);
+                    quizCompleted = data.quizCompleted || 0;
                 } else {
                     pseudoEl.textContent = user.email.split('@')[0];
                     globalScore = 0;
+                    quizCompleted = 0;
                 }
                 scoreEl.textContent = globalScore;
                 localStorage.setItem('globalScore', globalScore);
-
+                localStorage.setItem('quizCompleted', quizCompleted);
                 const hash = window.location.hash.substring(1);
                 const level = parseInt(hash) || 1;
-
                 if (!canAccessLevel(level, globalScore)) {
                     alert(`Niveau ${level} verrouillé. Vous avez besoin de ${levelRequirements[level]} points de score global.`);
                     window.location.href = 'index.html';
                     return;
                 }
-
                 currentMode = Math.min(6, Math.max(1, level)); // supporte maintenant jusqu'au niveau 6
                 startMode();
             } else {
@@ -622,7 +620,6 @@
                 window.location.href = 'index.html';
             }
         });
-
         const departements = [
             { nom: "Ain", numero: "01", prefecture: "Bourg-en-Bresse" },
             { nom: "Aisne", numero: "02", prefecture: "Laon" },
@@ -726,27 +723,23 @@
             { nom: "La Réunion", numero: "974", prefecture: "Saint-Denis" },
             { nom: "Mayotte", numero: "976", prefecture: "Mamoudzou" }
         ];
-
         const modes = {
-            1: { time: 60, qTime: 7, lives: 6, questionType: "nom_to_num" },
-            2: { time: 60, qTime: 6, lives: 5, questionType: "num_to_nom" },
+            1: { time: 60, qTime: 4, lives: 3, questionType: "nom_to_num" },
+            2: { time: 60, qTime: 5, lives: 4, questionType: "num_to_nom" },
             3: { time: 90, qTime: 9, lives: 8, questionType: "shape_to_nom_num" },
             4: { time: 60, qTime: 7, lives: 7, questionType: "prefecture_to_nom" },
             5: { time: 80, qTime: 4, lives: 6, questionType: "mix_all" },
             6: { time: 60, qTime: 3, lives: 5, questionType: "mix_all" } // Nouveau niveau 6
         };
-
         let currentMode = 1, score = 0, lives = 0, timeLeft = 0, qTime = 0;
         let timerInterval = null, qTimerInterval = null, awaitingNext = false;
         let previousQuestions = [];
         let correctAnswer;
         let isAuthMode = 'login';
-
         function getDeptLevel(score) {
             const level = Math.floor(score / 50) + 1;
             return `Niveau ${level}`;
         }
-
         const authSection = document.getElementById('auth-section');
         const quizSection = document.getElementById('quiz-section');
         const resultSection = document.getElementById('result-section');
@@ -762,7 +755,6 @@
         const qTimerDisplay = document.getElementById('question-timer');
         const timerFill = document.getElementById('timer-fill');
         const qTimerFill = document.getElementById('question-timer-fill');
-
         function updateQuizHeaderVisibility(isQuizActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('quiz-active', isQuizActive);
@@ -771,7 +763,6 @@
                 mobileBackBtn.classList.add('hidden');
             }
         }
-
         async function saveCurrentScore() {
             if (!window.currentUser || score <= 0) return;
             try {
@@ -796,6 +787,7 @@
                         pseudo: currentUser.email.split('@')[0],
                         email: currentUser.email,
                         quizScores: defaultQuizScores,
+                        quizCompleted: 0,
                         createdAt: new Date().toISOString()
                     };
                     await setDoc(userDocRef, userData);
@@ -813,7 +805,6 @@
                 console.error('Erreur sauvegarde scores au retour:', error);
             }
         }
-
         backBtn.onclick = async function () {
             await saveCurrentScore();
             stopAllTimers();
@@ -821,7 +812,6 @@
             window.location.href = 'index.html';
         };
         mobileBackBtn.onclick = backBtn.onclick;
-
         function startMode() {
             if (!modes[currentMode]) return;
             stopAllTimers();
@@ -843,7 +833,6 @@
             startMainTimer();
             window.scrollTo(0, 0);
         }
-
         function generateQuestion() {
             if (awaitingNext) return;
             let dep;
@@ -852,11 +841,9 @@
             } while (previousQuestions.includes(dep.numero) && previousQuestions.length < departements.length);
             previousQuestions.push(dep.numero);
             if (previousQuestions.length > 20) previousQuestions.shift();
-
             qTime = modes[currentMode].qTime;
-            qTimerDisplay.textContent = qTime;
+            qTimerDisplay.textContent = qTime.toFixed(1);
             qTimerFill.style.width = '100%';
-
             let questionText;
             switch (modes[currentMode].questionType) {
                 case "nom_to_num":
@@ -909,9 +896,14 @@
                 btn.classList.remove("correct", "incorrect");
                 btn.onclick = () => handleAnswer(options[i]);
             });
-            startQTimer();
-        }
 
+            // Ajouter un petit délai avant de démarrer le timer de question
+            setTimeout(() => {
+                if (!awaitingNext) {
+                    startQTimer();
+                }
+            }, 100); // Délai de 100ms
+        }
         function handleAnswer(selected) {
             if (awaitingNext) return;
             awaitingNext = true;
@@ -939,13 +931,11 @@
                 }
             }, 1000);
         }
-
         function updateLives() {
             const safeLives = Math.max(0, lives);
             const maxLives = modes[currentMode].lives;
             livesDisplay.textContent = '❤'.repeat(safeLives) + '♡'.repeat(Math.max(0, maxLives - safeLives));
         }
-
         function startMainTimer() {
             timerDisplay.textContent = timeLeft;
             timerFill.style.width = '100%';
@@ -963,20 +953,26 @@
                 }
             }, 1000);
         }
-
         function startQTimer() {
             clearInterval(qTimerInterval);
+            // Store initial question time for reference
+            const qStartTime = modes[currentMode].qTime;
+            qTime = qStartTime;
+
             qTimerInterval = setInterval(() => {
                 qTime -= 0.1;
-                qTimerDisplay.textContent = Math.ceil(qTime);
-                qTimerFill.style.width = (qTime / modes[currentMode].qTime * 100) + '%';
+                // Round to 1 decimal for display
+                qTimerDisplay.textContent = qTime.toFixed(1);
+                // Update width based on actual elapsed time vs start time
+                const percent = Math.max(0, qTime / qStartTime) * 100;
+                qTimerFill.style.width = percent + '%';
+
                 if (qTime <= 0) {
                     clearInterval(qTimerInterval);
                     handleAnswer('');
                 }
-            }, 1000);
+            }, 100); // Fire every 100ms = 0.1s
         }
-
         async function endGame() {
             quizSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
@@ -1007,6 +1003,7 @@
                         pseudo: currentUser.email.split('@')[0],
                         email: currentUser.email,
                         quizScores: defaultQuizScores,
+                        quizCompleted: 0,
                         createdAt: new Date().toISOString()
                     };
                     await setDoc(userDocRef, userData);
@@ -1016,10 +1013,16 @@
                 const newDeptScore = oldDeptScore + score;
                 quizScores.departements = newDeptScore;
                 const newGlobalScore = computeGlobalScore(quizScores);
-                await updateDoc(userDocRef, { quizScores });
+                let quizCompleted = userData.quizCompleted || 0;
+                if (lives > 0) {
+                    quizCompleted += 1;
+                }
+                await updateDoc(userDocRef, { quizScores, quizCompleted });
                 localStorage.setItem('globalScore', newGlobalScore);
+                localStorage.setItem('quizCompleted', quizCompleted);
                 document.getElementById('new-global-score').textContent = newGlobalScore;
                 document.getElementById('new-dept-score').textContent = newDeptScore;
+                document.getElementById('new-quiz-completed').textContent = quizCompleted;
                 const oldLevel = Math.floor(oldDeptScore / 50);
                 const newLevel = Math.floor(newDeptScore / 50);
                 if (newLevel > oldLevel) {
@@ -1033,21 +1036,17 @@
                 alert('Erreur lors de la sauvegarde des scores. Connectez-vous à nouveau.');
             }
         }
-
         function stopAllTimers() {
             clearInterval(timerInterval);
             clearInterval(qTimerInterval);
         }
-
         restartBtn.onclick = startMode;
-
         homeBtn.onclick = async function () {
             await saveCurrentScore();
             stopAllTimers();
             resultSection.classList.add('hidden');
             window.location.href = 'index.html';
         };
-
         window.toggleAuthMode = function () {
             isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
             const title = document.getElementById('auth-title');
@@ -1069,7 +1068,6 @@
                 pseudoGroup.style.display = 'none';
             }
         };
-
         document.getElementById('auth-submit-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
@@ -1100,6 +1098,7 @@
                         pseudo: pseudo.trim(),
                         email: email,
                         quizScores: defaultQuizScores,
+                        quizCompleted: 0,
                         createdAt: new Date().toISOString()
                     });
                 } else {
@@ -1110,12 +1109,10 @@
                 errorDiv.classList.remove('hidden');
             }
         });
-
         window.logout = async function () {
             await signOut(auth);
             window.location.href = 'index.html';
         };
-
         async function loadDeptLeaderboard() {
             const mobileList = document.querySelector('#dept-leaderboard-section.mobile #dept-leaderboard-list');
             const desktopList = document.querySelector('#dept-leaderboard-section.desktop #dept-leaderboard-list');
@@ -1147,7 +1144,6 @@
                 desktopList.innerHTML = errorMsg;
             }
         }
-
         // Initialiser le bouton base avec la valeur par défaut au cas où
         updateBaseBtnVisibility(0);
     </script>
