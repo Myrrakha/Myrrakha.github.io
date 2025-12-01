@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz Master - Chinois N2</title>
+  <style>
+    /* === Style global === */
+    body {
+      background: linear-gradient(135deg, #0f1115, #1c1c24);
+      color: #f0f0f0;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .navbar {
+      background: #1a1a24;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+    .nav-title {
+      font-size: 1.2em;
+      font-weight: 600;
+    }
+    .nav-right {
+      display: flex;
+      gap: 10px;
+    }
+    .center {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #23233a;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #aaa;
+      margin-bottom: 18px;
+      font-size: 1.05em;
+    }
+    .action-btn {
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: #3a3a50;
+      border: none;
+      cursor: pointer;
+      color: #f0f0f0;
+      transition: 0.20s;
+      font-size: 0.98em;
+    }
+    .action-btn:hover {
+      background: #4e4e6a;
+    }
+    .action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .loading {
+      text-align: center;
+      padding: 28px;
+      font-size: 1.1em;
+      color: #aaa;
+    }
+    /* Timers empilés verticalement */
+    #timers-container {
+      width: 92%;
+      max-width: 1000px;
+      margin: 25px auto 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .timer-item {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+    .timer-label {
+      font-size: 0.95em;
+      color: #ccc;
+      margin-bottom: 6px;
+      text-align: left;
+    }
+    .timer-bar {
+      width: 100%;
+      height: 28px;
+      background: #2b2b3a;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .timer-fill {
+      height: 100%;
+      width: 100%;
+      border-radius: 10px;
+      transition: width 0.15s linear;
+    }
+    #timer-fill {
+      background: #9c28a7ff;
+    }
+    #question-timer-fill {
+      background: #a832d6;
+    }
+    /* Quiz area */
+    #quiz-main {
+      display: none;
+    }
+    #quiz-section {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: center;
+      width: 100%;
+    }
+    .question-box {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .question-text {
+      font-size: 1.35em;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .answers-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      width: 100%;
+    }
+    .answer-btn {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #3a3a50;
+      border: none;
+      cursor: pointer;
+      color: #f0f0f0;
+      font-size: 1em;
+      min-width: 150px;
+      text-align: center;
+      transition: transform .12s, background .12s;
+    }
+    .answer-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      background: #4e4e6a;
+    }
+    .answer-btn:disabled {
+      opacity: 0.85;
+      cursor: default;
+      transform: none;
+    }
+    .stats {
+      margin: 12px 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 1.05em;
+    }
+    .stats div {
+      flex: 1;
+      text-align: center;
+      font-weight: 600;
+    }
+    #quiz-next-btn,
+    #quiz-restart-btn {
+      display: none;
+      width: 100%;
+      margin-top: 6px;
+    }
+    #quiz-result {
+      display: none;
+      text-align: center;
+    }
+    .final-score {
+      font-size: 1.8em;
+      color: #2ecc71;
+      margin: 12px 0;
+    }
+    @media (max-width:700px) {
+      .answers-container {
+        flex-direction: column;
+      }
+      #timers-container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="nav-left"><span class="nav-title">🎯 Quiz Master - Chinois N2</span></div>
+      <div class="nav-right">
+        <button class="action-btn" onclick="window.location.href='index.html'">← Retour</button>
+      </div>
+    </nav>
+  </header>
+  <div class="center">
+    <div id="loading" class="loading">
+      <p>Chargement du quiz…</p>
+    </div>
+    <!-- Quiz main -->
+    <div id="quiz-main">
+      <h1 id="quiz-title">Niveau 2 : Vocabulaire quotidien</h1>
+      <p class="subtitle" id="quiz-subtitle">Temps, lieux, expressions, jours et fêtes en chinois simplifié</p>
+      <div id="quiz-section">
+        <div class="question-box">
+          <div id="quiz-question" class="question-text"></div>
+        </div>
+        <div class="answers-container" id="quiz-answers"></div>
+        <!-- ⚡ TIMERS -->
+        <div id="timers-container">
+          <div class="timer-item">
+            <div class="timer-label">⏱️ Temps restant : <strong id="timer">0</strong>s</div>
+            <div id="timer-bar" class="timer-bar">
+              <div id="timer-fill" class="timer-fill"></div>
+            </div>
+          </div>
+          <div class="timer-item">
+            <div class="timer-label">⚡ Question : <strong id="question-timer">0</strong>s</div>
+            <div id="question-timer-bar" class="timer-bar">
+              <div id="question-timer-fill" class="timer-fill"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="stats">
+        <div>Score : <span id="quiz-score">0</span></div>
+        <div>Vies : <span id="quiz-lives">❤❤❤</span></div>
+        <div>Question : <span id="quiz-index">0</span>/<span id="quiz-total">0</span></div>
+      </div>
+    </div>
+    <!-- Result -->
+    <div id="quiz-result">
+      <h1>🎉 Quiz terminé !</h1>
+      <div class="final-score">Score : <span id="quiz-final-score">0</span></div>
+      <p id="result-message" style="font-size:1.05em; margin:8px 0 16px 0;"></p>
+      <button class="action-btn" onclick="window.location.href='index.html'" style="width:100%; margin-top:8px;">Retour au menu principal</button>
+      <button class="action-btn" id="retry-btn" style="width:100%; margin-top:10px;">Recommencer ce niveau</button>
+    </div>
+  </div>
+  <script>
+    // ==========================================
+    // UTILITAIRES
+    // ==========================================
+    function shuffle(array) {
+      return [...array].sort(() => Math.random() - 0.5);
+    }
+
+    // ==========================================
+    // DONNÉES NIVEAU 2
+    // ==========================================
+    const vocabulaireN2 = [
+      // Temps
+      { fr: "Hier", ch: "昨天", py: "zuótiān" },
+      { fr: "Aujourd'hui", ch: "今天", py: "jīntiān" },
+      { fr: "Demain", ch: "明天", py: "míngtiān" },
+      { fr: "Matin", ch: "早上", py: "zǎoshang" },
+      { fr: "Après-midi", ch: "下午", py: "xiàwǔ" },
+      { fr: "Soir", ch: "晚上", py: "wǎnshang" },
+      { fr: "Maintenant", ch: "现在", py: "xiànzài" },
+      { fr: "Plus tard", ch: "以后", py: "yǐhòu" },
+      // Lieux / spatial
+      { fr: "Ici", ch: "这里", py: "zhèlǐ" },
+      { fr: "Là-bas", ch: "那里", py: "nàlǐ" },
+      { fr: "À droite", ch: "右边", py: "yòubiān" },
+      { fr: "À gauche", ch: "左边", py: "zuǒbiān" },
+      { fr: "Devant", ch: "前面", py: "qiánmiàn" },
+      { fr: "Derrière", ch: "后面", py: "hòumiàn" },
+      { fr: "À côté", ch: "旁边", py: "pángbiān" },
+      // Expressions utiles
+      { fr: "Bonjour", ch: "你好", py: "nǐ hǎo" },
+      { fr: "Bonsoir", ch: "晚上好", py: "wǎnshang hǎo" },
+      { fr: "Merci", ch: "谢谢", py: "xièxiè" },
+      { fr: "Excusez-moi", ch: "对不起", py: "duìbuqǐ" },
+      { fr: "Je comprends", ch: "我懂了", py: "wǒ dǒng le" },
+      { fr: "Je ne comprends pas", ch: "我不懂", py: "wǒ bù dǒng" },
+      { fr: "Au revoir", ch: "再见", py: "zàijiàn" },
+      { fr: "À demain", ch: "明天见", py: "míngtiān jiàn" },
+      // Jours / calendrier
+      { fr: "Lundi", ch: "星期一", py: "xīngqī yī" },
+      { fr: "Mardi", ch: "星期二", py: "xīngqī èr" },
+      { fr: "Mercredi", ch: "星期三", py: "xīngqī sān" },
+      { fr: "Jeudi", ch: "星期四", py: "xīngqī sì" },
+      { fr: "Vendredi", ch: "星期五", py: "xīngqī wǔ" },
+      { fr: "Samedi", ch: "星期六", py: "xīngqī liù" },
+      { fr: "Dimanche", ch: "星期天", py: "xīngqī tiān" },
+      { fr: "Week-end", ch: "周末", py: "zhōumò" },
+      // Fêtes
+      { fr: "Nouvel an chinois", ch: "春节", py: "Chūnjié" },
+      { fr: "Fête de la Lune", ch: "中秋节", py: "Zhōngqiūjié" },
+      { fr: "Fête nationale", ch: "国庆节", py: "Guóqìngjié" }
+    ];
+
+    const n2Patterns = [
+      ["Je suis ici maintenant", "我现在在这里", "wǒ xiànzài zài zhèlǐ"],
+      ["Je vais là-bas demain", "我明天去那里", "wǒ míngtiān qù nàlǐ"],
+      ["Je viens ce soir", "我晚上来", "wǒ wǎnshang lái"],
+      ["Nous partons après-demain", "我们后天走", "wǒmen hòutiān zǒu"],
+      ["Elle arrive demain matin", "她明天早上到", "tā míngtiān zǎoshang dào"],
+      ["Ils sont derrière toi", "他们在你后面", "tāmen zài nǐ hòumiàn"],
+      ["Il est à côté de moi", "他在我的旁边", "tā zài wǒ de pángbiān"],
+      ["Je ne comprends pas", "我不懂", "wǒ bù dǒng"]
+    ];
+
+    // --- Générateur de question pour niveau 2 ---
+    function generateN2Question() {
+      const type = Math.floor(Math.random() * 3) + 1;
+
+      if (type === 1) {
+        const item = vocabulaireN2[Math.floor(Math.random() * vocabulaireN2.length)];
+        const wrong = new Set();
+        while (wrong.size < 4) {
+          const r = vocabulaireN2[Math.floor(Math.random() * vocabulaireN2.length)];
+          if (r.ch !== item.ch) wrong.add(r);
+        }
+        const opts = [...wrong, item]
+          .sort(() => Math.random() - 0.5)
+          .map(o => ({
+            raw: o.ch,
+            display: `${o.ch} (${o.py})`
+          }));
+        return {
+          q: `Comment s'écrit : <b>${item.fr}</b> ?`,
+          a: item.ch,
+          opts
+        };
+      }
+
+      if (type === 2) {
+        const item = vocabulaireN2[Math.floor(Math.random() * vocabulaireN2.length)];
+        const wrong = new Set();
+        while (wrong.size < 4) {
+          const r = vocabulaireN2[Math.floor(Math.random() * vocabulaireN2.length)];
+          if (r.fr !== item.fr) wrong.add(r);
+        }
+        const opts = [...wrong, item]
+          .sort(() => Math.random() - 0.5)
+          .map(o => ({
+            raw: o.fr,
+            display: o.fr
+          }));
+        return {
+          q: `Que signifie : <b>${item.ch}</b> (${item.py}) ?`,
+          a: item.fr,
+          opts
+        };
+      }
+
+      if (type === 3) {
+        const item = n2Patterns[Math.floor(Math.random() * n2Patterns.length)];
+        const wrong = new Set();
+        while (wrong.size < 4) {
+          const r = n2Patterns[Math.floor(Math.random() * n2Patterns.length)];
+          if (r[1] !== item[1]) wrong.add(r);
+        }
+        const opts = [...wrong, item]
+          .sort(() => Math.random() - 0.5)
+          .map(o => ({
+            raw: o[1],
+            display: `${o[1]} (${o[2]})`
+          }));
+        return {
+          q: `Comment dit-on : <b>${item[0]}</b> ?`,
+          a: item[1],
+          opts
+        };
+      }
+    }
+
+    // --- Génération de 50 questions pour niveau 2 ---
+    function generateQuizN2() {
+      const questions = [];
+      for (let i = 0; i < 50; i++) {
+        questions.push(generateN2Question());
+      }
+      return {
+        title: "Niveau 2 : Vocabulaire quotidien",
+        subtitle: "Temps, lieux, expressions, jours et fêtes en chinois simplifié",
+        questions
+      };
+    }
+
+    // ==========================================
+    // CONSTANTES & VARIABLES
+    // ==========================================
+    const TOTAL_TIME_SECONDS = 90;
+    const QUESTION_TIME_SECONDS = 10;
+    const INITIAL_LIVES = 10;
+
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let lives = INITIAL_LIVES;
+    let answered = false;
+    let globalTimerInterval = null;
+    let questionTimerInterval = null;
+
+    // ==========================================
+    // ÉLÉMENTS DOM
+    // ==========================================
+    const loadingEl = document.getElementById('loading');
+    const quizMain = document.getElementById('quiz-main');
+    const quizResult = document.getElementById('quiz-result');
+    const quizQuestion = document.getElementById('quiz-question');
+    const quizAnswers = document.getElementById('quiz-answers');
+    const quizScore = document.getElementById('quiz-score');
+    const quizLives = document.getElementById('quiz-lives');
+    const quizIndex = document.getElementById('quiz-index');
+    const quizTotal = document.getElementById('quiz-total');
+    const quizFinalScore = document.getElementById('quiz-final-score');
+    const resultMessage = document.getElementById('result-message');
+    const retryBtn = document.getElementById('retry-btn');
+    const timerDisplay = document.getElementById('timer');
+    const questionTimerDisplay = document.getElementById('question-timer');
+    const timerFill = document.getElementById('timer-fill');
+    const questionTimerFill = document.getElementById('question-timer-fill');
+
+    // ==========================================
+    // TIMERS
+    // ==========================================
+    function startGlobalTimer() {
+      clearInterval(globalTimerInterval);
+      let remaining = TOTAL_TIME_SECONDS;
+      timerDisplay.textContent = remaining;
+      timerFill.style.width = '100%';
+      globalTimerInterval = setInterval(() => {
+        remaining--;
+        timerDisplay.textContent = remaining;
+        const percentRemaining = 100 - ((TOTAL_TIME_SECONDS - remaining) / TOTAL_TIME_SECONDS) * 100;
+        timerFill.style.width = percentRemaining + '%';
+        if (remaining <= 0) {
+          clearInterval(globalTimerInterval);
+          endQuiz(true);
+        }
+      }, 1000);
+    }
+
+    function startQuestionTimer() {
+      clearInterval(questionTimerInterval);
+      let remaining = QUESTION_TIME_SECONDS;
+      questionTimerDisplay.textContent = remaining;
+      questionTimerFill.style.width = '100%';
+      questionTimerInterval = setInterval(() => {
+        remaining--;
+        questionTimerDisplay.textContent = remaining;
+        const percentRemaining = 100 - ((QUESTION_TIME_SECONDS - remaining) / QUESTION_TIME_SECONDS) * 100;
+        questionTimerFill.style.width = percentRemaining + '%';
+        if (remaining <= 0) {
+          clearInterval(questionTimerInterval);
+          handleQuestionTimeout();
+        }
+      }, 1000);
+    }
+
+    function stopQuestionTimer() {
+      clearInterval(questionTimerInterval);
+    }
+
+    function stopAllTimers() {
+      clearInterval(globalTimerInterval);
+      clearInterval(questionTimerInterval);
+    }
+
+    function highlightAnswers(correctAnswer, selectedAnswer = null) {
+      Array.from(quizAnswers.children).forEach(btn => {
+        btn.disabled = true;
+        const btnValue = btn.dataset.value;
+        if (btnValue === correctAnswer) {
+          btn.style.background = '#2ecc71';
+        } else if (selectedAnswer !== null && btnValue === selectedAnswer) {
+          btn.style.background = '#e74c3c';
+        }
+      });
+    }
+
+    // ==========================================
+    // QUIZ LOGIC
+    // ==========================================
+    function initQuiz() {
+      const data = generateQuizN2();
+      questions = [...data.questions].sort(() => Math.random() - 0.5);
+      currentQuestionIndex = 0;
+      score = 0;
+      lives = INITIAL_LIVES;
+      loadingEl.style.display = 'none';
+      quizMain.style.display = 'block';
+      quizResult.style.display = 'none';
+      updateStats();
+      showQuestion();
+      startGlobalTimer();
+    }
+
+    function showQuestion() {
+      stopQuestionTimer();
+      if (currentQuestionIndex >= questions.length || lives <= 0) {
+        endQuiz(false);
+        return;
+      }
+      const question = questions[currentQuestionIndex];
+      quizQuestion.innerHTML = question.q;
+      const shuffledOpts = [...question.opts].sort(() => Math.random() - 0.5);
+      quizAnswers.innerHTML = '';
+      shuffledOpts.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        let value, display;
+        if (typeof opt === 'object') {
+          value = String(opt.raw);
+          display = opt.display;
+        } else {
+          value = opt;
+          display = opt;
+        }
+        btn.innerHTML = display;
+        btn.dataset.value = value;
+        btn.onclick = () => selectAnswer(value, question.a);
+        quizAnswers.appendChild(btn);
+      });
+      quizIndex.textContent = currentQuestionIndex + 1;
+      quizTotal.textContent = questions.length;
+      startQuestionTimer();
+    }
+
+    function selectAnswer(selected, correct) {
+      if (answered) return;
+      answered = true;
+      stopQuestionTimer();
+      highlightAnswers(correct, selected);
+      if (selected === correct) {
+        score++;
+      } else {
+        lives--;
+      }
+      updateStats();
+      setTimeout(nextQuestion, 1000);
+    }
+
+    function handleQuestionTimeout() {
+      if (answered) return;
+      answered = true;
+      const question = questions[currentQuestionIndex];
+      highlightAnswers(question.a);
+      lives--;
+      updateStats();
+      setTimeout(nextQuestion, 1000);
+    }
+
+    function nextQuestion() {
+      currentQuestionIndex++;
+      answered = false;
+      showQuestion();
+    }
+
+    function updateStats() {
+      quizScore.textContent = score;
+      quizLives.textContent = '❤'.repeat(Math.max(0, lives)) + '♡'.repeat(Math.max(0, INITIAL_LIVES - lives));
+    }
+
+    function endQuiz(timeout = false) {
+      stopAllTimers();
+      quizMain.style.display = 'none';
+      quizResult.style.display = 'block';
+      quizFinalScore.textContent = score + ' / ' + questions.length;
+      if (timeout) {
+        resultMessage.textContent = '⏳ Temps écoulé ! Essayez encore — vous pouvez recommencer le niveau.';
+      } else {
+        const percentage = questions.length > 0 ? (score / questions.length) * 100 : 0;
+        if (percentage === 100) {
+          resultMessage.textContent = '🏆 Parfait ! Vous maîtrisez ce niveau !';
+        } else if (percentage >= 80) {
+          resultMessage.textContent = '👏 Excellent travail ! Continuez comme ça !';
+        } else if (percentage >= 60) {
+          resultMessage.textContent = '👍 Bon travail ! Encore un peu de pratique !';
+        } else {
+          resultMessage.textContent = '💪 Continuez à pratiquer, vous progressez !';
+        }
+      }
+    }
+
+    retryBtn.addEventListener('click', () => {
+      stopAllTimers();
+      initQuiz();
+    });
+
+    window.addEventListener('load', initQuiz);
+  </script>
+</body>
+</html>
+

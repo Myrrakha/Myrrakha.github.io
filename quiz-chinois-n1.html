@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quiz Master - Chinois Niveau 1</title>
+    <style>
+        .hidden {
+            display: none !important;
+        }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f1115, #1c1c24);
+            color: #f0f0f0;
+        }
+        #hover-warning {
+            position: absolute;
+            padding: 8px 14px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            font-size: 14px;
+            border-radius: 6px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 9999;
+        }
+        header {
+            width: 100%;
+            background: rgba(20, 20, 28, 0.8);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar {
+            max-width: 1100px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+        }
+        .nav-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #eaeaea;
+            letter-spacing: 1px;
+        }
+        .user-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .user-stats {
+            font-size: 0.9em;
+            text-align: right;
+        }
+        .logout-btn {
+            padding: 8px 16px;
+            background: #dc3545;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+        .logout-btn:hover {
+            background: #c82333;
+        }
+        /* AUTH SECTION */
+        #auth-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+        .auth-container {
+            background: #1f1f28;
+            padding: 40px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .auth-container h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #2c2c3a;
+            color: #f0f0f0;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: #9c28a7;
+            color: white;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.25s;
+            margin-top: 10px;
+        }
+        .auth-btn:hover {
+            background: #7d1f85;
+        }
+        .auth-switch {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+        .auth-switch a {
+            color: #9c28a7;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .error-msg {
+            background: #dc3545;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        /* QUIZ SECTION */
+        #quiz-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 40px;
+            padding: 0 20px;
+        }
+        .quiz-container {
+            display: flex;
+            gap: 25px;
+            width: 100%;
+            max-width: 1200px;
+            justify-content: center;
+        }
+        @media (min-width: 900px) {
+            .question-box {
+                flex: 2;
+            }
+            .answers-container {
+                flex: 1;
+            }
+            #chinois-leaderboard-section.desktop {
+                display: block;
+                flex: 1;
+                margin-top: 0;
+                max-height: 500px;
+            }
+        }
+        .question-box {
+            background: #262633;
+            padding: 30px;
+            border-radius: 15px;
+            font-size: 1.8em;
+            font-weight: 600;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.35);
+        }
+        .answers-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .answer-btn {
+            padding: 15px;
+            font-size: 1.2em;
+            border-radius: 12px;
+            background: #323248;
+            color: #f0f0f0;
+            cursor: pointer;
+            border: none;
+            transition: 0.18s;
+        }
+        .answer-btn:hover:not(:disabled) {
+            transform: scale(1.04);
+            background: #4a4a65;
+        }
+        .answer-btn:disabled {
+            cursor: not-allowed;
+        }
+        .correct {
+            background-color: #2ecc71 !important;
+        }
+        .incorrect {
+            background-color: #e74c3c !important;
+        }
+        #timers-container {
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 25px;
+        }
+        #timer-bar-container,
+        #question-timer-bar-container {
+            margin: 10px 0;
+            text-align: left;
+            font-size: 0.95em;
+        }
+        #timer-bar,
+        #question-timer-bar {
+            width: 100%;
+            height: 28px;
+            background: #2b2b3a;
+            border-radius: 10px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+        #timer-fill,
+        #question-timer-fill {
+            height: 100%;
+            width: 100%;
+            border-radius: 10px;
+            transition: width 0.15s linear;
+        }
+        #timer-fill {
+            background: #9c28a7ff;
+        }
+        #question-timer-fill {
+            background: #a832d6;
+        }
+        #score-lives {
+            margin-top: 20px;
+            display: flex;
+            gap: 80px;
+            justify-content: center;
+            font-size: 1.3em;
+            position: relative;
+        }
+        #lives {
+            color: #ff4b4b;
+            font-size: 1.4em;
+        }
+        /* MOBILE-SPECIFIC QUIZ HEADER HIDING */
+        @media (max-width: 899px) {
+            body.quiz-active header {
+                display: none;
+            }
+        }
+        /* RESULT SECTION */
+        #result-section {
+            margin-top: 60px;
+            text-align: center;
+        }
+        .result-stats {
+            background: #262633;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            margin: 30px auto;
+        }
+        .result-stats h3 {
+            color: #9c28a7;
+            margin-top: 0;
+        }
+        .action-btn {
+            margin: 10px;
+            padding: 12px 25px;
+            border-radius: 10px;
+            background: #3a3a50;
+            border: none;
+            cursor: pointer;
+            color: #f0f0f0;
+            transition: 0.25s;
+        }
+        .action-btn:hover {
+            background: #4e4e6a;
+        }
+        /* LEADERBOARD */
+        .chinois-leaderboard-section {
+            background: #262633;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .chinois-leaderboard-section .leaderboard-title {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #9c28a7;
+            font-size: 1.3em;
+        }
+        .chinois-leaderboard-section .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 6px 0;
+            background: #2c2c3a;
+            border-radius: 8px;
+        }
+        .chinois-leaderboard-section .leaderboard-rank {
+            font-size: 1.1em;
+            font-weight: bold;
+            width: 30px;
+        }
+        .chinois-leaderboard-section .leaderboard-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        .chinois-leaderboard-section .leaderboard-score {
+            font-size: 1em;
+            color: #9c28a7;
+            font-weight: bold;
+        }
+        /* MOBILE DESIGN */
+        @media (max-width: 899px) {
+            .quiz-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .question-box {
+                font-size: 1.6em;
+                padding: 16px;
+                min-height: 90px;
+            }
+            .answers-container {
+                gap: 10px;
+            }
+            .answer-btn {
+                padding: 12px;
+                font-size: 1.1em;
+            }
+            #score-lives {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 15px;
+            }
+            /* Supprimer le leaderboard au-dessus des timers sur mobile */
+            #chinois-leaderboard-section.desktop {
+                display: none !important;
+            }
+            /* Layout mobile avec leaderboard en bas */
+            #mobile-quiz-ui-row {
+                display: flex;
+                gap: 12px;
+                justify-content: center;
+                margin-top: 15px;
+                padding: 0 20px;
+                width: 100%;
+                max-width: 1200px;
+            }
+            #chinois-leaderboard-section.mobile {
+                margin: 0;
+                flex: 1;
+                max-width: 220px;
+            }
+            #mobile-back-container {
+                background: #262633;
+                padding: 20px 16px;
+                border-radius: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+                min-width: 60px;
+                height: fit-content;
+            }
+            #mobile-back-container .action-btn {
+                padding: 8px 12px;
+                font-size: 1.2em;
+                display: block;
+                width: 100%;
+                text-align: center;
+            }
+        }
+        @media (min-width: 900px) {
+            #chinois-leaderboard-section.mobile,
+            #mobile-quiz-ui-row {
+                display: none !important;
+            }
+            #mobile-back-btn {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-left">
+                <span class="nav-title">🎯 Quiz Master</span>
+                <button id="back-btn" class="action-btn" style="margin-left:10px;">Retour</button>
+                <!-- Le bouton Base -->
+                <button class="action-btn" id="base-btn" onclick="window.location.href='base.html'"
+                    style="margin-left:8px; background: #2c2c3a; display:none;">Base</button>
+                <script>
+                    function updateBaseBtnVisibility(globalScore) {
+                        const baseBtn = document.getElementById('base-btn');
+                        if (!baseBtn) return;
+                        if (globalScore >= 200) {
+                            baseBtn.style.display = 'inline-block';
+                            baseBtn.disabled = false;
+                            baseBtn.classList.remove('disabled');
+                        } else {
+                            baseBtn.style.display = 'none';
+                            baseBtn.disabled = true;
+                            baseBtn.classList.add('disabled');
+                        }
+                    }
+                </script>
+            </div>
+            <div class="nav-right" id="nav-logged-out">
+                <button class="action-btn" onclick="window.location.href='settings.html'"
+                    style="margin-left:10px;">Réglages</button>
+            </div>
+            <div class="nav-right hidden" id="nav-logged-in">
+                <div class="user-info">
+                    <div class="user-stats">
+                        <div><strong id="user-pseudo">Joueur</strong></div>
+                        <div>Score Global: <strong id="user-global-score">0</strong></div>
+                    </div>
+                    <button class="action-btn" onclick="window.location.href='settings.html'"
+                        style="margin-left:10px;">Réglages</button>
+                    <button class="logout-btn" onclick="logout()">Déconnexion</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <!-- SECTION AUTHENTIFICATION -->
+        <section id="auth-section">
+            <div class="auth-container" style="display: none;">
+                <h2 id="auth-title">Connexion</h2>
+                <div id="auth-error" class="error-msg hidden"></div>
+                <form id="auth-form" onsubmit="return false;">
+                    <div class="form-group" id="pseudo-group" style="display:none;">
+                        <label>Pseudo</label>
+                        <input type="text" id="auth-pseudo" placeholder="Ton pseudo">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="auth-email" placeholder="ton@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mot de passe</label>
+                        <input type="password" id="auth-password" placeholder="••••••••" required>
+                    </div>
+                    <button class="auth-btn" id="auth-submit-btn">Se connecter</button>
+                </form>
+                <div class="auth-switch">
+                    <span id="auth-switch-text">Pas encore de compte ? </span>
+                    <a id="auth-switch-link" onclick="toggleAuthMode()">S'inscrire</a>
+                </div>
+            </div>
+        </section>
+        <section id="quiz-section" class="hidden">
+            <div class="quiz-container">
+                <div class="question-box">
+                    <div id="question"></div>
+                </div>
+                <div class="answers-container">
+                    <button class="answer-btn"></button>
+                    <button class="answer-btn"></button>
+                    <button class="answer-btn"></button>
+                    <button class="answer-btn"></button>
+                    <button class="answer-btn"></button>
+                </div>
+                <!-- Leaderboard desktop uniquement -->
+                <div id="chinois-leaderboard-section" class="desktop chinois-leaderboard-section">
+                    <h3 class="leaderboard-title">🏆 Top Chinois</h3>
+                    <div class="chinois-leaderboard-list">
+                        <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+                    </div>
+                </div>
+            </div>
+            <div id="timers-container">
+                <div id="timer-bar-container">
+                    <span>⏱️ Temps restant : <span id="timer">0</span>s</span>
+                    <div id="timer-bar">
+                        <div id="timer-fill"></div>
+                    </div>
+                </div>
+                <div id="question-timer-bar-container">
+                    <span>⚡ Question : <span id="question-timer">0</span>s</span>
+                    <div id="question-timer-bar">
+                        <div id="question-timer-fill"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="score-lives">
+                <div>Score : <span id="score">0</span></div>
+                <div id="lives">❤❤❤</div>
+            </div>
+            <!-- Leaderboard mobile en bas -->
+            <div id="mobile-quiz-ui-row">
+                <div id="chinois-leaderboard-section" class="mobile chinois-leaderboard-section">
+                    <h3 class="leaderboard-title">🏆 Top Chinois</h3>
+                    <div class="chinois-leaderboard-list">
+                        <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+                    </div>
+                </div>
+                <div id="mobile-back-container">
+                    <button id="mobile-back-btn" class="action-btn">←</button>
+                </div>
+            </div>
+        </section>
+        <section id="result-section" class="hidden">
+            <h2>Partie terminée ! 🎉</h2>
+            <div class="result-stats">
+                <h3>Résumé</h3>
+                <p>Score de la partie : <strong id="final-score">0</strong></p>
+                <p>Nouveau score global : <strong id="new-global-score">0</strong></p>
+                <p>Score chinois : <strong id="new-dept-score">0</strong></p>
+                <p>Quiz complétés : <strong id="new-quiz-completed">0</strong></p>
+                <div id="level-up-msg" class="hidden" style="color: #2ecc71; margin-top: 15px; font-weight: bold;">
+                    🎊 NIVEAU SUPÉRIEUR ATTEINT !
+                </div>
+            </div>
+            <button id="restart-btn" class="action-btn">Rejouer</button>
+            <button id="home-btn" class="action-btn">Accueil</button>
+        </section>
+    </main>
+    <div id="hover-warning"></div>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        const firebaseConfig = {
+            apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
+            authDomain: "quiz-master-io.firebaseapp.com",
+            projectId: "quiz-master-io",
+            storageBucket: "quiz-master-io.firebasestorage.app",
+            messagingSenderId: "773382469164",
+            appId: "1:773382469164:web:5e24a9a62ce543f5190389"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        window.auth = auth;
+        window.db = db;
+        window.currentUser = null;
+        // 🔑 Seulement le niveau 1, accès libre
+        function canAccessLevel(level, globalScore) {
+            // Niveau 1 accessible à tous
+            return level === 1;
+        }
+        onAuthStateChanged(auth, async (user) => {
+            const quizSection = document.getElementById('quiz-section');
+            const navLoggedIn = document.getElementById('nav-logged-in');
+            const navLoggedOut = document.getElementById('nav-logged-out');
+            if (user) {
+                window.currentUser = user;
+                quizSection.style.display = "block";
+                navLoggedOut.classList.add('hidden');
+                navLoggedIn.classList.remove('hidden');
+                const userDocRef = doc(db, 'users', user.uid);
+                const userDoc = await getDoc(userDocRef);
+                const pseudoEl = document.getElementById('user-pseudo');
+                const scoreEl = document.getElementById('user-global-score');
+                let globalScore = 0;
+                let quizCompleted = 0;
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    const quizScores = data.quizScores || {};
+                    pseudoEl.textContent = data.pseudo || user.email.split('@')[0];
+                    globalScore = computeGlobalScore(quizScores);
+                    quizCompleted = data.quizCompleted || 0;
+                } else {
+                    pseudoEl.textContent = user.email.split('@')[0];
+                    globalScore = 0;
+                    quizCompleted = 0;
+                }
+                scoreEl.textContent = globalScore;
+                localStorage.setItem('globalScore', globalScore);
+                localStorage.setItem('quizCompleted', quizCompleted);
+                const hash = window.location.hash.substring(1);
+                const level = parseInt(hash) || 1;
+                if (!canAccessLevel(level, globalScore)) {
+                    alert(`Niveau ${level} verrouillé. Seul le niveau 1 est disponible pour ce quiz.`);
+                    window.location.href = 'index.html';
+                    return;
+                }
+                startMode();
+            } else {
+                window.currentUser = null;
+                window.location.href = 'index.html';
+            }
+        });
+        // 🔢 Helper identique à index.html — NE JAMAIS stocker globalScore dans Firestore
+        function computeGlobalScore(quizScores) {
+            const keys = [
+                'departements', 'chinois', 'medecine', 'math', 'anglais',
+                'neerlandais', 'allemand', 'italien', 'espagnol',
+                'geographie', 'animaux'
+            ];
+            return keys.reduce((sum, key) => sum + (quizScores[key] || 0), 0);
+        }
+        // ==========================================
+        // LOGIQUE NIVEAU 1 CHINOIS
+        // ==========================================
+        const digits = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
+        function numberToChinese(n) {
+            if (n <= 10) return ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"][n];
+            if (n < 20) return "十" + digits[n % 10];
+            if (n < 100) {
+                const tens = Math.floor(n / 10);
+                const ones = n % 10;
+                return digits[tens] + "十" + (ones ? digits[ones] : "");
+            }
+            if (n === 100) return "一百";
+            return "";
+        }
+        const type3Questions = [
+            { q: "Combien y a-t-il de continents ?", a: "7" },
+            { q: "Combien y a-t-il d’océans sur Terre ?", a: "5" },
+            { q: "Combien de jours dans une semaine ?", a: "7" },
+            { q: "Combien de minutes dans une heure ?", a: "60" },
+            { q: "Combien de secondes dans une minute ?", a: "60" },
+            { q: "Combien de mois dans une année ?", a: "12" },
+            { q: "Combien de pourcent vaut une moitié ?", a: "50" },
+            { q: "Combien de semaines dans une année scolaire ?", a: "36" },
+            { q: "Combien de jours dans un mois de février non bissextile ?", a: "28" },
+            { q: "Combien de jours dans un mois de février bissextile ?", a: "29" },
+            { q: "Combien d’heures dans une journée ?", a: "24" },
+            { q: "Combien de minutes dans une demi-heure ?", a: "30" },
+            { q: "Combien de secondes dans une demi-minute ?", a: "30" },
+            { q: "Combien de mois ont 31 jours ?", a: "7" },
+            { q: "Combien de mois ont 30 jours ?", a: "4" },
+            { q: "Combien de fuseaux horaires existe-t-il dans le monde ?", a: "24" },
+            { q: "Combien de jours dure une révolution complète de Mercure autour du Soleil ?", a: "88" },
+            { q: "Combien de kilomètres fait un marathon arrondi à l’entier le plus proche ?", a: "42" },
+            { q: "Combien de minutes fait un quart d'heure ?", a: "15" },
+            { q: "Combien de secondes dans une heure arrondie à la centaine la plus proche ?", a: "60" },
+            { q: "Combien de semaines font 3 mois ?", a: "13" },
+            { q: "Combien de jours dure un cycle lunaire complet arrondi ?", a: "30" },
+            { q: "Combien de jours dans 2 mois ?", a: "60" },
+            { q: "Combien de rotations complètes la Lune effectue-t-elle autour de la Terre en un an ?", a: "13" },
+            { q: "Combien de minutes faut-il pour que la lumière du Soleil atteigne la Terre ?", a: "8" },
+            { q: "Combien de joueurs dans une équipe de football ?", a: "11" },
+            { q: "Combien de cartes dans un jeu standard (sans jokers) ?", a: "52" },
+            { q: "Combien de notes dans une octave musicale ?", a: "7" },
+            { q: "Combien d’États aux États-Unis ?", a: "50" },
+            { q: "Combien de planètes dans le système solaire ?", a: "8" }
+        ];
+        function generateRandomOpts(correctAnswer) {
+            const values = new Set();
+            values.add(Number(correctAnswer));
+            while (values.size < 5) {
+                let v = Number(correctAnswer) + Math.floor(Math.random() * 21) - 10;
+                if (v < 0 || v > 100) v = Math.floor(Math.random() * 101);
+                if (!values.has(v)) {
+                    values.add(v);
+                }
+            }
+            const opts = [...values].map(v => ({
+                raw: numberToChinese(v),
+                display: `<span style="font-size: calc(1rem + 3px);">${numberToChinese(v)}</span>`
+            }));
+            return opts;
+        }
+        function generateType3RndOpts(correct) {
+            const values = new Set();
+            values.add(correct);
+            while (values.size < 5) {
+                let v = correct + Math.floor(Math.random() * 11) - 5;
+                if (v < 0 || v > 100) v = Math.floor(Math.random() * 101);
+                if (!values.has(v)) {
+                    values.add(v);
+                }
+            }
+            return [...values].map(v => ({
+                raw: numberToChinese(v),
+                display: `<span style="font-size: calc(1rem + 3px);">${numberToChinese(v)}</span>`
+            }));
+        }
+        function generateRandomQuestion() {
+            const type = Math.floor(Math.random() * 4) + 1;
+            if (type === 1) {
+                const n = Math.floor(Math.random() * 100) + 1;
+                const correct = numberToChinese(n);
+                const wrongSet = new Set();
+                while (wrongSet.size < 4) {
+                    const r = Math.floor(Math.random() * 100) + 1;
+                    const ch = numberToChinese(r);
+                    if (ch !== correct) {
+                        wrongSet.add(ch);
+                    }
+                }
+                const opts = [correct, ...wrongSet];
+                const shuffled = opts.sort(() => Math.random() - 0.5);
+                return {
+                    q: `Quel est le caractère pour <br><span style="font-size:4rem;font-weight:800;display:block;">${n}</span> ?`,
+                    a: correct,
+                    opts: shuffled.map(char => ({
+                        raw: char,
+                        display: `<span style="font-size: calc(1rem + 3px);">${char}</span>`
+                    }))
+                };
+            }
+            if (type === 2) {
+                let a = Math.floor(Math.random() * 100) + 1;
+                let b = Math.floor(Math.random() * 100) + 1;
+                if (b > a) [a, b] = [b, a];
+                const result = a - b;
+                const displayA = Math.random() > 0.5 ? String(a) : numberToChinese(a);
+                const displayB = Math.random() > 0.5 ? String(b) : numberToChinese(b);
+                const optObjects = generateRandomOpts(result);
+                const correctStr = numberToChinese(result);
+                // Filtrer les mauvaises réponses et s'assurer qu'elles ne contiennent pas la bonne
+                const wrongOpts = optObjects
+                    .filter(opt => opt.raw !== correctStr)
+                    .slice(0, 4);
+                const allOpts = [correctStr, ...wrongOpts.map(opt => opt.raw)];
+                // Mélange garanti sans doublons
+                const shuffled = [...new Set(allOpts)].sort(() => Math.random() - 0.5);
+                return {
+                    q: `${displayA} − ${displayB} = ?`,
+                    a: correctStr,
+                    opts: shuffled.map(v => ({
+                        raw: v,
+                        display: `<span style="font-size: calc(1rem + 3px);">${v}</span>`
+                    }))
+                };
+            }
+            if (type === 3) {
+                const item = type3Questions[Math.floor(Math.random() * type3Questions.length)];
+                const correct = Number(item.a);
+                const optObjects = generateType3RndOpts(correct);
+                const correctStr = numberToChinese(correct);
+                const wrongOpts = optObjects
+                    .filter(opt => opt.raw !== correctStr)
+                    .slice(0, 4);
+                const allOpts = [correctStr, ...wrongOpts.map(opt => opt.raw)];
+                const shuffled = [...new Set(allOpts)].sort(() => Math.random() - 0.5);
+                return {
+                    q: item.q,
+                    a: correctStr,
+                    opts: shuffled.map(v => ({
+                        raw: v,
+                        display: `<span style="font-size: calc(1rem + 3px);">${v}</span>`
+                    }))
+                };
+            }
+            if (type === 4) {
+                const n = Math.floor(Math.random() * 100) + 1;
+                const ch = numberToChinese(n);
+                const wrongSet = new Set();
+                while (wrongSet.size < 4) {
+                    const r = Math.floor(Math.random() * 100) + 1;
+                    if (r !== n) {
+                        wrongSet.add(numberToChinese(r));
+                    }
+                }
+                const opts = [numberToChinese(n), ...wrongSet];
+                const shuffled = opts.sort(() => Math.random() - 0.5);
+                return {
+                    q: `Quel est ce caractère : <br><span style="font-size:4rem;font-weight:800;display:block;">${ch}</span>`,
+                    a: numberToChinese(n),
+                    opts: shuffled.map(v => ({
+                        raw: v,
+                        display: `<span style="font-size: calc(1rem + 3px);">${v}</span>`
+                    }))
+                };
+            }
+        }
+        // Mode unique : niveau 1
+        const mode = { time: 60, qTime: 5, lives: 3 };
+        let score = 0, lives = 0, timeLeft = 0, qTime = 0;
+        let timerInterval = null, qTimerInterval = null, awaitingNext = false;
+        let previousQuestions = [];
+        let currentQuestionData;
+        let isAuthMode = 'login';
+        // 👇 Ajout du flag pour empêcher le double enregistrement
+        let gameCompleted = false;
+        const authSection = document.getElementById('auth-section');
+        const quizSection = document.getElementById('quiz-section');
+        const resultSection = document.getElementById('result-section');
+        const restartBtn = document.getElementById('restart-btn');
+        const homeBtn = document.getElementById('home-btn');
+        const backBtn = document.getElementById('back-btn');
+        const mobileBackBtn = document.getElementById('mobile-back-btn');
+        const answerBtns = document.querySelectorAll('.answer-btn');
+        const questionBox = document.getElementById('question');
+        const scoreDisplay = document.getElementById('score');
+        const livesDisplay = document.getElementById('lives');
+        const timerDisplay = document.getElementById('timer');
+        const qTimerDisplay = document.getElementById('question-timer');
+        const timerFill = document.getElementById('timer-fill');
+        const qTimerFill = document.getElementById('question-timer-fill');
+        function updateQuizHeaderVisibility(isQuizActive) {
+            if (window.innerWidth <= 899) {
+                document.body.classList.toggle('quiz-active', isQuizActive);
+                mobileBackBtn.classList.toggle('hidden', !isQuizActive);
+            } else {
+                mobileBackBtn.classList.add('hidden');
+            }
+        }
+        async function saveCurrentScore() {
+            // 🔒 Bloquer la sauvegarde si la partie est terminée
+            if (!window.currentUser || score <= 0 || gameCompleted) return;
+            try {
+                const userDocRef = doc(db, 'users', currentUser.uid);
+                const userDoc = await getDoc(userDocRef);
+                let userData = userDoc.data();
+                const defaultQuizScores = {
+                    departements: 0,
+                    chinois: 0,
+                    medecine: 0,
+                    math: 0,
+                    anglais: 0,
+                    neerlandais: 0,
+                    allemand: 0,
+                    italien: 0,
+                    espagnol: 0,
+                    geographie: 0,
+                    animaux: 0
+                };
+                if (!userData) {
+                    userData = {
+                        pseudo: currentUser.email.split('@')[0],
+                        email: currentUser.email,
+                        quizScores: defaultQuizScores,
+                        quizCompleted: 0,
+                        createdAt: new Date().toISOString()
+                    };
+                    await setDoc(userDocRef, userData);
+                }
+                const quizScores = { ...(userData.quizScores || defaultQuizScores) };
+                const oldDeptScore = quizScores.chinois || 0;
+                const newDeptScore = oldDeptScore + score;
+                quizScores.chinois = newDeptScore;
+                const newGlobalScore = computeGlobalScore(quizScores);
+                await updateDoc(userDocRef, { quizScores });
+                localStorage.setItem('globalScore', newGlobalScore);
+                document.getElementById('user-global-score').textContent = newGlobalScore;
+                updateBaseBtnVisibility(newGlobalScore);
+            } catch (error) {
+                console.error('Erreur sauvegarde scores au retour:', error);
+            }
+        }
+        backBtn.onclick = async function () {
+            await saveCurrentScore();
+            stopAllTimers();
+            quizSection.classList.add('hidden');
+            window.location.href = 'index.html';
+        };
+        mobileBackBtn.onclick = backBtn.onclick;
+        function startMode() {
+            stopAllTimers();
+            score = 0;
+            lives = mode.lives;
+            timeLeft = mode.time;
+            qTime = mode.qTime;
+            awaitingNext = false;
+            previousQuestions = [];
+            updateLives();
+            scoreDisplay.textContent = score;
+            authSection.classList.add('hidden');
+            resultSection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
+            updateQuizHeaderVisibility(true);
+            loadChinoisLeaderboard();
+            generateQuestion();
+            startMainTimer();
+            window.scrollTo(0, 0);
+        }
+        function generateQuestion() {
+            if (awaitingNext) return;
+            const qData = generateRandomQuestion();
+            currentQuestionData = qData;
+            qTime = mode.qTime;
+            qTimerDisplay.textContent = qTime.toFixed(1);
+            qTimerFill.style.width = '100%';
+            questionBox.innerHTML = qData.q;
+            // --- ASSURER EXACTEMENT 1 BONNE RÉPONSE ET 4 MAUVAISES ---
+            const opts = qData.opts.slice(0, 5);
+            // Vérifier et forcer unicité
+            const seen = new Set();
+            const filteredOpts = [];
+            for (const opt of opts) {
+                if (!seen.has(opt.raw)) {
+                    seen.add(opt.raw);
+                    filteredOpts.push(opt);
+                }
+            }
+            // Si la bonne réponse n'est pas présente, l'insérer
+            if (!filteredOpts.some(opt => opt.raw === qData.a)) {
+                if (filteredOpts.length >= 5) {
+                    filteredOpts[4] = {
+                        raw: qData.a,
+                        display: `<span style="font-size: calc(1rem + 3px);">${qData.a}</span>`
+                    };
+                } else {
+                    filteredOpts.push({
+                        raw: qData.a,
+                        display: `<span style="font-size: calc(1rem + 3px);">${qData.a}</span>`
+                    });
+                }
+            }
+            // Tronquer à 5 max
+            const finalOpts = filteredOpts.slice(0, 5);
+            // Supprimer toute autre occurrence de la bonne réponse
+            let finalUnique = [finalOpts[0]];
+            for (let i = 1; i < finalOpts.length; i++) {
+                if (finalOpts[i].raw !== qData.a || !finalUnique.some(opt => opt.raw === qData.a)) {
+                    finalUnique.push(finalOpts[i]);
+                }
+            }
+            // Si on a encore trop peu d'options, compléter
+            while (finalUnique.length < 5) {
+                let candidate;
+                do {
+                    candidate = numberToChinese(Math.floor(Math.random() * 100) + 1);
+                } while (seen.has(candidate) || candidate === qData.a);
+                seen.add(candidate);
+                finalUnique.push({
+                    raw: candidate,
+                    display: `<span style="font-size: calc(1rem + 3px);">${candidate}</span>`
+                });
+            }
+            finalUnique = finalUnique.slice(0, 5);
+            // Mélanger
+            for (let i = finalUnique.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [finalUnique[i], finalUnique[j]] = [finalUnique[j], finalUnique[i]];
+            }
+            // S'assurer qu'il n'y a qu'une seule bonne réponse
+            let hasCorrect = false;
+            for (let i = 0; i < finalUnique.length; i++) {
+                if (finalUnique[i].raw === qData.a) {
+                    if (hasCorrect) {
+                        // Remplacer le doublon
+                        let rep;
+                        do {
+                            rep = numberToChinese(Math.floor(Math.random() * 100) + 1);
+                        } while (rep === qData.a || finalUnique.some(opt => opt.raw === rep));
+                        finalUnique[i] = {
+                            raw: rep,
+                            display: `<span style="font-size: calc(1rem + 3px);">${rep}</span>`
+                        };
+                    } else {
+                        hasCorrect = true;
+                    }
+                }
+            }
+            // Appliquer aux boutons
+            answerBtns.forEach((btn, i) => {
+                if (i < 5) {
+                    btn.innerHTML = finalUnique[i].display;
+                    btn.dataset.value = finalUnique[i].raw;
+                    btn.disabled = false;
+                    btn.classList.remove("correct", "incorrect");
+                    btn.onclick = () => handleAnswer(finalUnique[i].raw);
+                    btn.style.display = '';
+                } else {
+                    btn.style.display = 'none';
+                }
+            });
+            setTimeout(() => {
+                if (!awaitingNext) {
+                    startQTimer();
+                }
+            }, 100);
+        }
+        function handleAnswer(selected) {
+            if (awaitingNext) return;
+            awaitingNext = true;
+            clearInterval(qTimerInterval);
+            answerBtns.forEach(btn => {
+                btn.disabled = true;
+                if (btn.dataset.value === currentQuestionData.a) {
+                    btn.classList.add("correct");
+                }
+                if (btn.dataset.value === selected && selected !== currentQuestionData.a) {
+                    btn.classList.add("incorrect");
+                }
+            });
+            if (selected === currentQuestionData.a) {
+                score++;
+            } else {
+                if (lives > 0) {
+                    lives--;
+                }
+            }
+            updateLives();
+            scoreDisplay.textContent = score;
+            setTimeout(() => {
+                awaitingNext = false;
+                if (lives <= 0) {
+                    endGame();
+                } else {
+                    generateQuestion();
+                }
+            }, 1000);
+        }
+        function updateLives() {
+            const safeLives = Math.max(0, lives);
+            const maxLives = mode.lives;
+            livesDisplay.textContent = '❤'.repeat(safeLives) + '♡'.repeat(Math.max(0, maxLives - safeLives));
+        }
+        function startMainTimer() {
+            timerDisplay.textContent = timeLeft;
+            timerFill.style.width = '100%';
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                timerFill.style.width = (timeLeft / mode.time * 100) + '%';
+                if (timeLeft <= 5) timerFill.style.background = '#dc3545';
+                else if (timeLeft <= 10) timerFill.style.background = '#ffa500';
+                else timerFill.style.background = '#9c28a7ff';
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endGame();
+                }
+            }, 1000);
+        }
+        function startQTimer() {
+            clearInterval(qTimerInterval);
+            const qStartTime = mode.qTime;
+            qTime = qStartTime;
+            qTimerInterval = setInterval(() => {
+                qTime -= 0.1;
+                qTimerDisplay.textContent = qTime.toFixed(1);
+                const percent = Math.max(0, qTime / qStartTime) * 100;
+                qTimerFill.style.width = percent + '%';
+                if (qTime <= 0) {
+                    clearInterval(qTimerInterval);
+                    handleAnswer('');
+                }
+            }, 100);
+        }
+        async function endGame() {
+            // 🔒 Empêcher les appels multiples
+            if (gameCompleted) return;
+            gameCompleted = true;
+            quizSection.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+            updateQuizHeaderVisibility(false);
+            document.getElementById('final-score').textContent = score;
+            stopAllTimers();
+            window.scrollTo(0, 0);
+            try {
+                if (!window.currentUser) throw new Error('Utilisateur non connecté');
+                const userDocRef = doc(db, 'users', currentUser.uid);
+                const userDoc = await getDoc(userDocRef);
+                let userData = userDoc.data();
+                const defaultQuizScores = {
+                    departements: 0,
+                    chinois: 0,
+                    medecine: 0,
+                    math: 0,
+                    anglais: 0,
+                    neerlandais: 0,
+                    allemand: 0,
+                    italien: 0,
+                    espagnol: 0,
+                    geographie: 0,
+                    animaux: 0
+                };
+                if (!userData) {
+                    userData = {
+                        pseudo: currentUser.email.split('@')[0],
+                        email: currentUser.email,
+                        quizScores: defaultQuizScores,
+                        quizCompleted: 0,
+                        createdAt: new Date().toISOString()
+                    };
+                    await setDoc(userDocRef, userData);
+                }
+                const quizScores = { ...(userData.quizScores || defaultQuizScores) };
+                const oldDeptScore = quizScores.chinois || 0;
+                const newDeptScore = oldDeptScore + score;
+                quizScores.chinois = newDeptScore;
+                const newGlobalScore = computeGlobalScore(quizScores);
+                let quizCompleted = userData.quizCompleted || 0;
+                if (lives > 0) {
+                    quizCompleted += 1;
+                }
+                await updateDoc(userDocRef, { quizScores, quizCompleted });
+                localStorage.setItem('globalScore', newGlobalScore);
+                localStorage.setItem('quizCompleted', quizCompleted);
+                document.getElementById('new-global-score').textContent = newGlobalScore;
+                document.getElementById('new-dept-score').textContent = newDeptScore;
+                document.getElementById('new-quiz-completed').textContent = quizCompleted;
+                const oldLevel = Math.floor(oldDeptScore / 50);
+                const newLevel = Math.floor(newDeptScore / 50);
+                if (newLevel > oldLevel) {
+                    document.getElementById('level-up-msg').classList.remove('hidden');
+                } else {
+                    document.getElementById('level-up-msg').classList.add('hidden');
+                }
+                updateBaseBtnVisibility(newGlobalScore);
+            } catch (error) {
+                console.error('Erreur sauvegarde scores:', error);
+                alert('Erreur lors de la sauvegarde des scores. Connectez-vous à nouveau.');
+            }
+        }
+        function stopAllTimers() {
+            clearInterval(timerInterval);
+            clearInterval(qTimerInterval);
+        }
+        restartBtn.onclick = () => {
+            gameCompleted = false;
+            startMode();
+        };
+        homeBtn.onclick = async function () {
+            await saveCurrentScore();
+            stopAllTimers();
+            resultSection.classList.add('hidden');
+            window.location.href = 'index.html';
+        };
+        window.toggleAuthMode = function () {
+            isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
+            const title = document.getElementById('auth-title');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const switchText = document.getElementById('auth-switch-text');
+            const switchLink = document.getElementById('auth-switch-link');
+            const pseudoGroup = document.getElementById('pseudo-group');
+            if (isAuthMode === 'signup') {
+                title.textContent = 'Inscription';
+                submitBtn.textContent = "S'inscrire";
+                switchText.textContent = 'Déjà un compte ? ';
+                switchLink.textContent = 'Se connecter';
+                pseudoGroup.style.display = 'block';
+            } else {
+                title.textContent = 'Connexion';
+                submitBtn.textContent = 'Se connecter';
+                switchText.textContent = "Pas encore de compte ? ";
+                switchLink.textContent = "S'inscrire";
+                pseudoGroup.style.display = 'none';
+            }
+        };
+        document.getElementById('auth-submit-btn').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const pseudo = document.getElementById('auth-pseudo').value;
+            const errorDiv = document.getElementById('auth-error');
+            errorDiv.classList.add('hidden');
+            try {
+                if (isAuthMode === 'signup') {
+                    if (!pseudo || pseudo.trim().length < 3) {
+                        throw new Error('Le pseudo doit contenir au moins 3 caractères');
+                    }
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    const defaultQuizScores = {
+                        departements: 0,
+                        chinois: 0,
+                        medecine: 0,
+                        math: 0,
+                        anglais: 0,
+                        neerlandais: 0,
+                        allemand: 0,
+                        italien: 0,
+                        espagnol: 0,
+                        geographie: 0,
+                        animaux: 0
+                    };
+                    await setDoc(doc(db, 'users', user.uid), {
+                        pseudo: pseudo.trim(),
+                        email: email,
+                        quizScores: defaultQuizScores,
+                        quizCompleted: 0,
+                        createdAt: new Date().toISOString()
+                    });
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                }
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+            }
+        });
+        window.logout = async function () {
+            await signOut(auth);
+            window.location.href = 'index.html';
+        };
+        async function loadChinoisLeaderboard() {
+            const mobileList = document.querySelector('#chinois-leaderboard-section.mobile .chinois-leaderboard-list');
+            const desktopList = document.querySelector('#chinois-leaderboard-section.desktop .chinois-leaderboard-list');
+            const placeholder = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
+            if (mobileList) mobileList.innerHTML = placeholder;
+            if (desktopList) desktopList.innerHTML = placeholder;
+            try {
+                const q = query(collection(db, 'users'), orderBy('quizScores.chinois', 'desc'), limit(10));
+                const querySnapshot = await getDocs(q);
+                let rank = 1;
+                let html = '';
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data() || {};
+                    const pseudo = data.pseudo || 'Anonyme';
+                    const score = data.quizScores?.chinois || 0;
+                    let medal = '';
+                    if (rank === 1) medal = '🥇';
+                    else if (rank === 2) medal = '🥈';
+                    else if (rank === 3) medal = '🥉';
+                    html += `<div class="leaderboard-item"><div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${pseudo}</div><div class="leaderboard-score">${score}</div></div>`;
+                    rank++;
+                });
+                const finalHtml = html || '<div style="text-align: center; opacity: 0.6;">Aucun joueur</div>';
+                if (mobileList) mobileList.innerHTML = finalHtml;
+                if (desktopList) desktopList.innerHTML = finalHtml;
+            } catch (error) {
+                console.error('Erreur loadChinoisLeaderboard:', error);
+                const errorMsg = '<div style="text-align: center; opacity: 0.6;">Erreur de chargement</div>';
+                if (mobileList) mobileList.innerHTML = errorMsg;
+                if (desktopList) desktopList.innerHTML = errorMsg;
+            }
+        }
+        // Initialiser le bouton base avec la valeur par défaut
+        updateBaseBtnVisibility(0);
+    </script>
+</body>
+</html>
+
