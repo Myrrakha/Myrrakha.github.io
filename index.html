@@ -91,6 +91,7 @@
             font-size: 16px;
             font-weight: 600;
             padding: 0;
+            text-decoration: none; /* 🔧 Supprime la ligne de soulignement pour les <a> */
         }
         .glass-btn:hover {
             background: rgba(255, 255, 255, 0.18);
@@ -411,8 +412,8 @@
             </div>
             <div class="nav-right hidden" id="nav-logged-in">
                 <div class="user-info">
-                    <button class="glass-btn" title="Statistiques" onclick="navigateTo('statistiques.html')">📊</button>
-                    <button class="glass-btn" title="Réglages" onclick="navigateTo('settings.html')">⚙️</button>
+                    <a href="statistiques.html" class="glass-btn" title="Statistiques">📊</a>
+                    <a href="settings.html" class="glass-btn" title="Réglages">⚙️</a>
                     <button class="glass-btn logout" id="logout-btn" title="Déconnexion">🚪</button>
                 </div>
             </div>
@@ -578,12 +579,10 @@
         const requiredModeUnlock = { 2: 10, 3: 30, 4: 60, 5: 90, 6: 125 };
         let isAuthMode = 'login';
         let authCheckComplete = false;
-
         // ✅ Fonction de navigation sûre (sans eval)
         function navigateTo(url) {
             window.location.href = url;
         }
-
         // Initial rendering for all users (connected or not)
         renderLevels('departements', 0);
         renderLevels('anglais', 0);
