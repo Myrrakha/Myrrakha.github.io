@@ -577,6 +577,10 @@
             const required = levelRequirements[level];
             return globalScore >= required;
         }
+
+        // 👇 Ajout du flag pour empêcher le double enregistrement
+        let gameCompleted = false;
+
         onAuthStateChanged(auth, async (user) => {
             const quizSection = document.getElementById('quiz-section');
             const navLoggedIn = document.getElementById('nav-logged-in');
@@ -764,7 +768,8 @@
             }
         }
         async function saveCurrentScore() {
-            if (!window.currentUser || score <= 0) return;
+            // 🔒 Bloquer la sauvegarde si la partie est terminée
+            if (!window.currentUser || score <= 0 || gameCompleted) return;
             try {
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
@@ -896,7 +901,6 @@
                 btn.classList.remove("correct", "incorrect");
                 btn.onclick = () => handleAnswer(options[i]);
             });
-
             // Ajouter un petit délai avant de démarrer le timer de question
             setTimeout(() => {
                 if (!awaitingNext) {
@@ -958,7 +962,6 @@
             // Store initial question time for reference
             const qStartTime = modes[currentMode].qTime;
             qTime = qStartTime;
-
             qTimerInterval = setInterval(() => {
                 qTime -= 0.1;
                 // Round to 1 decimal for display
@@ -966,7 +969,6 @@
                 // Update width based on actual elapsed time vs start time
                 const percent = Math.max(0, qTime / qStartTime) * 100;
                 qTimerFill.style.width = percent + '%';
-
                 if (qTime <= 0) {
                     clearInterval(qTimerInterval);
                     handleAnswer('');
@@ -974,6 +976,10 @@
             }, 100); // Fire every 100ms = 0.1s
         }
         async function endGame() {
+            // 🔒 Empêcher les appels multiples
+            if (gameCompleted) return;
+            gameCompleted = true;
+
             quizSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
             updateQuizHeaderVisibility(false);
@@ -1042,6 +1048,7 @@
         }
         restartBtn.onclick = startMode;
         homeBtn.onclick = async function () {
+            // Même si on appelle saveCurrentScore(), il sera bloqué si gameCompleted === true
             await saveCurrentScore();
             stopAllTimers();
             resultSection.classList.add('hidden');
