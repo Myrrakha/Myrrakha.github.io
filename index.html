@@ -651,10 +651,6 @@
                             <div class="levels-dropdown" id="anglais-dropdown">
                                 <div class="levels-grid-dropdown" id="anglais-levels"></div>
                             </div>
-                            <!-- Bouton spécifique pour Anglais N2 -->
-                            <button id="anglais-n2-btn" style="margin-top: 12px; padding: 6px 12px; background: #444; color: #aaa; border: none; border-radius: 6px; cursor: not-allowed;" disabled>
-                                Accès Niveau 2
-                            </button>
                         </div>
                         <div class="stat-card" id="neerlandais-card">
                             <h3>🇳🇱 Quiz Néerlandais</h3>
@@ -800,18 +796,15 @@
         const requiredModeUnlock = { 2: 10, 3: 30, 4: 60, 5: 90, 6: 125 };
         let isAuthMode = 'login';
         let authCheckComplete = false;
-
         // === Optimized Firebase caching logic ===
         const CACHE_DURATION_MS = 4 * 60 * 60 * 1000; // 4 hours
         let scoresCache = null;
         let lastFetchTime = 0;
-
         async function fetchAndCacheScores() {
             const now = Date.now();
             if (scoresCache && now - lastFetchTime < CACHE_DURATION_MS) {
                 return scoresCache;
             }
-
             try {
                 const usersSnapshot = await getDocs(collection(db, 'users'));
                 const players = {};
@@ -824,7 +817,6 @@
                         players[pseudo][theme] = score;
                     }
                 });
-
                 scoresCache = players;
                 lastFetchTime = now;
                 return players;
@@ -833,7 +825,6 @@
                 return scoresCache || {};
             }
         }
-
         async function getRanking(theme) {
             const players = await fetchAndCacheScores();
             return Object.entries(players)
@@ -843,6 +834,91 @@
                 }))
                 .sort((a, b) => b.score - a.score)
                 .slice(0, 10);
+        }
+        // === Local leaderboard persistence ===
+        const LEADERBOARD_LOCAL_KEY = 'cachedLeaderboard';
+        const LEADERBOARD_CACHE_DURATION = 4 * 60 * 60 * 1000; // 4h
+
+        function saveLeaderboardToLocal(cachedData) {
+            try {
+                const payload = {
+                    timestamp: Date.now(),
+                    data: cachedData
+                };
+                localStorage.setItem(LEADERBOARD_LOCAL_KEY, JSON.stringify(payload));
+            } catch (e) {
+                console.warn('Impossible de sauvegarder le leaderboard en local', e);
+            }
+        }
+
+        function getLeaderboardFromLocal() {
+            try {
+                const raw = localStorage.getItem(LEADERBOARD_LOCAL_KEY);
+                if (!raw) return null;
+                const payload = JSON.parse(raw);
+                if (Date.now() - payload.timestamp > LEADERBOARD_CACHE_DURATION) {
+                    localStorage.removeItem(LEADERBOARD_LOCAL_KEY);
+                    return null;
+                }
+                return payload.data;
+            } catch (e) {
+                console.warn('Impossible de lire le leaderboard local', e);
+                return null;
+            }
+        }
+
+        async function loadLeaderboard() {
+            const leaderboardList = document.getElementById('leaderboard-list');
+            const mobileGlobal = document.getElementById('mobile-leaderboard-global');
+            const mobileSeason = document.getElementById('mobile-leaderboard-season');
+
+            // Tentative de récupération depuis le cache Firebase (via getRanking)
+            let top10 = null;
+            try {
+                const globalTop = await getRanking('globalScore');
+                top10 = globalTop.length > 0 ? globalTop : null;
+                if (top10) {
+                    saveLeaderboardToLocal(top10); // sauvegarde réussie → on met à jour le local
+                }
+            } catch (error) {
+                console.error('Erreur Firebase lors du chargement du leaderboard:', error);
+                top10 = null;
+            }
+
+            // Fallback local si nécessaire
+            if (!top10) {
+                top10 = getLeaderboardFromLocal();
+            }
+
+            // Fonction réutilisable pour générer le HTML d’un item
+            const renderLeaderboardItem = (item, index) => {
+                const rank = index + 1;
+                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+                const li = document.createElement('div');
+                li.className = 'leaderboard-item';
+                li.innerHTML = `<div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${item.name}</div><div class="leaderboard-score">${item.score}</div>`;
+                return li;
+            };
+
+            // Mise à jour desktop
+            if (top10 && top10.length > 0) {
+                leaderboardList.innerHTML = '';
+                top10.forEach((item, i) => leaderboardList.appendChild(renderLeaderboardItem(item, i)));
+            } else {
+                leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
+            }
+
+            // Mise à jour mobile (uniquement si mobile)
+            if (window.matchMedia("(max-width: 899px)").matches) {
+                document.getElementById('mobile-leaderboard-carousel').classList.remove('hidden');
+                if (top10 && top10.length > 0) {
+                    mobileGlobal.innerHTML = '';
+                    top10.forEach((item, i) => mobileGlobal.appendChild(renderLeaderboardItem(item, i)));
+                } else {
+                    mobileGlobal.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur</div>';
+                }
+                mobileSeason.innerHTML = '<div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>';
+            }
         }
 
         // === Existing UI logic ===
@@ -1211,57 +1287,6 @@
                 await loadLeaderboard();
             }
         });
-        async function loadLeaderboard() {
-            const leaderboardList = document.getElementById('leaderboard-list');
-            leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
-            try {
-                const globalTop = await getRanking('globalScore');
-                const top10 = globalTop.length > 0 ? globalTop : [];
-
-                // Desktop
-                if (top10.length === 0) {
-                    leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
-                } else {
-                    leaderboardList.innerHTML = '';
-                    top10.forEach((item, index) => {
-                        const rank = index + 1;
-                        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
-                        const li = document.createElement('div');
-                        li.className = 'leaderboard-item';
-                        li.innerHTML = `<div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${item.name}</div><div class="leaderboard-score">${item.score}</div>`;
-                        leaderboardList.appendChild(li);
-                    });
-                }
-
-                // Mobile
-                if (window.matchMedia("(max-width: 899px)").matches) {
-                    document.getElementById('mobile-leaderboard-carousel').classList.remove('hidden');
-                    const globalList = document.getElementById('mobile-leaderboard-global');
-                    if (top10.length === 0) {
-                        globalList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur</div>';
-                    } else {
-                        globalList.innerHTML = '';
-                        top10.forEach((item, index) => {
-                            const rank = index + 1;
-                            const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
-                            const li = document.createElement('div');
-                            li.className = 'leaderboard-item';
-                            li.innerHTML = `<div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${item.name}</div><div class="leaderboard-score">${item.score}</div>`;
-                            globalList.appendChild(li);
-                        });
-                    }
-                    const seasonList = document.getElementById('mobile-leaderboard-season');
-                    seasonList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>';
-                }
-            } catch (error) {
-                console.error('Erreur loadLeaderboard:', error);
-                leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Erreur de chargement</div>';
-                if (window.matchMedia("(max-width: 899px)").matches) {
-                    document.getElementById('mobile-leaderboard-global').innerHTML = '<div style="text-align: center; opacity: 0.6;">Erreur</div>';
-                    document.getElementById('mobile-leaderboard-season').innerHTML = '<div style="text-align: center; opacity: 0.6;">Erreur</div>';
-                }
-            }
-        }
         async function loadUserData() {
             try {
                 const userDocRef = doc(db, 'users', currentUser.uid);
@@ -1345,7 +1370,6 @@
                 console.error('Erreur chargement données:', error);
             }
         }
-
         document.getElementById('auth-modal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('auth-modal')) {
                 hideAuthModal();

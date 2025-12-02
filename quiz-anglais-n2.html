@@ -362,10 +362,8 @@
         window.db = db;
         window.currentUser = null;
 
-        // Simplified global score logic: only globalScore and anglais
-        function computeGlobalScore(quizScores) {
-            return (quizScores?.anglais || 0);
-        }
+        // On conserve la logique simplifiée, mais on ne reset plus globalScore à 0
+        // Et on lit directement globalScore (via localStorage ou Firebase) sans le forcer à quizScores.anglais
 
         const mode = { time: 60, qTime: 5, lives: 3 };
         const irregularVerbs = [
@@ -564,7 +562,6 @@
         const qTimerDisplay = document.getElementById('question-timer');
         const timerFill = document.getElementById('timer-fill');
         const qTimerFill = document.getElementById('question-timer-fill');
-
         function updateQuizHeaderVisibility(isQuizActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('quiz-active', isQuizActive);
@@ -573,7 +570,6 @@
                 mobileBackBtn.classList.add('hidden');
             }
         }
-
         async function saveCurrentScore() {
             if (!window.currentUser || score <= 0 || gameCompleted) return;
             try {
@@ -603,7 +599,6 @@
                 console.error('Erreur sauvegarde partielle:', error);
             }
         }
-
         backBtn.onclick = async function () {
             await saveCurrentScore();
             stopAllTimers();
@@ -611,7 +606,6 @@
             window.location.href = 'index.html';
         };
         mobileBackBtn.onclick = backBtn.onclick;
-
         function generateRandomQuestion() {
             const questionType = Math.floor(Math.random() * 4);
             if (questionType === 0) {
@@ -686,7 +680,6 @@
                 return { q: question, a: correctAnswer, opts: options };
             }
         }
-
         function startMode() {
             stopAllTimers();
             score = 0;
@@ -703,7 +696,6 @@
             generateQuestion();
             startMainTimer();
         }
-
         function generateQuestion() {
             if (awaitingNext) return;
             const qData = generateRandomQuestion();
@@ -729,7 +721,6 @@
                 if (!awaitingNext) startQTimer();
             }, 100);
         }
-
         function handleAnswer(selected) {
             if (awaitingNext) return;
             awaitingNext = true;
@@ -756,13 +747,11 @@
                 else generateQuestion();
             }, 1000);
         }
-
         function updateLives() {
             const safeLives = Math.max(0, lives);
             const maxLives = mode.lives;
             livesDisplay.textContent = '❤'.repeat(safeLives) + '♡'.repeat(Math.max(0, maxLives - safeLives));
         }
-
         function startMainTimer() {
             timerDisplay.textContent = timeLeft;
             timerFill.style.width = '100%';
@@ -780,7 +769,6 @@
                 }
             }, 1000);
         }
-
         function startQTimer() {
             clearInterval(qTimerInterval);
             const qStartTime = mode.qTime;
@@ -796,7 +784,6 @@
                 }
             }, 100);
         }
-
         async function endGame() {
             if (gameCompleted) return;
             gameCompleted = true;
@@ -842,12 +829,10 @@
                 alert('Erreur lors de la sauvegarde.');
             }
         }
-
         function stopAllTimers() {
             clearInterval(timerInterval);
             clearInterval(qTimerInterval);
         }
-
         const restartBtn = document.getElementById('restart-btn');
         const homeBtn = document.getElementById('home-btn');
         restartBtn.onclick = () => {
@@ -860,12 +845,10 @@
             resultSection.classList.add('hidden');
             window.location.href = 'index.html';
         };
-
         window.logout = async function () {
             await signOut(auth);
             window.location.href = 'index.html';
         };
-
         async function loadLeaderboard() {
             const mobileList = document.querySelector('#leaderboard-section.mobile .leaderboard-list');
             const desktopList = document.querySelector('#leaderboard-section.desktop .leaderboard-list');
@@ -899,8 +882,8 @@
                 if (desktopList) desktopList.innerHTML = errorMsg;
             }
         }
-
         // 🔑 Vérifie que l'utilisateur a au moins 100 points de score global
+        // Lit globalScore depuis localStorage ou depuis Firebase sans forcer à quizScores.anglais
         onAuthStateChanged(auth, async (user) => {
             const navLoggedIn = document.getElementById('nav-logged-in');
             if (user) {
@@ -909,18 +892,24 @@
                 const userDoc = await getDoc(userDocRef);
                 const pseudoEl = document.getElementById('user-pseudo');
                 const scoreEl = document.getElementById('user-global-score');
-                let globalScore = 0;
-                if (userDoc.exists()) {
+
+                // 1. Essayer localStorage d'abord
+                let globalScore = parseInt(localStorage.getItem('globalScore')) || 0;
+
+                // 2. Si pas en local, charger depuis Firebase
+                if (globalScore === 0 && userDoc.exists()) {
                     const data = userDoc.data();
                     const quizScores = data.quizScores || {};
-                    pseudoEl.textContent = data.pseudo || user.email.split('@')[0];
+                    // On garde globalScore = quizScores.anglais uniquement pour init
                     globalScore = quizScores.anglais || 0;
-                } else {
-                    pseudoEl.textContent = user.email.split('@')[0];
-                    globalScore = 0;
+                    localStorage.setItem('globalScore', globalScore);
                 }
+
+                pseudoEl.textContent = userDoc.exists()
+                    ? (userDoc.data().pseudo || user.email.split('@')[0])
+                    : user.email.split('@')[0];
+
                 scoreEl.textContent = globalScore;
-                localStorage.setItem('globalScore', globalScore);
                 navLoggedIn.classList.remove('hidden');
 
                 if (globalScore < 100) {
@@ -928,6 +917,7 @@
                     window.location.href = 'index.html';
                     return;
                 }
+
                 startMode();
             } else {
                 window.location.href = 'index.html';

@@ -406,24 +406,7 @@
             <div class="nav-left">
                 <span class="nav-title">🎯 Quiz Master</span>
                 <button id="back-btn" class="action-btn" style="margin-left:10px;">Retour</button>
-                <!-- Le bouton Base -->
-                <button class="action-btn" id="base-btn" onclick="window.location.href='base.html'"
-                    style="margin-left:8px; background: #2c2c3a; display:none;">Base</button>
-                <script>
-                    function updateBaseBtnVisibility(globalScore) {
-                        const baseBtn = document.getElementById('base-btn');
-                        if (!baseBtn) return;
-                        if (globalScore >= 200) {
-                            baseBtn.style.display = 'inline-block';
-                            baseBtn.disabled = false;
-                            baseBtn.classList.remove('disabled');
-                        } else {
-                            baseBtn.style.display = 'none';
-                            baseBtn.disabled = true;
-                            baseBtn.classList.add('disabled');
-                        }
-                    }
-                </script>
+                <button class="action-btn" id="base-btn" style="margin-left:8px; background: #2c2c3a; display:none;">Base</button>
             </div>
             <div class="nav-right" id="nav-logged-out">
                 <button class="action-btn" onclick="window.location.href='settings.html'"
@@ -437,13 +420,12 @@
                     </div>
                     <button class="action-btn" onclick="window.location.href='settings.html'"
                         style="margin-left:10px;">Réglages</button>
-                    <button class="logout-btn" onclick="logout()">Déconnexion</button>
+                    <button class="logout-btn">Déconnexion</button>
                 </div>
             </div>
         </nav>
     </header>
     <main>
-        <!-- SECTION AUTHENTIFICATION -->
         <section id="auth-section">
             <div class="auth-container" style="display: none;">
                 <h2 id="auth-title">Connexion</h2>
@@ -465,7 +447,7 @@
                 </form>
                 <div class="auth-switch">
                     <span id="auth-switch-text">Pas encore de compte ? </span>
-                    <a id="auth-switch-link" onclick="toggleAuthMode()">S'inscrire</a>
+                    <a id="auth-switch-link">S'inscrire</a>
                 </div>
             </div>
         </section>
@@ -481,10 +463,9 @@
                     <button class="answer-btn"></button>
                     <button class="answer-btn"></button>
                 </div>
-                <!-- Leaderboard desktop uniquement (à droite sur grand écran) -->
                 <div id="dept-leaderboard-section" class="desktop">
                     <h3 class="leaderboard-title">🏆 Top Départements</h3>
-                    <div id="dept-leaderboard-list">
+                    <div id="dept-leaderboard-list-desktop">
                         <div style="text-align: center; opacity: 0.6;">Chargement...</div>
                     </div>
                 </div>
@@ -507,11 +488,10 @@
                 <div>Score : <span id="score">0</span></div>
                 <div id="lives">❤❤❤❤❤</div>
             </div>
-            <!-- Leaderboard mobile en bas -->
             <div id="mobile-quiz-ui-row">
                 <div id="dept-leaderboard-section" class="mobile">
                     <h3 class="leaderboard-title">🏆 Top Départements</h3>
-                    <div id="dept-leaderboard-list">
+                    <div id="dept-leaderboard-list-mobile">
                         <div style="text-align: center; opacity: 0.6;">Chargement...</div>
                     </div>
                 </div>
@@ -540,7 +520,8 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, updateDoc, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
             authDomain: "quiz-master-io.firebaseapp.com",
@@ -549,26 +530,89 @@
             messagingSenderId: "773382469164",
             appId: "1:773382469164:web:5e24a9a62ce543f5190389"
         };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         window.auth = auth;
         window.db = db;
         window.currentUser = null;
-        // 🔑 Niveaux & points requis
+
         const levelRequirements = {
-            1: 0,
-            2: 10,
-            3: 30,
-            4: 60,
-            5: 90,
-            6: 125
+            1: 0, 2: 10, 3: 30, 4: 60, 5: 90, 6: 125
         };
-        // 👇 Supprimé : computeGlobalScore
-        // 👇 Ajout du flag pour empêcher le double enregistrement
+
         let gameCompleted = false;
+
+        // DOM Elements
+        const authSection = document.getElementById('auth-section');
+        const quizSection = document.getElementById('quiz-section');
+        const resultSection = document.getElementById('result-section');
+        const restartBtn = document.getElementById('restart-btn');
+        const homeBtn = document.getElementById('home-btn');
+        const backBtn = document.getElementById('back-btn');
+        const mobileBackBtn = document.getElementById('mobile-back-btn');
+        const baseBtn = document.getElementById('base-btn');
+        const logoutBtn = document.querySelector('.logout-btn');
+        const authSwitchLink = document.getElementById('auth-switch-link');
+        const authSubmitBtn = document.getElementById('auth-submit-btn');
+        const answerBtns = document.querySelectorAll('.answer-btn');
+        const questionBox = document.getElementById('question');
+        const scoreDisplay = document.getElementById('score');
+        const livesDisplay = document.getElementById('lives');
+        const timerDisplay = document.getElementById('timer');
+        const qTimerDisplay = document.getElementById('question-timer');
+        const timerFill = document.getElementById('timer-fill');
+        const qTimerFill = document.getElementById('question-timer-fill');
+
+        // ✅ Fonction centralisée de chargement des scores
+        function loadScores() {
+            const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+            const globalScore = parseInt(localStorage.getItem('globalScore') || '0');
+            const quizCompleted = parseInt(localStorage.getItem('quizCompleted') || '0');
+            const deptScore = quizScores.departements || 0;
+            return { quizScores, globalScore, quizCompleted, deptScore };
+        }
+
+        // ✅ Fonction pour mettre à jour la visibilité du bouton Base
+        function updateBaseBtnVisibility(globalScore) {
+            if (!baseBtn) return;
+            baseBtn.style.display = globalScore >= 200 ? 'inline-block' : 'none';
+            baseBtn.disabled = globalScore < 200;
+            if (globalScore >= 200) {
+                baseBtn.onclick = () => window.location.href = 'base.html';
+            } else {
+                baseBtn.onclick = null;
+            }
+        }
+
+        // ✅ Leaderboard basé uniquement sur localStorage
+        function loadDeptLeaderboard() {
+            const mobileList = document.getElementById('dept-leaderboard-list-mobile');
+            const desktopList = document.getElementById('dept-leaderboard-list-desktop');
+            const placeholder = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
+            mobileList.innerHTML = placeholder;
+            desktopList.innerHTML = placeholder;
+            try {
+                const { globalScore, deptScore } = loadScores();
+                const pseudo = localStorage.getItem('userPseudo') || 'Toi';
+                const html = `
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank">👑</div>
+                        <div class="leaderboard-name">${pseudo}</div>
+                        <div class="leaderboard-score">${deptScore}</div>
+                    </div>
+                `;
+                mobileList.innerHTML = html;
+                desktopList.innerHTML = html;
+            } catch (e) {
+                const errorMsg = '<div style="text-align: center; opacity: 0.6;">Erreur local</div>';
+                mobileList.innerHTML = errorMsg;
+                desktopList.innerHTML = errorMsg;
+            }
+        }
+
         onAuthStateChanged(auth, async (user) => {
-            const quizSection = document.getElementById('quiz-section');
             const navLoggedIn = document.getElementById('nav-logged-in');
             const navLoggedOut = document.getElementById('nav-logged-out');
             if (user) {
@@ -576,25 +620,12 @@
                 quizSection.style.display = "block";
                 navLoggedOut.classList.add('hidden');
                 navLoggedIn.classList.remove('hidden');
-                const userDocRef = doc(db, 'users', user.uid);
-                const userDoc = await getDoc(userDocRef);
-                const pseudoEl = document.getElementById('user-pseudo');
-                const scoreEl = document.getElementById('user-global-score');
-                let globalScore = 0;
-                let quizCompleted = 0;
-                if (userDoc.exists()) {
-                    const data = userDoc.data();
-                    pseudoEl.textContent = data.pseudo || user.email.split('@')[0];
-                    globalScore = data.globalScore || 0; // ✅ Lecture directe
-                    quizCompleted = data.quizCompleted || 0;
-                } else {
-                    pseudoEl.textContent = user.email.split('@')[0];
-                    globalScore = 0;
-                    quizCompleted = 0;
-                }
-                scoreEl.textContent = globalScore;
-                localStorage.setItem('globalScore', globalScore);
-                localStorage.setItem('quizCompleted', quizCompleted);
+
+                const { globalScore, quizCompleted, deptScore } = loadScores();
+                const pseudo = localStorage.getItem('userPseudo') || user.email.split('@')[0];
+                document.getElementById('user-pseudo').textContent = pseudo;
+                document.getElementById('user-global-score').textContent = globalScore;
+
                 const hash = window.location.hash.substring(1);
                 const level = parseInt(hash) || 1;
                 if (!canAccessLevel(level, globalScore)) {
@@ -602,17 +633,18 @@
                     window.location.href = 'index.html';
                     return;
                 }
-                currentMode = Math.min(6, Math.max(1, level)); // supporte maintenant jusqu'au niveau 6
+                currentMode = Math.min(6, Math.max(1, level));
                 startMode();
             } else {
                 window.currentUser = null;
                 window.location.href = 'index.html';
             }
         });
+
         function canAccessLevel(level, globalScore) {
-            const required = levelRequirements[level];
-            return globalScore >= required;
+            return globalScore >= (levelRequirements[level] !== undefined ? levelRequirements[level] : Infinity);
         }
+
         const departements = [
             { nom: "Ain", numero: "01", prefecture: "Bourg-en-Bresse" },
             { nom: "Aisne", numero: "02", prefecture: "Laon" },
@@ -716,38 +748,22 @@
             { nom: "La Réunion", numero: "974", prefecture: "Saint-Denis" },
             { nom: "Mayotte", numero: "976", prefecture: "Mamoudzou" }
         ];
+
         const modes = {
             1: { time: 60, qTime: 4, lives: 3, questionType: "nom_to_num" },
             2: { time: 60, qTime: 5, lives: 4, questionType: "num_to_nom" },
             3: { time: 90, qTime: 9, lives: 8, questionType: "shape_to_nom_num" },
             4: { time: 60, qTime: 7, lives: 7, questionType: "prefecture_to_nom" },
             5: { time: 80, qTime: 4, lives: 6, questionType: "mix_all" },
-            6: { time: 60, qTime: 3, lives: 5, questionType: "mix_all" } // Nouveau niveau 6
+            6: { time: 60, qTime: 3, lives: 5, questionType: "mix_all" }
         };
+
         let currentMode = 1, score = 0, lives = 0, timeLeft = 0, qTime = 0;
         let timerInterval = null, qTimerInterval = null, awaitingNext = false;
         let previousQuestions = [];
         let correctAnswer;
         let isAuthMode = 'login';
-        function getDeptLevel(score) {
-            const level = Math.floor(score / 50) + 1;
-            return `Niveau ${level}`;
-        }
-        const authSection = document.getElementById('auth-section');
-        const quizSection = document.getElementById('quiz-section');
-        const resultSection = document.getElementById('result-section');
-        const restartBtn = document.getElementById('restart-btn');
-        const homeBtn = document.getElementById('home-btn');
-        const backBtn = document.getElementById('back-btn');
-        const mobileBackBtn = document.getElementById('mobile-back-btn');
-        const answerBtns = document.querySelectorAll('.answer-btn');
-        const questionBox = document.getElementById('question');
-        const scoreDisplay = document.getElementById('score');
-        const livesDisplay = document.getElementById('lives');
-        const timerDisplay = document.getElementById('timer');
-        const qTimerDisplay = document.getElementById('question-timer');
-        const timerFill = document.getElementById('timer-fill');
-        const qTimerFill = document.getElementById('question-timer-fill');
+
         function updateQuizHeaderVisibility(isQuizActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('quiz-active', isQuizActive);
@@ -756,28 +772,21 @@
                 mobileBackBtn.classList.add('hidden');
             }
         }
-        // ✅ Sauvegarde mise à jour : incrément direct sur globalScore et deptScore
+
         async function saveScores(deptIncrement, markCompleted = false) {
             if (deptIncrement <= 0) return;
-            // Lecture locale
-            let currentGlobalScore = parseInt(localStorage.getItem('globalScore')) || 0;
-            let quizCompleted = parseInt(localStorage.getItem('quizCompleted')) || 0;
-            let deptScore = parseInt(localStorage.getItem('deptScore')) || 0;
-
-            // Mise à jour
-            const newGlobalScore = currentGlobalScore + deptIncrement;
+            const { globalScore, quizCompleted, deptScore } = loadScores();
+            const newGlobalScore = globalScore + deptIncrement;
             const newDeptScore = deptScore + deptIncrement;
+            let newQuizCompleted = quizCompleted;
             if (markCompleted && lives > 0) {
-                quizCompleted += 1;
+                newQuizCompleted += 1;
             }
-
-            // Sauvegarde locale
+            const updatedQuizScores = { ...JSON.parse(localStorage.getItem('quizScores') || '{}'), departements: newDeptScore };
+            localStorage.setItem('quizScores', JSON.stringify(updatedQuizScores));
             localStorage.setItem('globalScore', newGlobalScore.toString());
-            localStorage.setItem('quizCompleted', quizCompleted.toString());
-            localStorage.setItem('deptScore', newDeptScore.toString());
-
-            // Firebase
-            if (window.currentUser) {
+            localStorage.setItem('quizCompleted', newQuizCompleted.toString());
+            if (window.currentUser?.uid) {
                 try {
                     const userDocRef = doc(db, 'users', currentUser.uid);
                     const updateData = {
@@ -789,23 +798,23 @@
                     }
                     await updateDoc(userDocRef, updateData);
                 } catch (error) {
-                    console.warn('Firebase indisponible, sauvegarde locale uniquement:', error);
+                    console.warn('Firebase indisponible, sauvegarde locale seule:', error);
                 }
             }
-
-            // UI
             document.getElementById('user-global-score').textContent = newGlobalScore;
             updateBaseBtnVisibility(newGlobalScore);
         }
-        backBtn.onclick = async function () {
-            if (!gameCompleted) {
-                await saveScores(score, false);
-            }
+
+        const handleBack = async function () {
+            if (!gameCompleted) await saveScores(score, false);
             stopAllTimers();
             quizSection.classList.add('hidden');
             window.location.href = 'index.html';
         };
-        mobileBackBtn.onclick = backBtn.onclick;
+
+        backBtn.addEventListener('click', handleBack);
+        mobileBackBtn.addEventListener('click', handleBack);
+
         function startMode() {
             if (!modes[currentMode]) return;
             stopAllTimers();
@@ -822,11 +831,15 @@
             resultSection.classList.add('hidden');
             quizSection.classList.remove('hidden');
             updateQuizHeaderVisibility(true);
+            const scores = loadScores();
+            document.getElementById('user-global-score').textContent = scores.globalScore;
+            updateBaseBtnVisibility(scores.globalScore);
             loadDeptLeaderboard();
             generateQuestion();
             startMainTimer();
             window.scrollTo(0, 0);
         }
+
         function generateQuestion() {
             if (awaitingNext) return;
             let dep;
@@ -835,9 +848,11 @@
             } while (previousQuestions.includes(dep.numero) && previousQuestions.length < departements.length);
             previousQuestions.push(dep.numero);
             if (previousQuestions.length > 20) previousQuestions.shift();
+
             qTime = modes[currentMode].qTime;
             qTimerDisplay.textContent = qTime.toFixed(1);
             qTimerFill.style.width = '100%';
+
             let questionText;
             switch (modes[currentMode].questionType) {
                 case "nom_to_num":
@@ -874,6 +889,7 @@
                     break;
             }
             questionBox.innerHTML = questionText;
+
             let wrongAnswers = [];
             const otherDeps = departements.filter(d => d !== dep).sort(() => Math.random() - 0.5);
             if (modes[currentMode].questionType === "nom_to_num" || (correctAnswer === dep.numero)) {
@@ -883,6 +899,7 @@
             } else {
                 wrongAnswers = otherDeps.slice(0, 4).map(d => Math.random() > 0.5 ? d.nom : d.numero);
             }
+
             let options = [...wrongAnswers, correctAnswer].sort(() => Math.random() - 0.5);
             answerBtns.forEach((btn, i) => {
                 btn.textContent = options[i];
@@ -890,12 +907,12 @@
                 btn.classList.remove("correct", "incorrect");
                 btn.onclick = () => handleAnswer(options[i]);
             });
+
             setTimeout(() => {
-                if (!awaitingNext) {
-                    startQTimer();
-                }
+                if (!awaitingNext) startQTimer();
             }, 100);
         }
+
         function handleAnswer(selected) {
             if (awaitingNext) return;
             awaitingNext = true;
@@ -905,15 +922,16 @@
                 if (btn.textContent === correctAnswer) btn.classList.add("correct");
                 if (btn.textContent === selected && selected !== correctAnswer) btn.classList.add("incorrect");
             });
+
             if (selected === correctAnswer) {
                 score++;
             } else {
-                if (lives > 0) {
-                    lives--;
-                }
+                if (lives > 0) lives--;
             }
+
             updateLives();
             scoreDisplay.textContent = score;
+
             setTimeout(() => {
                 awaitingNext = false;
                 if (lives <= 0) {
@@ -923,11 +941,13 @@
                 }
             }, 1000);
         }
+
         function updateLives() {
             const safeLives = Math.max(0, lives);
             const maxLives = modes[currentMode].lives;
             livesDisplay.textContent = '❤'.repeat(safeLives) + '♡'.repeat(Math.max(0, maxLives - safeLives));
         }
+
         function startMainTimer() {
             timerDisplay.textContent = timeLeft;
             timerFill.style.width = '100%';
@@ -945,6 +965,7 @@
                 }
             }, 1000);
         }
+
         function startQTimer() {
             clearInterval(qTimerInterval);
             const qStartTime = modes[currentMode].qTime;
@@ -960,6 +981,7 @@
                 }
             }, 100);
         }
+
         async function endGame() {
             if (gameCompleted) return;
             gameCompleted = true;
@@ -969,40 +991,36 @@
             document.getElementById('final-score').textContent = score;
             stopAllTimers();
             window.scrollTo(0, 0);
-            // Sauvegarde avec indication de complétion
             await saveScores(score, true);
-            // Mettre à jour l'affichage des résultats
-            const newGlobalScore = parseInt(localStorage.getItem('globalScore')) || 0;
-            const newDeptScore = parseInt(localStorage.getItem('deptScore')) || 0;
-            const quizCompleted = parseInt(localStorage.getItem('quizCompleted')) || 0;
-            document.getElementById('new-global-score').textContent = newGlobalScore;
-            document.getElementById('new-dept-score').textContent = newDeptScore;
+            const { globalScore, deptScore, quizCompleted } = loadScores();
+            document.getElementById('new-global-score').textContent = globalScore;
+            document.getElementById('new-dept-score').textContent = deptScore;
             document.getElementById('new-quiz-completed').textContent = quizCompleted;
-            // Message de niveau
-            const oldDeptScore = newDeptScore - score;
+            const oldDeptScore = deptScore - score;
             const oldLevel = Math.floor(oldDeptScore / 50);
-            const newLevel = Math.floor(newDeptScore / 50);
+            const newLevel = Math.floor(deptScore / 50);
             if (newLevel > oldLevel) {
                 document.getElementById('level-up-msg').classList.remove('hidden');
             } else {
                 document.getElementById('level-up-msg').classList.add('hidden');
             }
-            updateBaseBtnVisibility(newGlobalScore);
+            updateBaseBtnVisibility(globalScore);
         }
+
         function stopAllTimers() {
             clearInterval(timerInterval);
             clearInterval(qTimerInterval);
         }
-        restartBtn.onclick = startMode;
-        homeBtn.onclick = async function () {
-            if (!gameCompleted) {
-                await saveScores(score, false);
-            }
+
+        restartBtn.addEventListener('click', startMode);
+        homeBtn.addEventListener('click', async function () {
+            if (!gameCompleted) await saveScores(score, false);
             stopAllTimers();
             resultSection.classList.add('hidden');
             window.location.href = 'index.html';
-        };
-        window.toggleAuthMode = function () {
+        });
+
+        function toggleAuthMode() {
             isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
             const title = document.getElementById('auth-title');
             const submitBtn = document.getElementById('auth-submit-btn');
@@ -1022,8 +1040,11 @@
                 switchLink.textContent = "S'inscrire";
                 pseudoGroup.style.display = 'none';
             }
-        };
-        document.getElementById('auth-submit-btn').addEventListener('click', async () => {
+        }
+
+        authSwitchLink.addEventListener('click', toggleAuthMode);
+
+        authSubmitBtn.addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
             const pseudo = document.getElementById('auth-pseudo').value;
@@ -1053,15 +1074,14 @@
                         pseudo: pseudo.trim(),
                         email: email,
                         quizScores: defaultQuizScores,
-                        globalScore: 0, // ✅ champ ajouté
+                        globalScore: 0,
                         quizCompleted: 0,
                         createdAt: new Date().toISOString()
                     });
-                    // Initialiser le localStorage aussi
+                    localStorage.setItem('userPseudo', pseudo.trim());
                     localStorage.setItem('quizScores', JSON.stringify(defaultQuizScores));
                     localStorage.setItem('quizCompleted', '0');
                     localStorage.setItem('globalScore', '0');
-                    localStorage.setItem('deptScore', '0');
                 } else {
                     await signInWithEmailAndPassword(auth, email, password);
                 }
@@ -1070,42 +1090,16 @@
                 errorDiv.classList.remove('hidden');
             }
         });
-        window.logout = async function () {
+
+        logoutBtn.addEventListener('click', async () => {
             await signOut(auth);
             window.location.href = 'index.html';
-        };
-        async function loadDeptLeaderboard() {
-            const mobileList = document.querySelector('#dept-leaderboard-section.mobile #dept-leaderboard-list');
-            const desktopList = document.querySelector('#dept-leaderboard-section.desktop #dept-leaderboard-list');
-            const placeholder = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
-            mobileList.innerHTML = placeholder;
-            desktopList.innerHTML = placeholder;
-            try {
-                const q = query(collection(db, 'users'), orderBy('quizScores.departements', 'desc'), limit(10));
-                const querySnapshot = await getDocs(q);
-                let rank = 1;
-                let html = '';
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data() || {};
-                    const pseudo = data.pseudo || 'Anonyme';
-                    const score = data.quizScores?.departements || 0;
-                    let medal = '';
-                    if (rank === 1) medal = '🥇';
-                    else if (rank === 2) medal = '🥈';
-                    else if (rank === 3) medal = '🥉';
-                    html += `<div class="leaderboard-item"><div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${pseudo}</div><div class="leaderboard-score">${score}</div></div>`;
-                    rank++;
-                });
-                mobileList.innerHTML = html || '<div style="text-align: center; opacity: 0.6;">Aucun joueur</div>';
-                desktopList.innerHTML = html || '<div style="text-align: center; opacity: 0.6;">Aucun joueur</div>';
-            } catch (error) {
-                console.error('Erreur loadDeptLeaderboard:', error);
-                const errorMsg = '<div style="text-align: center; opacity: 0.6;">Erreur de chargement</div>';
-                mobileList.innerHTML = errorMsg;
-                desktopList.innerHTML = errorMsg;
-            }
-        }
-        updateBaseBtnVisibility(0);
+        });
+
+        // Initial call after DOM is ready
+        window.addEventListener('DOMContentLoaded', () => {
+            updateBaseBtnVisibility(0);
+        });
     </script>
 </body>
 </html>
