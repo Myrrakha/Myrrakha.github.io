@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz Master - Chinois simplifié</title>
+  <style>
+    /* === Style global === */
+    body {
+      background: linear-gradient(135deg, #0f1115, #1c1c24);
+      color: #f0f0f0;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      background: #1a1a24;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-title {
+      font-size: 1.2em;
+      font-weight: 600;
+    }
+
+    .nav-right {
+      display: flex;
+      gap: 10px;
+    }
+
+    .center {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #23233a;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #aaa;
+      margin-bottom: 18px;
+      font-size: 1.05em;
+    }
+
+    .action-btn {
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: #3a3a50;
+      border: none;
+      cursor: pointer;
+      color: #f0f0f0;
+      transition: 0.20s;
+      font-size: 0.98em;
+    }
+
+    .action-btn:hover {
+      background: #4e4e6a;
+    }
+
+    .action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 28px;
+      font-size: 1.1em;
+      color: #aaa;
+    }
+
+    /* Timers empilés verticalement */
+    #timers-container {
+      width: 92%;
+      max-width: 1000px;
+      margin: 25px auto 0;
+      /* centré + espace en haut */
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .timer-item {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .timer-label {
+      font-size: 0.95em;
+      color: #ccc;
+      margin-bottom: 6px;
+      text-align: left;
+    }
+
+    .timer-bar {
+      width: 100%;
+      height: 28px;
+      background: #2b2b3a;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .timer-fill {
+      height: 100%;
+      width: 100%;
+      border-radius: 10px;
+      transition: width 0.15s linear;
+    }
+
+    #timer-fill {
+      background: #9c28a7ff;
+      /* violet principal */
+    }
+
+    #question-timer-fill {
+      background: #a832d6;
+      /* violet secondaire (comme dans départements) */
+    }
+
+    /* Quiz area */
+    #quiz-main {
+      display: none;
+    }
+
+    #quiz-section {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: center;
+      width: 100%;
+    }
+
+    .question-box {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .question-text {
+      font-size: 1.35em;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .answers-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .answer-btn {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #3a3a50;
+      border: none;
+      cursor: pointer;
+      color: #f0f0f0;
+      font-size: 1em;
+      min-width: 150px;
+      text-align: center;
+      transition: transform .12s, background .12s;
+    }
+
+    .answer-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      background: #4e4e6a;
+    }
+
+    .answer-btn:disabled {
+      opacity: 0.85;
+      cursor: default;
+      transform: none;
+    }
+
+    .stats {
+      margin: 12px 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 1.05em;
+    }
+
+    .stats div {
+      flex: 1;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    #quiz-next-btn,
+    #quiz-restart-btn {
+      display: none;
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    #quiz-result {
+      display: none;
+      text-align: center;
+    }
+
+    .final-score {
+      font-size: 1.8em;
+      color: #2ecc71;
+      margin: 12px 0;
+    }
+
+    .quiz-main-container {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+      align-items: flex-start;
+    }
+
+    .leaderboard-container {
+      background: #2c2c3a;
+      padding: 14px;
+      border-radius: 10px;
+      width: 180px;
+      max-height: 300px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .leaderboard-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      font-size: 0.9em;
+    }
+
+    .leaderboard-item .rank {
+      font-weight: bold;
+      color: #ffcc00;
+      width: 24px;
+    }
+
+    .leaderboard-item .name {
+      flex: 1;
+      text-align: right;
+      padding-right: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .leaderboard-item .score {
+      font-weight: bold;
+      color: #2ecc71;
+      margin-left: 6px;
+    }
+
+    @media (max-width: 750px) {
+      .quiz-main-container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .leaderboard-container {
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width:700px) {
+      .answers-container {
+        flex-direction: column;
+      }
+
+      #timers-container {
+        flex-direction: column;
+      }
+
+      #timer-bar-container,
+      #question-timer-bar-container {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 700px) {
+      #timers-container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="nav-left"><span class="nav-title">🎯 Quiz Master - Chinois simplifié</span></div>
+      <div class="nav-right">
+        <button class="action-btn" onclick="window.location.href='index.html'">← Retour</button>
+        <button class="action-btn" onclick="window.location.href='settings.html'">Réglages</button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="center">
+    <div id="loading" class="loading">
+      <p>Chargement du quiz…</p>
+    </div>
+
+    <!-- Quiz main -->
+    <div id="quiz-main">
+      <h1 id="quiz-title">Quiz Chinois</h1>
+      <p class="subtitle" id="quiz-subtitle"></p>
+
+      <div id="quiz-section">
+        <div class="question-box">
+          <div id="quiz-question" class="question-text"></div>
+        </div>
+        <div class="quiz-main-container">
+          <div class="answers-container" id="quiz-answers"></div>
+          <div class="leaderboard-container" id="chinois-leaderboard">
+            <h3 style="margin: 0 0 12px 0; font-size: 1.1em; text-align: center;">🏆 Top 5 Chinois</h3>
+            <div id="chinois-leaderboard-list" style="font-size: 0.95em;"></div>
+          </div>
+        </div>
+
+        <!-- ⚡ TIMERS PLACÉS ICI, EN DESSOUS DES RÉPONSES -->
+        <div id="timers-container">
+          <div class="timer-item">
+            <div class="timer-label">⏱️ Temps restant : <strong id="timer">0</strong>s</div>
+            <div id="timer-bar" class="timer-bar">
+              <div id="timer-fill" class="timer-fill"></div>
+            </div>
+          </div>
+          <div class="timer-item">
+            <div class="timer-label">⚡ Question : <strong id="question-timer">0</strong>s</div>
+            <div id="question-timer-bar" class="timer-bar">
+              <div id="question-timer-fill" class="timer-fill"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div>Score : <span id="quiz-score">0</span></div>
+        <div>Vies : <span id="quiz-lives">❤❤❤</span></div>
+        <div>Question : <span id="quiz-index">0</span>/<span id="quiz-total">0</span></div>
+      </div>
+
+      <!-- Pas de boutons "Suivant" ici -->
+    </div>
+
+    <!-- Result -->
+    <div id="quiz-result">
+      <h1>🎉 Quiz terminé !</h1>
+      <div class="final-score">Score : <span id="quiz-final-score">0</span></div>
+      <p id="result-message" style="font-size:1.05em; margin:8px 0 16px 0;"></p>
+      <button class="action-btn" onclick="window.location.href='index.html'" style="width:100%; margin-top:8px;">Retour
+        au menu principal</button>
+      <button class="action-btn" id="retry-btn" style="width:100%; margin-top:10px;">Recommencer ce niveau</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    // ==========================================
+    // CONFIGURATION FIREBASE
+    // ==========================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
+      authDomain: "quiz-master-io.firebaseapp.com",
+      projectId: "quiz-master-io",
+      storageBucket: "quiz-master-io.firebasestorage.app",
+      messagingSenderId: "773382469164",
+      appId: "1:773382469164:web:5e24a9a62ce543f5190389"
+    };
+
+    // Initialisation
+    let app, db, auth;
+    try {
+      app = initializeApp(firebaseConfig);
+      db = getFirestore(app);
+      auth = getAuth(app);
+      console.log("✅ Firebase initialisé");
+    } catch (error) {
+      console.error("❌ Erreur Firebase:", error);
+    }
+
+    // ==========================================
+    // UTILITAIRES
+    // ==========================================
+    function shuffle(array) {
+      return [...array].sort(() => Math.random() - 0.5);
+    }
+
+    function pickWrong(pool, correctItem, key) {
+      const wrong = new Set();
+      while (wrong.size < 4) {
+        const r = pool[Math.floor(Math.random() * pool.length)];
+        if (r[key] !== correctItem[key]) {
+          wrong.add(r);
+        }
+      }
+      return Array.from(wrong);
+    }
+
+    // ==========================================
+    // DONNÉES DES QUIZ
+    // ==========================================
+
+    // --- Génération chinois 1 → 100 ---
+    const digits = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
+    function numberToChinese(n) {
+      if (n <= 10) return ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"][n];
+      if (n < 20) return "十" + digits[n % 10];
+      if (n < 100) {
+        const tens = Math.floor(n / 10);
+        const ones = n % 10;
+        return digits[tens] + "十" + (ones ? digits[ones] : "");
+      }
+      if (n === 100) return "一百";
+      return "";
+    }
+
+    // --- Questions culturelles enrichies (Niveau 1 & Niveau 2) ---
+    const type3Questions = [
+      { q: "Combien y a-t-il de continents ?", a: "7" },
+      { q: "Combien y a-t-il d’océans sur Terre ?", a: "5" },
+      { q: "Combien de jours dans une semaine ?", a: "7" },
+      { q: "Combien de minutes dans une heure ?", a: "60" },
+      { q: "Combien de secondes dans une minute ?", a: "60" },
+      { q: "Combien de mois dans une année ?", a: "12" },
+      { q: "Combien de pourcent vaut une moitié ?", a: "50" },
+      { q: "Combien y a-t-il de continents ?", a: "7" },
+      { q: "Combien y a-t-il d’océans sur Terre ?", a: "5" },
+      { q: "Combien de jours dans une semaine ?", a: "7" },
+      { q: "Combien de minutes dans une heure ?", a: "60" },
+      { q: "Combien de secondes dans une minute ?", a: "60" },
+      { q: "Combien de mois dans une année ?", a: "12" },
+      { q: "Combien de semaines dans une année scolaire ?", a: "36" },
+      { q: "Combien de jours dans un mois de février non bissextile ?", a: "28" }, { q: "Combien de jours dans un mois de février bissextile ?", a: "29" },
+      { q: "Combien d’heures dans une journée ?", a: "24" },
+      { q: "Combien de minutes dans une demi-heure ?", a: "30" },
+      { q: "Combien de secondes dans une demi-minute ?", a: "30" },
+      { q: "Combien de mois ont 31 jours ?", a: "7" },
+      { q: "Combien de mois ont 30 jours ?", a: "4" },
+      { q: "Combien de fuseaux horaires existe-t-il dans le monde ?", a: "24" },
+      { q: "Combien de jours dure une révolution complète de Mercure autour du Soleil ?", a: "88" },
+      { q: "Combien de kilomètres fait un marathon arrondi à l’entier le plus proche ?", a: "42" },
+      { q: "Combien de minutes fait un quart d'heure ?", a: "15" },
+      { q: "Combien de secondes dans une heure arrondie à la centaine la plus proche ?", a: "60" },
+      { q: "Combien de semaines font 3 mois ?", a: "13" },
+      { q: "Combien de jours dure un cycle lunaire complet arrondi ?", a: "30" },
+      { q: "Combien de jours dans 2 mois ?", a: "60" },
+      { q: "Combien de rotations complètes la Lune effectue-t-elle autour de la Terre en un an ?", a: "13" },
+      { q: "Combien de minutes faut-il pour que la lumière du Soleil atteigne la Terre ?", a: "8" },
+      { q: "Quelle est la vitesse maximale d’un TGV en service (en km/h) ?", a: "90" },
+      { q: "Combien de minutes dans 1h30 ?", a: "90" },
+      { q: "Combien de mois font 5 ans ?", a: "60" },
+      { q: "Combien de semaines environ dans un mois ?", a: "4" },
+      { q: "Combien de jours dure un mois lunaire moyen arrondi ?", a: "30" },
+      { q: "Combien de minutes met un train à 300 km/h pour faire 100 km ?", a: "20" },
+      { q: "Combien de jours met la lumière pour parcourir 1 orbite terrestre autour du Soleil ?", a: "0" },
+      { q: "Combien de secondes met un son pour parcourir 1 km arrondi ?", a: "3" },
+      { q: "Combien de mètres fait un kilomètre divisé par 10 ?", a: "100" },
+      { q: "Combien de centimètres fait un mètre ?", a: "100" },
+      { q: "Combien de millimètres fait un centimètre ?", a: "10" },
+      { q: "Combien de jours dans 4 semaines ?", a: "28" },
+      { q: "Combien d’heures dans 240 minutes ?", a: "4" },
+      { q: "Combien de minutes dans un tiers d’heure ?", a: "20" },
+      { q: "À combien de pourcent correspond 1/4 ?", a: "25" },
+      { q: "Combien d’heures dans 3 jours ?", a: "72" },
+      { q: "Combien de jours dans 6 semaines ?", a: "42" },
+      { q: "Combien de secondes dans 30 secondes ?", a: "30" },
+      { q: "Combien de secondes dans 10 minutes ?", a: "600" },
+      { q: "Combien de pourcent font 3 quarts ?", a: "75" },
+      { q: "Combien de minutes met un train à 100 km/h pour parcourir 50 km ?", a: "30" },
+      { q: "Combien y a-t-il de fuseaux horaires naturels couvrant la Chine entière (même si un seul est utilisé) ?", a: "5" },
+      { q: "Combien de minutes dure le trajet Pékin–Tianjin en TGV (environ) ?", a: "30" },
+      { q: "Combien de kilomètres fait la ligne de métro la plus longue de Shanghai (arrondi à la dizaine la plus proche) ?", a: "50" },
+      { q: "Combien d’années a duré la construction du Grand Canal moderne restauré sous les Ming (approx.) ?", a: "40" },
+      { q: "Combien d’heures faut-il en avion entre Shanghai et Tokyo (approx.) ?", a: "3" },
+      { q: "Combien de minutes dure en moyenne un épisode du Nouvel An chinois diffusé à la CCTV (Gala) par segment ?", a: "10" },
+      { q: "Combien de kilomètres séparent Hong Kong de Shenzhen (à vol d’oiseau) ?", a: "30" },
+      { q: "Combien de minutes dure un trajet de bus typique entre deux districts centraux de Pékin ?", a: "20" },
+      { q: "Combien de kilomètres fait la montée principale de la Grande Muraille à Badaling (aller simple) ?", a: "3" }
+    ];
+
+    // =======================================
+    // LEXIQUE NIVEAU 2
+    // =======================================
+    const vocabulaireN2 = [
+        // Temps
+        { fr: "Hier", ch: "昨天", py: "zuótiān" },
+        { fr: "Aujourd'hui", ch: "今天", py: "jīntiān" },
+        { fr: "Demain", ch: "明天", py: "míngtiān" },
+        { fr: "Matin", ch: "早上", py: "zǎoshang" },
+        { fr: "Après-midi", ch: "下午", py: "xiàwǔ" },
+        { fr: "Soir", ch: "晚上", py: "wǎnshang" },
+        { fr: "Maintenant", ch: "现在", py: "xiànzài" },
+        { fr: "Plus tard", ch: "以后", py: "yǐhòu" },
+
+        // Lieux / spatial
+        { fr: "Ici", ch: "这里", py: "zhèlǐ" },
+        { fr: "Là-bas", ch: "那里", py: "nàlǐ" },
+        { fr: "À droite", ch: "右边", py: "yòubiān" },
+        { fr: "À gauche", ch: "左边", py: "zuǒbiān" },
+        { fr: "Devant", ch: "前面", py: "qiánmiàn" },
+        { fr: "Derrière", ch: "后面", py: "hòumiàn" },
+        { fr: "À côté", ch: "旁边", py: "pángbiān" },
+
+        // Expressions utiles
+        { fr: "Bonjour", ch: "你好", py: "nǐ hǎo" },
+        { fr: "Bonsoir", ch: "晚上好", py: "wǎnshang hǎo" },
+        { fr: "Merci", ch: "谢谢", py: "xièxiè" },
+        { fr: "Excusez-moi", ch: "对不起", py: "duìbuqǐ" },
+        { fr: "Je comprends", ch: "我懂了", py: "wǒ dǒng le" },
+        { fr: "Je ne comprends pas", ch: "我不懂", py: "wǒ bù dǒng" },
+        { fr: "Au revoir", ch: "再见", py: "zàijiàn" },
+        { fr: "À demain", ch: "明天见", py: "míngtiān jiàn" },
+
+        // Jours / calendrier
+        { fr: "Lundi", ch: "星期一", py: "xīngqī yī" },
+        { fr: "Mardi", ch: "星期二", py: "xīngqī èr" },
+        { fr: "Mercredi", ch: "星期三", py: "xīngqī sān" },
+        { fr: "Jeudi", ch: "星期四", py: "xīngqī sì" },
+        { fr: "Vendredi", ch: "星期五", py: "xīngqī wǔ" },
+        { fr: "Samedi", ch: "星期六", py: "xīngqī liù" },
+        { fr: "Dimanche", ch: "星期天", py: "xīngqī tiān" },
+        { fr: "Week-end", ch: "周末", py: "zhōumò" },
+
+        // Fêtes
+        { fr: "Nouvel an chinois", ch: "春节", py: "Chūnjié" },
+        { fr: "Fête de la Lune", ch: "中秋节", py: "Zhōngqiūjié" },
+        { fr: "Fête nationale", ch: "国庆节", py: "Guóqìngjié" }
+    ];
+
+    // --- Patterns pour les phrases contextuelles ---
+    const n2Patterns = [
+        ["Je suis ici maintenant", "我现在在这里", "wǒ xiànzài zài zhèlǐ"],
+        ["Je vais là-bas demain", "我明天去那里", "wǒ míngtiān qù nàlǐ"],
+        ["Je viens ce soir", "我晚上来", "wǒ wǎnshang lái"],
+        ["Nous partons après-demain", "我们后天走", "wǒmen hòutiān zǒu"],
+        ["Elle arrive demain matin", "她明天早上到", "tā míngtiān zǎoshang dào"],
+        ["Ils sont derrière toi", "他们在你后面", "tāmen zài nǐ hòumiàn"],
+        ["Il est à côté de moi", "他在我的旁边", "tā zài wǒ de pángbiān"],
+        ["Je ne comprends pas", "我不懂", "wǒ bù dǒng"]
+    ];
+
+    // =======================================
+    // LEXIQUE NIVEAU 3
+    // =======================================
+    const vocabulaireN3 = [
+        // Verbes fréquents
+        { fr: "vouloir", ch: "想", py: "xiǎng" },
+        { fr: "pouvoir (capacité)", ch: "会", py: "huì" },
+        { fr: "pouvoir (permission)", ch: "可以", py: "kěyǐ" },
+        { fr: "devoir", ch: "要", py: "yào" },
+        { fr: "aller", ch: "去", py: "qù" },
+        { fr: "venir", ch: "来", py: "lái" },
+        { fr: "manger", ch: "吃", py: "chī" },
+        { fr: "boire", ch: "喝", py: "hē" },
+        { fr: "voir", ch: "看", py: "kàn" },
+
+        // Phrases utiles
+        { fr: "Je veux manger", ch: "我想吃饭", py: "wǒ xiǎng chī fàn" },
+        { fr: "Je ne comprends pas", ch: "我不懂", py: "wǒ bù dǒng" },
+        { fr: "Peux-tu m'aider ?", ch: "你可以帮我吗？", py: "nǐ kěyǐ bāng wǒ ma?" },
+        { fr: "Où vas-tu ?", ch: "你去哪儿？", py: "nǐ qù nǎr?" },
+        { fr: "Je suis occupé", ch: "我很忙", py: "wǒ hěn máng" },
+        { fr: "J'arrive bientôt", ch: "我马上来", py: "wǒ mǎshàng lái" },
+        { fr: "Attends-moi un moment", ch: "等我一下", py: "děng wǒ yíxià" },
+
+        // Expressions + particules
+        { fr: "C'est vrai ?", ch: "真的吗？", py: "zhēn de ma?" },
+        { fr: "D'accord", ch: "好的", py: "hǎo de" },
+        { fr: "Pas de problème", ch: "没问题", py: "méi wèntí" },
+        { fr: "Très bien", ch: "很好", py: "hěn hǎo" },
+
+        // Temporalité plus avancée
+        { fr: "Je suis en train de manger", ch: "我正在吃饭", py: "wǒ zhèngzài chī fàn" },
+        { fr: "Je viens de finir", ch: "我刚刚结束", py: "wǒ gānggāng jiéshù" },
+    ];
+
+    // --- Fonctions de génération Niveau 3 ---
+    function qN3_type1() {
+        const item = vocabulaireN3[Math.floor(Math.random() * vocabulaireN3.length)];
+
+        const wrong = pickWrong(vocabulaireN3, item, "ch");
+        const opts = shuffle([...wrong, item].map(o => ({ raw: o.ch, display: `${o.ch} (${o.py})` })));
+
+        return {
+            q: `Comment dit-on : <b>${item.fr}</b> ?`,
+            a: item.ch,
+            opts
+        };
+    }
+
+    function qN3_type2() {
+        const item = vocabulaireN3[Math.floor(Math.random() * vocabulaireN3.length)];
+
+        const wrong = pickWrong(vocabulaireN3, item, "fr");
+        const opts = shuffle([...wrong, item].map(o => ({ raw: o.fr, display: o.fr })));
+
+        return {
+            q: `Que signifie : <b>${item.ch}</b> (${item.py}) ?`,
+            a: item.fr,
+            opts
+        };
+    }
+
+    function qN3_type3() {
+        const item = vocabulaireN3[Math.floor(Math.random() * vocabulaireN3.length)];
+
+        const wrong = pickWrong(vocabulaireN3, item, "ch");
+        const opts = shuffle([...wrong, item].map(o => ({ raw: o.ch, display: `${o.ch}` })));
+
+        return {
+            q: `Quel est l'écriture chinoise de : <b>${item.py}</b> ?`,
+            a: item.ch,
+            opts
+        };
+    }
+
+    function qN3_type4() {
+        const candidates = vocabulaireN3.filter(o => /想|会|要|可以|正在/.test(o.ch));
+        const item = candidates[Math.floor(Math.random() * candidates.length)];
+
+        const missing = item.ch.match(/想|会|要|可以|正在/)[0];
+        const question = item.ch.replace(missing, "___");
+
+        const opts = shuffle([
+            { raw: missing, display: missing },
+            { raw: "不", display: "不" },
+            { raw: "很", display: "很" },
+            { raw: "在", display: "在" },
+            { raw: "吗", display: "吗" }
+        ]);
+
+        return {
+            q: `Complète la phrase : <b>${question}</b>`,
+            a: missing,
+            opts
+        };
+    }
+
+    function qN3_type5() {
+        const sentences = [
+            ["我", "想", "去", "北京"],
+            ["你", "会", "说", "中文"],
+            ["我", "正在", "吃饭"],
+            ["他", "明天", "来", "这里"]
+        ];
+
+        const s = sentences[Math.floor(Math.random() * sentences.length)];
+        const shuffled = shuffle([...s]);
+
+        const allVariants = new Set([s.join(" ")]);
+        while (allVariants.size < 5) {
+            const variant = shuffle([...s]).join(" ");
+            allVariants.add(variant);
+        }
+
+        const opts = shuffle(Array.from(allVariants).map(o => ({ raw: o, display: o }))).slice(0, 5);
+
+        return {
+            q: `Remets la phrase en ordre : <b>${shuffled.join(" / ")}</b>`,
+            a: s.join(" "),
+            opts
+        };
+    }
+
+    function qN3_type6() {
+        const bank = [
+            { q: "你吃___饭吗？", a: "过" },
+            { q: "你去北京___？", a: "吗" },
+            { q: "我们走___！", a: "吧" },
+            { q: "我吃___了饭", a: "" }
+        ];
+
+        const item = bank[Math.floor(Math.random() * bank.length)];
+
+        const allOpts = new Set(["了", "吗", "吧", "过", "不", "", item.a]);
+        const opts = shuffle(Array.from(allOpts).map(o => ({ raw: o, display: o || "∅" }))).slice(0, 5);
+
+        return {
+            q: `Complète : <b>${item.q}</b>`,
+            a: item.a,
+            opts
+        };
+    }
+
+    function qN3_type7() {
+        const base = [
+            { fr: "Je mange maintenant", ch: "我现在吃饭" },
+            { fr: "Je veux aller en Chine", ch: "我想去中国" },
+            { fr: "Je peux venir demain", ch: "我明天可以来" }
+        ];
+
+        const item = base[Math.floor(Math.random() * base.length)];
+
+        const wrong = [
+            "我吃饭现在",
+            "现在我饭吃",
+            "我马上吃饭",
+            "我今天吃饭"
+        ];
+
+        const opts = shuffle([item.ch, ...wrong].slice(0, 5).map(o => ({ raw: o, display: o })));
+
+        return {
+            q: `Comment dire : <b>${item.fr}</b> ?`,
+            a: item.ch,
+            opts
+        };
+    }
+
+    // --- Générateur d'une question aléatoire pour niveau 1 ---
+    function generateRandomQuestion() {
+      const type = Math.floor(Math.random() * 4) + 1;
+
+      // ------------------------- (1) Quel est le caractère pour XX ? -------------------------
+      if (type === 1) {
+        const n = Math.floor(Math.random() * 100) + 1;
+        const correct = numberToChinese(n);
+
+        const wrong = new Set();
+        while (wrong.size < 5) {
+          const r = Math.floor(Math.random() * 100) + 1;
+          if (r !== n) wrong.add(numberToChinese(r));
+        }
+
+        const allOpts = [correct, ...wrong];
+        const shuffleOpts = [...allOpts].sort(() => Math.random() - 0.5);
+
+        return {
+          q: `Quel est le caractère pour <br><span style="font-size:4rem;font-weight:800;display:block;">${n}</span> ?`,
+          a: correct,
+          opts: shuffleOpts.map(char => ({
+            raw: char,
+            display: `<span style="font-size: calc(1rem + 3px);">${char}</span>`
+          }))
+        };
+      }
+
+      // ------------------------- (2) Calcul XX - YY = ? -------------------------
+      if (type === 2) {
+        let a = Math.floor(Math.random() * 100) + 1;
+        let b = Math.floor(Math.random() * 100) + 1;
+        if (b > a) [a, b] = [b, a];
+
+        const result = a - b;
+
+        const displayA = Math.random() > 0.5 ? String(a) : numberToChinese(a);
+        const displayB = Math.random() > 0.5 ? String(b) : numberToChinese(b);
+
+        return {
+          q: `${displayA} − ${displayB} = ?`,
+          a: String(result),
+          opts: generateRandomOpts(result, 6)
+        };
+      }
+
+      // ------------------------- (3) Questions culturelles -------------------------
+      if (type === 3) {
+        const item = type3Questions[Math.floor(Math.random() * type3Questions.length)];
+        const correct = Number(item.a);
+
+        return {
+          q: item.q,
+          a: item.a,
+          opts: generateType3RndOpts(correct, 6)
+        };
+      }
+
+      // ------------------------- (4) Quel est ce caractère ? -------------------------
+      if (type === 4) {
+        const n = Math.floor(Math.random() * 100) + 1;
+        const ch = numberToChinese(n);
+
+        const wrong = new Set();
+        while (wrong.size < 5) {
+          const r = Math.floor(Math.random() * 100) + 1;
+          if (r !== n) wrong.add(r);
+        }
+
+        const allOpts = [n, ...wrong];
+        const shuffledOpts = [...allOpts].sort(() => Math.random() - 0.5);
+
+        return {
+          q: `Quel est ce caractère : <br><span style="font-size:4rem;font-weight:800;display:block;">${ch}</span>`,
+          a: String(n),
+          opts: shuffledOpts.map(v => ({
+            raw: v,
+            display: `<span style="font-size: calc(1rem + 3px);">${v}</span>`
+          }))
+        };
+      }
+    }
+
+    // --- Génère des options FR + CH aléatoires ---
+    function generateRandomOpts(correctAnswer, count = 6) {
+      const values = new Set();
+      values.add(Number(correctAnswer));
+
+      while (values.size < count) {
+        let v = Number(correctAnswer) + Math.floor(Math.random() * 21) - 10;
+        if (v < 0 || v > 100) v = Math.floor(Math.random() * 101);
+        values.add(v);
+      }
+
+      const opts = [...values].map(v => ({
+        raw: v,
+        display: `<span style="font-size: calc(1rem + 3px);">${v} (${numberToChinese(v)})</span>`
+      }));
+
+      return opts.sort(() => Math.random() - 0.5);
+    }
+
+    function generateType3RndOpts(correctAnswer, count = 6) {
+      const values = new Set();
+      values.add(Number(correctAnswer));
+
+      while (values.size < count) {
+        let v = Number(correctAnswer) + Math.floor(Math.random() * 21) - 10;
+        if (v < 0 || v > 100) v = Math.floor(Math.random() * 101);
+        values.add(v);
+      }
+
+      return [...values].map(v => ({
+        raw: v,
+        display: `<span style="font-size: calc(1rem + 3px);">${numberToChinese(v)}</span>`
+      })).sort(() => Math.random() - 0.5);
+    }
+
+    // --- Générateur de question pour niveau 2 ---
+    function generateN2Question() {
+      const type = Math.floor(Math.random() * 3) + 1;
+
+      // ----------------------------------------------------------
+      // TYPE 1 — FR → CH + PINYIN (25% des questions en FR)
+      // ----------------------------------------------------------
+      if (type === 1) {
+        const item = vocabulaireN2[Math.floor(Math.random() * vocabulaireN2.length)];
+
+        const wrong = new Set();
+        while (wrong.size < 4) {
+          const r = vocabulaireN2[Math.floor(Math.random() * vocabulaireN2.length)];
+          if (r.ch !== item.ch) wrong.add(r);
+        }
+
+        const opts = [...wrong, item]
+          .sort(() => Math.random() - 0.5)
+          .map(o => ({
+            raw: o.ch,
+            display: `${o.ch} (${o.py})`
+          }));
+
+        return {
+          q: `Comment s'écrit : <b>${item.fr}</b> ?`,
+          a: item.ch,
+          opts
+        };
+      }
+
+      // ----------------------------------------------------------
+      // TYPE 2 — CH → FR + PINYIN (75% des questions en CH)
+      // ----------------------------------------------------------
+      if (type === 2) {
+        const item = vocabulaireN2[Math.floor(Math.random() * vocabulaireN2.length)];
+
+        const wrong = new Set();
+        while (wrong.size < 4) {
+          const r = vocabulaireN2[Math.floor(Math.random() * vocabulaireN2.length)];
+          if (r.fr !== item.fr) wrong.add(r);
+        }
+
+        const opts = [...wrong, item]
+          .sort(() => Math.random() - 0.5)
+          .map(o => ({
+            raw: o.fr,
+            display: o.fr
+          }));
+
+        return {
+          q: `Que signifie : <b>${item.ch}</b> (${item.py}) ?`,
+          a: item.fr,
+          opts
+        };
+      }
+
+      // ----------------------------------------------------------
+      // TYPE 3 — Contexte temporel/spatial (CH + PINYIN)
+      // ----------------------------------------------------------
+      if (type === 3) {
+        const item = n2Patterns[Math.floor(Math.random() * n2Patterns.length)];
+
+        const wrong = new Set();
+        while (wrong.size < 4) {
+          const r = n2Patterns[Math.floor(Math.random() * n2Patterns.length)];
+          if (r[1] !== item[1]) wrong.add(r);
+        }
+
+        const opts = [...wrong, item]
+          .sort(() => Math.random() - 0.5)
+          .map(o => ({
+            raw: o[1],
+            display: `${o[1]} (${o[2]})`
+          }));
+
+        return {
+          q: `Comment dit-on : <b>${item[0]}</b> ?`,
+          a: item[1],
+          opts
+        };
+      }
+    }
+
+    // --- Générateur de question pour niveau 3 ---
+    function generateN3Question() {
+      const type = Math.floor(Math.random() * 7) + 1;
+
+      switch (type) {
+        case 1: return qN3_type1();
+        case 2: return qN3_type2();
+        case 3: return qN3_type3();
+        case 4: return qN3_type4();
+        case 5: return qN3_type5();
+        case 6: return qN3_type6();
+        case 7: return qN3_type7();
+        default: return qN3_type1();
+      }
+    }
+
+    // --- Génération de 50 questions pour niveau 1 ---
+    function generateQuizN1() {
+      const questions = [];
+      for (let i = 0; i < 50; i++) {
+        questions.push(generateRandomQuestion());
+      }
+
+      return {
+        title: "Niveau 1 : Chiffres et logiques 1-100",
+        subtitle: "Questions aléatoires mélangeant chiffres, calculs, culture générale et caractères chinois",
+        questions
+      };
+    }
+
+    // --- Génération de 50 questions pour niveau 2 ---
+    function generateQuizN2() {
+      const questions = [];
+      for (let i = 0; i < 50; i++) {
+        questions.push(generateN2Question());
+      }
+
+      return {
+        title: "Niveau 2 : Vocabulaire quotidien",
+        subtitle: "Temps, lieux, expressions, jours et fêtes en chinois simplifié",
+        questions
+      };
+    }
+
+    // --- Génération de 50 questions pour niveau 3 ---
+    function generateQuizN3() {
+      const questions = [];
+      for (let i = 0; i < 50; i++) {
+        questions.push(generateN3Question());
+      }
+
+      return {
+        title: "Niveau 3 : Verbes et constructions",
+        subtitle: "Verbes, particules, ordre des mots et phrases complexes en chinois",
+        questions
+      };
+    }
+
+    // --- Données des quiz ---
+    const quizData = {
+      1: generateQuizN1(),
+      2: generateQuizN2(),
+      3: generateQuizN3(),
+      4: {
+        title: "Niveau 4 : Membres de la famille",
+        subtitle: "Apprenez à désigner les membres de la famille",
+        questions: [
+          { q: "Comment écrit-on <strong>'maman'</strong> ?", a: "妈妈", opts: ["妈妈", "爸爸", "哥哥", "姐姐", "妹妹"] },
+          { q: "Comment écrit-on <strong>'papa'</strong> ?", a: "爸爸", opts: ["爸爸", "妈妈", "弟弟", "妹妹", "哥哥"] },
+          { q: "Comment écrit-on <strong>'grand frère'</strong> ?", a: "哥哥", opts: ["哥哥", "弟弟", "姐姐", "妹妹", "爸爸"] },
+          { q: "Comment écrit-on <strong>'petit frère'</strong> ?", a: "弟弟", opts: ["弟弟", "哥哥", "爸爸", "妈妈", "叔叔"] },
+          { q: "Comment écrit-on <strong>'grande sœur'</strong> ?", a: "姐姐", opts: ["姐姐", "妹妹", "妈妈", "哥哥", "阿姨"] },
+          { q: "Comment écrit-on <strong>'petite sœur'</strong> ?", a: "妹妹", opts: ["妹妹", "姐姐", "爸爸", "弟弟", "奶奶"] },
+          { q: "Qui est 爸爸 ?", a: "Papa", opts: ["Papa", "Maman", "Grand-père", "Oncle", "Tante"] },
+          { q: "Qui est 姐姐 ?", a: "Grande sœur", opts: ["Grande sœur", "Petite sœur", "Maman", "Tante", "Cousine"] },
+          { q: "Comment dit-on 'grand-mère' ?", a: "奶奶", opts: ["奶奶", "外婆", "爷爷", "姥姥", "妈妈"] },
+          { q: "Comment dit-on 'oncle' (frère du père) ?", a: "叔叔", opts: ["叔叔", "舅舅", "伯伯", "阿姨", "爷爷"] }
+        ]
+      },
+      5: {
+        title: "Niveau 5 : Animaux courants",
+        subtitle: "Découvrez les animaux en chinois simplifié",
+        questions: [
+          { q: "Comment écrit-on <strong>'chat'</strong> ?", a: "猫", opts: ["猫", "狗", "鸟", "马", "牛"] },
+          { q: "Comment écrit-on <strong>'chien'</strong> ?", a: "狗", opts: ["狗", "猫", "鱼", "牛", "马"] },
+          { q: "Comment écrit-on <strong>'oiseau'</strong> ?", a: "鸟", opts: ["鸟", "马", "狗", "猫", "猪"] },
+          { q: "Comment écrit-on <strong>'poisson'</strong> ?", a: "鱼", opts: ["鱼", "牛", "猫", "狗", "鸟"] },
+          { q: "Comment écrit-on <strong>'cheval'</strong> ?", a: "马", opts: ["马", "鸟", "鱼", "牛", "羊"] },
+          { q: "Comment écrit-on <strong>'vache'</strong> ?", a: "牛", opts: ["牛", "马", "猫", "狗", "羊"] },
+          { q: "Quel animal représente 猫 ?", a: "Chat", opts: ["Chat", "Chien", "Tigre", "Lapin", "Oiseau"] },
+          { q: "Quel animal représente 鱼 ?", a: "Poisson", opts: ["Poisson", "Oiseau", "Grenouille", "Serpent", "Chien"] },
+          { q: "Quel animal représente 马 ?", a: "Cheval", opts: ["Cheval", "Vache", "Âne", "Zèbre", "Chèvre"] },
+          { q: "Quel animal représente 牛 ?", a: "Vache", opts: ["Vache", "Cheval", "Chien", "Chat", "Mouton"] }
+        ]
+      }
+    };
+
+    // ==========================================
+    // CONSTANTES
+    // ==========================================
+    const TOTAL_TIME_SECONDS = 90;
+    const QUESTION_TIME_SECONDS = 10;
+    const INITIAL_LIVES = 10;
+
+    // ==========================================
+    // VARIABLES D'ÉTAT
+    // ==========================================
+    let currentLevel = null;
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let lives = INITIAL_LIVES;
+    let answered = false;
+    let globalTimerInterval = null;
+    let questionTimerInterval = null;
+
+    // ==========================================
+    // ÉLÉMENTS DOM
+    // ==========================================
+    const loadingEl = document.getElementById('loading');
+    const timersContainer = document.getElementById('timers-container');
+    const quizMain = document.getElementById('quiz-main');
+    const quizResult = document.getElementById('quiz-result');
+    const quizTitle = document.getElementById('quiz-title');
+    const quizSubtitle = document.getElementById('quiz-subtitle');
+    const quizQuestion = document.getElementById('quiz-question');
+    const quizAnswers = document.getElementById('quiz-answers');
+    const quizScore = document.getElementById('quiz-score');
+    const quizLives = document.getElementById('quiz-lives');
+    const quizIndex = document.getElementById('quiz-index');
+    const quizTotal = document.getElementById('quiz-total');
+    const quizNextBtn = document.getElementById('quiz-next-btn');
+    const quizRestartBtn = document.getElementById('quiz-restart-btn');
+    const quizFinalScore = document.getElementById('quiz-final-score');
+    const resultMessage = document.getElementById('result-message');
+    const retryBtn = document.getElementById('retry-btn');
+    const timerDisplay = document.getElementById('timer');
+    const questionTimerDisplay = document.getElementById('question-timer');
+    const timerFill = document.getElementById('timer-fill');
+    const questionTimerFill = document.getElementById('question-timer-fill');
+
+    // ==========================================
+    // GESTION DES TIMERS
+    // ==========================================
+    function startGlobalTimer() {
+      clearInterval(globalTimerInterval);
+      let remaining = TOTAL_TIME_SECONDS;
+      timerDisplay.textContent = remaining;
+      timerFill.style.width = '100%';
+
+      globalTimerInterval = setInterval(() => {
+        remaining--;
+        timerDisplay.textContent = remaining;
+        const percentElapsed = ((TOTAL_TIME_SECONDS - remaining) / TOTAL_TIME_SECONDS) * 100;
+        const percentRemaining = 100 - percentElapsed;
+        timerFill.style.width = percentRemaining + '%';
+
+        if (remaining <= 0) {
+          clearInterval(globalTimerInterval);
+          endQuiz(true);
+        }
+      }, 1000);
+    }
+
+    function highlightAnswers(correctAnswer, selectedAnswer = null) {
+      Array.from(quizAnswers.children).forEach(btn => {
+        btn.disabled = true;
+        const btnValue = btn.dataset.value;
+        if (btnValue === correctAnswer) {
+          btn.style.background = '#2ecc71';
+        } else if (selectedAnswer !== null && btnValue === selectedAnswer) {
+          btn.style.background = '#e74c3c';
+        }
+      });
+    };
+
+    function startQuestionTimer() {
+      clearInterval(questionTimerInterval);
+      let remaining = QUESTION_TIME_SECONDS;
+      questionTimerDisplay.textContent = remaining;
+      questionTimerFill.style.width = '100%';
+
+      questionTimerInterval = setInterval(() => {
+        remaining--;
+        questionTimerDisplay.textContent = remaining;
+        const percentElapsed = ((QUESTION_TIME_SECONDS - remaining) / QUESTION_TIME_SECONDS) * 100;
+        const percentRemaining = 100 - percentElapsed;
+        questionTimerFill.style.width = percentRemaining + '%';
+
+        if (remaining <= 0) {
+          clearInterval(questionTimerInterval);
+          handleQuestionTimeout();
+        }
+      }, 1000);
+    }
+
+    function stopQuestionTimer() {
+      clearInterval(questionTimerInterval);
+    }
+
+    function stopAllTimers() {
+      clearInterval(globalTimerInterval);
+      clearInterval(questionTimerInterval);
+    }
+
+    // ==========================================
+    // GESTION DU QUIZ
+    // ==========================================
+    async function initQuiz() {
+      const hash = window.location.hash.replace('#', '');
+      const level = parseInt(hash, 10);
+
+      if (!level || !quizData[level]) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      currentLevel = level;
+      const data = quizData[level];
+
+      quizTitle.textContent = data.title;
+      quizSubtitle.textContent = data.subtitle;
+      questions = [...data.questions].sort(() => Math.random() - 0.5);
+      currentQuestionIndex = 0;
+      score = 0;
+      lives = INITIAL_LIVES;
+
+      loadingEl.style.display = 'none';
+      quizMain.style.display = 'block';
+      quizResult.style.display = 'none';
+      timersContainer.style.display = 'flex';
+
+      updateStats();
+      showQuestion();
+      startGlobalTimer();
+      await loadChinoisLeaderboard();
+    }
+
+    function showQuestion() {
+      stopQuestionTimer();
+
+      if (currentQuestionIndex >= questions.length || lives <= 0) {
+        endQuiz(false);
+        return;
+      }
+
+      const question = questions[currentQuestionIndex];
+      quizQuestion.innerHTML = question.q;
+
+      const shuffledOpts = [...question.opts].sort(() => Math.random() - 0.5);
+      quizAnswers.innerHTML = '';
+
+      shuffledOpts.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+
+        let value, display;
+        if (typeof opt === 'object') {
+          value = String(opt.raw);
+          display = opt.display;
+        } else {
+          value = opt;
+          display = opt;
+        }
+
+        btn.innerHTML = display;
+        btn.dataset.value = value;
+        btn.onclick = () => selectAnswer(value, question.a);
+        quizAnswers.appendChild(btn);
+      });
+
+      quizIndex.textContent = currentQuestionIndex + 1;
+      quizTotal.textContent = questions.length;
+
+      startQuestionTimer();
+    }
+
+    function selectAnswer(selected, correct) {
+      if (answered) return;
+      answered = true;
+      stopQuestionTimer();
+
+      highlightAnswers(correct, selected);
+
+      if (selected === correct) {
+        score++;
+      } else {
+        lives--;
+      }
+
+      updateStats();
+      setTimeout(nextQuestion, 1000);
+    }
+
+    function handleQuestionTimeout() {
+      if (answered) return;
+      answered = true;
+      const question = questions[currentQuestionIndex];
+      highlightAnswers(question.a);
+      lives--;
+      updateStats();
+      setTimeout(nextQuestion, 1000);
+    }
+
+    function nextQuestion() {
+      currentQuestionIndex++;
+      answered = false;
+      showQuestion();
+    }
+
+    function updateStats() {
+      quizScore.textContent = score;
+      quizLives.textContent = '❤'.repeat(Math.max(0, lives)) + '♡'.repeat(Math.max(0, INITIAL_LIVES - lives));
+    }
+
+    async function endQuiz(timeout = false) {
+      stopAllTimers();
+
+      quizMain.style.display = 'none';
+      quizResult.style.display = 'block';
+
+      quizFinalScore.textContent = score + ' / ' + questions.length;
+
+      // Sauvegarde du score réel via Firebase
+      await saveQuizScore(score);
+      await loadChinoisLeaderboard();
+
+      if (timeout) {
+        resultMessage.textContent = '⏳ Temps écoulé ! Essayez encore — vous pouvez recommencer le niveau.';
+      } else {
+        const percentage = questions.length > 0 ? (score / questions.length) * 100 : 0;
+        if (percentage === 100) {
+          resultMessage.textContent = '🏆 Parfait ! Vous maîtrisez ce niveau !';
+        } else if (percentage >= 80) {
+          resultMessage.textContent = '👏 Excellent travail ! Continuez comme ça !';
+        } else if (percentage >= 60) {
+          resultMessage.textContent = '👍 Bon travail ! Encore un peu de pratique !';
+        } else {
+          resultMessage.textContent = '💪 Continuez à pratiquer, vous progressez !';
+        }
+      }
+    }
+
+    // ==========================================
+    // SAUVEGARDE FIREBASE (originale, non simulée)
+    // ==========================================
+    async function saveQuizScore(finalScore) {
+      try {
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+          console.log("Utilisateur non connecté, score non sauvegardé");
+          return;
+        }
+
+        const userDocRef = doc(db, "users", currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        let userData = userDoc.exists() ? userDoc.data() : null;
+
+        // Création du profil si nécessaire
+        if (!userData) {
+          userData = {
+            pseudo: currentUser.email.split("@")[0],
+            email: currentUser.email,
+            globalScore: 0,
+            quizScores: { departements: 0, chinois: 0 },
+            createdAt: new Date().toISOString()
+          };
+          await setDoc(userDocRef, userData);
+        }
+
+        // Mise à jour des scores
+        const oldGlobalScore = userData.globalScore || 0;
+        const newGlobalScore = oldGlobalScore + finalScore;
+        const oldChinoisScore = userData.quizScores?.chinois || 0;
+        const newChinoisScore = oldChinoisScore + finalScore;
+
+        await updateDoc(userDocRef, {
+          globalScore: newGlobalScore,
+          'quizScores.chinois': newChinoisScore,
+          lastQuizDate: new Date().toISOString()
+        });
+
+        console.log("✅ Score sauvegardé:", finalScore);
+      } catch (error) {
+        console.error("❌ Erreur sauvegarde score:", error);
+      }
+    }
+
+    async function loadChinoisLeaderboard() {
+      const listEl = document.getElementById('chinois-leaderboard-list');
+      if (!listEl) return;
+
+      listEl.innerHTML = '<div style="text-align:center; opacity:0.6;">Chargement...</div>';
+
+      try {
+        // Requête Firestore : top 5 par quizScores.chinois
+        const q = query(
+          collection(db, 'users'),
+          orderBy('quizScores.chinois', 'desc'),
+          limit(5)
+        );
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          listEl.innerHTML = '<div style="text-align:center; opacity:0.6;">Aucun score</div>';
+          return;
+        }
+
+        let html = '';
+        let rank = 1;
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const pseudo = (data.pseudo || 'Anonyme').substring(0, 12);
+          const score = data.quizScores?.chinois || 0;
+
+          // Emoji pour le top 3
+          let rankText = `${rank}.`;
+          if (rank === 1) rankText = '🥇';
+          else if (rank === 2) rankText = '🥈';
+          else if (rank === 3) rankText = '🥉';
+
+          html += `
+            <div class="leaderboard-item">
+              <span class="rank">${rankText}</span>
+              <span class="name">${pseudo}</span>
+              <span class="score">${score}</span>
+            </div>
+          `;
+          rank++;
+        });
+
+        listEl.innerHTML = html;
+      } catch (error) {
+        console.error("Erreur chargement leaderboard chinois:", error);
+        listEl.innerHTML = '<div style="text-align:center; opacity:0.6;">Erreur</div>';
+      }
+    }
+
+    retryBtn.addEventListener('click', () => {
+      stopAllTimers();
+      initQuiz();
+    });
+
+    window.addEventListener('hashchange', () => {
+      stopAllTimers();
+      initQuiz();
+    });
+
+    // ==========================================
+    // DÉMARRAGE
+    // ==========================================
+    window.addEventListener('load', initQuiz);
+  </script>
+</body>
+
+</html>
+

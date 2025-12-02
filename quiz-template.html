@@ -312,8 +312,6 @@
                 <h3>Résumé</h3>
                 <p>Score de la partie : <strong id="final-score">0</strong></p>
                 <p>Nouveau score global : <strong id="new-global-score">0</strong></p>
-                <!-- ✏️ À MODIFIER : changer le libellé et la variable selon le type de quiz -->
-                <p>Score [QUIZ_TYPE] : <strong id="new-dept-score">0</strong></p>
                 <p>Quiz complétés : <strong id="new-quiz-completed">0</strong></p>
                 <div id="level-up-msg" class="hidden" style="color: #2ecc71; margin-top: 15px; font-weight: bold;">
                     🎊 NIVEAU SUPÉRIEUR ATTEINT !
@@ -328,7 +326,7 @@
         // 🔧 INITIALISATION FIREBASE (identique à tous les quiz)
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, getDoc, updateDoc, setDoc, collection, query, orderBy, limit, getDocs, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
@@ -344,17 +342,6 @@
         window.auth = auth;
         window.db = db;
         window.currentUser = null;
-
-        // ✏️ À MODIFIER : liste utilisée pour calculer le score global (ajoute ton quiz ici si besoin)
-        function computeGlobalScore(quizScores) {
-            const keys = [
-                'departements', 'chinois', 'medecine', 'math', 'anglais',
-                'neerlandais', 'allemand', 'italien', 'espagnol',
-                'geographie', 'animaux'
-                // ← Ajoute ta clé ici si tu crées un nouveau type de quiz
-            ];
-            return keys.reduce((sum, key) => sum + (quizScores[key] || 0), 0);
-        }
 
         // ✏️ À MODIFIER : configurer les paramètres du mode (durée, nombre de vies, etc.)
         const mode = { time: 60, qTime: 5, lives: 3 };
@@ -393,38 +380,34 @@
         async function saveCurrentScore() {
             if (!window.currentUser || score <= 0 || gameCompleted) return;
             try {
-                // ✏️ À MODIFIER : CLÉ SPÉCIFIQUE DU QUIZ DANS quizScores
-                const quizKey = 'chinois'; // ← ← ← ← ← MODIFIER ICI
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
-                let userData = userDoc.data();
-                const defaultQuizScores = {
-                    departements: 0, chinois: 0, medecine: 0, math: 0, anglais: 0,
-                    neerlandais: 0, allemand: 0, italien: 0, espagnol: 0,
-                    geographie: 0, animaux: 0
-                    // ← Ajouter ta clé ici aussi
-                };
-                if (!userData) {
-                    userData = {
+                let currentGlobalScore = 0;
+                if (!userDoc.exists()) {
+                    // Créer utilisateur si nécessaire
+                    await setDoc(userDocRef, {
                         pseudo: currentUser.email.split('@')[0],
                         email: currentUser.email,
-                        quizScores: defaultQuizScores,
+                        globalScore: 0,
                         quizCompleted: 0,
                         createdAt: new Date().toISOString()
-                    };
-                    await setDoc(userDocRef, userData);
+                    });
+                } else {
+                    currentGlobalScore = userDoc.data().globalScore || 0;
                 }
-                const quizScores = { ...(userData.quizScores || defaultQuizScores) };
-                const oldDeptScore = quizScores[quizKey] || 0;
-                const newDeptScore = oldDeptScore + score;
-                quizScores[quizKey] = newDeptScore;
-                const newGlobalScore = computeGlobalScore(quizScores);
-                await updateDoc(userDocRef, { quizScores });
+                const newGlobalScore = currentGlobalScore + score;
+                await updateDoc(userDocRef, {
+                    globalScore: newGlobalScore
+                });
                 localStorage.setItem('globalScore', newGlobalScore);
                 document.getElementById('user-global-score').textContent = newGlobalScore;
-                // Optionnel : updateBaseBtnVisibility(newGlobalScore);
             } catch (error) {
                 console.error('Erreur sauvegarde partielle:', error);
+                // Fallback local
+                const current = parseInt(localStorage.getItem('globalScore')) || 0;
+                const updated = current + score;
+                localStorage.setItem('globalScore', updated);
+                document.getElementById('user-global-score').textContent = updated;
             }
         }
 
@@ -459,7 +442,7 @@
             resultSection.classList.add('hidden');
             quizSection.classList.remove('hidden');
             updateQuizHeaderVisibility(true);
-            loadLeaderboard(); // ✏️ À MODIFIER si nom du leaderboard change
+            loadLeaderboard();
             generateQuestion();
             startMainTimer();
         }
@@ -473,7 +456,6 @@
             qTimerFill.style.width = '100%';
             questionBox.innerHTML = qData.q;
 
-            // Assure 1 bonne réponse + 4 mauvaises
             const opts = qData.opts.slice(0, 5);
             answerBtns.forEach((btn, i) => {
                 if (i < 5) {
@@ -574,49 +556,45 @@
             try {
                 if (!window.currentUser) throw new Error('Utilisateur non connecté');
 
-                // ✏️ À MODIFIER : CLÉ DU QUIZ À METTRE À JOUR
-                const quizKey = 'chinois'; // ← ← ← ← ← MODIFIER ICI
-
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
-                let userData = userDoc.data();
-                const defaultQuizScores = {
-                    departements: 0, chinois: 0, medecine: 0, math: 0, anglais: 0,
-                    neerlandais: 0, allemand: 0, italien: 0, espagnol: 0,
-                    geographie: 0, animaux: 0
-                };
+                let currentGlobalScore = 0;
+                let quizCompleted = 0;
 
-                if (!userData) {
-                    userData = {
+                if (!userDoc.exists()) {
+                    // Créer utilisateur
+                    await setDoc(userDocRef, {
                         pseudo: currentUser.email.split('@')[0],
                         email: currentUser.email,
-                        quizScores: defaultQuizScores,
-                        quizCompleted: 0,
+                        globalScore: score,
+                        quizCompleted: lives > 0 ? 1 : 0,
                         createdAt: new Date().toISOString()
-                    };
-                    await setDoc(userDocRef, userData);
+                    });
+                    currentGlobalScore = score;
+                    quizCompleted = lives > 0 ? 1 : 0;
+                } else {
+                    const data = userDoc.data();
+                    currentGlobalScore = data.globalScore || 0;
+                    quizCompleted = data.quizCompleted || 0;
+                    const newGlobalScore = currentGlobalScore + score;
+                    const newQuizCompleted = quizCompleted + (lives > 0 ? 1 : 0);
+                    await updateDoc(userDocRef, {
+                        globalScore: newGlobalScore,
+                        quizCompleted: newQuizCompleted
+                    });
+                    currentGlobalScore = newGlobalScore;
+                    quizCompleted = newQuizCompleted;
                 }
 
-                const quizScores = { ...(userData.quizScores || defaultQuizScores) };
-                const oldDeptScore = quizScores[quizKey] || 0;
-                const newDeptScore = oldDeptScore + score;
-                quizScores[quizKey] = newDeptScore;
-
-                const newGlobalScore = computeGlobalScore(quizScores);
-                let quizCompleted = userData.quizCompleted || 0;
-                if (lives > 0) quizCompleted += 1;
-
-                await updateDoc(userDocRef, { quizScores, quizCompleted });
-
-                localStorage.setItem('globalScore', newGlobalScore);
+                localStorage.setItem('globalScore', currentGlobalScore);
                 localStorage.setItem('quizCompleted', quizCompleted);
 
-                document.getElementById('new-global-score').textContent = newGlobalScore;
-                document.getElementById('new-dept-score').textContent = newDeptScore;
+                document.getElementById('new-global-score').textContent = currentGlobalScore;
                 document.getElementById('new-quiz-completed').textContent = quizCompleted;
 
-                const oldLevel = Math.floor(oldDeptScore / 50);
-                const newLevel = Math.floor(newDeptScore / 50);
+                // Si tu veux garder un système de niveaux basé sur le score total
+                const oldLevel = Math.floor((currentGlobalScore - score) / 50);
+                const newLevel = Math.floor(currentGlobalScore / 50);
                 if (newLevel > oldLevel) {
                     document.getElementById('level-up-msg').classList.remove('hidden');
                 } else {
@@ -624,7 +602,12 @@
                 }
             } catch (error) {
                 console.error('Erreur sauvegarde fin de partie:', error);
-                alert('Erreur lors de la sauvegarde.');
+                // Fallback local
+                const current = parseInt(localStorage.getItem('globalScore')) || 0;
+                const updated = current + score;
+                localStorage.setItem('globalScore', updated);
+                document.getElementById('new-global-score').textContent = updated;
+                alert('Sauvegarde locale utilisée (hors ligne).');
             }
         }
 
@@ -651,7 +634,7 @@
             window.location.href = 'index.html';
         };
 
-        // ✏️ À MODIFIER : chargement du bon leaderboard
+        // Chargement du leaderboard global
         async function loadLeaderboard() {
             const mobileList = document.querySelector('#leaderboard-section.mobile .leaderboard-list');
             const desktopList = document.querySelector('#leaderboard-section.desktop .leaderboard-list');
@@ -660,15 +643,14 @@
             if (desktopList) desktopList.innerHTML = placeholder;
 
             try {
-                // ✏️ À MODIFIER : champ du leaderboard
-                const q = query(collection(db, 'users'), orderBy('quizScores.chinois', 'desc'), limit(10));
+                const q = query(collection(db, 'users'), orderBy('globalScore', 'desc'), limit(10));
                 const querySnapshot = await getDocs(q);
                 let rank = 1;
                 let html = '';
                 querySnapshot.forEach((doc) => {
                     const data = doc.data() || {};
                     const pseudo = data.pseudo || 'Anonyme';
-                    const score = data.quizScores?.chinois || 0; // ← ← ← MODIFIER ICI
+                    const score = data.globalScore || 0;
                     let medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
                     html += `<div class="leaderboard-item">
                         <div class="leaderboard-rank">${medal || rank}</div>
@@ -700,12 +682,11 @@
                 let globalScore = 0;
                 if (userDoc.exists()) {
                     const data = userDoc.data();
-                    const quizScores = data.quizScores || {};
                     pseudoEl.textContent = data.pseudo || user.email.split('@')[0];
-                    globalScore = computeGlobalScore(quizScores);
+                    globalScore = data.globalScore || 0;
                 } else {
                     pseudoEl.textContent = user.email.split('@')[0];
-                    globalScore = 0;
+                    globalScore = parseInt(localStorage.getItem('globalScore')) || 0;
                 }
                 scoreEl.textContent = globalScore;
                 localStorage.setItem('globalScore', globalScore);
@@ -731,12 +712,7 @@
             // Exemple : seul le niveau 1 est libre
             return level === 1;
         }
-
-        // Initialisation bouton Base si utilisé
-        function updateBaseBtnVisibility(globalScore) {
-            // Facultatif – à supprimer si non utilisé
-        }
-        updateBaseBtnVisibility(0);
     </script>
 </body>
 </html>
+

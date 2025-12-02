@@ -903,7 +903,7 @@
                 document.getElementById('user-global-score').textContent = globalScore;
                 updateBaseBtnVisibility(globalScore);
 
-                return { globalScore, newDeptScore, quizCompleted };
+                return { globalScore, newChinoisScore, quizCompleted };
             } catch (error) {
                 console.error('Erreur sauvegarde:', error);
                 alert('Erreur lors de la sauvegarde du score.');
@@ -1129,8 +1129,8 @@
                 document.getElementById('new-chinois-score').textContent = saved.newChinoisScore;
                 document.getElementById('new-quiz-completed').textContent = saved.quizCompleted;
 
-                const oldLevel = Math.floor((saved.newDeptScore - score) / 50);
-                const newLevel = Math.floor(saved.newDeptScore / 50);
+                const oldLevel = Math.floor((saved.newChinoisScore - score) / 50);
+                const newLevel = Math.floor(saved.newChinoisScore / 50);
                 if (newLevel > oldLevel) {
                     document.getElementById('level-up-msg').classList.remove('hidden');
                 } else {

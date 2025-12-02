@@ -574,9 +574,7 @@
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
                 let userData = userDoc.data();
-                
-                // Valeurs par défaut
-                
+                              
                 if (!userData) {
                     userData = {
                         pseudo: currentUser.email.split('@')[0],
@@ -589,7 +587,6 @@
                     await setDoc(userDocRef, userData);
                 }
 
-                // Récupérer les scores existants
                 const currentDeptScore = quizScores.chinois || 0;
                 const currentGlobalScore = userData.globalScore || localStorage.getItem('globalScore') || 0;
 

@@ -358,9 +358,6 @@
         window.db = db;
         window.currentUser = null;
 
-        // ✏️ À MODIFIER : liste utilisée pour calculer le score global (ajoute ton quiz ici si besoin)
-        // REMOVED: No longer needed since we only use globalScore directly
-
         // ✏️ À MODIFIER : configurer les paramètres du mode (durée, nombre de vies, etc.)
         const mode = { time: 60, qTime: 7, lives: 3 };
 
@@ -401,32 +398,19 @@
                 const quizKey = 'anglais';
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
-                let userData = userDoc.data();
-                const defaultQuizScores = {
-                    departements: 0, chinois: 0, medecine: 0, math: 0, anglais: 0,
-                    neerlandais: 0, allemand: 0, italien: 0, espagnol: 0,
-                    geographie: 0, animaux: 0
-                };
-                if (!userData) {
-                    userData = {
-                        pseudo: currentUser.email.split('@')[0],
-                        email: currentUser.email,
-                        quizScores: defaultQuizScores,
-                        quizCompleted: 0,
-                        globalScore: 0,
-                        createdAt: new Date().toISOString()
-                    };
-                    await setDoc(userDocRef, userData);
-                }
-                const quizScores = { ...(userData.quizScores || defaultQuizScores) };
-                const oldDeptScore = quizScores[quizKey] || 0;
-                const newDeptScore = oldDeptScore + score;
-                quizScores[quizKey] = newDeptScore;
-                
-                // Calculate new global score by adding only the quiz score
-                const newGlobalScore = (userData.globalScore || 0) + score;
-                
-                await updateDoc(userDocRef, { quizScores, globalScore: newGlobalScore });
+                let userData = userDoc.exists() ? userDoc.data() : null;
+
+                const currentGlobalScore = userData?.globalScore || 0;
+                const currentAnglaisScore = userData?.quizScores?.[quizKey] || 0;
+
+                const newAnglaisScore = currentAnglaisScore + score;
+                const newGlobalScore = currentGlobalScore + score;
+
+                await updateDoc(userDocRef, {
+                    globalScore: newGlobalScore,
+                    [`quizScores.${quizKey}`]: newAnglaisScore
+                });
+
                 localStorage.setItem('globalScore', newGlobalScore);
                 document.getElementById('user-global-score').textContent = newGlobalScore;
             } catch (error) {
@@ -745,25 +729,38 @@
             document.getElementById('final-score').textContent = score;
             stopAllTimers();
 
+            if (!window.currentUser) {
+                // Fallback: store in localStorage only
+                let localGlobal = parseInt(localStorage.getItem('globalScore') || '0');
+                let localQuizCompleted = parseInt(localStorage.getItem('quizCompleted') || '0');
+                let localAnglais = parseInt(localStorage.getItem('anglaisScore') || '0');
+
+                const newAnglaisScore = localAnglais + score;
+                const newGlobalScore = localGlobal + score;
+                const newQuizCompleted = lives > 0 ? localQuizCompleted + 1 : localQuizCompleted;
+
+                localStorage.setItem('globalScore', newGlobalScore);
+                localStorage.setItem('quizCompleted', newQuizCompleted);
+                localStorage.setItem('anglaisScore', newAnglaisScore);
+
+                document.getElementById('new-global-score').textContent = newGlobalScore;
+                document.getElementById('new-dept-score').textContent = newAnglaisScore;
+                document.getElementById('new-quiz-completed').textContent = newQuizCompleted;
+                return;
+            }
+
             try {
-                if (!window.currentUser) throw new Error('Utilisateur non connecté');
-
                 const quizKey = 'anglais';
-
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
                 let userData = userDoc.data();
-                const defaultQuizScores = {
-                    departements: 0, chinois: 0, medecine: 0, math: 0, anglais: 0,
-                    neerlandais: 0, allemand: 0, italien: 0, espagnol: 0,
-                    geographie: 0, animaux: 0
-                };
 
+                // Initialize if new user
                 if (!userData) {
                     userData = {
                         pseudo: currentUser.email.split('@')[0],
                         email: currentUser.email,
-                        quizScores: defaultQuizScores,
+                        quizScores: { [quizKey]: 0 },
                         quizCompleted: 0,
                         globalScore: 0,
                         createdAt: new Date().toISOString()
@@ -771,31 +768,38 @@
                     await setDoc(userDocRef, userData);
                 }
 
-                const quizScores = { ...(userData.quizScores || defaultQuizScores) };
-                const oldDeptScore = quizScores[quizKey] || 0;
-                const newDeptScore = oldDeptScore + score;
-                quizScores[quizKey] = newDeptScore;
+                const currentAnglaisScore = userData.quizScores?.[quizKey] || 0;
+                const currentGlobalScore = userData.globalScore || 0;
+                const currentQuizCompleted = userData.quizCompleted || 0;
 
-                // Update global score by adding only the current quiz score
-                const newGlobalScore = (userData.globalScore || 0) + score;
-                let quizCompleted = userData.quizCompleted || 0;
-                if (lives > 0) quizCompleted += 1;
+                const newAnglaisScore = currentAnglaisScore + score;
+                const newGlobalScore = currentGlobalScore + score; // ← Only add current quiz points
+                const newQuizCompleted = lives > 0 ? currentQuizCompleted + 1 : currentQuizCompleted;
 
-                await updateDoc(userDocRef, { quizScores, quizCompleted, globalScore: newGlobalScore });
+                // Update only the necessary fields
+                await updateDoc(userDocRef, {
+                    globalScore: newGlobalScore,
+                    quizCompleted: newQuizCompleted,
+                    [`quizScores.${quizKey}`]: newAnglaisScore
+                });
 
+                // Sync to localStorage
                 localStorage.setItem('globalScore', newGlobalScore);
-                localStorage.setItem('quizCompleted', quizCompleted);
+                localStorage.setItem('quizCompleted', newQuizCompleted);
 
+                // Update UI
                 document.getElementById('new-global-score').textContent = newGlobalScore;
-                document.getElementById('new-dept-score').textContent = newDeptScore;
-                document.getElementById('new-quiz-completed').textContent = quizCompleted;
+                document.getElementById('new-dept-score').textContent = newAnglaisScore;
+                document.getElementById('new-quiz-completed').textContent = newQuizCompleted;
 
-                const oldLevel = Math.floor(oldDeptScore / 50);
-                const newLevel = Math.floor(newDeptScore / 50);
+                // Level-up logic (based on anglais score only)
+                const oldLevel = Math.floor(currentAnglaisScore / 50);
+                const newLevel = Math.floor(newAnglaisScore / 50);
+                const levelUpMsg = document.getElementById('level-up-msg');
                 if (newLevel > oldLevel) {
-                    document.getElementById('level-up-msg').classList.remove('hidden');
+                    levelUpMsg.classList.remove('hidden');
                 } else {
-                    document.getElementById('level-up-msg').classList.add('hidden');
+                    levelUpMsg.classList.add('hidden');
                 }
             } catch (error) {
                 console.error('Erreur sauvegarde fin de partie:', error);

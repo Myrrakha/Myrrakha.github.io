@@ -333,7 +333,6 @@
                 <p>Score de la partie : <strong id="final-score">0</strong></p>
                 <p>Nouveau score global : <strong id="new-global-score">0</strong></p>
                 <p>Score anglais : <strong id="new-dept-score">0</strong></p>
-                <p>Quiz complétés : <strong id="new-quiz-completed">0</strong></p>
                 <div id="level-up-msg" class="hidden" style="color: #2ecc71; margin-top: 15px; font-weight: bold;">
                     🎊 NIVEAU SUPÉRIEUR ATTEINT !
                 </div>
@@ -363,13 +362,9 @@
         window.db = db;
         window.currentUser = null;
 
+        // Simplified global score logic: only globalScore and anglais
         function computeGlobalScore(quizScores) {
-            const keys = [
-                'departements', 'chinois', 'medecine', 'math', 'anglais',
-                'neerlandais', 'allemand', 'italien', 'espagnol',
-                'geographie', 'animaux'
-            ];
-            return keys.reduce((sum, key) => sum + (quizScores[key] || 0), 0);
+            return (quizScores?.anglais || 0);
         }
 
         const mode = { time: 60, qTime: 5, lives: 3 };
@@ -553,12 +548,10 @@
             { q: "What is the past simple of 'choose'?", a: "chose" },
             { q: "What is the past participle of 'choose'?", a: "chosen" }
         ];
-
         let score = 0, lives = 0, timeLeft = 0, qTime = 0;
         let timerInterval = null, qTimerInterval = null, awaitingNext = false;
         let currentQuestionData = null;
         let gameCompleted = false;
-
         const quizSection = document.getElementById('quiz-section');
         const resultSection = document.getElementById('result-section');
         const backBtn = document.getElementById('back-btn');
@@ -584,32 +577,27 @@
         async function saveCurrentScore() {
             if (!window.currentUser || score <= 0 || gameCompleted) return;
             try {
-                const quizKey = 'anglais';
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
                 let userData = userDoc.data();
-                const defaultQuizScores = {
-                    departements: 0, chinois: 0, medecine: 0, math: 0, anglais: 0,
-                    neerlandais: 0, allemand: 0, italien: 0, espagnol: 0,
-                    geographie: 0, animaux: 0
-                };
+                const defaultQuizScores = { anglais: 0 };
                 if (!userData) {
                     userData = {
                         pseudo: currentUser.email.split('@')[0],
                         email: currentUser.email,
                         quizScores: defaultQuizScores,
-                        quizCompleted: 0,
                         createdAt: new Date().toISOString()
                     };
                     await setDoc(userDocRef, userData);
                 }
                 const quizScores = { ...(userData.quizScores || defaultQuizScores) };
-                const oldDeptScore = quizScores[quizKey] || 0;
-                const newDeptScore = oldDeptScore + score;
-                quizScores[quizKey] = newDeptScore;
-                const newGlobalScore = computeGlobalScore(quizScores);
+                const oldAnglais = quizScores.anglais || 0;
+                const newAnglais = oldAnglais + score;
+                quizScores.anglais = newAnglais;
+                const newGlobalScore = newAnglais; // Only anglais counts
                 await updateDoc(userDocRef, { quizScores });
                 localStorage.setItem('globalScore', newGlobalScore);
+                localStorage.setItem('anglaisScore', newAnglais);
                 document.getElementById('user-global-score').textContent = newGlobalScore;
             } catch (error) {
                 console.error('Erreur sauvegarde partielle:', error);
@@ -819,40 +807,31 @@
             stopAllTimers();
             try {
                 if (!window.currentUser) throw new Error('Utilisateur non connecté');
-                const quizKey = 'anglais';
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
                 let userData = userDoc.data();
-                const defaultQuizScores = {
-                    departements: 0, chinois: 0, medecine: 0, math: 0, anglais: 0,
-                    neerlandais: 0, allemand: 0, italien: 0, espagnol: 0,
-                    geographie: 0, animaux: 0
-                };
+                const defaultQuizScores = { anglais: 0 };
                 if (!userData) {
                     userData = {
                         pseudo: currentUser.email.split('@')[0],
                         email: currentUser.email,
                         quizScores: defaultQuizScores,
-                        quizCompleted: 0,
                         createdAt: new Date().toISOString()
                     };
                     await setDoc(userDocRef, userData);
                 }
                 const quizScores = { ...(userData.quizScores || defaultQuizScores) };
-                const oldDeptScore = quizScores[quizKey] || 0;
-                const newDeptScore = oldDeptScore + score;
-                quizScores[quizKey] = newDeptScore;
-                const newGlobalScore = computeGlobalScore(quizScores);
-                let quizCompleted = userData.quizCompleted || 0;
-                if (lives > 0) quizCompleted += 1;
-                await updateDoc(userDocRef, { quizScores, quizCompleted });
+                const oldAnglais = quizScores.anglais || 0;
+                const newAnglais = oldAnglais + score;
+                quizScores.anglais = newAnglais;
+                const newGlobalScore = newAnglais;
+                await updateDoc(userDocRef, { quizScores });
                 localStorage.setItem('globalScore', newGlobalScore);
-                localStorage.setItem('quizCompleted', quizCompleted);
+                localStorage.setItem('anglaisScore', newAnglais);
                 document.getElementById('new-global-score').textContent = newGlobalScore;
-                document.getElementById('new-dept-score').textContent = newDeptScore;
-                document.getElementById('new-quiz-completed').textContent = quizCompleted;
-                const oldLevel = Math.floor(oldDeptScore / 50);
-                const newLevel = Math.floor(newDeptScore / 50);
+                document.getElementById('new-dept-score').textContent = newAnglais;
+                const oldLevel = Math.floor(oldAnglais / 50);
+                const newLevel = Math.floor(newAnglais / 50);
                 if (newLevel > oldLevel) {
                     document.getElementById('level-up-msg').classList.remove('hidden');
                 } else {
@@ -935,7 +914,7 @@
                     const data = userDoc.data();
                     const quizScores = data.quizScores || {};
                     pseudoEl.textContent = data.pseudo || user.email.split('@')[0];
-                    globalScore = computeGlobalScore(quizScores);
+                    globalScore = quizScores.anglais || 0;
                 } else {
                     pseudoEl.textContent = user.email.split('@')[0];
                     globalScore = 0;
@@ -944,14 +923,11 @@
                 localStorage.setItem('globalScore', globalScore);
                 navLoggedIn.classList.remove('hidden');
 
-                // 🔒 Vérification d'accès au Niveau 2 (score global ≥ 100)
                 if (globalScore < 100) {
                     alert("💡 Vous devez avoir au moins 100 points de score global pour accéder à ce quiz.");
                     window.location.href = 'index.html';
                     return;
                 }
-
-                // Démarrer le quiz
                 startMode();
             } else {
                 window.location.href = 'index.html';

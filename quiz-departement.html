@@ -584,7 +584,6 @@
                 let quizCompleted = 0;
                 if (userDoc.exists()) {
                     const data = userDoc.data();
-                    const quizScores = data.quizScores || {};
                     pseudoEl.textContent = data.pseudo || user.email.split('@')[0];
                     globalScore = data.globalScore || 0; // ✅ Lecture directe
                     quizCompleted = data.quizCompleted || 0;
@@ -757,30 +756,33 @@
                 mobileBackBtn.classList.add('hidden');
             }
         }
-        // ✅ Sauvegarde mise à jour : incrément direct
+        // ✅ Sauvegarde mise à jour : incrément direct sur globalScore et deptScore
         async function saveScores(deptIncrement, markCompleted = false) {
             if (deptIncrement <= 0) return;
-            // Lecture locale du globalScore existant
+            // Lecture locale
             let currentGlobalScore = parseInt(localStorage.getItem('globalScore')) || 0;
             let quizCompleted = parseInt(localStorage.getItem('quizCompleted')) || 0;
-            // Mettre à jour
+            let deptScore = parseInt(localStorage.getItem('deptScore')) || 0;
+
+            // Mise à jour
             const newGlobalScore = currentGlobalScore + deptIncrement;
+            const newDeptScore = deptScore + deptIncrement;
             if (markCompleted && lives > 0) {
                 quizCompleted += 1;
             }
-            // Mettre à jour quizScores pour le leaderboard
-            let quizScores = JSON.parse(localStorage.getItem('quizScores')) || {};
-            quizScores.departements = (quizScores.departements || 0) + deptIncrement;
-            localStorage.setItem('quizScores', JSON.stringify(quizScores));
+
+            // Sauvegarde locale
             localStorage.setItem('globalScore', newGlobalScore.toString());
             localStorage.setItem('quizCompleted', quizCompleted.toString());
+            localStorage.setItem('deptScore', newDeptScore.toString());
+
             // Firebase
             if (window.currentUser) {
                 try {
                     const userDocRef = doc(db, 'users', currentUser.uid);
                     const updateData = {
-                        'quizScores.departements': increment(deptIncrement),
-                        globalScore: increment(deptIncrement)
+                        globalScore: increment(deptIncrement),
+                        'quizScores.departements': increment(deptIncrement)
                     };
                     if (markCompleted && lives > 0) {
                         updateData.quizCompleted = increment(1);
@@ -790,6 +792,7 @@
                     console.warn('Firebase indisponible, sauvegarde locale uniquement:', error);
                 }
             }
+
             // UI
             document.getElementById('user-global-score').textContent = newGlobalScore;
             updateBaseBtnVisibility(newGlobalScore);
@@ -969,10 +972,9 @@
             // Sauvegarde avec indication de complétion
             await saveScores(score, true);
             // Mettre à jour l'affichage des résultats
-            const quizScores = JSON.parse(localStorage.getItem('quizScores')) || {};
-            const quizCompleted = parseInt(localStorage.getItem('quizCompleted')) || 0;
             const newGlobalScore = parseInt(localStorage.getItem('globalScore')) || 0;
-            const newDeptScore = quizScores.departements || 0;
+            const newDeptScore = parseInt(localStorage.getItem('deptScore')) || 0;
+            const quizCompleted = parseInt(localStorage.getItem('quizCompleted')) || 0;
             document.getElementById('new-global-score').textContent = newGlobalScore;
             document.getElementById('new-dept-score').textContent = newDeptScore;
             document.getElementById('new-quiz-completed').textContent = quizCompleted;
@@ -1059,6 +1061,7 @@
                     localStorage.setItem('quizScores', JSON.stringify(defaultQuizScores));
                     localStorage.setItem('quizCompleted', '0');
                     localStorage.setItem('globalScore', '0');
+                    localStorage.setItem('deptScore', '0');
                 } else {
                     await signInWithEmailAndPassword(auth, email, password);
                 }
