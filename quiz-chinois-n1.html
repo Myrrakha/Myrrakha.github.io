@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,12 +9,14 @@
         .hidden {
             display: none !important;
         }
+
         body {
             margin: 0;
             font-family: 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #0f1115, #1c1c24);
             color: #f0f0f0;
         }
+
         #hover-warning {
             position: absolute;
             padding: 8px 14px;
@@ -26,6 +29,7 @@
             transition: opacity 0.4s ease;
             z-index: 9999;
         }
+
         header {
             width: 100%;
             background: rgba(20, 20, 28, 0.8);
@@ -35,6 +39,7 @@
             top: 0;
             z-index: 1000;
         }
+
         .navbar {
             max-width: 1100px;
             margin: auto;
@@ -43,21 +48,25 @@
             align-items: center;
             padding: 12px 20px;
         }
+
         .nav-title {
             font-size: 1.4em;
             font-weight: 600;
             color: #eaeaea;
             letter-spacing: 1px;
         }
+
         .user-info {
             display: flex;
             gap: 15px;
             align-items: center;
         }
+
         .user-stats {
             font-size: 0.9em;
             text-align: right;
         }
+
         .logout-btn {
             padding: 8px 16px;
             background: #dc3545;
@@ -67,9 +76,11 @@
             cursor: pointer;
             transition: 0.25s;
         }
+
         .logout-btn:hover {
             background: #c82333;
         }
+
         /* AUTH SECTION */
         #auth-section {
             display: flex;
@@ -77,6 +88,7 @@
             align-items: center;
             min-height: 80vh;
         }
+
         .auth-container {
             background: #1f1f28;
             padding: 40px;
@@ -85,18 +97,22 @@
             max-width: 400px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
+
         .auth-container h2 {
             margin-top: 0;
             text-align: center;
         }
+
         .form-group {
             margin-bottom: 20px;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
             font-size: 0.95em;
         }
+
         .form-group input {
             width: 100%;
             padding: 12px;
@@ -107,6 +123,7 @@
             font-size: 1em;
             box-sizing: border-box;
         }
+
         .auth-btn {
             width: 100%;
             padding: 12px;
@@ -120,19 +137,23 @@
             transition: 0.25s;
             margin-top: 10px;
         }
+
         .auth-btn:hover {
             background: #7d1f85;
         }
+
         .auth-switch {
             text-align: center;
             margin-top: 20px;
             font-size: 0.9em;
         }
+
         .auth-switch a {
             color: #9c28a7;
             cursor: pointer;
             text-decoration: underline;
         }
+
         .error-msg {
             background: #dc3545;
             padding: 10px;
@@ -140,6 +161,7 @@
             margin-bottom: 15px;
             text-align: center;
         }
+
         /* QUIZ SECTION */
         #quiz-section {
             display: flex;
@@ -148,6 +170,7 @@
             margin-top: 40px;
             padding: 0 20px;
         }
+
         .quiz-container {
             display: flex;
             gap: 25px;
@@ -155,13 +178,16 @@
             max-width: 1200px;
             justify-content: center;
         }
+
         @media (min-width: 900px) {
             .question-box {
                 flex: 2;
             }
+
             .answers-container {
                 flex: 1;
             }
+
             #chinois-leaderboard-section.desktop {
                 display: block;
                 flex: 1;
@@ -169,6 +195,7 @@
                 max-height: 500px;
             }
         }
+
         .question-box {
             background: #262633;
             padding: 30px;
@@ -182,11 +209,13 @@
             text-align: center;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.35);
         }
+
         .answers-container {
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
+
         .answer-btn {
             padding: 15px;
             font-size: 1.2em;
@@ -197,30 +226,37 @@
             border: none;
             transition: 0.18s;
         }
+
         .answer-btn:hover:not(:disabled) {
             transform: scale(1.04);
             background: #4a4a65;
         }
+
         .answer-btn:disabled {
             cursor: not-allowed;
         }
+
         .correct {
             background-color: #2ecc71 !important;
         }
+
         .incorrect {
             background-color: #e74c3c !important;
         }
+
         #timers-container {
             width: 100%;
             max-width: 1000px;
             margin-top: 25px;
         }
+
         #timer-bar-container,
         #question-timer-bar-container {
             margin: 10px 0;
             text-align: left;
             font-size: 0.95em;
         }
+
         #timer-bar,
         #question-timer-bar {
             width: 100%;
@@ -230,6 +266,7 @@
             margin-top: 6px;
             overflow: hidden;
         }
+
         #timer-fill,
         #question-timer-fill {
             height: 100%;
@@ -237,12 +274,15 @@
             border-radius: 10px;
             transition: width 0.15s linear;
         }
+
         #timer-fill {
             background: #9c28a7ff;
         }
+
         #question-timer-fill {
             background: #a832d6;
         }
+
         #score-lives {
             margin-top: 20px;
             display: flex;
@@ -251,21 +291,25 @@
             font-size: 1.3em;
             position: relative;
         }
+
         #lives {
             color: #ff4b4b;
             font-size: 1.4em;
         }
+
         /* MOBILE-SPECIFIC QUIZ HEADER HIDING */
         @media (max-width: 899px) {
             body.quiz-active header {
                 display: none;
             }
         }
+
         /* RESULT SECTION */
         #result-section {
             margin-top: 60px;
             text-align: center;
         }
+
         .result-stats {
             background: #262633;
             padding: 30px;
@@ -273,10 +317,12 @@
             max-width: 500px;
             margin: 30px auto;
         }
+
         .result-stats h3 {
             color: #9c28a7;
             margin-top: 0;
         }
+
         .action-btn {
             margin: 10px;
             padding: 12px 25px;
@@ -287,9 +333,11 @@
             color: #f0f0f0;
             transition: 0.25s;
         }
+
         .action-btn:hover {
             background: #4e4e6a;
         }
+
         /* LEADERBOARD */
         .chinois-leaderboard-section {
             background: #262633;
@@ -299,12 +347,14 @@
             max-height: 400px;
             overflow-y: auto;
         }
+
         .chinois-leaderboard-section .leaderboard-title {
             text-align: center;
             margin-bottom: 15px;
             color: #9c28a7;
             font-size: 1.3em;
         }
+
         .chinois-leaderboard-section .leaderboard-item {
             display: flex;
             justify-content: space-between;
@@ -314,47 +364,57 @@
             background: #2c2c3a;
             border-radius: 8px;
         }
+
         .chinois-leaderboard-section .leaderboard-rank {
             font-size: 1.1em;
             font-weight: bold;
             width: 30px;
         }
+
         .chinois-leaderboard-section .leaderboard-name {
             flex: 1;
             font-weight: 500;
         }
+
         .chinois-leaderboard-section .leaderboard-score {
             font-size: 1em;
             color: #9c28a7;
             font-weight: bold;
         }
+
         /* MOBILE DESIGN */
         @media (max-width: 899px) {
             .quiz-container {
                 flex-direction: column;
                 gap: 15px;
             }
+
             .question-box {
                 font-size: 1.6em;
                 padding: 16px;
                 min-height: 90px;
             }
+
             .answers-container {
                 gap: 10px;
             }
+
             .answer-btn {
                 padding: 12px;
                 font-size: 1.1em;
             }
+
             #score-lives {
                 flex-direction: column;
                 gap: 10px;
                 margin-top: 15px;
             }
+
             /* Supprimer le leaderboard au-dessus des timers sur mobile */
             #chinois-leaderboard-section.desktop {
                 display: none !important;
             }
+
             /* Layout mobile avec leaderboard en bas */
             #mobile-quiz-ui-row {
                 display: flex;
@@ -365,11 +425,13 @@
                 width: 100%;
                 max-width: 1200px;
             }
+
             #chinois-leaderboard-section.mobile {
                 margin: 0;
                 flex: 1;
                 max-width: 220px;
             }
+
             #mobile-back-container {
                 background: #262633;
                 padding: 20px 16px;
@@ -381,6 +443,7 @@
                 min-width: 60px;
                 height: fit-content;
             }
+
             #mobile-back-container .action-btn {
                 padding: 8px 12px;
                 font-size: 1.2em;
@@ -389,17 +452,21 @@
                 text-align: center;
             }
         }
+
         @media (min-width: 900px) {
+
             #chinois-leaderboard-section.mobile,
             #mobile-quiz-ui-row {
                 display: none !important;
             }
+
             #mobile-back-btn {
                 display: none !important;
             }
         }
     </style>
 </head>
+
 <body>
     <header>
         <nav class="navbar">
@@ -526,7 +593,7 @@
                 <h3>Résumé</h3>
                 <p>Score de la partie : <strong id="final-score">0</strong></p>
                 <p>Nouveau score global : <strong id="new-global-score">0</strong></p>
-                <p>Score chinois : <strong id="new-dept-score">0</strong></p>
+                <p>Score chinois : <strong id="new-chinois-score">0</strong></p>
                 <p>Quiz complétés : <strong id="new-quiz-completed">0</strong></p>
                 <div id="level-up-msg" class="hidden" style="color: #2ecc71; margin-top: 15px; font-weight: bold;">
                     🎊 NIVEAU SUPÉRIEUR ATTEINT !
@@ -555,9 +622,8 @@
         window.auth = auth;
         window.db = db;
         window.currentUser = null;
-        // 🔑 Seulement le niveau 1, accès libre
+        // 🔑 Seul le niveau 1, accès libre
         function canAccessLevel(level, globalScore) {
-            // Niveau 1 accessible à tous
             return level === 1;
         }
         onAuthStateChanged(auth, async (user) => {
@@ -577,9 +643,8 @@
                 let quizCompleted = 0;
                 if (userDoc.exists()) {
                     const data = userDoc.data();
-                    const quizScores = data.quizScores || {};
                     pseudoEl.textContent = data.pseudo || user.email.split('@')[0];
-                    globalScore = computeGlobalScore(quizScores);
+                    globalScore = data.globalScore || 0;
                     quizCompleted = data.quizCompleted || 0;
                 } else {
                     pseudoEl.textContent = user.email.split('@')[0];
@@ -602,15 +667,6 @@
                 window.location.href = 'index.html';
             }
         });
-        // 🔢 Helper identique à index.html — NE JAMAIS stocker globalScore dans Firestore
-        function computeGlobalScore(quizScores) {
-            const keys = [
-                'departements', 'chinois', 'medecine', 'math', 'anglais',
-                'neerlandais', 'allemand', 'italien', 'espagnol',
-                'geographie', 'animaux'
-            ];
-            return keys.reduce((sum, key) => sum + (quizScores[key] || 0), 0);
-        }
         // ==========================================
         // LOGIQUE NIVEAU 1 CHINOIS
         // ==========================================
@@ -722,12 +778,10 @@
                 const displayB = Math.random() > 0.5 ? String(b) : numberToChinese(b);
                 const optObjects = generateRandomOpts(result);
                 const correctStr = numberToChinese(result);
-                // Filtrer les mauvaises réponses et s'assurer qu'elles ne contiennent pas la bonne
                 const wrongOpts = optObjects
                     .filter(opt => opt.raw !== correctStr)
                     .slice(0, 4);
                 const allOpts = [correctStr, ...wrongOpts.map(opt => opt.raw)];
-                // Mélange garanti sans doublons
                 const shuffled = [...new Set(allOpts)].sort(() => Math.random() - 0.5);
                 return {
                     q: `${displayA} − ${displayB} = ?`,
@@ -779,15 +833,14 @@
                 };
             }
         }
-        // Mode unique : niveau 1
         const mode = { time: 60, qTime: 5, lives: 3 };
         let score = 0, lives = 0, timeLeft = 0, qTime = 0;
         let timerInterval = null, qTimerInterval = null, awaitingNext = false;
         let previousQuestions = [];
         let currentQuestionData;
         let isAuthMode = 'login';
-        // 👇 Ajout du flag pour empêcher le double enregistrement
         let gameCompleted = false;
+
         const authSection = document.getElementById('auth-section');
         const quizSection = document.getElementById('quiz-section');
         const resultSection = document.getElementById('result-section');
@@ -803,6 +856,7 @@
         const qTimerDisplay = document.getElementById('question-timer');
         const timerFill = document.getElementById('timer-fill');
         const qTimerFill = document.getElementById('question-timer-fill');
+
         function updateQuizHeaderVisibility(isQuizActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('quiz-active', isQuizActive);
@@ -811,56 +865,78 @@
                 mobileBackBtn.classList.add('hidden');
             }
         }
-        async function saveCurrentScore() {
-            // 🔒 Bloquer la sauvegarde si la partie est terminée
-            if (!window.currentUser || score <= 0 || gameCompleted) return;
+
+        // ✅ FONCTION UNIQUE POUR ENREGISTRER LE SCORE GLOBAL + SCORE CHINOIS + QUIZ COMPLÉTÉ
+        async function saveFinalScore(isCompleted) {
+            if (!window.currentUser || gameCompleted) return;
+            gameCompleted = true;
+
             try {
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
-                let userData = userDoc.data();
-                const defaultQuizScores = {
-                    departements: 0,
-                    chinois: 0,
-                    medecine: 0,
-                    math: 0,
-                    anglais: 0,
-                    neerlandais: 0,
-                    allemand: 0,
-                    italien: 0,
-                    espagnol: 0,
-                    geographie: 0,
-                    animaux: 0
-                };
-                if (!userData) {
-                    userData = {
-                        pseudo: currentUser.email.split('@')[0],
-                        email: currentUser.email,
-                        quizScores: defaultQuizScores,
-                        quizCompleted: 0,
-                        createdAt: new Date().toISOString()
-                    };
-                    await setDoc(userDocRef, userData);
+                let userData = userDoc.exists() ? userDoc.data() : null;
+
+                let globalScore = userData?.globalScore || 0;
+                let quizScores = userData?.quizScores || { chinois: 0 };
+                let quizCompleted = userData?.quizCompleted || 0;
+
+                // ✅ Incrémenter le score chinois
+                const oldChinoisScore = quizScores.chinois || 0;
+                const newChinoisScore = oldChinoisScore + score;
+                quizScores.chinois = newChinoisScore;
+
+                // ✅ Incrémenter globalScore avec le même score (pas le remplacer !)
+                globalScore = (userData?.globalScore || 0) + score;
+
+                if (isCompleted && lives > 0) {
+                    quizCompleted += 1;
                 }
-                const quizScores = { ...(userData.quizScores || defaultQuizScores) };
-                const oldDeptScore = quizScores.chinois || 0;
-                const newDeptScore = oldDeptScore + score;
-                quizScores.chinois = newDeptScore;
-                const newGlobalScore = computeGlobalScore(quizScores);
-                await updateDoc(userDocRef, { quizScores });
-                localStorage.setItem('globalScore', newGlobalScore);
-                document.getElementById('user-global-score').textContent = newGlobalScore;
-                updateBaseBtnVisibility(newGlobalScore);
+
+                await updateDoc(userDocRef, {
+                    globalScore: globalScore,
+                    quizScores: quizScores,
+                    quizCompleted: quizCompleted
+                });
+
+                localStorage.setItem('globalScore', globalScore);
+                localStorage.setItem('quizCompleted', quizCompleted);
+                document.getElementById('user-global-score').textContent = globalScore;
+                updateBaseBtnVisibility(globalScore);
+
+                return { globalScore, newDeptScore, quizCompleted };
             } catch (error) {
-                console.error('Erreur sauvegarde scores au retour:', error);
+                console.error('Erreur sauvegarde:', error);
+                alert('Erreur lors de la sauvegarde du score.');
+                return null;
             }
         }
+
+        // ✅ Retour au menu → sauvegarde + redirection
         backBtn.onclick = async function () {
-            await saveCurrentScore();
+            const saved = await saveFinalScore(false);
             stopAllTimers();
             quizSection.classList.add('hidden');
+            if (saved) {
+                document.getElementById('new-global-score').textContent = saved.globalScore;
+                document.getElementById('new-chinois-score').textContent = saved.newChinoisScore;
+                document.getElementById('new-quiz-completed').textContent = saved.quizCompleted;
+            }
             window.location.href = 'index.html';
         };
         mobileBackBtn.onclick = backBtn.onclick;
+
+        homeBtn.onclick = async function () {
+            const saved = await saveFinalScore(false);
+            stopAllTimers();
+            resultSection.classList.add('hidden');
+            if (saved) {
+                document.getElementById('new-global-score').textContent = saved.globalScore;
+                document.getElementById('new-chinois-score').textContent = saved.newChinoisScore;
+                document.getElementById('new-quiz-completed').textContent = saved.quizCompleted;
+            }
+            window.location.href = 'index.html';
+        };
+
         function startMode() {
             stopAllTimers();
             score = 0;
@@ -874,12 +950,14 @@
             authSection.classList.add('hidden');
             resultSection.classList.add('hidden');
             quizSection.classList.remove('hidden');
+            gameCompleted = false;
             updateQuizHeaderVisibility(true);
             loadChinoisLeaderboard();
             generateQuestion();
             startMainTimer();
             window.scrollTo(0, 0);
         }
+
         function generateQuestion() {
             if (awaitingNext) return;
             const qData = generateRandomQuestion();
@@ -888,9 +966,8 @@
             qTimerDisplay.textContent = qTime.toFixed(1);
             qTimerFill.style.width = '100%';
             questionBox.innerHTML = qData.q;
-            // --- ASSURER EXACTEMENT 1 BONNE RÉPONSE ET 4 MAUVAISES ---
+
             const opts = qData.opts.slice(0, 5);
-            // Vérifier et forcer unicité
             const seen = new Set();
             const filteredOpts = [];
             for (const opt of opts) {
@@ -899,7 +976,6 @@
                     filteredOpts.push(opt);
                 }
             }
-            // Si la bonne réponse n'est pas présente, l'insérer
             if (!filteredOpts.some(opt => opt.raw === qData.a)) {
                 if (filteredOpts.length >= 5) {
                     filteredOpts[4] = {
@@ -913,16 +989,7 @@
                     });
                 }
             }
-            // Tronquer à 5 max
-            const finalOpts = filteredOpts.slice(0, 5);
-            // Supprimer toute autre occurrence de la bonne réponse
-            let finalUnique = [finalOpts[0]];
-            for (let i = 1; i < finalOpts.length; i++) {
-                if (finalOpts[i].raw !== qData.a || !finalUnique.some(opt => opt.raw === qData.a)) {
-                    finalUnique.push(finalOpts[i]);
-                }
-            }
-            // Si on a encore trop peu d'options, compléter
+            let finalUnique = filteredOpts.slice(0, 5);
             while (finalUnique.length < 5) {
                 let candidate;
                 do {
@@ -934,18 +1001,14 @@
                     display: `<span style="font-size: calc(1rem + 3px);">${candidate}</span>`
                 });
             }
-            finalUnique = finalUnique.slice(0, 5);
-            // Mélanger
             for (let i = finalUnique.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [finalUnique[i], finalUnique[j]] = [finalUnique[j], finalUnique[i]];
             }
-            // S'assurer qu'il n'y a qu'une seule bonne réponse
             let hasCorrect = false;
             for (let i = 0; i < finalUnique.length; i++) {
                 if (finalUnique[i].raw === qData.a) {
                     if (hasCorrect) {
-                        // Remplacer le doublon
                         let rep;
                         do {
                             rep = numberToChinese(Math.floor(Math.random() * 100) + 1);
@@ -959,7 +1022,6 @@
                     }
                 }
             }
-            // Appliquer aux boutons
             answerBtns.forEach((btn, i) => {
                 if (i < 5) {
                     btn.innerHTML = finalUnique[i].display;
@@ -978,6 +1040,7 @@
                 }
             }, 100);
         }
+
         function handleAnswer(selected) {
             if (awaitingNext) return;
             awaitingNext = true;
@@ -1009,11 +1072,13 @@
                 }
             }, 1000);
         }
+
         function updateLives() {
             const safeLives = Math.max(0, lives);
             const maxLives = mode.lives;
             livesDisplay.textContent = '❤'.repeat(safeLives) + '♡'.repeat(Math.max(0, maxLives - safeLives));
         }
+
         function startMainTimer() {
             timerDisplay.textContent = timeLeft;
             timerFill.style.width = '100%';
@@ -1031,6 +1096,7 @@
                 }
             }, 1000);
         }
+
         function startQTimer() {
             clearInterval(qTimerInterval);
             const qStartTime = mode.qTime;
@@ -1046,86 +1112,43 @@
                 }
             }, 100);
         }
+
+        // ✅ Fin normale → sauvegarde complète
         async function endGame() {
-            // 🔒 Empêcher les appels multiples
             if (gameCompleted) return;
-            gameCompleted = true;
+            const saved = await saveFinalScore(true);
             quizSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
             updateQuizHeaderVisibility(false);
             document.getElementById('final-score').textContent = score;
             stopAllTimers();
             window.scrollTo(0, 0);
-            try {
-                if (!window.currentUser) throw new Error('Utilisateur non connecté');
-                const userDocRef = doc(db, 'users', currentUser.uid);
-                const userDoc = await getDoc(userDocRef);
-                let userData = userDoc.data();
-                const defaultQuizScores = {
-                    departements: 0,
-                    chinois: 0,
-                    medecine: 0,
-                    math: 0,
-                    anglais: 0,
-                    neerlandais: 0,
-                    allemand: 0,
-                    italien: 0,
-                    espagnol: 0,
-                    geographie: 0,
-                    animaux: 0
-                };
-                if (!userData) {
-                    userData = {
-                        pseudo: currentUser.email.split('@')[0],
-                        email: currentUser.email,
-                        quizScores: defaultQuizScores,
-                        quizCompleted: 0,
-                        createdAt: new Date().toISOString()
-                    };
-                    await setDoc(userDocRef, userData);
-                }
-                const quizScores = { ...(userData.quizScores || defaultQuizScores) };
-                const oldDeptScore = quizScores.chinois || 0;
-                const newDeptScore = oldDeptScore + score;
-                quizScores.chinois = newDeptScore;
-                const newGlobalScore = computeGlobalScore(quizScores);
-                let quizCompleted = userData.quizCompleted || 0;
-                if (lives > 0) {
-                    quizCompleted += 1;
-                }
-                await updateDoc(userDocRef, { quizScores, quizCompleted });
-                localStorage.setItem('globalScore', newGlobalScore);
-                localStorage.setItem('quizCompleted', quizCompleted);
-                document.getElementById('new-global-score').textContent = newGlobalScore;
-                document.getElementById('new-dept-score').textContent = newDeptScore;
-                document.getElementById('new-quiz-completed').textContent = quizCompleted;
-                const oldLevel = Math.floor(oldDeptScore / 50);
-                const newLevel = Math.floor(newDeptScore / 50);
+
+            if (saved) {
+                document.getElementById('new-global-score').textContent = saved.globalScore;
+                document.getElementById('new-chinois-score').textContent = saved.newChinoisScore;
+                document.getElementById('new-quiz-completed').textContent = saved.quizCompleted;
+
+                const oldLevel = Math.floor((saved.newDeptScore - score) / 50);
+                const newLevel = Math.floor(saved.newDeptScore / 50);
                 if (newLevel > oldLevel) {
                     document.getElementById('level-up-msg').classList.remove('hidden');
                 } else {
                     document.getElementById('level-up-msg').classList.add('hidden');
                 }
-                updateBaseBtnVisibility(newGlobalScore);
-            } catch (error) {
-                console.error('Erreur sauvegarde scores:', error);
-                alert('Erreur lors de la sauvegarde des scores. Connectez-vous à nouveau.');
             }
         }
+
         function stopAllTimers() {
             clearInterval(timerInterval);
             clearInterval(qTimerInterval);
         }
+
         restartBtn.onclick = () => {
             gameCompleted = false;
             startMode();
         };
-        homeBtn.onclick = async function () {
-            await saveCurrentScore();
-            stopAllTimers();
-            resultSection.classList.add('hidden');
-            window.location.href = 'index.html';
-        };
+
         window.toggleAuthMode = function () {
             isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
             const title = document.getElementById('auth-title');
@@ -1147,6 +1170,7 @@
                 pseudoGroup.style.display = 'none';
             }
         };
+
         document.getElementById('auth-submit-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
@@ -1160,23 +1184,11 @@
                     }
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
-                    const defaultQuizScores = {
-                        departements: 0,
-                        chinois: 0,
-                        medecine: 0,
-                        math: 0,
-                        anglais: 0,
-                        neerlandais: 0,
-                        allemand: 0,
-                        italien: 0,
-                        espagnol: 0,
-                        geographie: 0,
-                        animaux: 0
-                    };
                     await setDoc(doc(db, 'users', user.uid), {
                         pseudo: pseudo.trim(),
                         email: email,
-                        quizScores: defaultQuizScores,
+                        globalScore: 0,
+                        quizScores: { chinois: 0 },
                         quizCompleted: 0,
                         createdAt: new Date().toISOString()
                     });
@@ -1188,10 +1200,12 @@
                 errorDiv.classList.remove('hidden');
             }
         });
+
         window.logout = async function () {
             await signOut(auth);
             window.location.href = 'index.html';
         };
+
         async function loadChinoisLeaderboard() {
             const mobileList = document.querySelector('#chinois-leaderboard-section.mobile .chinois-leaderboard-list');
             const desktopList = document.querySelector('#chinois-leaderboard-section.desktop .chinois-leaderboard-list');
@@ -1224,9 +1238,9 @@
                 if (desktopList) desktopList.innerHTML = errorMsg;
             }
         }
-        // Initialiser le bouton base avec la valeur par défaut
+
         updateBaseBtnVisibility(0);
     </script>
 </body>
-</html>
 
+</html>

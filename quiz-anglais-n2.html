@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Quiz Master - Anglais Niveau 1</title>
+    <title>Quiz Master - Anglais N2</title>
     <style>
         .hidden { display: none !important; }
         body {
@@ -71,7 +71,12 @@
         @media (min-width: 900px) {
             .question-box { flex: 2; }
             .answers-container { flex: 1; }
-            #leaderboard-section.desktop { display: block; flex: 1; margin-top: 0; max-height: 500px; }
+            #leaderboard-section.desktop { 
+                display: block; 
+                flex: 1; 
+                margin-top: 0; 
+                max-height: 500px; 
+            }
         }
         .question-box {
             background: #262633;
@@ -100,9 +105,6 @@
             cursor: pointer;
             border: none;
             transition: 0.18s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         .answer-btn:hover:not(:disabled) {
             transform: scale(1.04);
@@ -220,13 +222,28 @@
             padding: 20px;
             margin-top: 20px;
             max-height: 400px;
-            overflow-y: auto;
+            overflow: hidden;
         }
         .leaderboard-section .leaderboard-title {
             text-align: center;
             margin-bottom: 15px;
             color: #9c28a7;
             font-size: 1.3em;
+        }
+        .leaderboard-section .leaderboard-list {
+            max-height: 320px;
+            overflow-y: auto;
+        }
+        .leaderboard-section .leaderboard-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        .leaderboard-section .leaderboard-list::-webkit-scrollbar-track {
+            background: #1e1e29;
+            border-radius: 4px;
+        }
+        .leaderboard-section .leaderboard-list::-webkit-scrollbar-thumb {
+            background: #9c28a7;
+            border-radius: 4px;
         }
         .leaderboard-section .leaderboard-item {
             display: flex;
@@ -327,22 +344,10 @@
     </main>
     <div id="hover-warning"></div>
     <script type="module">
-        // 🔧 INITIALISATION FIREBASE (identique à tous les quiz)
+        // 🔧 INITIALISATION FIREBASE
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { 
-            getFirestore, 
-            doc, 
-            getDoc, 
-            setDoc, 
-            updateDoc, 
-            collection, 
-            query, 
-            orderBy, 
-            limit, 
-            getDocs 
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
+        import { getAuth, onAuthStateChanged, signOut, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
             authDomain: "quiz-master-io.firebaseapp.com",
@@ -358,19 +363,202 @@
         window.db = db;
         window.currentUser = null;
 
-        // ✏️ À MODIFIER : liste utilisée pour calculer le score global (ajoute ton quiz ici si besoin)
-        // REMOVED: No longer needed since we only use globalScore directly
+        function computeGlobalScore(quizScores) {
+            const keys = [
+                'departements', 'chinois', 'medecine', 'math', 'anglais',
+                'neerlandais', 'allemand', 'italien', 'espagnol',
+                'geographie', 'animaux'
+            ];
+            return keys.reduce((sum, key) => sum + (quizScores[key] || 0), 0);
+        }
 
-        // ✏️ À MODIFIER : configurer les paramètres du mode (durée, nombre de vies, etc.)
-        const mode = { time: 60, qTime: 7, lives: 3 };
+        const mode = { time: 60, qTime: 5, lives: 3 };
+        const irregularVerbs = [
+          { base: "arise", past: "arose", ppart: "arisen", fr: "survenir" },
+          { base: "awake", past: "awoke", ppart: "awoken", fr: "se réveiller" },
+          { base: "be", past: "was/were", ppart: "been", fr: "être" },
+          { base: "bear", past: "bore", ppart: "borne/born", fr: "porter/supporter" },
+          { base: "beat", past: "beat", ppart: "beaten", fr: "battre" },
+          { base: "become", past: "became", ppart: "become", fr: "devenir" },
+          { base: "begin", past: "began", ppart: "begun", fr: "commencer" },
+          { base: "bend", past: "bent", ppart: "bent", fr: "plier" },
+          { base: "bet", past: "bet", ppart: "bet", fr: "parier" },
+          { base: "bind", past: "bound", ppart: "bound", fr: "lier" },
+          { base: "bite", past: "bit", ppart: "bitten", fr: "mordre" },
+          { base: "bleed", past: "bled", ppart: "bled", fr: "saigner" },
+          { base: "blow", past: "blew", ppart: "blown", fr: "souffler" },
+          { base: "break", past: "broke", ppart: "broken", fr: "casser" },
+          { base: "breed", past: "bred", ppart: "bred", fr: "élever (animaux)" },
+          { base: "bring", past: "brought", ppart: "brought", fr: "apporter" },
+          { base: "broadcast", past: "broadcast", ppart: "broadcast", fr: "diffuser" },
+          { base: "build", past: "built", ppart: "built", fr: "construire" },
+          { base: "burn", past: "burnt/burned", ppart: "burnt/burned", fr: "brûler" },
+          { base: "burst", past: "burst", ppart: "burst", fr: "éclater" },
+          { base: "buy", past: "bought", ppart: "bought", fr: "acheter" },
+          { base: "cast", past: "cast", ppart: "cast", fr: "jeter" },
+          { base: "catch", past: "caught", ppart: "caught", fr: "attraper" },
+          { base: "choose", past: "chose", ppart: "chosen", fr: "choisir" },
+          { base: "cling", past: "clung", ppart: "clung", fr: "s'accrocher" },
+          { base: "come", past: "came", ppart: "come", fr: "venir" },
+          { base: "cost", past: "cost", ppart: "cost", fr: "coûter" },
+          { base: "creep", past: "crept", ppart: "crept", fr: "ramper" },
+          { base: "cut", past: "cut", ppart: "cut", fr: "couper" },
+          { base: "deal", past: "dealt", ppart: "dealt", fr: "distribuer" },
+          { base: "dig", past: "dug", ppart: "dug", fr: "creuser" },
+          { base: "do", past: "did", ppart: "done", fr: "faire" },
+          { base: "draw", past: "drew", ppart: "drawn", fr: "dessiner/tirer" },
+          { base: "dream", past: "dreamt/dreamed", ppart: "dreamt/dreamed", fr: "rêver" },
+          { base: "drink", past: "drank", ppart: "drunk", fr: "boire" },
+          { base: "drive", past: "drove", ppart: "driven", fr: "conduire" },
+          { base: "dwell", past: "dwelt", ppart: "dwelt", fr: "habiter" },
+          { base: "eat", past: "ate", ppart: "eaten", fr: "manger" },
+          { base: "fall", past: "fell", ppart: "fallen", fr: "tomber" },
+          { base: "feed", past: "fed", ppart: "fed", fr: "nourrir" },
+          { base: "feel", past: "felt", ppart: "felt", fr: "sentir" },
+          { base: "fight", past: "fought", ppart: "fought", fr: "se battre" },
+          { base: "find", past: "found", ppart: "found", fr: "trouver" },
+          { base: "flee", past: "fled", ppart: "fled", fr: "fuir" },
+          { base: "fling", past: "flung", ppart: "flung", fr: "lancer violemment" },
+          { base: "fly", past: "flew", ppart: "flown", fr: "voler" },
+          { base: "forbid", past: "forbade", ppart: "forbidden", fr: "interdire" },
+          { base: "forget", past: "forgot", ppart: "forgotten", fr: "oublier" },
+          { base: "forgive", past: "forgave", ppart: "forgiven", fr: "pardonner" },
+          { base: "freeze", past: "froze", ppart: "frozen", fr: "geler" },
+          { base: "get", past: "got", ppart: "got/gotten", fr: "obtenir" },
+          { base: "give", past: "gave", ppart: "given", fr: "donner" },
+          { base: "go", past: "went", ppart: "gone", fr: "aller" },
+          { base: "grind", past: "ground", ppart: "ground", fr: "moudre" },
+          { base: "grow", past: "grew", ppart: "grown", fr: "grandir" },
+          { base: "hang", past: "hung", ppart: "hung", fr: "pendre" },
+          { base: "have", past: "had", ppart: "had", fr: "avoir" },
+          { base: "hear", past: "heard", ppart: "heard", fr: "entendre" },
+          { base: "hide", past: "hid", ppart: "hidden", fr: "cacher" },
+          { base: "hit", past: "hit", ppart: "hit", fr: "frapper" },
+          { base: "hold", past: "held", ppart: "held", fr: "tenir" },
+          { base: "hurt", past: "hurt", ppart: "hurt", fr: "blesser" },
+          { base: "keep", past: "kept", ppart: "kept", fr: "garder" },
+          { base: "kneel", past: "knelt", ppart: "knelt", fr: "s'agenouiller" },
+          { base: "knit", past: "knit", ppart: "knit", fr: "tricoter" },
+          { base: "know", past: "knew", ppart: "known", fr: "savoir/connaître" },
+          { base: "lay", past: "laid", ppart: "laid", fr: "poser" },
+          { base: "lead", past: "led", ppart: "led", fr: "mener" },
+          { base: "lean", past: "leant/leaned", ppart: "leant/leaned", fr: "se pencher" },
+          { base: "leap", past: "leapt/leaped", ppart: "leapt/leaped", fr: "sauter" },
+          { base: "learn", past: "learnt/learned", ppart: "learnt/learned", fr: "apprendre" },
+          { base: "leave", past: "left", ppart: "left", fr: "laisser/quitter" },
+          { base: "lend", past: "lent", ppart: "lent", fr: "prêter" },
+          { base: "let", past: "let", ppart: "let", fr: "permettre" },
+          { base: "lie", past: "lay", ppart: "lain", fr: "être allongé" },
+          { base: "light", past: "lit/lighted", ppart: "lit/lighted", fr: "allumer" },
+          { base: "lose", past: "lost", ppart: "lost", fr: "perdre" },
+          { base: "make", past: "made", ppart: "made", fr: "fabriquer" },
+          { base: "mean", past: "meant", ppart: "meant", fr: "signifier" },
+          { base: "meet", past: "met", ppart: "met", fr: "rencontrer" },
+          { base: "pay", past: "paid", ppart: "paid", fr: "payer" },
+          { base: "put", past: "put", ppart: "put", fr: "mettre" },
+          { base: "quit", past: "quit", ppart: "quit", fr: "abandonner" },
+          { base: "read", past: "read", ppart: "read", fr: "lire" },
+          { base: "ride", past: "rode", ppart: "ridden", fr: "chevaucher" },
+          { base: "ring", past: "rang", ppart: "rung", fr: "sonner" },
+          { base: "rise", past: "rose", ppart: "risen", fr: "s'élever" },
+          { base: "run", past: "ran", ppart: "run", fr: "courir" },
+          { base: "say", past: "said", ppart: "said", fr: "dire" },
+          { base: "see", past: "saw", ppart: "seen", fr: "voir" },
+          { base: "sell", past: "sold", ppart: "sold", fr: "vendre" },
+          { base: "send", past: "sent", ppart: "sent", fr: "envoyer" },
+          { base: "set", past: "set", ppart: "set", fr: "placer" },
+          { base: "sew", past: "sewed", ppart: "sewn/sewed", fr: "coudre" },
+          { base: "shake", past: "shook", ppart: "shaken", fr: "secouer" },
+          { base: "shine", past: "shone", ppart: "shone", fr: "briller" },
+          { base: "shoot", past: "shot", ppart: "shot", fr: "tirer" },
+          { base: "show", past: "showed", ppart: "shown", fr: "montrer" },
+          { base: "shrink", past: "shrank", ppart: "shrunk", fr: "rétrécir" },
+          { base: "shut", past: "shut", ppart: "shut", fr: "fermer" },
+          { base: "sing", past: "sang", ppart: "sung", fr: "chanter" },
+          { base: "sink", past: "sank", ppart: "sunk", fr: "couler" },
+          { base: "sit", past: "sat", ppart: "sat", fr: "s'asseoir" },
+          { base: "sleep", past: "slept", ppart: "slept", fr: "dormir" },
+          { base: "slide", past: "slid", ppart: "slid", fr: "glisser" },
+          { base: "sling", past: "slung", ppart: "slung", fr: "lancer (bras)" },
+          { base: "speak", past: "spoke", ppart: "spoken", fr: "parler" },
+          { base: "spend", past: "spent", ppart: "spent", fr: "dépenser/passer" },
+          { base: "spin", past: "spun", ppart: "spun", fr: "tourner" },
+          { base: "spread", past: "spread", ppart: "spread", fr: "étaler" },
+          { base: "spring", past: "sprang", ppart: "sprung", fr: "bondir" },
+          { base: "stand", past: "stood", ppart: "stood", fr: "se tenir debout" },
+          { base: "steal", past: "stole", ppart: "stolen", fr: "voler" },
+          { base: "stick", past: "stuck", ppart: "stuck", fr: "coller" },
+          { base: "sting", past: "stung", ppart: "stung", fr: "piquer" },
+          { base: "stink", past: "stank", ppart: "stunk", fr: "puer" },
+          { base: "strike", past: "struck", ppart: "struck/stricken", fr: "frapper" },
+          { base: "swear", past: "swore", ppart: "sworn", fr: "jurer" },
+          { base: "sweep", past: "swept", ppart: "swept", fr: "balayer" },
+          { base: "swim", past: "swam", ppart: "swum", fr: "nager" },
+          { base: "take", past: "took", ppart: "taken", fr: "prendre" },
+          { base: "teach", past: "taught", ppart: "taught", fr: "enseigner" },
+          { base: "tear", past: "tore", ppart: "torn", fr: "déchirer" },
+          { base: "tell", past: "told", ppart: "told", fr: "raconter/dire" },
+          { base: "think", past: "thought", ppart: "thought", fr: "penser" },
+          { base: "throw", past: "threw", ppart: "thrown", fr: "jeter" },
+          { base: "thrust", past: "thrust", ppart: "thrust", fr: "pousser violemment" },
+          { base: "understand", past: "understood", ppart: "understood", fr: "comprendre" },
+          { base: "uphold", past: "upheld", ppart: "upheld", fr: "maintenir" },
+          { base: "wake", past: "woke", ppart: "woken", fr: "réveiller" },
+          { base: "wear", past: "wore", ppart: "worn", fr: "porter (vêtement)" },
+          { base: "weep", past: "wept", ppart: "wept", fr: "pleurer" },
+          { base: "win", past: "won", ppart: "won", fr: "gagner" },
+          { base: "write", past: "wrote", ppart: "written", fr: "écrire" }
+        ];
+        const type5Questions = [
+            { en: "He has written a letter", correct: "Il a écrit une lettre", choices: ["Il a écrit une lettre", "Il écrivait une lettre", "Il écrira une lettre", "Il avait écrit une lettre", "Il écrit une lettre"] },
+            { en: "They have broken the window", correct: "Ils ont cassé la fenêtre", choices: ["Ils ont cassé la fenêtre", "Ils cassaient la fenêtre", "Ils vont casser la fenêtre", "Ils avaient cassé la fenêtre", "Ils cassent la fenêtre"] },
+            { en: "She has drunk too much coffee", correct: "Elle a bu trop de café", choices: ["Elle a bu trop de café", "Elle buvait trop de café", "Elle boira trop de café", "Elle avait bu trop de café", "Elle boit trop de café"] },
+            { en: "We have seen this movie before", correct: "Nous avons déjà vu ce film", choices: ["Nous avons déjà vu ce film", "Nous voyons déjà ce film", "Nous verrons ce film", "Nous avions déjà vu ce film", "Nous voyions ce film"] },
+            { en: "I have lost my keys", correct: "J'ai perdu mes clés", choices: ["J'ai perdu mes clés", "Je perds mes clés", "Je perdais mes clés", "J'avais perdu mes clés", "Je vais perdre mes clés"] },
+            { en: "He has spoken to the manager", correct: "Il a parlé au responsable", choices: ["Il a parlé au responsable", "Il parlait au responsable", "Il parle au responsable", "Il avait parlé au responsable", "Il va parler au responsable"] },
+            { en: "They have built a new house", correct: "Ils ont construit une nouvelle maison", choices: ["Ils ont construit une nouvelle maison", "Ils construisaient une nouvelle maison", "Ils avaient construit une nouvelle maison", "Ils construisent une nouvelle maison", "Ils vont construire une nouvelle maison"] },
+            { en: "She has chosen the red dress", correct: "Elle a choisi la robe rouge", choices: ["Elle a choisi la robe rouge", "Elle choisit la robe rouge", "Elle choisissait la robe rouge", "Elle avait choisi la robe rouge", "Elle va choisir la robe rouge"] },
+            { en: "We have met him before", correct: "Nous l'avons déjà rencontré", choices: ["Nous l'avons déjà rencontré", "Nous le rencontrons déjà", "Nous allons le rencontrer", "Nous l'avions déjà rencontré", "Nous le rencontrions"] },
+            { en: "I have slept very well", correct: "J'ai très bien dormi", choices: ["J'ai très bien dormi", "Je dors très bien", "Je dormais très bien", "J'avais très bien dormi", "Je vais très bien dormir"] },
+            { en: "He has sold his car", correct: "Il a vendu sa voiture", choices: ["Il a vendu sa voiture", "Il vend sa voiture", "Il vendait sa voiture", "Il avait vendu sa voiture", "Il va vendre sa voiture"] },
+            { en: "They have bought new shoes", correct: "Ils ont acheté de nouvelles chaussures", choices: ["Ils ont acheté de nouvelles chaussures", "Ils achètent de nouvelles chaussures", "Ils achetaient de nouvelles chaussures", "Ils avaient acheté de nouvelles chaussures", "Ils vont acheter de nouvelles chaussures"] },
+            { en: "She has driven all night", correct: "Elle a conduit toute la nuit", choices: ["Elle a conduit toute la nuit", "Elle conduit toute la nuit", "Elle conduisait toute la nuit", "Elle avait conduit toute la nuit", "Elle va conduire toute la nuit"] },
+            { en: "We have learned something new", correct: "Nous avons appris quelque chose de nouveau", choices: ["Nous avons appris quelque chose de nouveau", "Nous apprenons quelque chose de nouveau", "Nous apprenions quelque chose de nouveau", "Nous avions appris quelque chose de nouveau", "Nous allons apprendre quelque chose de nouveau"] },
+            { en: "I have felt very tired lately", correct: "Je me suis senti très fatigué dernièrement", choices: ["Je me suis senti très fatigué dernièrement", "Je me sens très fatigué dernièrement", "Je me sentais très fatigué dernièrement", "Je m'étais senti très fatigué dernièrement", "Je vais me sentir très fatigué"] },
+            { en: "He has kept his promise", correct: "Il a tenu sa promesse", choices: ["Il a tenu sa promesse", "Il tient sa promesse", "Il tenait sa promesse", "Il avait tenu sa promesse", "Il va tenir sa promesse"] },
+            { en: "They have won the game", correct: "Ils ont gagné le match", choices: ["Ils ont gagné le match", "Ils gagnent le match", "Ils gagnaient le match", "Ils avaient gagné le match", "Ils vont gagner le match"] },
+            { en: "She has rung the bell", correct: "Elle a sonné la cloche", choices: ["Elle a sonné la cloche", "Elle sonne la cloche", "Elle sonnait la cloche", "Elle avait sonné la cloche", "Elle va sonner la cloche"] },
+            { en: "We have flown over the mountains", correct: "Nous avons volé au-dessus des montagnes", choices: ["Nous avons volé au-dessus des montagnes", "Nous volons au-dessus des montagnes", "Nous volions au-dessus des montages", "Nous avions volé au-dessus des montagnes", "Nous allons voler au-dessus des montagnes"] },
+            { en: "I have spoken to her already", correct: "Je lui ai déjà parlé", choices: ["Je lui ai déjà parlé", "Je lui parle déjà", "Je lui parlais", "Je lui avais déjà parlé", "Je vais lui parler"] }
+        ];
+        const type2Questions = [
+            { q: "What is the past simple of 'eat'?", a: "ate" },
+            { q: "What is the past participle of 'eat'?", a: "eaten" },
+            { q: "What is the past simple of 'see'?", a: "saw" },
+            { q: "What is the past participle of 'see'?", a: "seen" },
+            { q: "What is the past simple of 'take'?", a: "took" },
+            { q: "What is the past participle of 'take'?", a: "taken" },
+            { q: "What is the past simple of 'break'?", a: "broke" },
+            { q: "What is the past participle of 'break'?", a: "broken" },
+            { q: "What is the past simple of 'write'?", a: "wrote" },
+            { q: "What is the past participle of 'write'?", a: "written" },
+            { q: "What is the past simple of 'give'?", a: "gave" },
+            { q: "What is the past participle of 'give'?", a: "given" },
+            { q: "What is the past simple of 'drink'?", a: "drank" },
+            { q: "What is the past participle of 'drink'?", a: "drunk" },
+            { q: "What is the past simple of 'drive'?", a: "drove" },
+            { q: "What is the past participle of 'drive'?", a: "driven" },
+            { q: "What is the past simple of 'speak'?", a: "spoke" },
+            { q: "What is the past participle of 'speak'?", a: "spoken" },
+            { q: "What is the past simple of 'choose'?", a: "chose" },
+            { q: "What is the past participle of 'choose'?", a: "chosen" }
+        ];
 
-        // États du jeu
         let score = 0, lives = 0, timeLeft = 0, qTime = 0;
         let timerInterval = null, qTimerInterval = null, awaitingNext = false;
         let currentQuestionData = null;
         let gameCompleted = false;
 
-        // Éléments DOM
         const quizSection = document.getElementById('quiz-section');
         const resultSection = document.getElementById('result-section');
         const backBtn = document.getElementById('back-btn');
@@ -384,7 +572,6 @@
         const timerFill = document.getElementById('timer-fill');
         const qTimerFill = document.getElementById('question-timer-fill');
 
-        // Gestion UI header
         function updateQuizHeaderVisibility(isQuizActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('quiz-active', isQuizActive);
@@ -394,7 +581,6 @@
             }
         }
 
-        // Sauvegarde partielle du score (ex: retour vers l'accueil)
         async function saveCurrentScore() {
             if (!window.currentUser || score <= 0 || gameCompleted) return;
             try {
@@ -413,7 +599,6 @@
                         email: currentUser.email,
                         quizScores: defaultQuizScores,
                         quizCompleted: 0,
-                        globalScore: 0,
                         createdAt: new Date().toISOString()
                     };
                     await setDoc(userDocRef, userData);
@@ -422,11 +607,8 @@
                 const oldDeptScore = quizScores[quizKey] || 0;
                 const newDeptScore = oldDeptScore + score;
                 quizScores[quizKey] = newDeptScore;
-                
-                // Calculate new global score by adding only the quiz score
-                const newGlobalScore = (userData.globalScore || 0) + score;
-                
-                await updateDoc(userDocRef, { quizScores, globalScore: newGlobalScore });
+                const newGlobalScore = computeGlobalScore(quizScores);
+                await updateDoc(userDocRef, { quizScores });
                 localStorage.setItem('globalScore', newGlobalScore);
                 document.getElementById('user-global-score').textContent = newGlobalScore;
             } catch (error) {
@@ -434,7 +616,6 @@
             }
         }
 
-        // Bouton retour
         backBtn.onclick = async function () {
             await saveCurrentScore();
             stopAllTimers();
@@ -443,180 +624,78 @@
         };
         mobileBackBtn.onclick = backBtn.onclick;
 
-        // 🔢 LOGIQUE SPÉCIFIQUE DU QUIZ ANGLAIS
-        const ones = ["zero","one","two","three","four","five","six","seven","eight","nine"];
-        const teens = ["ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
-        const tensWords = ["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
-
-        function numberToEnglishWords(n) {
-            if (n < 10) return ones[n];
-            if (n < 20) return teens[n - 10];
-            if (n < 100) {
-                const tens = Math.floor(n / 10);
-                const onesDigit = n % 10;
-                return tensWords[tens] + (onesDigit ? "-" + ones[onesDigit] : "");
-            }
-            if (n === 100) return "one hundred";
-            return "";
-        }
-
-        function generateRandomOpts(correctAnswer) {
-            const values = new Set();
-            values.add(Number(correctAnswer));
-            while (values.size < 5) {
-                let v = Number(correctAnswer) + Math.floor(Math.random() * 21) - 10;
-                if (v < 0 || v > 100) v = Math.floor(Math.random() * 101);
-                values.add(v);
-            }
-            return [...values].map(v => ({
-                raw: numberToEnglishWords(v),
-                display: `<span style="font-size: calc(1rem + 3px);">${numberToEnglishWords(v)}</span>`
-            }));
-        }
-
-        function generateType3RndOpts(correct) {
-            const values = new Set();
-            values.add(correct);
-            while (values.size < 5) {
-                let v = correct + Math.floor(Math.random() * 11) - 5;
-                if (v < 0 || v > 100) v = Math.floor(Math.random() * 101);
-                values.add(v);
-            }
-            return [...values].map(v => ({
-                raw: numberToEnglishWords(v),
-                display: `<span style="font-size: calc(1rem + 3px);">${numberToEnglishWords(v)}</span>`
-            }));
-        }
-
-        const type3Questions = [
-            { q: "How many countries are in the United Kingdom?", a: "4" },
-            { q: "How many members are there in the UK House of Commons?", a: "650" },
-            { q: "How many stripes are there on the Union Jack?", a: "9" },
-            { q: "How many years did Queen Victoria reign?", a: "63" },
-            { q: "How many kings or queens has the UK had since 1707?", a: "12" },
-            { q: "How many official languages does the UK have?", a: "4" },
-            { q: "How many Premier League teams are there?", a: "20" },
-            { q: "How many minutes are there in a standard football match?", a: "90" },
-            { q: "How many letters are in the English alphabet?", a: "26" },
-            { q: "How many Nobel Prize winners come from the UK (approx.)?", a: "130" },
-            { q: "How many London Underground lines are there?", a: "11" },
-            { q: "How many boroughs are there in Greater London?", a: "32" },
-            { q: "How many official parks are there in London?", a: "8" },
-            { q: "How many bridges cross the Thames in central London?", a: "35" },
-            { q: "How many UK coins are currently in circulation?", a: "8" },
-            { q: "How many constituencies are there in England?", a: "533" },
-            { q: "How many Olympic Games has London hosted?", a: "3" },
-            { q: "How many seats are there in the House of Lords?", a: "800" },
-            { q: "How many airports does London have?", a: "6" },
-            { q: "How many museums are there in London?", a: "170" },
-            { q: "How many castles are there in Scotland?", a: "200" },
-            { q: "How many official national parks are there in the UK?", a: "15" },
-            { q: "How many letters are in 'Parliament'?", a: "10" },
-            { q: "How many Nobel Prizes were won by UK scientists in the 20th century?", a: "80" },
-            { q: "How many Prime Ministers has the UK had since 1900?", a: "28" },
-            { q: "How many monarchs ruled England before the Act of Union 1707?", a: "61" },
-            { q: "How many countries in the Commonwealth are former British colonies?", a: "54" },
-            { q: "How many cities in the UK have cathedrals?", a: "42" },
-            { q: "How many minutes is the changing of the guard at Buckingham Palace (approx.)?", a: "45" },
-            { q: "How many World Heritage Sites are in the UK?", a: "33" }
-        ];
-
         function generateRandomQuestion() {
-            const type = Math.floor(Math.random() * 4) + 1;
-
-            // Type 1 : number → words
-            if (type === 1) {
-                const n = Math.floor(Math.random() * 100) + 1;
-                const correct = numberToEnglishWords(n);
-                const wrongSet = new Set();
-                while (wrongSet.size < 4) {
-                    const r = Math.floor(Math.random() * 100) + 1;
-                    const w = numberToEnglishWords(r);
-                    if (w !== correct) wrongSet.add(w);
+            const questionType = Math.floor(Math.random() * 4);
+            if (questionType === 0) {
+                const randomIndex = Math.floor(Math.random() * irregularVerbs.length);
+                const verb = irregularVerbs[randomIndex];
+                const questionTypes = ['past', 'ppart', 'base'];
+                const qType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+                let question, correctAnswer, options;
+                if (qType === 'past') {
+                    question = `Quel est le prétérit de "${verb.base}" ?`;
+                    correctAnswer = verb.past;
+                } else if (qType === 'ppart') {
+                    question = `Quel est le participe passé de "${verb.base}" ?`;
+                    correctAnswer = verb.ppart;
+                } else {
+                    question = `Quel est l'infinitif de "${verb.past}" ?`;
+                    correctAnswer = verb.base;
                 }
-                const opts = [correct, ...wrongSet];
-                const shuffled = opts.sort(() => Math.random() - 0.5);
-                return {
-                    q: `What is the English word for <br><span style="font-size:4rem;font-weight:800;display:block;">${n}</span>?`,
-                    a: correct,
-                    opts: shuffled.map(char => ({
-                        raw: char,
-                        display: `<span style="font-size: calc(1rem + 3px);">${char}</span>`
-                    }))
-                };
-            }
-
-            // Type 2 : subtraction
-            if (type === 2) {
-                let a = Math.floor(Math.random() * 100) + 1;
-                let b = Math.floor(Math.random() * 100) + 1;
-                if (b > a) [a, b] = [b, a];
-                const result = a - b;
-
-                const displayA = Math.random() > 0.5 ? String(a) : numberToEnglishWords(a);
-                const displayB = Math.random() > 0.5 ? String(b) : numberToEnglishWords(b);
-
-                const optObjects = generateRandomOpts(result);
-                const correctStr = numberToEnglishWords(result);
-
-                const wrongOpts = optObjects.filter(opt => opt.raw !== correctStr).slice(0, 4);
-                const allOpts = [correctStr, ...wrongOpts.map(opt => opt.raw)];
-                const shuffled = [...new Set(allOpts)].sort(() => Math.random() - 0.5);
-
-                return {
-                    q: `${displayA} − ${displayB} = ?`,
-                    a: correctStr,
-                    opts: shuffled.map(v => ({
-                        raw: v,
-                        display: `<span style="font-size: calc(1rem + 3px);">${v}</span>`
-                    }))
-                };
-            }
-
-            // Type 3 : cultural / factual questions
-            if (type === 3) {
-                const item = type3Questions[Math.floor(Math.random() * type3Questions.length)];
-                const correct = Number(item.a);
-
-                const optObjects = generateType3RndOpts(correct);
-                const correctStr = numberToEnglishWords(correct);
-
-                const wrongOpts = optObjects.filter(opt => opt.raw !== correctStr).slice(0, 4);
-                const allOpts = [correctStr, ...wrongOpts.map(opt => opt.raw)];
-                const shuffled = [...new Set(allOpts)].sort(() => Math.random() - 0.5);
-
-                return {
-                    q: item.q,
-                    a: correctStr,
-                    opts: shuffled.map(v => ({
-                        raw: v,
-                        display: `<span style="font-size: calc(1rem + 3px);">${v}</span>`
-                    }))
-                };
-            }
-
-            // Type 4 : display word → number
-            if (type === 4) {
-                const n = Math.floor(Math.random() * 100) + 1;
-                const en = numberToEnglishWords(n);
-
-                const wrongSet = new Set();
-                while (wrongSet.size < 4) {
-                    const r = Math.floor(Math.random() * 100) + 1;
-                    wrongSet.add(numberToEnglishWords(r));
+                options = [correctAnswer];
+                let availableVerbs = irregularVerbs.filter(v => v !== verb);
+                for (let i = 0; i < 4 && availableVerbs.length > 0; i++) {
+                    const randomIdx = Math.floor(Math.random() * availableVerbs.length);
+                    const randomVerb = availableVerbs[randomIdx];
+                    availableVerbs.splice(randomIdx, 1);
+                    if (qType === 'past') {
+                        options.push(randomVerb.past);
+                    } else if (qType === 'ppart') {
+                        options.push(randomVerb.ppart);
+                    } else {
+                        options.push(randomVerb.base);
+                    }
                 }
-
-                const opts = [en, ...wrongSet];
-                const shuffled = opts.sort(() => Math.random() - 0.5);
-
-                return {
-                    q: `Which number is this word: <br><span style="font-size:4rem;font-weight:800;display:block;">${en}</span>?`,
-                    a: en,
-                    opts: shuffled.map(v => ({
-                        raw: v,
-                        display: `<span style="font-size: calc(1rem + 3px);">${v}</span>`
-                    }))
-                };
+                options = options.sort(() => Math.random() - 0.5);
+                return { q: question, a: correctAnswer, opts: options };
+            } else if (questionType === 1) {
+                const randomIndex = Math.floor(Math.random() * irregularVerbs.length);
+                const verb = irregularVerbs[randomIndex];
+                const question = `Quelle est la traduction de "${verb.base}" ?`;
+                const correctAnswer = verb.fr;
+                const options = [correctAnswer];
+                let availableVerbs = irregularVerbs.filter(v => v !== verb);
+                for (let i = 0; i < 4 && availableVerbs.length > 0; i++) {
+                    const randomIdx = Math.floor(Math.random() * availableVerbs.length);
+                    const randomVerb = availableVerbs[randomIdx];
+                    availableVerbs.splice(randomIdx, 1);
+                    options.push(randomVerb.fr);
+                }
+                options = options.sort(() => Math.random() - 0.5);
+                return { q: question, a: correctAnswer, opts: options };
+            } else if (questionType === 2) {
+                const randomIndex = Math.floor(Math.random() * type2Questions.length);
+                const q = type2Questions[randomIndex];
+                const question = q.q;
+                const correctAnswer = q.a;
+                let options = [correctAnswer];
+                let otherForms = [];
+                irregularVerbs.forEach(v => {
+                    if (v.past !== correctAnswer && v.ppart !== correctAnswer && v.base !== correctAnswer) {
+                        otherForms.push(v.past, v.ppart);
+                    }
+                });
+                otherForms = [...new Set(otherForms)].sort(() => Math.random() - 0.5).slice(0, 4);
+                options = [...options, ...otherForms].slice(0, 5);
+                options = options.sort(() => Math.random() - 0.5);
+                return { q: question, a: correctAnswer, opts: options };
+            } else {
+                const randomIndex = Math.floor(Math.random() * type5Questions.length);
+                const q = type5Questions[randomIndex];
+                const question = `Traduisez : "${q.en}"`;
+                const correctAnswer = q.correct;
+                const options = [...q.choices].sort(() => Math.random() - 0.5);
+                return { q: question, a: correctAnswer, opts: options };
             }
         }
 
@@ -645,22 +724,19 @@
             qTimerDisplay.textContent = qTime.toFixed(1);
             qTimerFill.style.width = '100%';
             questionBox.innerHTML = qData.q;
-
-            // Assure 5 options
             const opts = qData.opts.slice(0, 5);
             answerBtns.forEach((btn, i) => {
                 if (i < 5) {
-                    btn.innerHTML = opts[i]?.display || "–";
-                    btn.dataset.value = opts[i]?.raw || "";
+                    btn.innerHTML = opts[i] || "–";
+                    btn.dataset.value = opts[i] || "";
                     btn.disabled = false;
                     btn.classList.remove("correct", "incorrect");
-                    btn.onclick = () => handleAnswer(opts[i]?.raw);
+                    btn.onclick = () => handleAnswer(opts[i]);
                     btn.style.display = '';
                 } else {
                     btn.style.display = 'none';
                 }
             });
-
             setTimeout(() => {
                 if (!awaitingNext) startQTimer();
             }, 100);
@@ -668,7 +744,6 @@
 
         function handleAnswer(selected) {
             if (awaitingNext) return;
-            if (selected === undefined) return; // Handle invalid selection
             awaitingNext = true;
             clearInterval(qTimerInterval);
             answerBtns.forEach(btn => {
@@ -680,7 +755,6 @@
                     btn.classList.add("incorrect");
                 }
             });
-
             if (selected === currentQuestionData.a) {
                 score++;
             } else {
@@ -688,7 +762,6 @@
             }
             updateLives();
             scoreDisplay.textContent = score;
-
             setTimeout(() => {
                 awaitingNext = false;
                 if (lives <= 0) endGame();
@@ -731,7 +804,7 @@
                 qTimerFill.style.width = percent + '%';
                 if (qTime <= 0) {
                     clearInterval(qTimerInterval);
-                    handleAnswer(''); // Timeout counts as incorrect
+                    handleAnswer('');
                 }
             }, 100);
         }
@@ -744,12 +817,9 @@
             updateQuizHeaderVisibility(false);
             document.getElementById('final-score').textContent = score;
             stopAllTimers();
-
             try {
                 if (!window.currentUser) throw new Error('Utilisateur non connecté');
-
                 const quizKey = 'anglais';
-
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
                 let userData = userDoc.data();
@@ -758,38 +828,29 @@
                     neerlandais: 0, allemand: 0, italien: 0, espagnol: 0,
                     geographie: 0, animaux: 0
                 };
-
                 if (!userData) {
                     userData = {
                         pseudo: currentUser.email.split('@')[0],
                         email: currentUser.email,
                         quizScores: defaultQuizScores,
                         quizCompleted: 0,
-                        globalScore: 0,
                         createdAt: new Date().toISOString()
                     };
                     await setDoc(userDocRef, userData);
                 }
-
                 const quizScores = { ...(userData.quizScores || defaultQuizScores) };
                 const oldDeptScore = quizScores[quizKey] || 0;
                 const newDeptScore = oldDeptScore + score;
                 quizScores[quizKey] = newDeptScore;
-
-                // Update global score by adding only the current quiz score
-                const newGlobalScore = (userData.globalScore || 0) + score;
+                const newGlobalScore = computeGlobalScore(quizScores);
                 let quizCompleted = userData.quizCompleted || 0;
                 if (lives > 0) quizCompleted += 1;
-
-                await updateDoc(userDocRef, { quizScores, quizCompleted, globalScore: newGlobalScore });
-
+                await updateDoc(userDocRef, { quizScores, quizCompleted });
                 localStorage.setItem('globalScore', newGlobalScore);
                 localStorage.setItem('quizCompleted', quizCompleted);
-
                 document.getElementById('new-global-score').textContent = newGlobalScore;
                 document.getElementById('new-dept-score').textContent = newDeptScore;
                 document.getElementById('new-quiz-completed').textContent = quizCompleted;
-
                 const oldLevel = Math.floor(oldDeptScore / 50);
                 const newLevel = Math.floor(newDeptScore / 50);
                 if (newLevel > oldLevel) {
@@ -826,14 +887,12 @@
             window.location.href = 'index.html';
         };
 
-        // ✏️ À MODIFIER : chargement du bon leaderboard
         async function loadLeaderboard() {
             const mobileList = document.querySelector('#leaderboard-section.mobile .leaderboard-list');
             const desktopList = document.querySelector('#leaderboard-section.desktop .leaderboard-list');
             const placeholder = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
             if (mobileList) mobileList.innerHTML = placeholder;
             if (desktopList) desktopList.innerHTML = placeholder;
-
             try {
                 const q = query(collection(db, 'users'), orderBy('quizScores.anglais', 'desc'), limit(10));
                 const querySnapshot = await getDocs(q);
@@ -862,7 +921,7 @@
             }
         }
 
-        // Authentification – ne jamais afficher le quiz sans auth
+        // 🔑 Vérifie que l'utilisateur a au moins 100 points de score global
         onAuthStateChanged(auth, async (user) => {
             const navLoggedIn = document.getElementById('nav-logged-in');
             if (user) {
@@ -874,8 +933,9 @@
                 let globalScore = 0;
                 if (userDoc.exists()) {
                     const data = userDoc.data();
+                    const quizScores = data.quizScores || {};
                     pseudoEl.textContent = data.pseudo || user.email.split('@')[0];
-                    globalScore = data.globalScore || 0;
+                    globalScore = computeGlobalScore(quizScores);
                 } else {
                     pseudoEl.textContent = user.email.split('@')[0];
                     globalScore = 0;
@@ -884,30 +944,19 @@
                 localStorage.setItem('globalScore', globalScore);
                 navLoggedIn.classList.remove('hidden');
 
-                // Vérifier accès (à adapter selon niveaux)
-                const hash = window.location.hash.substring(1);
-                const level = parseInt(hash) || 1;
-                if (!canAccessLevel(level, globalScore)) {
-                    alert(`Niveau ${level} verrouillé.`);
+                // 🔒 Vérification d'accès au Niveau 2 (score global ≥ 100)
+                if (globalScore < 100) {
+                    alert("💡 Vous devez avoir au moins 100 points de score global pour accéder à ce quiz.");
                     window.location.href = 'index.html';
                     return;
                 }
 
+                // Démarrer le quiz
                 startMode();
             } else {
                 window.location.href = 'index.html';
             }
         });
-
-        // ✏️ À MODIFIER : conditions d’accès
-        function canAccessLevel(level, globalScore) {
-            // Exemple : seul le niveau 1 est libre
-            return level === 1;
-        }
-
-        function updateBaseBtnVisibility(globalScore) {
-        }
-        updateBaseBtnVisibility(0);
     </script>
 </body>
 </html>

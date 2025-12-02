@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Quiz Master - Anglais Niveau 1</title>
+    <title>Quiz Master - [NOM DU QUIZ]</title>
     <style>
         .hidden { display: none !important; }
         body {
@@ -100,9 +100,6 @@
             cursor: pointer;
             border: none;
             transition: 0.18s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         .answer-btn:hover:not(:disabled) {
             transform: scale(1.04);
@@ -315,7 +312,8 @@
                 <h3>Résumé</h3>
                 <p>Score de la partie : <strong id="final-score">0</strong></p>
                 <p>Nouveau score global : <strong id="new-global-score">0</strong></p>
-                <p>Score anglais : <strong id="new-dept-score">0</strong></p>
+                <!-- ✏️ À MODIFIER : changer le libellé et la variable selon le type de quiz -->
+                <p>Score [QUIZ_TYPE] : <strong id="new-dept-score">0</strong></p>
                 <p>Quiz complétés : <strong id="new-quiz-completed">0</strong></p>
                 <div id="level-up-msg" class="hidden" style="color: #2ecc71; margin-top: 15px; font-weight: bold;">
                     🎊 NIVEAU SUPÉRIEUR ATTEINT !
@@ -330,18 +328,7 @@
         // 🔧 INITIALISATION FIREBASE (identique à tous les quiz)
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { 
-            getFirestore, 
-            doc, 
-            getDoc, 
-            setDoc, 
-            updateDoc, 
-            collection, 
-            query, 
-            orderBy, 
-            limit, 
-            getDocs 
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
@@ -359,10 +346,18 @@
         window.currentUser = null;
 
         // ✏️ À MODIFIER : liste utilisée pour calculer le score global (ajoute ton quiz ici si besoin)
-        // REMOVED: No longer needed since we only use globalScore directly
+        function computeGlobalScore(quizScores) {
+            const keys = [
+                'departements', 'chinois', 'medecine', 'math', 'anglais',
+                'neerlandais', 'allemand', 'italien', 'espagnol',
+                'geographie', 'animaux'
+                // ← Ajoute ta clé ici si tu crées un nouveau type de quiz
+            ];
+            return keys.reduce((sum, key) => sum + (quizScores[key] || 0), 0);
+        }
 
         // ✏️ À MODIFIER : configurer les paramètres du mode (durée, nombre de vies, etc.)
-        const mode = { time: 60, qTime: 7, lives: 3 };
+        const mode = { time: 60, qTime: 5, lives: 3 };
 
         // États du jeu
         let score = 0, lives = 0, timeLeft = 0, qTime = 0;
@@ -398,7 +393,8 @@
         async function saveCurrentScore() {
             if (!window.currentUser || score <= 0 || gameCompleted) return;
             try {
-                const quizKey = 'anglais';
+                // ✏️ À MODIFIER : CLÉ SPÉCIFIQUE DU QUIZ DANS quizScores
+                const quizKey = 'chinois'; // ← ← ← ← ← MODIFIER ICI
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
                 let userData = userDoc.data();
@@ -406,6 +402,7 @@
                     departements: 0, chinois: 0, medecine: 0, math: 0, anglais: 0,
                     neerlandais: 0, allemand: 0, italien: 0, espagnol: 0,
                     geographie: 0, animaux: 0
+                    // ← Ajouter ta clé ici aussi
                 };
                 if (!userData) {
                     userData = {
@@ -413,7 +410,6 @@
                         email: currentUser.email,
                         quizScores: defaultQuizScores,
                         quizCompleted: 0,
-                        globalScore: 0,
                         createdAt: new Date().toISOString()
                     };
                     await setDoc(userDocRef, userData);
@@ -422,13 +418,11 @@
                 const oldDeptScore = quizScores[quizKey] || 0;
                 const newDeptScore = oldDeptScore + score;
                 quizScores[quizKey] = newDeptScore;
-                
-                // Calculate new global score by adding only the quiz score
-                const newGlobalScore = (userData.globalScore || 0) + score;
-                
-                await updateDoc(userDocRef, { quizScores, globalScore: newGlobalScore });
+                const newGlobalScore = computeGlobalScore(quizScores);
+                await updateDoc(userDocRef, { quizScores });
                 localStorage.setItem('globalScore', newGlobalScore);
                 document.getElementById('user-global-score').textContent = newGlobalScore;
+                // Optionnel : updateBaseBtnVisibility(newGlobalScore);
             } catch (error) {
                 console.error('Erreur sauvegarde partielle:', error);
             }
@@ -443,181 +437,14 @@
         };
         mobileBackBtn.onclick = backBtn.onclick;
 
-        // 🔢 LOGIQUE SPÉCIFIQUE DU QUIZ ANGLAIS
-        const ones = ["zero","one","two","three","four","five","six","seven","eight","nine"];
-        const teens = ["ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
-        const tensWords = ["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
-
-        function numberToEnglishWords(n) {
-            if (n < 10) return ones[n];
-            if (n < 20) return teens[n - 10];
-            if (n < 100) {
-                const tens = Math.floor(n / 10);
-                const onesDigit = n % 10;
-                return tensWords[tens] + (onesDigit ? "-" + ones[onesDigit] : "");
-            }
-            if (n === 100) return "one hundred";
-            return "";
-        }
-
-        function generateRandomOpts(correctAnswer) {
-            const values = new Set();
-            values.add(Number(correctAnswer));
-            while (values.size < 5) {
-                let v = Number(correctAnswer) + Math.floor(Math.random() * 21) - 10;
-                if (v < 0 || v > 100) v = Math.floor(Math.random() * 101);
-                values.add(v);
-            }
-            return [...values].map(v => ({
-                raw: numberToEnglishWords(v),
-                display: `<span style="font-size: calc(1rem + 3px);">${numberToEnglishWords(v)}</span>`
-            }));
-        }
-
-        function generateType3RndOpts(correct) {
-            const values = new Set();
-            values.add(correct);
-            while (values.size < 5) {
-                let v = correct + Math.floor(Math.random() * 11) - 5;
-                if (v < 0 || v > 100) v = Math.floor(Math.random() * 101);
-                values.add(v);
-            }
-            return [...values].map(v => ({
-                raw: numberToEnglishWords(v),
-                display: `<span style="font-size: calc(1rem + 3px);">${numberToEnglishWords(v)}</span>`
-            }));
-        }
-
-        const type3Questions = [
-            { q: "How many countries are in the United Kingdom?", a: "4" },
-            { q: "How many members are there in the UK House of Commons?", a: "650" },
-            { q: "How many stripes are there on the Union Jack?", a: "9" },
-            { q: "How many years did Queen Victoria reign?", a: "63" },
-            { q: "How many kings or queens has the UK had since 1707?", a: "12" },
-            { q: "How many official languages does the UK have?", a: "4" },
-            { q: "How many Premier League teams are there?", a: "20" },
-            { q: "How many minutes are there in a standard football match?", a: "90" },
-            { q: "How many letters are in the English alphabet?", a: "26" },
-            { q: "How many Nobel Prize winners come from the UK (approx.)?", a: "130" },
-            { q: "How many London Underground lines are there?", a: "11" },
-            { q: "How many boroughs are there in Greater London?", a: "32" },
-            { q: "How many official parks are there in London?", a: "8" },
-            { q: "How many bridges cross the Thames in central London?", a: "35" },
-            { q: "How many UK coins are currently in circulation?", a: "8" },
-            { q: "How many constituencies are there in England?", a: "533" },
-            { q: "How many Olympic Games has London hosted?", a: "3" },
-            { q: "How many seats are there in the House of Lords?", a: "800" },
-            { q: "How many airports does London have?", a: "6" },
-            { q: "How many museums are there in London?", a: "170" },
-            { q: "How many castles are there in Scotland?", a: "200" },
-            { q: "How many official national parks are there in the UK?", a: "15" },
-            { q: "How many letters are in 'Parliament'?", a: "10" },
-            { q: "How many Nobel Prizes were won by UK scientists in the 20th century?", a: "80" },
-            { q: "How many Prime Ministers has the UK had since 1900?", a: "28" },
-            { q: "How many monarchs ruled England before the Act of Union 1707?", a: "61" },
-            { q: "How many countries in the Commonwealth are former British colonies?", a: "54" },
-            { q: "How many cities in the UK have cathedrals?", a: "42" },
-            { q: "How many minutes is the changing of the guard at Buckingham Palace (approx.)?", a: "45" },
-            { q: "How many World Heritage Sites are in the UK?", a: "33" }
-        ];
-
+        // ✏️ À MODIFIER : cette fonction doit retourner un objet { q, a, opts }
         function generateRandomQuestion() {
-            const type = Math.floor(Math.random() * 4) + 1;
-
-            // Type 1 : number → words
-            if (type === 1) {
-                const n = Math.floor(Math.random() * 100) + 1;
-                const correct = numberToEnglishWords(n);
-                const wrongSet = new Set();
-                while (wrongSet.size < 4) {
-                    const r = Math.floor(Math.random() * 100) + 1;
-                    const w = numberToEnglishWords(r);
-                    if (w !== correct) wrongSet.add(w);
-                }
-                const opts = [correct, ...wrongSet];
-                const shuffled = opts.sort(() => Math.random() - 0.5);
-                return {
-                    q: `What is the English word for <br><span style="font-size:4rem;font-weight:800;display:block;">${n}</span>?`,
-                    a: correct,
-                    opts: shuffled.map(char => ({
-                        raw: char,
-                        display: `<span style="font-size: calc(1rem + 3px);">${char}</span>`
-                    }))
-                };
-            }
-
-            // Type 2 : subtraction
-            if (type === 2) {
-                let a = Math.floor(Math.random() * 100) + 1;
-                let b = Math.floor(Math.random() * 100) + 1;
-                if (b > a) [a, b] = [b, a];
-                const result = a - b;
-
-                const displayA = Math.random() > 0.5 ? String(a) : numberToEnglishWords(a);
-                const displayB = Math.random() > 0.5 ? String(b) : numberToEnglishWords(b);
-
-                const optObjects = generateRandomOpts(result);
-                const correctStr = numberToEnglishWords(result);
-
-                const wrongOpts = optObjects.filter(opt => opt.raw !== correctStr).slice(0, 4);
-                const allOpts = [correctStr, ...wrongOpts.map(opt => opt.raw)];
-                const shuffled = [...new Set(allOpts)].sort(() => Math.random() - 0.5);
-
-                return {
-                    q: `${displayA} − ${displayB} = ?`,
-                    a: correctStr,
-                    opts: shuffled.map(v => ({
-                        raw: v,
-                        display: `<span style="font-size: calc(1rem + 3px);">${v}</span>`
-                    }))
-                };
-            }
-
-            // Type 3 : cultural / factual questions
-            if (type === 3) {
-                const item = type3Questions[Math.floor(Math.random() * type3Questions.length)];
-                const correct = Number(item.a);
-
-                const optObjects = generateType3RndOpts(correct);
-                const correctStr = numberToEnglishWords(correct);
-
-                const wrongOpts = optObjects.filter(opt => opt.raw !== correctStr).slice(0, 4);
-                const allOpts = [correctStr, ...wrongOpts.map(opt => opt.raw)];
-                const shuffled = [...new Set(allOpts)].sort(() => Math.random() - 0.5);
-
-                return {
-                    q: item.q,
-                    a: correctStr,
-                    opts: shuffled.map(v => ({
-                        raw: v,
-                        display: `<span style="font-size: calc(1rem + 3px);">${v}</span>`
-                    }))
-                };
-            }
-
-            // Type 4 : display word → number
-            if (type === 4) {
-                const n = Math.floor(Math.random() * 100) + 1;
-                const en = numberToEnglishWords(n);
-
-                const wrongSet = new Set();
-                while (wrongSet.size < 4) {
-                    const r = Math.floor(Math.random() * 100) + 1;
-                    wrongSet.add(numberToEnglishWords(r));
-                }
-
-                const opts = [en, ...wrongSet];
-                const shuffled = opts.sort(() => Math.random() - 0.5);
-
-                return {
-                    q: `Which number is this word: <br><span style="font-size:4rem;font-weight:800;display:block;">${en}</span>?`,
-                    a: en,
-                    opts: shuffled.map(v => ({
-                        raw: v,
-                        display: `<span style="font-size: calc(1rem + 3px);">${v}</span>`
-                    }))
-                };
-            }
+            // ← ← ← ← ← ICI, implémenter ta logique de génération
+            return {
+                q: "Question factice",
+                a: "Bonne réponse",
+                opts: ["Bonne réponse", "Mauvaise 1", "Mauvaise 2", "Mauvaise 3", "Mauvaise 4"]
+            };
         }
 
         function startMode() {
@@ -632,7 +459,7 @@
             resultSection.classList.add('hidden');
             quizSection.classList.remove('hidden');
             updateQuizHeaderVisibility(true);
-            loadLeaderboard();
+            loadLeaderboard(); // ✏️ À MODIFIER si nom du leaderboard change
             generateQuestion();
             startMainTimer();
         }
@@ -646,15 +473,15 @@
             qTimerFill.style.width = '100%';
             questionBox.innerHTML = qData.q;
 
-            // Assure 5 options
+            // Assure 1 bonne réponse + 4 mauvaises
             const opts = qData.opts.slice(0, 5);
             answerBtns.forEach((btn, i) => {
                 if (i < 5) {
-                    btn.innerHTML = opts[i]?.display || "–";
-                    btn.dataset.value = opts[i]?.raw || "";
+                    btn.innerHTML = opts[i] || "–";
+                    btn.dataset.value = opts[i] || "";
                     btn.disabled = false;
                     btn.classList.remove("correct", "incorrect");
-                    btn.onclick = () => handleAnswer(opts[i]?.raw);
+                    btn.onclick = () => handleAnswer(opts[i]);
                     btn.style.display = '';
                 } else {
                     btn.style.display = 'none';
@@ -668,7 +495,6 @@
 
         function handleAnswer(selected) {
             if (awaitingNext) return;
-            if (selected === undefined) return; // Handle invalid selection
             awaitingNext = true;
             clearInterval(qTimerInterval);
             answerBtns.forEach(btn => {
@@ -731,7 +557,7 @@
                 qTimerFill.style.width = percent + '%';
                 if (qTime <= 0) {
                     clearInterval(qTimerInterval);
-                    handleAnswer(''); // Timeout counts as incorrect
+                    handleAnswer('');
                 }
             }, 100);
         }
@@ -748,7 +574,8 @@
             try {
                 if (!window.currentUser) throw new Error('Utilisateur non connecté');
 
-                const quizKey = 'anglais';
+                // ✏️ À MODIFIER : CLÉ DU QUIZ À METTRE À JOUR
+                const quizKey = 'chinois'; // ← ← ← ← ← MODIFIER ICI
 
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
@@ -765,7 +592,6 @@
                         email: currentUser.email,
                         quizScores: defaultQuizScores,
                         quizCompleted: 0,
-                        globalScore: 0,
                         createdAt: new Date().toISOString()
                     };
                     await setDoc(userDocRef, userData);
@@ -776,12 +602,11 @@
                 const newDeptScore = oldDeptScore + score;
                 quizScores[quizKey] = newDeptScore;
 
-                // Update global score by adding only the current quiz score
-                const newGlobalScore = (userData.globalScore || 0) + score;
+                const newGlobalScore = computeGlobalScore(quizScores);
                 let quizCompleted = userData.quizCompleted || 0;
                 if (lives > 0) quizCompleted += 1;
 
-                await updateDoc(userDocRef, { quizScores, quizCompleted, globalScore: newGlobalScore });
+                await updateDoc(userDocRef, { quizScores, quizCompleted });
 
                 localStorage.setItem('globalScore', newGlobalScore);
                 localStorage.setItem('quizCompleted', quizCompleted);
@@ -835,14 +660,15 @@
             if (desktopList) desktopList.innerHTML = placeholder;
 
             try {
-                const q = query(collection(db, 'users'), orderBy('quizScores.anglais', 'desc'), limit(10));
+                // ✏️ À MODIFIER : champ du leaderboard
+                const q = query(collection(db, 'users'), orderBy('quizScores.chinois', 'desc'), limit(10));
                 const querySnapshot = await getDocs(q);
                 let rank = 1;
                 let html = '';
                 querySnapshot.forEach((doc) => {
                     const data = doc.data() || {};
                     const pseudo = data.pseudo || 'Anonyme';
-                    const score = data.quizScores?.anglais || 0;
+                    const score = data.quizScores?.chinois || 0; // ← ← ← MODIFIER ICI
                     let medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
                     html += `<div class="leaderboard-item">
                         <div class="leaderboard-rank">${medal || rank}</div>
@@ -874,8 +700,9 @@
                 let globalScore = 0;
                 if (userDoc.exists()) {
                     const data = userDoc.data();
+                    const quizScores = data.quizScores || {};
                     pseudoEl.textContent = data.pseudo || user.email.split('@')[0];
-                    globalScore = data.globalScore || 0;
+                    globalScore = computeGlobalScore(quizScores);
                 } else {
                     pseudoEl.textContent = user.email.split('@')[0];
                     globalScore = 0;
@@ -905,10 +732,11 @@
             return level === 1;
         }
 
+        // Initialisation bouton Base si utilisé
         function updateBaseBtnVisibility(globalScore) {
+            // Facultatif – à supprimer si non utilisé
         }
         updateBaseBtnVisibility(0);
     </script>
 </body>
 </html>
-

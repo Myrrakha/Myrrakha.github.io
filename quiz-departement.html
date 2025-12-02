@@ -540,7 +540,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
             authDomain: "quiz-master-io.firebaseapp.com",
@@ -564,23 +564,9 @@
             5: 90,
             6: 125
         };
-        // 🔢 Helper identique à index.html — NE JAMAIS stocker globalScore dans Firestore
-        function computeGlobalScore(quizScores) {
-            const keys = [
-                'departements', 'chinois', 'medecine', 'math', 'anglais',
-                'neerlandais', 'allemand', 'italien', 'espagnol',
-                'geographie', 'animaux'
-            ];
-            return keys.reduce((sum, key) => sum + (quizScores[key] || 0), 0);
-        }
-        function canAccessLevel(level, globalScore) {
-            const required = levelRequirements[level];
-            return globalScore >= required;
-        }
-
+        // 👇 Supprimé : computeGlobalScore
         // 👇 Ajout du flag pour empêcher le double enregistrement
         let gameCompleted = false;
-
         onAuthStateChanged(auth, async (user) => {
             const quizSection = document.getElementById('quiz-section');
             const navLoggedIn = document.getElementById('nav-logged-in');
@@ -600,7 +586,7 @@
                     const data = userDoc.data();
                     const quizScores = data.quizScores || {};
                     pseudoEl.textContent = data.pseudo || user.email.split('@')[0];
-                    globalScore = computeGlobalScore(quizScores);
+                    globalScore = data.globalScore || 0; // ✅ Lecture directe
                     quizCompleted = data.quizCompleted || 0;
                 } else {
                     pseudoEl.textContent = user.email.split('@')[0];
@@ -624,6 +610,10 @@
                 window.location.href = 'index.html';
             }
         });
+        function canAccessLevel(level, globalScore) {
+            const required = levelRequirements[level];
+            return globalScore >= required;
+        }
         const departements = [
             { nom: "Ain", numero: "01", prefecture: "Bourg-en-Bresse" },
             { nom: "Aisne", numero: "02", prefecture: "Laon" },
@@ -767,51 +757,47 @@
                 mobileBackBtn.classList.add('hidden');
             }
         }
-        async function saveCurrentScore() {
-            // 🔒 Bloquer la sauvegarde si la partie est terminée
-            if (!window.currentUser || score <= 0 || gameCompleted) return;
-            try {
-                const userDocRef = doc(db, 'users', currentUser.uid);
-                const userDoc = await getDoc(userDocRef);
-                let userData = userDoc.data();
-                const defaultQuizScores = {
-                    departements: 0,
-                    chinois: 0,
-                    medecine: 0,
-                    math: 0,
-                    anglais: 0,
-                    neerlandais: 0,
-                    allemand: 0,
-                    italien: 0,
-                    espagnol: 0,
-                    geographie: 0,
-                    animaux: 0
-                };
-                if (!userData) {
-                    userData = {
-                        pseudo: currentUser.email.split('@')[0],
-                        email: currentUser.email,
-                        quizScores: defaultQuizScores,
-                        quizCompleted: 0,
-                        createdAt: new Date().toISOString()
-                    };
-                    await setDoc(userDocRef, userData);
-                }
-                const quizScores = { ...(userData.quizScores || defaultQuizScores) };
-                const oldDeptScore = quizScores.departements || 0;
-                const newDeptScore = oldDeptScore + score;
-                quizScores.departements = newDeptScore;
-                const newGlobalScore = computeGlobalScore(quizScores);
-                await updateDoc(userDocRef, { quizScores });
-                localStorage.setItem('globalScore', newGlobalScore);
-                document.getElementById('user-global-score').textContent = newGlobalScore;
-                updateBaseBtnVisibility(newGlobalScore);
-            } catch (error) {
-                console.error('Erreur sauvegarde scores au retour:', error);
+        // ✅ Sauvegarde mise à jour : incrément direct
+        async function saveScores(deptIncrement, markCompleted = false) {
+            if (deptIncrement <= 0) return;
+            // Lecture locale du globalScore existant
+            let currentGlobalScore = parseInt(localStorage.getItem('globalScore')) || 0;
+            let quizCompleted = parseInt(localStorage.getItem('quizCompleted')) || 0;
+            // Mettre à jour
+            const newGlobalScore = currentGlobalScore + deptIncrement;
+            if (markCompleted && lives > 0) {
+                quizCompleted += 1;
             }
+            // Mettre à jour quizScores pour le leaderboard
+            let quizScores = JSON.parse(localStorage.getItem('quizScores')) || {};
+            quizScores.departements = (quizScores.departements || 0) + deptIncrement;
+            localStorage.setItem('quizScores', JSON.stringify(quizScores));
+            localStorage.setItem('globalScore', newGlobalScore.toString());
+            localStorage.setItem('quizCompleted', quizCompleted.toString());
+            // Firebase
+            if (window.currentUser) {
+                try {
+                    const userDocRef = doc(db, 'users', currentUser.uid);
+                    const updateData = {
+                        'quizScores.departements': increment(deptIncrement),
+                        globalScore: increment(deptIncrement)
+                    };
+                    if (markCompleted && lives > 0) {
+                        updateData.quizCompleted = increment(1);
+                    }
+                    await updateDoc(userDocRef, updateData);
+                } catch (error) {
+                    console.warn('Firebase indisponible, sauvegarde locale uniquement:', error);
+                }
+            }
+            // UI
+            document.getElementById('user-global-score').textContent = newGlobalScore;
+            updateBaseBtnVisibility(newGlobalScore);
         }
         backBtn.onclick = async function () {
-            await saveCurrentScore();
+            if (!gameCompleted) {
+                await saveScores(score, false);
+            }
             stopAllTimers();
             quizSection.classList.add('hidden');
             window.location.href = 'index.html';
@@ -901,12 +887,11 @@
                 btn.classList.remove("correct", "incorrect");
                 btn.onclick = () => handleAnswer(options[i]);
             });
-            // Ajouter un petit délai avant de démarrer le timer de question
             setTimeout(() => {
                 if (!awaitingNext) {
                     startQTimer();
                 }
-            }, 100); // Délai de 100ms
+            }, 100);
         }
         function handleAnswer(selected) {
             if (awaitingNext) return;
@@ -959,88 +944,48 @@
         }
         function startQTimer() {
             clearInterval(qTimerInterval);
-            // Store initial question time for reference
             const qStartTime = modes[currentMode].qTime;
             qTime = qStartTime;
             qTimerInterval = setInterval(() => {
                 qTime -= 0.1;
-                // Round to 1 decimal for display
                 qTimerDisplay.textContent = qTime.toFixed(1);
-                // Update width based on actual elapsed time vs start time
                 const percent = Math.max(0, qTime / qStartTime) * 100;
                 qTimerFill.style.width = percent + '%';
                 if (qTime <= 0) {
                     clearInterval(qTimerInterval);
                     handleAnswer('');
                 }
-            }, 100); // Fire every 100ms = 0.1s
+            }, 100);
         }
         async function endGame() {
-            // 🔒 Empêcher les appels multiples
             if (gameCompleted) return;
             gameCompleted = true;
-
             quizSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
             updateQuizHeaderVisibility(false);
             document.getElementById('final-score').textContent = score;
             stopAllTimers();
             window.scrollTo(0, 0);
-            try {
-                if (!window.currentUser) throw new Error('Utilisateur non connecté');
-                const userDocRef = doc(db, 'users', currentUser.uid);
-                const userDoc = await getDoc(userDocRef);
-                let userData = userDoc.data();
-                const defaultQuizScores = {
-                    departements: 0,
-                    chinois: 0,
-                    medecine: 0,
-                    math: 0,
-                    anglais: 0,
-                    neerlandais: 0,
-                    allemand: 0,
-                    italien: 0,
-                    espagnol: 0,
-                    geographie: 0,
-                    animaux: 0
-                };
-                if (!userData) {
-                    userData = {
-                        pseudo: currentUser.email.split('@')[0],
-                        email: currentUser.email,
-                        quizScores: defaultQuizScores,
-                        quizCompleted: 0,
-                        createdAt: new Date().toISOString()
-                    };
-                    await setDoc(userDocRef, userData);
-                }
-                const quizScores = { ...(userData.quizScores || defaultQuizScores) };
-                const oldDeptScore = quizScores.departements || 0;
-                const newDeptScore = oldDeptScore + score;
-                quizScores.departements = newDeptScore;
-                const newGlobalScore = computeGlobalScore(quizScores);
-                let quizCompleted = userData.quizCompleted || 0;
-                if (lives > 0) {
-                    quizCompleted += 1;
-                }
-                await updateDoc(userDocRef, { quizScores, quizCompleted });
-                localStorage.setItem('globalScore', newGlobalScore);
-                localStorage.setItem('quizCompleted', quizCompleted);
-                document.getElementById('new-global-score').textContent = newGlobalScore;
-                document.getElementById('new-dept-score').textContent = newDeptScore;
-                document.getElementById('new-quiz-completed').textContent = quizCompleted;
-                const oldLevel = Math.floor(oldDeptScore / 50);
-                const newLevel = Math.floor(newDeptScore / 50);
-                if (newLevel > oldLevel) {
-                    document.getElementById('level-up-msg').classList.remove('hidden');
-                } else {
-                    document.getElementById('level-up-msg').classList.add('hidden');
-                }
-                updateBaseBtnVisibility(newGlobalScore);
-            } catch (error) {
-                console.error('Erreur sauvegarde scores:', error);
-                alert('Erreur lors de la sauvegarde des scores. Connectez-vous à nouveau.');
+            // Sauvegarde avec indication de complétion
+            await saveScores(score, true);
+            // Mettre à jour l'affichage des résultats
+            const quizScores = JSON.parse(localStorage.getItem('quizScores')) || {};
+            const quizCompleted = parseInt(localStorage.getItem('quizCompleted')) || 0;
+            const newGlobalScore = parseInt(localStorage.getItem('globalScore')) || 0;
+            const newDeptScore = quizScores.departements || 0;
+            document.getElementById('new-global-score').textContent = newGlobalScore;
+            document.getElementById('new-dept-score').textContent = newDeptScore;
+            document.getElementById('new-quiz-completed').textContent = quizCompleted;
+            // Message de niveau
+            const oldDeptScore = newDeptScore - score;
+            const oldLevel = Math.floor(oldDeptScore / 50);
+            const newLevel = Math.floor(newDeptScore / 50);
+            if (newLevel > oldLevel) {
+                document.getElementById('level-up-msg').classList.remove('hidden');
+            } else {
+                document.getElementById('level-up-msg').classList.add('hidden');
             }
+            updateBaseBtnVisibility(newGlobalScore);
         }
         function stopAllTimers() {
             clearInterval(timerInterval);
@@ -1048,8 +993,9 @@
         }
         restartBtn.onclick = startMode;
         homeBtn.onclick = async function () {
-            // Même si on appelle saveCurrentScore(), il sera bloqué si gameCompleted === true
-            await saveCurrentScore();
+            if (!gameCompleted) {
+                await saveScores(score, false);
+            }
             stopAllTimers();
             resultSection.classList.add('hidden');
             window.location.href = 'index.html';
@@ -1105,9 +1051,14 @@
                         pseudo: pseudo.trim(),
                         email: email,
                         quizScores: defaultQuizScores,
+                        globalScore: 0, // ✅ champ ajouté
                         quizCompleted: 0,
                         createdAt: new Date().toISOString()
                     });
+                    // Initialiser le localStorage aussi
+                    localStorage.setItem('quizScores', JSON.stringify(defaultQuizScores));
+                    localStorage.setItem('quizCompleted', '0');
+                    localStorage.setItem('globalScore', '0');
                 } else {
                     await signInWithEmailAndPassword(auth, email, password);
                 }
@@ -1151,7 +1102,6 @@
                 desktopList.innerHTML = errorMsg;
             }
         }
-        // Initialiser le bouton base avec la valeur par défaut au cas où
         updateBaseBtnVisibility(0);
     </script>
 </body>

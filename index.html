@@ -650,6 +650,10 @@
                             <div class="levels-dropdown" id="anglais-dropdown">
                                 <div class="levels-grid-dropdown" id="anglais-levels"></div>
                             </div>
+                            <!-- Bouton spécifique pour Anglais N2 -->
+                            <button id="anglais-n2-btn" style="margin-top: 12px; padding: 6px 12px; background: #444; color: #aaa; border: none; border-radius: 6px; cursor: not-allowed;" disabled>
+                                Accès Niveau 2
+                            </button>
                         </div>
                         <div class="stat-card" id="neerlandais-card">
                             <h3>🇳🇱 Quiz Néerlandais</h3>
@@ -726,11 +730,14 @@
                                     <div id="mobile-leaderboard-season"></div>
                                 </div>
                             </div>
+                            <!-- Troisième slide : statique, plus d'appel à la base de données -->
                             <div class="carousel-slide neon-bordered">
                                 <div class="leaderboard-highlight"></div>
                                 <div class="glass-inner">
-                                    <h3 class="slide-title" id="random-top-title">🗺️ Top aléatoire</h3>
-                                    <div id="random-top"></div>
+                                    <h3 class="slide-title">💡 Astuce du Jour</h3>
+                                    <div style="text-align: center; font-size: 0.95rem; opacity: 0.85;">
+                                        Révisez 10 min par jour pour progresser rapidement !
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1095,6 +1102,7 @@
                             geographie: 0,
                             animaux: 0
                         },
+                        globalScore: 0,
                         createdAt: new Date().toISOString()
                     });
                     hideAuthModal();
@@ -1157,16 +1165,6 @@
                 await loadLeaderboard();
             }
         });
-        function computeGlobalScore(quizScores) {
-            const keys = [
-                'departements', 'chinois', 'medecine', 'math', 'anglais',
-                'neerlandais', 'allemand', 'italien', 'espagnol',
-                'geographie', 'animaux'
-            ];
-            const globalScore = keys.reduce((sum, key) => sum + (quizScores[key] || 0), 0);
-            localStorage.setItem('globalScore', globalScore);
-            return globalScore;
-        }
         async function loadLeaderboard() {
             const leaderboardList = document.getElementById('leaderboard-list');
             leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
@@ -1176,12 +1174,11 @@
                 let currentUserScores = null;
                 usersSnapshot.forEach((doc) => {
                     const data = doc.data() || {};
-                    const quizScores = data.quizScores || {};
-                    const globalScore = computeGlobalScore(quizScores);
+                    const globalScore = data.globalScore || 0;
                     const pseudo = data.pseudo || 'Anonyme';
-                    leaderboard.push({ pseudo, globalScore, quizScores });
+                    leaderboard.push({ pseudo, globalScore, quizScores: data.quizScores || {} });
                     if (window.currentUser && doc.id === window.currentUser.uid) {
-                        currentUserScores = quizScores;
+                        currentUserScores = data.quizScores || {};
                     }
                 });
                 leaderboard.sort((a, b) => b.globalScore - a.globalScore);
@@ -1219,12 +1216,7 @@
                     }
                     const seasonList = document.getElementById('mobile-leaderboard-season');
                     seasonList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>';
-                    // Démarrer le top aléatoire après chargement leaderboard
-                    if (window.currentUser) {
-                        startRandomTopCycle();
-                    } else {
-                        document.getElementById('random-top').innerHTML = '<div style="text-align:center;opacity:0.6;">Connectez-vous pour voir les tops</div>';
-                    }
+                    // La troisième slide n’appelle plus startRandomTopCycle
                 }
             } catch (error) {
                 console.error('Erreur loadLeaderboard:', error);
@@ -1232,7 +1224,6 @@
                 if (window.matchMedia("(max-width: 899px)").matches) {
                     document.getElementById('mobile-leaderboard-global').innerHTML = '<div style="text-align: center; opacity: 0.6;">Erreur</div>';
                     document.getElementById('mobile-leaderboard-season').innerHTML = '<div style="text-align: center; opacity: 0.6;">Erreur</div>';
-                    document.getElementById('random-top').innerHTML = '<div style="text-align:center;opacity:0.6;">Erreur</div>';
                 }
             }
         }
@@ -1258,46 +1249,36 @@
                             geographie: 0,
                             animaux: 0
                         },
+                        globalScore: 0,
                         createdAt: new Date().toISOString()
                     };
                     await setDoc(userDocRef, defaultData);
                     userData = defaultData;
                 }
                 const quizScores = userData.quizScores || {};
-                const deptScore = quizScores.departements || 0;
-                const chinoisScore = quizScores.chinois || 0;
-                const medecineScore = quizScores.medecine || 0;
-                const mathScore = quizScores.math || 0;
-                const anglaisScore = quizScores.anglais || 0;
-                const neerlandaisScore = quizScores.neerlandais || 0;
-                const allemandScore = quizScores.allemand || 0;
-                const italienScore = quizScores.italien || 0;
-                const espagnolScore = quizScores.espagnol || 0;
-                const geographieScore = quizScores.geographie || 0;
-                const animauxScore = quizScores.animaux || 0;
-                const globalScore = computeGlobalScore(quizScores);
-                document.getElementById('home-dept-score').textContent = deptScore;
-                document.getElementById('home-chinois-score').textContent = chinoisScore;
-                document.getElementById('home-medecine-score').textContent = medecineScore;
-                document.getElementById('home-math-score').textContent = mathScore;
-                document.getElementById('home-anglais-score').textContent = anglaisScore;
-                document.getElementById('home-neerlandais-score').textContent = neerlandaisScore;
-                document.getElementById('home-allemand-score').textContent = allemandScore;
-                document.getElementById('home-italien-score').textContent = italienScore;
-                document.getElementById('home-espagnol-score').textContent = espagnolScore;
-                document.getElementById('home-geographie-score').textContent = geographieScore;
-                document.getElementById('home-animaux-score').textContent = animauxScore;
-                document.getElementById('dept-level').textContent = getDeptLevel(deptScore);
-                document.getElementById('chinois-level').textContent = getDeptLevel(chinoisScore);
-                document.getElementById('medecine-level').textContent = getDeptLevel(medecineScore);
-                document.getElementById('math-level').textContent = getDeptLevel(mathScore);
-                document.getElementById('anglais-level').textContent = getDeptLevel(anglaisScore);
-                document.getElementById('neerlandais-level').textContent = getDeptLevel(neerlandaisScore);
-                document.getElementById('allemand-level').textContent = getDeptLevel(allemandScore);
-                document.getElementById('italien-level').textContent = getDeptLevel(italienScore);
-                document.getElementById('espagnol-level').textContent = getDeptLevel(espagnolScore);
-                document.getElementById('geographie-level').textContent = getDeptLevel(geographieScore);
-                document.getElementById('animaux-level').textContent = getDeptLevel(animauxScore);
+                const globalScore = userData.globalScore || 0;
+                document.getElementById('home-dept-score').textContent = quizScores.departements || 0;
+                document.getElementById('home-chinois-score').textContent = quizScores.chinois || 0;
+                document.getElementById('home-medecine-score').textContent = quizScores.medecine || 0;
+                document.getElementById('home-math-score').textContent = quizScores.math || 0;
+                document.getElementById('home-anglais-score').textContent = quizScores.anglais || 0;
+                document.getElementById('home-neerlandais-score').textContent = quizScores.neerlandais || 0;
+                document.getElementById('home-allemand-score').textContent = quizScores.allemand || 0;
+                document.getElementById('home-italien-score').textContent = quizScores.italien || 0;
+                document.getElementById('home-espagnol-score').textContent = quizScores.espagnol || 0;
+                document.getElementById('home-geographie-score').textContent = quizScores.geographie || 0;
+                document.getElementById('home-animaux-score').textContent = quizScores.animaux || 0;
+                document.getElementById('dept-level').textContent = getDeptLevel(quizScores.departements || 0);
+                document.getElementById('chinois-level').textContent = getDeptLevel(quizScores.chinois || 0);
+                document.getElementById('medecine-level').textContent = getDeptLevel(quizScores.medecine || 0);
+                document.getElementById('math-level').textContent = getDeptLevel(quizScores.math || 0);
+                document.getElementById('anglais-level').textContent = getDeptLevel(quizScores.anglais || 0);
+                document.getElementById('neerlandais-level').textContent = getDeptLevel(quizScores.neerlandais || 0);
+                document.getElementById('allemand-level').textContent = getDeptLevel(quizScores.allemand || 0);
+                document.getElementById('italien-level').textContent = getDeptLevel(quizScores.italien || 0);
+                document.getElementById('espagnol-level').textContent = getDeptLevel(quizScores.espagnol || 0);
+                document.getElementById('geographie-level').textContent = getDeptLevel(quizScores.geographie || 0);
+                document.getElementById('animaux-level').textContent = getDeptLevel(quizScores.animaux || 0);
                 renderLevels('departements', globalScore);
                 renderLevels('chinois', globalScore);
                 renderLevels('medecine', globalScore);
@@ -1309,76 +1290,28 @@
                 renderLevels('espagnol', globalScore);
                 renderLevels('geographie', globalScore);
                 renderLevels('animaux', globalScore);
+
+                // --- Ajout : Gestion du bouton Anglais N2 ---
+                const n2Btn = document.getElementById('anglais-n2-btn');
+                if (globalScore >= 100) {
+                    n2Btn.disabled = false;
+                    n2Btn.style.cursor = 'pointer';
+                    n2Btn.style.background = '#9c28a7';
+                    n2Btn.style.color = '#fff';
+                    n2Btn.title = '';
+                    n2Btn.onclick = () => window.location.href = 'quiz-anglais-n2.html';
+                } else {
+                    n2Btn.disabled = true;
+                    n2Btn.style.cursor = 'not-allowed';
+                    n2Btn.style.background = '#444';
+                    n2Btn.style.color = '#aaa';
+                    n2Btn.title = "Débloqué à 100 points de score global";
+                }
             } catch (error) {
                 console.error('Erreur chargement données:', error);
             }
         }
-        const quizNames = {
-            departements: "Départements",
-            chinois: "Chinois",
-            medecine: "Médecine",
-            math: "Math",
-            anglais: "Anglais",
-            neerlandais: "Néerlandais",
-            allemand: "Allemand",
-            italien: "Italien",
-            espagnol: "Espagnol",
-            geographie: "Géographie",
-            animaux: "Animaux"
-        };
-        let randomTopInterval = null;
-        async function showNextTop() {
-            const randomTopEl = document.getElementById("random-top");
-            const titleEl = document.getElementById("random-top-title");
-            const usersRef = collection(db, "users");
-            const allUsersSnapshot = await getDocs(usersRef);
-            // Récupérer tous les scores
-            const allScores = {};
-            allUsersSnapshot.forEach(docSnap => {
-                const quizScores = docSnap.data().quizScores || {};
-                Object.keys(quizScores).forEach(key => {
-                    if (!allScores[key]) allScores[key] = 0;
-                    if (quizScores[key] > 0) allScores[key]++;
-                });
-            });
-            // Filtrer les catégories avec au moins un score > 0
-            const activeQuizzes = Object.keys(allScores).filter(q => allScores[q] > 0);
-            if (activeQuizzes.length === 0) {
-                titleEl.textContent = "Top aléatoire";
-                randomTopEl.innerHTML = '<div style="text-align:center;opacity:0.6;">Aucun score à afficher</div>';
-                return;
-            }
-            // Choisir une catégorie aléatoire
-            const key = activeQuizzes[Math.floor(Math.random() * activeQuizzes.length)];
-            // Mettre à jour le titre
-            titleEl.textContent = `Top ${quizNames[key]}`;
-            // Récupérer le top 5 pour cette catégorie
-            const q = query(usersRef, orderBy(`quizScores.${key}`, "desc"), limit(5));
-            const querySnapshot = await getDocs(q);
-            const topList = document.createElement("ol");
-            topList.style.paddingLeft = "16px";
-            topList.style.margin = "0";
-            topList.style.fontSize = "0.95rem";
-            querySnapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-                const pseudo = data.pseudo || (data.email ? data.email.split("@")[0] : "Anonyme");
-                const score = data.quizScores[key] || 0;
-                if (score > 0) {
-                    const li = document.createElement("li");
-                    li.textContent = `${pseudo} : ${score} pts`;
-                    li.style.fontSize = "0.95rem";
-                    topList.appendChild(li);
-                }
-            });
-            // Remplacer directement le contenu
-            randomTopEl.innerHTML = '';
-            randomTopEl.appendChild(topList);
-        }
-        function startRandomTopCycle() {
-            if (randomTopInterval) clearInterval(randomTopInterval);
-            showNextTop(); // Premier affichage immédiat
-            randomTopInterval = setInterval(showNextTop, 7000);
-        }
+        // Supprimé : randomTopInterval, showNextTop, startRandomTopCycle
         document.getElementById('auth-modal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('auth-modal')) {
                 hideAuthModal();
