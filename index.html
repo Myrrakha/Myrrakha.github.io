@@ -301,6 +301,7 @@
                 position: relative;
                 margin: 0 auto;
                 max-width: 500px;
+                display: block !important;
             }
             /* Conteneur global des slides — maintenant scrollable */
             #carousel-slides {
@@ -450,7 +451,7 @@
         }
         @media (min-width: 900px) {
             #mobile-leaderboard-carousel {
-                display: none;
+                display: none !important;
             }
         }
         /* MOBILE DESIGN */
@@ -799,10 +800,55 @@
         const requiredModeUnlock = { 2: 10, 3: 30, 4: 60, 5: 90, 6: 125 };
         let isAuthMode = 'login';
         let authCheckComplete = false;
+
+        // === Optimized Firebase caching logic ===
+        const CACHE_DURATION_MS = 4 * 60 * 60 * 1000; // 4 hours
+        let scoresCache = null;
+        let lastFetchTime = 0;
+
+        async function fetchAndCacheScores() {
+            const now = Date.now();
+            if (scoresCache && now - lastFetchTime < CACHE_DURATION_MS) {
+                return scoresCache;
+            }
+
+            try {
+                const usersSnapshot = await getDocs(collection(db, 'users'));
+                const players = {};
+                usersSnapshot.forEach(doc => {
+                    const data = doc.data() || {};
+                    const pseudo = data.pseudo || 'Anonyme';
+                    const quizScores = data.quizScores || {};
+                    players[pseudo] = {};
+                    for (const [theme, score] of Object.entries(quizScores)) {
+                        players[pseudo][theme] = score;
+                    }
+                });
+
+                scoresCache = players;
+                lastFetchTime = now;
+                return players;
+            } catch (error) {
+                console.error('Erreur lors de la récupération des scores:', error);
+                return scoresCache || {};
+            }
+        }
+
+        async function getRanking(theme) {
+            const players = await fetchAndCacheScores();
+            return Object.entries(players)
+                .map(([name, data]) => ({
+                    name,
+                    score: data[theme] ?? 0
+                }))
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 10);
+        }
+
+        // === Existing UI logic ===
         function navigateTo(url) {
             window.location.href = url;
         }
-        // Initial rendering for all users (connected or not)
         renderLevels('departements', 0);
         renderLevels('anglais', 0);
         renderLevels('neerlandais', 0);
@@ -1169,20 +1215,9 @@
             const leaderboardList = document.getElementById('leaderboard-list');
             leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
             try {
-                const usersSnapshot = await getDocs(collection(db, 'users'));
-                const leaderboard = [];
-                let currentUserScores = null;
-                usersSnapshot.forEach((doc) => {
-                    const data = doc.data() || {};
-                    const globalScore = data.globalScore || 0;
-                    const pseudo = data.pseudo || 'Anonyme';
-                    leaderboard.push({ pseudo, globalScore, quizScores: data.quizScores || {} });
-                    if (window.currentUser && doc.id === window.currentUser.uid) {
-                        currentUserScores = data.quizScores || {};
-                    }
-                });
-                leaderboard.sort((a, b) => b.globalScore - a.globalScore);
-                const top10 = leaderboard.slice(0, 10);
+                const globalTop = await getRanking('globalScore');
+                const top10 = globalTop.length > 0 ? globalTop : [];
+
                 // Desktop
                 if (top10.length === 0) {
                     leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
@@ -1193,10 +1228,11 @@
                         const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
                         const li = document.createElement('div');
                         li.className = 'leaderboard-item';
-                        li.innerHTML = `<div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${item.pseudo}</div><div class="leaderboard-score">${item.globalScore}</div>`;
+                        li.innerHTML = `<div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${item.name}</div><div class="leaderboard-score">${item.score}</div>`;
                         leaderboardList.appendChild(li);
                     });
                 }
+
                 // Mobile
                 if (window.matchMedia("(max-width: 899px)").matches) {
                     document.getElementById('mobile-leaderboard-carousel').classList.remove('hidden');
@@ -1210,13 +1246,12 @@
                             const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
                             const li = document.createElement('div');
                             li.className = 'leaderboard-item';
-                            li.innerHTML = `<div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${item.pseudo}</div><div class="leaderboard-score">${item.globalScore}</div>`;
+                            li.innerHTML = `<div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${item.name}</div><div class="leaderboard-score">${item.score}</div>`;
                             globalList.appendChild(li);
                         });
                     }
                     const seasonList = document.getElementById('mobile-leaderboard-season');
                     seasonList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>';
-                    // La troisième slide n’appelle plus startRandomTopCycle
                 }
             } catch (error) {
                 console.error('Erreur loadLeaderboard:', error);
@@ -1290,7 +1325,6 @@
                 renderLevels('espagnol', globalScore);
                 renderLevels('geographie', globalScore);
                 renderLevels('animaux', globalScore);
-
                 // --- Ajout : Gestion du bouton Anglais N2 ---
                 const n2Btn = document.getElementById('anglais-n2-btn');
                 if (globalScore >= 100) {
@@ -1311,7 +1345,7 @@
                 console.error('Erreur chargement données:', error);
             }
         }
-        // Supprimé : randomTopInterval, showNextTop, startRandomTopCycle
+
         document.getElementById('auth-modal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('auth-modal')) {
                 hideAuthModal();
