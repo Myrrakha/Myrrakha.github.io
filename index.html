@@ -796,101 +796,127 @@
         const requiredModeUnlock = { 2: 10, 3: 30, 4: 60, 5: 90, 6: 125 };
         let isAuthMode = 'login';
         let authCheckComplete = false;
-        // === Optimized Firebase caching logic ===
-        const CACHE_DURATION_MS = 4 * 60 * 60 * 1000; // 4 hours
-        let scoresCache = null;
+
+        // ✅ ÉTAPE 1-5 : NOUVELLE LOGIQUE DE CACHE À 30 MIN
+        const CACHE_DURATION_MS = 30 * 60 * 1000; // 30 minutes
+        let cachedPlayers = null;
         let lastFetchTime = 0;
-        async function fetchAndCacheScores() {
-            const now = Date.now();
-            if (scoresCache && now - lastFetchTime < CACHE_DURATION_MS) {
-                return scoresCache;
-            }
-            try {
-                const usersSnapshot = await getDocs(collection(db, 'users'));
-                const players = {};
-                usersSnapshot.forEach(doc => {
-                    const data = doc.data() || {};
-                    const pseudo = data.pseudo || 'Anonyme';
-                    const quizScores = data.quizScores || {};
-                    players[pseudo] = {};
-                    for (const [theme, score] of Object.entries(quizScores)) {
-                        players[pseudo][theme] = score;
-                    }
-                });
-                scoresCache = players;
-                lastFetchTime = now;
-                return players;
-            } catch (error) {
-                console.error('Erreur lors de la récupération des scores:', error);
-                return scoresCache || {};
-            }
-        }
-        async function getRanking(theme) {
-            const players = await fetchAndCacheScores();
-            return Object.entries(players)
-                .map(([name, data]) => ({
-                    name,
-                    score: data[theme] ?? 0
-                }))
-                .sort((a, b) => b.score - a.score)
-                .slice(0, 10);
-        }
-        // === Local leaderboard persistence ===
-        const LEADERBOARD_LOCAL_KEY = 'cachedLeaderboard';
-        const LEADERBOARD_CACHE_DURATION = 4 * 60 * 60 * 1000; // 4h
+        const LEADERBOARD_LOCAL_KEY = 'leaderboard_cache_v2';
 
-        function saveLeaderboardToLocal(cachedData) {
+        // Liste exhaustive des thèmes à charger
+        const ALL_THEMES = [
+            'globalScore',
+            'departements', 'chinois', 'medecine', 'math',
+            'anglais', 'neerlandais', 'allemand', 'italien',
+            'espagnol', 'geographie', 'animaux'
+        ];
+
+        // 1. Récupère TOUTES les données depuis Firebase (une seule requête)
+        async function fetchAllScoresFromFirebase() {
+            const snapshot = await getDocs(collection(db, 'users'));
+            const players = {};
+            snapshot.forEach(doc => {
+                const d = doc.data();
+                const pseudo = d.pseudo;
+                if (!pseudo) return;
+                players[pseudo] = {};
+                // Inclure globalScore
+                players[pseudo].globalScore = d.globalScore ?? 0;
+                // Inclure chaque quiz
+                const quizScores = d.quizScores || {};
+                for (const theme of ALL_THEMES) {
+                    if (theme === 'globalScore') continue;
+                    players[pseudo][theme] = quizScores[theme] ?? 0;
+                }
+            });
+            return players;
+        }
+
+        // 2. Sauvegarde dans localStorage avec timestamp
+        function saveToLocal(players) {
             try {
-                const payload = {
+                localStorage.setItem(LEADERBOARD_LOCAL_KEY, JSON.stringify({
                     timestamp: Date.now(),
-                    data: cachedData
-                };
-                localStorage.setItem(LEADERBOARD_LOCAL_KEY, JSON.stringify(payload));
-            } catch (e) {
-                console.warn('Impossible de sauvegarder le leaderboard en local', e);
-            }
+                    data: players
+                }));
+            } catch (e) { /* ignore */ }
         }
 
-        function getLeaderboardFromLocal() {
+        // 3. Charge depuis localStorage si valide
+        function loadFromLocal() {
             try {
                 const raw = localStorage.getItem(LEADERBOARD_LOCAL_KEY);
                 if (!raw) return null;
-                const payload = JSON.parse(raw);
-                if (Date.now() - payload.timestamp > LEADERBOARD_CACHE_DURATION) {
+                const { timestamp, data } = JSON.parse(raw);
+                if (Date.now() - timestamp > CACHE_DURATION_MS) {
                     localStorage.removeItem(LEADERBOARD_LOCAL_KEY);
                     return null;
                 }
-                return payload.data;
+                return data;
             } catch (e) {
-                console.warn('Impossible de lire le leaderboard local', e);
                 return null;
             }
         }
 
+        // 4. Fonction principale de chargement avec cache mémoire + localStorage + offline fallback
+        async function loadLeaderboardData() {
+            // Cache RAM actif ?
+            if (cachedPlayers && (Date.now() - lastFetchTime) < CACHE_DURATION_MS) {
+                return cachedPlayers;
+            }
+
+            let players = null;
+            try {
+                players = await fetchAllScoresFromFirebase();
+                cachedPlayers = players;
+                lastFetchTime = Date.now();
+                saveToLocal(players);
+            } catch (error) {
+                console.warn('Impossible de charger depuis Firebase → tentative depuis localStorage');
+            }
+
+            if (!players) {
+                players = loadFromLocal();
+            }
+
+            return players || {};
+        }
+
+        // 5. Obtenir un classement spécifique
+        async function getRanking(theme) {
+            const players = await loadLeaderboardData();
+            return Object.entries(players)
+                .map(([name, scores]) => ({ name, score: scores[theme] ?? 0 }))
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 10);
+        }
+
+        // === Ancien code UI inchangé ===
         async function loadLeaderboard() {
             const leaderboardList = document.getElementById('leaderboard-list');
             const mobileGlobal = document.getElementById('mobile-leaderboard-global');
             const mobileSeason = document.getElementById('mobile-leaderboard-season');
 
-            // Tentative de récupération depuis le cache Firebase (via getRanking)
             let top10 = null;
             try {
                 const globalTop = await getRanking('globalScore');
                 top10 = globalTop.length > 0 ? globalTop : null;
-                if (top10) {
-                    saveLeaderboardToLocal(top10); // sauvegarde réussie → on met à jour le local
-                }
             } catch (error) {
-                console.error('Erreur Firebase lors du chargement du leaderboard:', error);
+                console.error('Erreur lors du chargement du leaderboard:', error);
                 top10 = null;
             }
 
-            // Fallback local si nécessaire
             if (!top10) {
-                top10 = getLeaderboardFromLocal();
+                const local = loadFromLocal();
+                if (local) {
+                    const fallback = Object.entries(local)
+                        .map(([name, scores]) => ({ name, score: scores.globalScore ?? 0 }))
+                        .sort((a, b) => b.score - a.score)
+                        .slice(0, 10);
+                    top10 = fallback;
+                }
             }
 
-            // Fonction réutilisable pour générer le HTML d’un item
             const renderLeaderboardItem = (item, index) => {
                 const rank = index + 1;
                 const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
@@ -900,7 +926,6 @@
                 return li;
             };
 
-            // Mise à jour desktop
             if (top10 && top10.length > 0) {
                 leaderboardList.innerHTML = '';
                 top10.forEach((item, i) => leaderboardList.appendChild(renderLeaderboardItem(item, i)));
@@ -908,7 +933,6 @@
                 leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
             }
 
-            // Mise à jour mobile (uniquement si mobile)
             if (window.matchMedia("(max-width: 899px)").matches) {
                 document.getElementById('mobile-leaderboard-carousel').classList.remove('hidden');
                 if (top10 && top10.length > 0) {
@@ -921,7 +945,7 @@
             }
         }
 
-        // === Existing UI logic ===
+        // === Reste du code inchangé ===
         function navigateTo(url) {
             window.location.href = url;
         }
@@ -1350,22 +1374,6 @@
                 renderLevels('espagnol', globalScore);
                 renderLevels('geographie', globalScore);
                 renderLevels('animaux', globalScore);
-                // --- Ajout : Gestion du bouton Anglais N2 ---
-                const n2Btn = document.getElementById('anglais-n2-btn');
-                if (globalScore >= 100) {
-                    n2Btn.disabled = false;
-                    n2Btn.style.cursor = 'pointer';
-                    n2Btn.style.background = '#9c28a7';
-                    n2Btn.style.color = '#fff';
-                    n2Btn.title = '';
-                    n2Btn.onclick = () => window.location.href = 'quiz-anglais-n2.html';
-                } else {
-                    n2Btn.disabled = true;
-                    n2Btn.style.cursor = 'not-allowed';
-                    n2Btn.style.background = '#444';
-                    n2Btn.style.color = '#aaa';
-                    n2Btn.title = "Débloqué à 111 points de score global";
-                }
             } catch (error) {
                 console.error('Erreur chargement données:', error);
             }
