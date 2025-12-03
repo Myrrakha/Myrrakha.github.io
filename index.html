@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- SEO de la page d'accueil -->
-    <title>Quiz des Départements Français – Niveau facile à expert</title>
+    <title>Quiz Master - Accueil</title>
     <meta name="description"
         content="Testez vos connaissances avec notre quiz des départements français. 5 niveaux de difficulté, corrections instantanées et progression suivie.">
     <meta name="keywords"
@@ -22,7 +22,6 @@
     <meta name="twitter:description"
         content="Mettez votre connaissance de la France à l'épreuve avec nos quiz niveaux 1 à 5.">
     <meta name="twitter:image" content="https://myrrakha.github.io/images/preview.jpg">
-    <title>Quiz Master - Accueil</title>
     <style>
         .hidden {
             display: none !important;
@@ -32,7 +31,6 @@
             font-family: 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #0f1115, #1c1c24);
             color: #f0f0f0;
-            /* Supprime le scroll vertical global sur mobile */
             overflow-x: hidden;
         }
         #hover-warning {
@@ -293,6 +291,36 @@
             color: #9c28a7;
             font-weight: bold;
         }
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #9c28a7;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        /* TOAST */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        #toast.show {
+            opacity: 1;
+        }
         /* MOBILE CAROUSEL */
         @media (max-width: 899px) {
             #mobile-leaderboard-carousel {
@@ -303,23 +331,21 @@
                 max-width: 500px;
                 display: block !important;
             }
-            /* Conteneur global des slides — maintenant scrollable */
             #carousel-slides {
                 display: flex;
                 overflow-x: auto;
+                overflow-y: hidden; /* 👈 Empêche le défilement vertical */
                 scroll-snap-type: x mandatory;
                 scroll-behavior: smooth;
                 -webkit-overflow-scrolling: touch;
-                height: 300px; /* hauteur fixe souhaitée */
+                height: 300px;
                 width: 100%;
-                /* Cacher la scrollbar sur mobile */
-                -ms-overflow-style: none;  /* IE et Edge */
-                scrollbar-width: none;     /* Firefox */
+                -ms-overflow-style: none;
+                scrollbar-width: none;
             }
             #carousel-slides::-webkit-scrollbar {
-                display: none; /* Chrome, Safari, Opera */
+                display: none;
             }
-            /* Chaque slide */
             .carousel-slide {
                 flex: 0 0 100%;
                 height: 100%;
@@ -331,7 +357,6 @@
                 box-sizing: border-box;
                 padding: 0 10px;
             }
-            /* --- Slide : Cadre néon carré --- */
             .neon-bordered {
                 position: relative;
                 padding: 12px;
@@ -353,7 +378,6 @@
                 ) border-box;
                 background-size: 300% 300%;
                 animation: neonMove 6s linear infinite, neonPulse 4s ease-in-out infinite;
-                /* --- MASK (standard + Safari) --- */
                 mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
                 mask-composite: exclude;
                 -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
@@ -365,12 +389,8 @@
                 100% { background-position: 200% 50%; }
             }
             @keyframes neonPulse {
-                0%, 90%, 100% {
-                    filter: brightness(1);
-                }
-                92% {
-                    filter: brightness(3); /* flash */
-                }
+                0%, 90%, 100% { filter: brightness(1); }
+                92% { filter: brightness(3); }
             }
             .leaderboard-highlight {
                 position: absolute;
@@ -420,7 +440,6 @@
             .leaderboard-container > div {
                 padding: 6px 0;
             }
-            /* --- Animations de transition --- */
             .fade-in {
                 opacity: 0;
                 animation: fadeIn 1s forwards;
@@ -438,7 +457,6 @@
             #desktop-leaderboard {
                 display: none;
             }
-            /* CORRECTION DU DÉCALAGE */
             #random-top h4,
             #random-top ol {
                 margin: 0 !important;
@@ -454,7 +472,6 @@
                 display: none !important;
             }
         }
-        /* MOBILE DESIGN */
         @media (max-width: 899px) {
             .levels-grid-dropdown {
                 grid-template-columns: 1fr;
@@ -468,18 +485,16 @@
                 max-width: 100%;
                 padding: 0 16px;
             }
-            /* Cacher la scrollbar du body sur mobile */
             html, body {
                 overflow-x: hidden;
                 overflow-y: auto;
-                -ms-overflow-style: none;  /* IE et Edge */
-                scrollbar-width: none;     /* Firefox */
+                -ms-overflow-style: none;
+                scrollbar-width: none;
             }
             html::-webkit-scrollbar,
             body::-webkit-scrollbar {
-                display: none; /* Chrome, Safari, Opera */
+                display: none;
             }
-            /* Ajustement des cartes */
             .stat-card {
                 width: calc(100% - 16px);
                 margin: 0 8px;
@@ -586,6 +601,13 @@
             margin-bottom: 15px;
             text-align: center;
         }
+        /* Score placeholder container */
+        .score-placeholder {
+            min-height: 64px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -607,14 +629,15 @@
         </nav>
     </header>
     <main>
-        <!-- SECTION ACCUEIL -->
         <section id="home-section">
             <div class="home-content">
                 <div class="stats-grid-container">
                     <div class="stats-grid">
                         <div class="stat-card" id="dept-card">
                             <h3>🗺️ Quiz Départements</h3>
-                            <div class="stat-value" id="home-dept-score">0</div>
+                            <div class="score-placeholder" id="home-dept-score-container">
+                                <span class="loading-spinner"></span>
+                            </div>
                             <div class="level-badge" id="dept-level">Niveau 1</div>
                             <div class="levels-dropdown" id="departements-dropdown">
                                 <div class="levels-grid-dropdown" id="departements-levels"></div>
@@ -622,7 +645,9 @@
                         </div>
                         <div class="stat-card" id="chinois-card">
                             <h3>🇨🇳 Quiz Chinois</h3>
-                            <div class="stat-value" id="home-chinois-score">0</div>
+                            <div class="score-placeholder" id="home-chinois-score-container">
+                                <span class="loading-spinner"></span>
+                            </div>
                             <div class="level-badge" id="chinois-level">Niveau 1</div>
                             <div class="levels-dropdown" id="chinois-dropdown">
                                 <div class="levels-grid-dropdown" id="chinois-levels"></div>
@@ -630,7 +655,9 @@
                         </div>
                         <div class="stat-card" id="medecine-card">
                             <h3>🩺 Quiz Médecine</h3>
-                            <div class="stat-value" id="home-medecine-score">0</div>
+                            <div class="score-placeholder" id="home-medecine-score-container">
+                                <span class="loading-spinner"></span>
+                            </div>
                             <div class="level-badge" id="medecine-level">Niveau 1</div>
                             <div class="levels-dropdown" id="medecine-dropdown">
                                 <div class="levels-grid-dropdown" id="medecine-levels"></div>
@@ -638,7 +665,9 @@
                         </div>
                         <div class="stat-card" id="math-card">
                             <h3>➗ Quiz Mathématiques</h3>
-                            <div class="stat-value" id="home-math-score">0</div>
+                            <div class="score-placeholder" id="home-math-score-container">
+                                <span class="loading-spinner"></span>
+                            </div>
                             <div class="level-badge" id="math-level">Niveau 1</div>
                             <div class="levels-dropdown" id="math-dropdown">
                                 <div class="levels-grid-dropdown" id="math-levels"></div>
@@ -646,7 +675,9 @@
                         </div>
                         <div class="stat-card" id="anglais-card">
                             <h3>🇬🇧 Quiz Anglais</h3>
-                            <div class="stat-value" id="home-anglais-score">0</div>
+                            <div class="score-placeholder" id="home-anglais-score-container">
+                                <span class="loading-spinner"></span>
+                            </div>
                             <div class="level-badge" id="anglais-level">Niveau 1</div>
                             <div class="levels-dropdown" id="anglais-dropdown">
                                 <div class="levels-grid-dropdown" id="anglais-levels"></div>
@@ -654,7 +685,9 @@
                         </div>
                         <div class="stat-card" id="neerlandais-card">
                             <h3>🇳🇱 Quiz Néerlandais</h3>
-                            <div class="stat-value" id="home-neerlandais-score">0</div>
+                            <div class="score-placeholder" id="home-neerlandais-score-container">
+                                <span class="loading-spinner"></span>
+                            </div>
                             <div class="level-badge" id="neerlandais-level">Niveau 1</div>
                             <div class="levels-dropdown" id="neerlandais-dropdown">
                                 <div class="levels-grid-dropdown" id="neerlandais-levels"></div>
@@ -662,7 +695,9 @@
                         </div>
                         <div class="stat-card" id="allemand-card">
                             <h3>🇩🇪 Quiz Allemand</h3>
-                            <div class="stat-value" id="home-allemand-score">0</div>
+                            <div class="score-placeholder" id="home-allemand-score-container">
+                                <span class="loading-spinner"></span>
+                            </div>
                             <div class="level-badge" id="allemand-level">Niveau 1</div>
                             <div class="levels-dropdown" id="allemand-dropdown">
                                 <div class="levels-grid-dropdown" id="allemand-levels"></div>
@@ -670,7 +705,9 @@
                         </div>
                         <div class="stat-card" id="italien-card">
                             <h3>🇮🇹 Quiz Italien</h3>
-                            <div class="stat-value" id="home-italien-score">0</div>
+                            <div class="score-placeholder" id="home-italien-score-container">
+                                <span class="loading-spinner"></span>
+                            </div>
                             <div class="level-badge" id="italien-level">Niveau 1</div>
                             <div class="levels-dropdown" id="italien-dropdown">
                                 <div class="levels-grid-dropdown" id="italien-levels"></div>
@@ -678,7 +715,9 @@
                         </div>
                         <div class="stat-card" id="espagnol-card">
                             <h3>🇪🇸 Quiz Espagnol</h3>
-                            <div class="stat-value" id="home-espagnol-score">0</div>
+                            <div class="score-placeholder" id="home-espagnol-score-container">
+                                <span class="loading-spinner"></span>
+                            </div>
                             <div class="level-badge" id="espagnol-level">Niveau 1</div>
                             <div class="levels-dropdown" id="espagnol-dropdown">
                                 <div class="levels-grid-dropdown" id="espagnol-levels"></div>
@@ -686,7 +725,9 @@
                         </div>
                         <div class="stat-card" id="geographie-card">
                             <h3>🌍 Quiz Géographie</h3>
-                            <div class="stat-value" id="home-geographie-score">0</div>
+                            <div class="score-placeholder" id="home-geographie-score-container">
+                                <span class="loading-spinner"></span>
+                            </div>
                             <div class="level-badge" id="geographie-level">Niveau 1</div>
                             <div class="levels-dropdown" id="geographie-dropdown">
                                 <div class="levels-grid-dropdown" id="geographie-levels"></div>
@@ -694,7 +735,9 @@
                         </div>
                         <div class="stat-card" id="animaux-card">
                             <h3>🐾 Quiz Animaux</h3>
-                            <div class="stat-value" id="home-animaux-score">0</div>
+                            <div class="score-placeholder" id="home-animaux-score-container">
+                                <span class="loading-spinner"></span>
+                            </div>
                             <div class="level-badge" id="animaux-level">Niveau 1</div>
                             <div class="levels-dropdown" id="animaux-dropdown">
                                 <div class="levels-grid-dropdown" id="animaux-levels"></div>
@@ -703,31 +746,36 @@
                     </div>
                 </div>
                 <div id="leaderboard-section">
-                    <!-- Desktop leaderboard -->
                     <div id="desktop-leaderboard" class="leaderboard-container">
                         <h2 class="leaderboard-title">🏆 Classement Mondial</h2>
                         <div id="leaderboard-list">
-                            <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+                            <div style="text-align: center; opacity: 0.6;">
+                                <span class="loading-spinner"></span> Chargement…
+                            </div>
                         </div>
                     </div>
-                    <!-- Mobile carousel -->
                     <div id="mobile-leaderboard-carousel" class="hidden">
-                        <div class="carousel-slides" id="carousel-slides">
+                        <div id="carousel-slides">
                             <div class="carousel-slide neon-bordered">
                                 <div class="leaderboard-highlight"></div>
                                 <div class="glass-inner">
                                     <h3 class="slide-title">🏆 Classement Mondial</h3>
-                                    <div id="mobile-leaderboard-global"></div>
+                                    <div id="mobile-leaderboard-global">
+                                        <div style="text-align: center; opacity: 0.6;">
+                                            <span class="loading-spinner"></span> Chargement…
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="carousel-slide neon-bordered">
                                 <div class="leaderboard-highlight"></div>
                                 <div class="glass-inner">
                                     <h3 class="slide-title">📅 Classement Saison</h3>
-                                    <div id="mobile-leaderboard-season"></div>
+                                    <div id="mobile-leaderboard-season">
+                                        <div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>
+                                    </div>
                                 </div>
                             </div>
-                            <!-- Troisième slide : statique, plus d'appel à la base de données -->
                             <div class="carousel-slide neon-bordered">
                                 <div class="leaderboard-highlight"></div>
                                 <div class="glass-inner">
@@ -743,7 +791,6 @@
             </div>
         </section>
     </main>
-    <!-- Auth Modal -->
     <div id="auth-modal">
         <div class="auth-modal-container">
             <button class="close-modal">&times;</button>
@@ -771,8 +818,8 @@
         </div>
     </div>
     <div id="hover-warning"></div>
+    <div id="toast">Débloqué à {{points}} points globaux</div>
     <script type="module">
-        // Firebase SDK URLs corrected (extra spaces removed)
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -789,29 +836,122 @@
         const db = getFirestore(app);
         window.auth = auth;
         window.db = db;
-        window.currentUser = null;
-        const chinoisRequired = { 1: 200, 2: 250, 3: 300, 4: 350, 5: 400 };
-        const medecineRequired = { 1: 40, 2: 80, 3: 160, 4: 320, 5: 500 };
-        const mathRequired = { 1: 60, 2: 120, 3: 240, 4: 480, 5: 960 };
-        const requiredModeUnlock = { 2: 10, 3: 30, 4: 60, 5: 90, 6: 125 };
+        // ✅ Centralisation des niveaux
+        const QUIZ_LEVELS = {
+            departements: [
+                { id: 1, name: "Nom → Numéro", required: 0 },
+                { id: 2, name: "Numéro → Nom", required: 10 },
+                { id: 3, name: "Forme → Nom/Num", required: 30 },
+                { id: 4, name: "Préfecture → Dépt", required: 60 },
+                { id: 5, name: "Mix", required: 90 },
+                { id: 6, name: "Niveaux Suivants", required: 125 }
+            ],
+            chinois: [
+                { id: 1, name: "Chiffres et nombres de 0 à 100", required: 200 },
+                { id: 2, name: "Vocabulaire et expressions utiles", required: 250 },
+                { id: 3, name: "Écriture", required: 300 },
+                { id: 4, name: "Grammaire", required: 350 },
+                { id: 5, name: "Conversation", required: 400 }
+            ],
+            medecine: [
+                { id: 1, name: "Anatomie", required: 40 },
+                { id: 2, name: "Physiologie", required: 80 },
+                { id: 3, name: "Pathologies", required: 160 },
+                { id: 4, name: "Pharmacologie", required: 320 },
+                { id: 5, name: "Cas cliniques", required: 500 }
+            ],
+            math: [
+                { id: 1, name: "Algèbre", required: 60 },
+                { id: 2, name: "Géométrie", required: 120 },
+                { id: 3, name: "Analyse", required: 240 },
+                { id: 4, name: "Probas/Stat", required: 480 },
+                { id: 5, name: "Maths avancées", required: 960 }
+            ],
+            anglais: [
+                { id: 1, name: "Chiffres et nombres de 0 à 100", required: 0 },
+                { id: 2, name: "Grammaire", required: 100 },
+                { id: 3, name: "Phrasal Verbs", required: 260 },
+                { id: 4, name: "Compréhension", required: 340 },
+                { id: 5, name: "Conversation", required: 420 }
+            ],
+            neerlandais: [
+                { id: 1, name: "Basique", required: 100 },
+                { id: 2, name: "Verbes", required: 190 },
+                { id: 3, name: "Spelling", required: 280 },
+                { id: 4, name: "Lecture", required: 370 },
+                { id: 5, name: "Immersion", required: 460 }
+            ],
+            allemand: [
+                { id: 1, name: "Vocabulaire", required: 100 },
+                { id: 2, name: "Cas (Nomin./Acc.)", required: 190 },
+                { id: 3, name: "Verbes modaux", required: 280 },
+                { id: 4, name: "Lecture", required: 370 },
+                { id: 5, name: "Deutsche Kultur", required: 460 }
+            ],
+            italien: [
+                { id: 1, name: "Salutations", required: 100 },
+                { id: 2, name: "Verbes réguliers", required: 180 },
+                { id: 3, name: "Cuisine", required: 260 },
+                { id: 4, name: "Grammaire", required: 340 },
+                { id: 5, name: "Italia", required: 420 }
+            ],
+            espagnol: [
+                { id: 1, name: "Basico", required: 100 },
+                { id: 2, name: "Ser vs Estar", required: 180 },
+                { id: 3, name: "Subjonctif", required: 260 },
+                { id: 4, name: "Lectura", required: 340 },
+                { id: 5, name: "Latino", required: 420 }
+            ],
+            geographie: [
+                { id: 1, name: "Pays d’Europe", required: 80 },
+                { id: 2, name: "Capitales mondiales", required: 160 },
+                { id: 3, name: "Drapeaux", required: 240 },
+                { id: 4, name: "Relief & climats", required: 320 },
+                { id: 5, name: "Géo avancée", required: 400 }
+            ],
+            animaux: [
+                { id: 1, name: "Animaux de ferme", required: 50 },
+                { id: 2, name: "Faune sauvage", required: 120 },
+                { id: 3, name: "Class. scientifique", required: 200 },
+                { id: 4, name: "Habitats", required: 280 },
+                { id: 5, name: "Conservation", required: 360 }
+            ]
+        };
+        // ✅ Fonction centralisée pour obtenir le niveau actuel
+        function getCurrentLevelLabel(theme, globalScore) {
+            const levels = QUIZ_LEVELS[theme];
+            if (!levels) return "Niveau 1";
+            let currentLevel = 1;
+            for (const level of levels) {
+                if (globalScore >= level.required) {
+                    currentLevel = level.id;
+                } else {
+                    break;
+                }
+            }
+            return `Niveau ${currentLevel}`;
+        }
+        let authStateReady = false;
+        let currentUser = null;
         let isAuthMode = 'login';
-        let authCheckComplete = false;
-
-        // ✅ ÉTAPE 1-5 : NOUVELLE LOGIQUE DE CACHE À 30 MIN
-        const CACHE_DURATION_MS = 30 * 60 * 1000; // 30 minutes
+        const CACHE_DURATION_MS = 30 * 60 * 1000;
         let cachedPlayers = null;
         let lastFetchTime = 0;
         const LEADERBOARD_LOCAL_KEY = 'leaderboard_cache_v2';
-
-        // Liste exhaustive des thèmes à charger
         const ALL_THEMES = [
             'globalScore',
             'departements', 'chinois', 'medecine', 'math',
             'anglais', 'neerlandais', 'allemand', 'italien',
             'espagnol', 'geographie', 'animaux'
         ];
-
-        // 1. Récupère TOUTES les données depuis Firebase (une seule requête)
+        // Conventions d’URL : départements gardent l’ancien format, les autres utilisent le nouveau
+        function getQuizUrl(category, levelId) {
+            if (category === 'departements') {
+                return `quiz-departement.html#${levelId}`;
+            } else {
+                return `quiz-${category}-n${levelId}.html`;
+            }
+        }
         async function fetchAllScoresFromFirebase() {
             const snapshot = await getDocs(collection(db, 'users'));
             const players = {};
@@ -820,9 +960,7 @@
                 const pseudo = d.pseudo;
                 if (!pseudo) return;
                 players[pseudo] = {};
-                // Inclure globalScore
                 players[pseudo].globalScore = d.globalScore ?? 0;
-                // Inclure chaque quiz
                 const quizScores = d.quizScores || {};
                 for (const theme of ALL_THEMES) {
                     if (theme === 'globalScore') continue;
@@ -831,8 +969,6 @@
             });
             return players;
         }
-
-        // 2. Sauvegarde dans localStorage avec timestamp
         function saveToLocal(players) {
             try {
                 localStorage.setItem(LEADERBOARD_LOCAL_KEY, JSON.stringify({
@@ -841,8 +977,6 @@
                 }));
             } catch (e) { /* ignore */ }
         }
-
-        // 3. Charge depuis localStorage si valide
         function loadFromLocal() {
             try {
                 const raw = localStorage.getItem(LEADERBOARD_LOCAL_KEY);
@@ -857,14 +991,10 @@
                 return null;
             }
         }
-
-        // 4. Fonction principale de chargement avec cache mémoire + localStorage + offline fallback
         async function loadLeaderboardData() {
-            // Cache RAM actif ?
             if (cachedPlayers && (Date.now() - lastFetchTime) < CACHE_DURATION_MS) {
                 return cachedPlayers;
             }
-
             let players = null;
             try {
                 players = await fetchAllScoresFromFirebase();
@@ -874,15 +1004,11 @@
             } catch (error) {
                 console.warn('Impossible de charger depuis Firebase → tentative depuis localStorage');
             }
-
             if (!players) {
                 players = loadFromLocal();
             }
-
             return players || {};
         }
-
-        // 5. Obtenir un classement spécifique
         async function getRanking(theme) {
             const players = await loadLeaderboardData();
             return Object.entries(players)
@@ -890,22 +1016,19 @@
                 .sort((a, b) => b.score - a.score)
                 .slice(0, 10);
         }
-
-        // === Ancien code UI inchangé ===
         async function loadLeaderboard() {
             const leaderboardList = document.getElementById('leaderboard-list');
             const mobileGlobal = document.getElementById('mobile-leaderboard-global');
             const mobileSeason = document.getElementById('mobile-leaderboard-season');
-
+            leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;"><span class="loading-spinner"></span> Chargement…</div>';
+            mobileGlobal.innerHTML = '<div style="text-align: center; opacity: 0.6;"><span class="loading-spinner"></span> Chargement…</div>';
             let top10 = null;
             try {
                 const globalTop = await getRanking('globalScore');
                 top10 = globalTop.length > 0 ? globalTop : null;
             } catch (error) {
                 console.error('Erreur lors du chargement du leaderboard:', error);
-                top10 = null;
             }
-
             if (!top10) {
                 const local = loadFromLocal();
                 if (local) {
@@ -916,47 +1039,80 @@
                     top10 = fallback;
                 }
             }
-
             const renderLeaderboardItem = (item, index) => {
                 const rank = index + 1;
                 const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
                 const li = document.createElement('div');
                 li.className = 'leaderboard-item';
-                li.innerHTML = `<div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${item.name}</div><div class="leaderboard-score">${item.score}</div>`;
+                // Échappement du pseudo pour XSS
+                const escapedName = item.name
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+                li.innerHTML = `<div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${escapedName}</div><div class="leaderboard-score">${item.score}</div>`;
                 return li;
             };
-
             if (top10 && top10.length > 0) {
                 leaderboardList.innerHTML = '';
                 top10.forEach((item, i) => leaderboardList.appendChild(renderLeaderboardItem(item, i)));
+                mobileGlobal.innerHTML = '';
+                top10.forEach((item, i) => mobileGlobal.appendChild(renderLeaderboardItem(item, i)));
             } else {
                 leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
+                mobileGlobal.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur</div>';
             }
-
             if (window.matchMedia("(max-width: 899px)").matches) {
                 document.getElementById('mobile-leaderboard-carousel').classList.remove('hidden');
-                if (top10 && top10.length > 0) {
-                    mobileGlobal.innerHTML = '';
-                    top10.forEach((item, i) => mobileGlobal.appendChild(renderLeaderboardItem(item, i)));
-                } else {
-                    mobileGlobal.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur</div>';
-                }
-                mobileSeason.innerHTML = '<div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>';
             }
+            mobileSeason.innerHTML = '<div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>';
         }
-
-        // === Reste du code inchangé ===
         function navigateTo(url) {
             window.location.href = url;
         }
-        renderLevels('departements', 0);
-        renderLevels('anglais', 0);
-        renderLevels('neerlandais', 0);
-        renderLevels('allemand', 0);
-        renderLevels('italien', 0);
-        renderLevels('espagnol', 0);
-        renderLevels('geographie', 0);
-        renderLevels('animaux', 0);
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        function renderLevels(category, globalScore) {
+            const container = document.getElementById(`${category}-levels`);
+            if (!container) return;
+            container.innerHTML = '';
+            const levels = QUIZ_LEVELS[category];
+            if (!levels) return;
+            levels.forEach(level => {
+                const isUnlocked = globalScore >= level.required;
+                const card = document.createElement('div');
+                card.className = `level-card-dropdown ${isUnlocked ? '' : 'locked'}`;
+                if (!isUnlocked) {
+                    card.title = `Débloqué à ${level.required} points globaux`;
+                }
+                card.innerHTML = `
+                    <div class="level-number-dropdown">${level.id}</div>
+                    <div class="level-name-dropdown">${level.name}</div>
+                    ${isUnlocked ?
+                        '<div class="unlock-status-dropdown"><span class="unlock-icon">✓</span>Débloqué</div>' :
+                        `<div class="level-requirement-dropdown">Requis: ${level.required} pts</div>`
+                    }
+                `;
+                if (isUnlocked) {
+                    card.addEventListener('click', () => startLevel(category, level.id));
+                } else {
+                    card.addEventListener('click', () => {
+                        showToast(`Débloqué à ${level.required} points globaux`);
+                    });
+                    card.addEventListener('mouseenter', function (e) {
+                        showHoverWarning(`Débloqué à ${level.required} points globaux`, e.pageX, e.pageY);
+                    });
+                }
+                container.appendChild(card);
+            });
+        }
+        // Initialisation sans données utilisateur → rendu vide
+        Object.keys(QUIZ_LEVELS).forEach(theme => renderLevels(theme, 0));
         loadLeaderboard();
         document.getElementById('login-btn').addEventListener('click', showAuthModal);
         document.getElementById('logout-btn').addEventListener('click', logoutUser);
@@ -969,10 +1125,6 @@
             else if (score >= 50) return '🌱 Apprenti';
             else return '🆕 Débutant';
         }
-        function getDeptLevel(score) {
-            const level = Math.floor(score / 50) + 1;
-            return `Niveau ${level}`;
-        }
         function showHoverWarning(text, x, y) {
             const warn = document.getElementById("hover-warning");
             warn.textContent = text;
@@ -981,216 +1133,27 @@
             warn.style.opacity = 1;
             setTimeout(() => { warn.style.opacity = 0; }, 1800);
         }
-        function renderLevels(category, globalScore) {
-            const container = document.getElementById(`${category}-levels`);
-            if (!container) return;
-            container.innerHTML = '';
-            const levels = {
-                departements: [
-                    { id: 1, name: "Nom → Numéro", required: 0 },
-                    { id: 2, name: "Numéro → Nom", required: 10 },
-                    { id: 3, name: "Forme → Nom/Num", required: 30 },
-                    { id: 4, name: "Préfecture → Dépt", required: 60 },
-                    { id: 5, name: "Mix", required: 90 },
-                    { id: 6, name: "Niveaux Suivants", required: 125 }
-                ],
-                chinois: [
-                    { id: 1, name: "Chiffres et nombres de 0 à 100", required: 200 },
-                    { id: 2, name: "Vocabulaire et expressions utiles", required: 250 },
-                    { id: 3, name: "Écriture", required: 300 },
-                    { id: 4, name: "Grammaire", required: 350 },
-                    { id: 5, name: "Conversation", required: 400 }
-                ],
-                medecine: [
-                    { id: 1, name: "Anatomie", required: 40 },
-                    { id: 2, name: "Physiologie", required: 80 },
-                    { id: 3, name: "Pathologies", required: 160 },
-                    { id: 4, name: "Pharmacologie", required: 320 },
-                    { id: 5, name: "Cas cliniques", required: 500 }
-                ],
-                math: [
-                    { id: 1, name: "Algèbre", required: 60 },
-                    { id: 2, name: "Géométrie", required: 120 },
-                    { id: 3, name: "Analyse", required: 240 },
-                    { id: 4, name: "Probas/Stat", required: 480 },
-                    { id: 5, name: "Maths avancées", required: 960 }
-                ],
-                anglais: [
-                    { id: 1, name: "Chiffres et nombres de 0 à 100", required: 0 },
-                    { id: 2, name: "Grammaire", required: 100 },
-                    { id: 3, name: "Phrasal Verbs", required: 260 },
-                    { id: 4, name: "Compréhension", required: 340 },
-                    { id: 5, name: "Conversation", required: 420 }
-                ],
-                neerlandais: [
-                    { id: 1, name: "Basique", required: 100 },
-                    { id: 2, name: "Verbes", required: 190 },
-                    { id: 3, name: "Spelling", required: 280 },
-                    { id: 4, name: "Lecture", required: 370 },
-                    { id: 5, name: "Immersion", required: 460 }
-                ],
-                allemand: [
-                    { id: 1, name: "Vocabulaire", required: 100 },
-                    { id: 2, name: "Cas (Nomin./Acc.)", required: 190 },
-                    { id: 3, name: "Verbes modaux", required: 280 },
-                    { id: 4, name: "Lecture", required: 370 },
-                    { id: 5, name: "Deutsche Kultur", required: 460 }
-                ],
-                italien: [
-                    { id: 1, name: "Salutations", required: 100 },
-                    { id: 2, name: "Verbes réguliers", required: 180 },
-                    { id: 3, name: "Cuisine", required: 260 },
-                    { id: 4, name: "Grammaire", required: 340 },
-                    { id: 5, name: "Italia", required: 420 }
-                ],
-                espagnol: [
-                    { id: 1, name: "Basico", required: 100 },
-                    { id: 2, name: "Ser vs Estar", required: 180 },
-                    { id: 3, name: "Subjonctif", required: 260 },
-                    { id: 4, name: "Lectura", required: 340 },
-                    { id: 5, name: "Latino", required: 420 }
-                ],
-                geographie: [
-                    { id: 1, name: "Pays d’Europe", required: 80 },
-                    { id: 2, name: "Capitales mondiales", required: 160 },
-                    { id: 3, name: "Drapeaux", required: 240 },
-                    { id: 4, name: "Relief & climats", required: 320 },
-                    { id: 5, name: "Géo avancée", required: 400 }
-                ],
-                animaux: [
-                    { id: 1, name: "Animaux de ferme", required: 50 },
-                    { id: 2, name: "Faune sauvage", required: 120 },
-                    { id: 3, name: "Class. scientifique", required: 200 },
-                    { id: 4, name: "Habitats", required: 280 },
-                    { id: 5, name: "Conservation", required: 360 }
-                ]
-            };
-            if (!levels[category]) return;
-            levels[category].forEach(level => {
-                const isUnlocked = globalScore >= level.required;
-                const card = document.createElement('div');
-                card.className = `level-card-dropdown ${isUnlocked ? '' : 'locked'}`;
-                if (!isUnlocked) {
-                    card.title = `Débloqué à ${level.required} points globaux`;
-                }
-                card.innerHTML = `
-            <div class="level-number-dropdown">${level.id}</div>
-            <div class="level-name-dropdown">${level.name}</div>
-            ${isUnlocked ?
-                        '<div class="unlock-status-dropdown"><span class="unlock-icon">✓</span>Débloqué</div>' :
-                        `<div class="level-requirement-dropdown">Requis: ${level.required} pts</div>`
-                    }
-        `;
-                if (isUnlocked) {
-                    card.addEventListener('click', () => startLevel(category, level.id));
-                } else {
-                    card.addEventListener('mouseenter', function (e) {
-                        showHoverWarning(`Débloqué à ${level.required} points globaux`, e.pageX, e.pageY);
-                    });
-                }
-                container.appendChild(card);
-            });
-        }
         function startLevel(category, levelId) {
             document.querySelectorAll('.levels-dropdown').forEach(dropdown => {
                 dropdown.classList.remove('visible');
             });
-            window.scrollTo(0, 0);
-            let url;
-            switch (category) {
-                case 'departements':
-                    url = `quiz-departement.html#${levelId}`;
-                    break;
-                case 'chinois':
-                    url = `quiz-chinois-n${levelId}.html`;
-                    break;
-                case 'medecine':
-                    url = `quiz-medecine.html#${levelId}`;
-                    break;
-                case 'math':
-                    url = `quiz-math.html#${levelId}`;
-                    break;
-                case 'anglais':
-                    url = `quiz-anglais-n${levelId}.html`;
-                    break;
-                case 'neerlandais':
-                    url = `quiz-neerlandais.html#${levelId}`;
-                    break;
-                case 'allemand':
-                    url = `quiz-allemand.html#${levelId}`;
-                    break;
-                case 'italien':
-                    url = `quiz-italien.html#${levelId}`;
-                    break;
-                case 'espagnol':
-                    url = `quiz-espagnol.html#${levelId}`;
-                    break;
-                case 'geographie':
-                    url = `quiz-geographie.html#${levelId}`;
-                    break;
-                case 'animaux':
-                    url = `quiz-animaux.html#${levelId}`;
-                    break;
-                default:
-                    return;
-            }
+            const url = getQuizUrl(category, levelId);
             window.location.href = url;
         }
-        document.getElementById('dept-card').addEventListener('click', function (e) {
-            if (!e.target.closest('.level-card-dropdown')) {
-                document.getElementById('departements-dropdown').classList.toggle('visible');
-            }
-        });
-        document.getElementById('chinois-card').addEventListener('click', function (e) {
-            if (!e.target.closest('.level-card-dropdown')) {
-                document.getElementById('chinois-dropdown').classList.toggle('visible');
-            }
-        });
-        document.getElementById('medecine-card').addEventListener('click', function (e) {
-            if (!e.target.closest('.level-card-dropdown')) {
-                document.getElementById('medecine-dropdown').classList.toggle('visible');
-            }
-        });
-        document.getElementById('math-card').addEventListener('click', function (e) {
-            if (!e.target.closest('.level-card-dropdown')) {
-                document.getElementById('math-dropdown').classList.toggle('visible');
-            }
-        });
-        document.getElementById('anglais-card').addEventListener('click', function (e) {
-            if (!e.target.closest('.level-card-dropdown')) {
-                document.getElementById('anglais-dropdown').classList.toggle('visible');
-            }
-        });
-        document.getElementById('neerlandais-card').addEventListener('click', function (e) {
-            if (!e.target.closest('.level-card-dropdown')) {
-                document.getElementById('neerlandais-dropdown').classList.toggle('visible');
-            }
-        });
-        document.getElementById('allemand-card').addEventListener('click', function (e) {
-            if (!e.target.closest('.level-card-dropdown')) {
-                document.getElementById('allemand-dropdown').classList.toggle('visible');
-            }
-        });
-        document.getElementById('italien-card').addEventListener('click', function (e) {
-            if (!e.target.closest('.level-card-dropdown')) {
-                document.getElementById('italien-dropdown').classList.toggle('visible');
-            }
-        });
-        document.getElementById('espagnol-card').addEventListener('click', function (e) {
-            if (!e.target.closest('.level-card-dropdown')) {
-                document.getElementById('espagnol-dropdown').classList.toggle('visible');
-            }
-        });
-        document.getElementById('geographie-card').addEventListener('click', function (e) {
-            if (!e.target.closest('.level-card-dropdown')) {
-                document.getElementById('geographie-dropdown').classList.toggle('visible');
-            }
-        });
-        document.getElementById('animaux-card').addEventListener('click', function (e) {
-            if (!e.target.closest('.level-card-dropdown')) {
-                document.getElementById('animaux-dropdown').classList.toggle('visible');
-            }
-        });
+        function setupCardListeners() {
+            const themes = ['dept', 'chinois', 'medecine', 'math', 'anglais', 'neerlandais', 'allemand', 'italien', 'espagnol', 'geographie', 'animaux'];
+            themes.forEach(theme => {
+                const card = document.getElementById(`${theme === 'dept' ? 'departements' : theme}-card`);
+                const dropdown = document.getElementById(`${theme === 'dept' ? 'departements' : theme}-dropdown`);
+                if (card && dropdown) {
+                    card.addEventListener('click', function (e) {
+                        if (!e.target.closest('.level-card-dropdown')) {
+                            dropdown.classList.toggle('visible');
+                        }
+                    });
+                }
+            });
+        }
         document.addEventListener('click', function (e) {
             if (!e.target.closest('.stat-card') && !e.target.closest('.level-card-dropdown')) {
                 document.querySelectorAll('.levels-dropdown').forEach(dropdown => {
@@ -1276,41 +1239,6 @@
         function hideAuthModal() {
             document.getElementById('auth-modal').classList.remove('visible');
         }
-        function showAuthModalIfNeeded() {
-            if (!window.currentUser) {
-                showAuthModal();
-            } else {
-            }
-        }
-        window.addEventListener('pageshow', async (event) => {
-            if (event.persisted && window.currentUser) {
-                await loadUserData();
-            }
-        });
-        onAuthStateChanged(auth, async (user) => {
-            const navLoggedOut = document.getElementById('nav-logged-out');
-            const navLoggedIn = document.getElementById('nav-logged-in');
-            if (user) {
-                window.currentUser = user;
-                navLoggedOut.classList.add('hidden');
-                navLoggedIn.classList.remove('hidden');
-                await loadUserData();
-                window.scrollTo(0, 0);
-                hideAuthModal();
-            } else {
-                window.currentUser = null;
-                navLoggedOut.classList.remove('hidden');
-                navLoggedIn.classList.add('hidden');
-            }
-            authCheckComplete = true;
-        });
-        window.addEventListener('pageshow', async (event) => {
-            if (event.persisted && window.currentUser) {
-                console.log("[INFO] Rechargement des données utilisateur après retour en arrière");
-                await loadUserData();
-                await loadLeaderboard();
-            }
-        });
         async function loadUserData() {
             try {
                 const userDocRef = doc(db, 'users', currentUser.uid);
@@ -1341,39 +1269,42 @@
                 }
                 const quizScores = userData.quizScores || {};
                 const globalScore = userData.globalScore || 0;
-                document.getElementById('home-dept-score').textContent = quizScores.departements || 0;
-                document.getElementById('home-chinois-score').textContent = quizScores.chinois || 0;
-                document.getElementById('home-medecine-score').textContent = quizScores.medecine || 0;
-                document.getElementById('home-math-score').textContent = quizScores.math || 0;
-                document.getElementById('home-anglais-score').textContent = quizScores.anglais || 0;
-                document.getElementById('home-neerlandais-score').textContent = quizScores.neerlandais || 0;
-                document.getElementById('home-allemand-score').textContent = quizScores.allemand || 0;
-                document.getElementById('home-italien-score').textContent = quizScores.italien || 0;
-                document.getElementById('home-espagnol-score').textContent = quizScores.espagnol || 0;
-                document.getElementById('home-geographie-score').textContent = quizScores.geographie || 0;
-                document.getElementById('home-animaux-score').textContent = quizScores.animaux || 0;
-                document.getElementById('dept-level').textContent = getDeptLevel(quizScores.departements || 0);
-                document.getElementById('chinois-level').textContent = getDeptLevel(quizScores.chinois || 0);
-                document.getElementById('medecine-level').textContent = getDeptLevel(quizScores.medecine || 0);
-                document.getElementById('math-level').textContent = getDeptLevel(quizScores.math || 0);
-                document.getElementById('anglais-level').textContent = getDeptLevel(quizScores.anglais || 0);
-                document.getElementById('neerlandais-level').textContent = getDeptLevel(quizScores.neerlandais || 0);
-                document.getElementById('allemand-level').textContent = getDeptLevel(quizScores.allemand || 0);
-                document.getElementById('italien-level').textContent = getDeptLevel(quizScores.italien || 0);
-                document.getElementById('espagnol-level').textContent = getDeptLevel(quizScores.espagnol || 0);
-                document.getElementById('geographie-level').textContent = getDeptLevel(quizScores.geographie || 0);
-                document.getElementById('animaux-level').textContent = getDeptLevel(quizScores.animaux || 0);
-                renderLevels('departements', globalScore);
-                renderLevels('chinois', globalScore);
-                renderLevels('medecine', globalScore);
-                renderLevels('math', globalScore);
-                renderLevels('anglais', globalScore);
-                renderLevels('neerlandais', globalScore);
-                renderLevels('allemand', globalScore);
-                renderLevels('italien', globalScore);
-                renderLevels('espagnol', globalScore);
-                renderLevels('geographie', globalScore);
-                renderLevels('animaux', globalScore);
+                // Remplacer spinners par scores réels
+                const scoreMap = {
+                    'departements': 'home-dept-score-container',
+                    'chinois': 'home-chinois-score-container',
+                    'medecine': 'home-medecine-score-container',
+                    'math': 'home-math-score-container',
+                    'anglais': 'home-anglais-score-container',
+                    'neerlandais': 'home-neerlandais-score-container',
+                    'allemand': 'home-allemand-score-container',
+                    'italien': 'home-italien-score-container',
+                    'espagnol': 'home-espagnol-score-container',
+                    'geographie': 'home-geographie-score-container',
+                    'animaux': 'home-animaux-score-container'
+                };
+                for (const [theme, containerId] of Object.entries(scoreMap)) {
+                    const container = document.getElementById(containerId);
+                    const score = quizScores[theme] || 0;
+                    const span = document.createElement('div');
+                    span.className = 'stat-value';
+                    span.id = `home-${theme}-score`;
+                    span.textContent = score;
+                    container.innerHTML = '';
+                    container.appendChild(span);
+                }
+                document.getElementById('dept-level').textContent = getCurrentLevelLabel('departements', globalScore);
+                document.getElementById('chinois-level').textContent = getCurrentLevelLabel('chinois', globalScore);
+                document.getElementById('medecine-level').textContent = getCurrentLevelLabel('medecine', globalScore);
+                document.getElementById('math-level').textContent = getCurrentLevelLabel('math', globalScore);
+                document.getElementById('anglais-level').textContent = getCurrentLevelLabel('anglais', globalScore);
+                document.getElementById('neerlandais-level').textContent = getCurrentLevelLabel('neerlandais', globalScore);
+                document.getElementById('allemand-level').textContent = getCurrentLevelLabel('allemand', globalScore);
+                document.getElementById('italien-level').textContent = getCurrentLevelLabel('italien', globalScore);
+                document.getElementById('espagnol-level').textContent = getCurrentLevelLabel('espagnol', globalScore);
+                document.getElementById('geographie-level').textContent = getCurrentLevelLabel('geographie', globalScore);
+                document.getElementById('animaux-level').textContent = getCurrentLevelLabel('animaux', globalScore);
+                Object.keys(QUIZ_LEVELS).forEach(theme => renderLevels(theme, globalScore));
             } catch (error) {
                 console.error('Erreur chargement données:', error);
             }
@@ -1383,6 +1314,22 @@
                 hideAuthModal();
             }
         });
+        onAuthStateChanged(auth, async (user) => {
+            const navLoggedOut = document.getElementById('nav-logged-out');
+            const navLoggedIn = document.getElementById('nav-logged-in');
+            if (user) {
+                currentUser = user;
+                navLoggedOut.classList.add('hidden');
+                navLoggedIn.classList.remove('hidden');
+                await loadUserData();
+                hideAuthModal();
+            } else {
+                currentUser = null;
+                navLoggedOut.classList.remove('hidden');
+                navLoggedIn.classList.add('hidden');
+            }
+        });
+        setupCardListeners();
     </script>
 </body>
 </html>
