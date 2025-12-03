@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quiz Master - Départements</title>
+    <style>
+        .hidden {
+            display: none !important;
+        }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f1115, #1c1c24);
+            color: #f0f0f0;
+        }
+        #hover-warning {
+            position: absolute;
+            padding: 8px 14px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            font-size: 14px;
+            border-radius: 6px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 9999;
+        }
+        header {
+            width: 100%;
+            background: rgba(20, 20, 28, 0.8);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar {
+            max-width: 1100px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+        }
+        .nav-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #eaeaea;
+            letter-spacing: 1px;
+        }
+        .user-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .user-stats {
+            font-size: 0.9em;
+            text-align: right;
+        }
+        .logout-btn {
+            padding: 8px 16px;
+            background: #dc3545;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+        .logout-btn:hover {
+            background: #c82333;
+        }
+        /* QUIZ SECTION */
+        #quiz-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 40px;
+            padding: 0 20px;
+        }
+        .quiz-container {
+            display: flex;
+            gap: 25px;
+            width: 100%;
+            max-width: 1200px;
+            justify-content: center;
+        }
+        @media (min-width: 900px) {
+            .question-box { flex: 2; }
+            .answers-container { flex: 1; }
+            #leaderboard-section.desktop { display: block; flex: 1; margin-top: 0; max-height: 500px; }
+        }
+        .question-box {
+            background: #262633;
+            padding: 30px;
+            border-radius: 15px;
+            font-size: 1.8em;
+            font-weight: 600;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.35);
+        }
+        .answers-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .answer-btn {
+            padding: 15px;
+            font-size: 1.2em;
+            border-radius: 12px;
+            background: #323248;
+            color: #f0f0f0;
+            cursor: pointer;
+            border: none;
+            transition: 0.18s;
+        }
+        .answer-btn:hover:not(:disabled) {
+            transform: scale(1.04);
+            background: #4a4a65;
+        }
+        .answer-btn:disabled { cursor: not-allowed; }
+        .correct { background-color: #2ecc71 !important; }
+        .incorrect { background-color: #e74c3c !important; }
+
+        #timers-container {
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 25px;
+        }
+        #timer-bar-container, #question-timer-bar-container {
+            margin: 10px 0;
+            text-align: left;
+            font-size: 0.95em;
+        }
+        #timer-bar, #question-timer-bar {
+            width: 100%;
+            height: 28px;
+            background: #2b2b3a;
+            border-radius: 10px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+        #timer-fill, #question-timer-fill {
+            height: 100%;
+            width: 100%;
+            border-radius: 10px;
+            transition: width 0.15s linear;
+        }
+        #timer-fill { background: #9c28a7ff; }
+        #question-timer-fill { background: #a832d6; }
+
+        #score-lives {
+            margin-top: 20px;
+            display: flex;
+            gap: 80px;
+            justify-content: center;
+            font-size: 1.3em;
+            position: relative;
+        }
+        #lives { color: #ff4b4b; font-size: 1.4em; }
+
+        @media (max-width: 899px) {
+            body.quiz-active header { display: none; }
+            .quiz-container { flex-direction: column; gap: 15px; }
+            .question-box { font-size: 1.6em; padding: 16px; min-height: 90px; }
+            .answers-container { gap: 10px; }
+            .answer-btn { padding: 12px; font-size: 1.1em; }
+            #score-lives { flex-direction: column; gap: 10px; margin-top: 15px; }
+            #leaderboard-section.desktop { display: none !important; }
+            #mobile-quiz-ui-row {
+                display: flex;
+                gap: 12px;
+                justify-content: center;
+                margin-top: 15px;
+                padding: 0 20px;
+                width: 100%;
+                max-width: 1200px;
+            }
+            #leaderboard-section.mobile {
+                margin: 0;
+                flex: 1;
+                max-width: 220px;
+            }
+            #mobile-back-container {
+                background: #262633;
+                padding: 20px 16px;
+                border-radius: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+                min-width: 60px;
+                height: fit-content;
+            }
+            #mobile-back-container .action-btn {
+                padding: 8px 12px;
+                font-size: 1.2em;
+                display: block;
+                width: 100%;
+                text-align: center;
+            }
+        }
+        @media (min-width: 900px) {
+            #leaderboard-section.mobile, #mobile-quiz-ui-row { display: none !important; }
+            #mobile-back-btn { display: none !important; }
+        }
+
+        /* RESULT SECTION */
+        #result-section {
+            margin-top: 60px;
+            text-align: center;
+        }
+        .result-stats {
+            background: #262633;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            margin: 30px auto;
+        }
+        .result-stats h3 {
+            color: #9c28a7;
+            margin-top: 0;
+        }
+        .action-btn {
+            margin: 10px;
+            padding: 12px 25px;
+            border-radius: 10px;
+            background: #3a3a50;
+            border: none;
+            cursor: pointer;
+            color: #f0f0f0;
+            transition: 0.25s;
+        }
+        .action-btn:hover {
+            background: #4e4e6a;
+        }
+
+        /* LEADERBOARD */
+        #leaderboard-section {
+            background: #262633;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .leaderboard-title {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #9c28a7;
+            font-size: 1.3em;
+        }
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 6px 0;
+            background: #2c2c3a;
+            border-radius: 8px;
+        }
+        .leaderboard-rank {
+            font-size: 1.1em;
+            font-weight: bold;
+            width: 30px;
+        }
+        .leaderboard-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        .leaderboard-score {
+            font-size: 1em;
+            color: #9c28a7;
+            font-weight: bold;
+        }
+
+        /* Unlock Message */
+        #level-unlock-msg {
+            color: #34c759;
+            margin-top: 15px;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-left">
+                <span class="nav-title">🎯 Quiz Master</span>
+                <button id="back-btn" class="action-btn" style="margin-left:10px;">Retour</button>
+            </div>
+            <div class="nav-right hidden" id="nav-logged-in">
+                <div class="user-info">
+                    <div class="user-stats">
+                        <div><strong id="user-pseudo">Joueur</strong></div>
+                        <div>Score Global: <strong id="user-global-score">0</strong></div>
+                    </div>
+                    <button class="action-btn" onclick="window.location.href='settings.html'"
+                        style="margin-left:10px;">Réglages</button>
+                    <button class="logout-btn">Déconnexion</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section id="quiz-section" class="hidden">
+            <div class="quiz-container">
+                <div class="question-box">
+                    <div id="question"></div>
+                </div>
+                <div class="answers-container">
+                    <button class="answer-btn"></button>
+                    <button class="answer-btn"></button>
+                    <button class="answer-btn"></button>
+                    <button class="answer-btn"></button>
+                    <button class="answer-btn"></button>
+                </div>
+                <div id="leaderboard-section" class="desktop">
+                    <h3 class="leaderboard-title">🏆 Classement</h3>
+                    <div id="leaderboard-list-desktop">
+                        <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+                    </div>
+                </div>
+            </div>
+            <div id="timers-container">
+                <div id="timer-bar-container">
+                    <span>⏱️ Temps restant : <span id="timer">0</span>s</span>
+                    <div id="timer-bar"><div id="timer-fill"></div></div>
+                </div>
+                <div id="question-timer-bar-container">
+                    <span>⚡ Question : <span id="question-timer">0</span>s</span>
+                    <div id="question-timer-bar"><div id="question-timer-fill"></div></div>
+                </div>
+            </div>
+            <div id="score-lives">
+                <div>Score : <span id="score">0</span></div>
+                <div id="lives">❤❤❤❤❤</div>
+            </div>
+            <div id="mobile-quiz-ui-row">
+                <div id="leaderboard-section" class="mobile">
+                    <h3 class="leaderboard-title">🏆 Classement</h3>
+                    <div id="leaderboard-list-mobile">
+                        <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+                    </div>
+                </div>
+                <div id="mobile-back-container">
+                    <button id="mobile-back-btn" class="action-btn">←</button>
+                </div>
+            </div>
+        </section>
+        <section id="result-section" class="hidden">
+            <h2>Partie terminée ! 🎉</h2>
+            <div class="result-stats">
+                <h3>Résumé</h3>
+                <p>Score de la partie : <strong id="final-score">0</strong></p>
+                <p>Meilleur score (N1) : <strong id="best-score">0</strong></p>
+                <p>Score Départements : <strong id="new-theme-score">0</strong></p>
+                <p>Score Global : <strong id="new-global-score">0</strong></p>
+                <div id="level-up-msg" class="hidden" style="color: #2ecc71; margin-top: 15px; font-weight: bold;">
+                    🎊 NIVEAU SUPÉRIEUR ATTEINT !
+                </div>
+                <div id="level-unlock-msg">🔓 Niveau 2 débloqué !</div>
+            </div>
+            <button id="restart-btn" class="action-btn">Rejouer</button>
+            <button id="home-btn" class="action-btn">Accueil</button>
+        </section>
+    </main>
+    <div id="hover-warning"></div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import {
+            getAuth, onAuthStateChanged, signOut
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import {
+            getFirestore, doc, updateDoc, increment, runTransaction, getDoc
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // 🔑 CONFIGURATION
+        const THEME = 'departements';
+        const QUIZ_TITLE = 'Départements';
+        const SCORE_REQUIS_N2 = 8;
+
+        const DEPARTEMENTS = [
+            { numero: "01", nom: "Ain" },
+            { numero: "02", nom: "Aisne" },
+            { numero: "03", nom: "Allier" },
+            { numero: "04", nom: "Alpes-de-Haute-Provence" },
+            { numero: "05", nom: "Hautes-Alpes" },
+            { numero: "06", nom: "Alpes-Maritimes" },
+            { numero: "07", nom: "Ardèche" },
+            { numero: "08", nom: "Ardennes" },
+            { numero: "09", nom: "Ariège" },
+            { numero: "10", nom: "Aube" },
+            { numero: "11", nom: "Aude" },
+            { numero: "12", nom: "Aveyron" },
+            { numero: "13", nom: "Bouches-du-Rhône" },
+            { numero: "14", nom: "Calvados" },
+            { numero: "15", nom: "Cantal" },
+            { numero: "16", nom: "Charente" },
+            { numero: "17", nom: "Charente-Maritime" },
+            { numero: "18", nom: "Cher" },
+            { numero: "19", nom: "Corrèze" },
+            { numero: "2A", nom: "Corse-du-Sud" },
+            { numero: "2B", nom: "Haute-Corse" },
+            { numero: "21", nom: "Côte-d'Or" },
+            { numero: "22", nom: "Côtes-d'Armor" },
+            { numero: "23", nom: "Creuse" },
+            { numero: "24", nom: "Dordogne" },
+            { numero: "25", nom: "Doubs" }
+        ];
+
+        // Générer les questions
+        const QUESTIONS = [];
+        DEPARTEMENTS.forEach(dep => {
+            // nom → numéro
+            QUESTIONS.push({
+                question: `Quel est le numéro du département ?<br><span style="font-size:1.4em;">${dep.nom}</span>`,
+                correct: dep.numero,
+                options: DEPARTEMENTS.filter(d => d.numero !== dep.numero).sort(() => 0.5 - Math.random()).slice(0, 4).map(d => d.numero)
+            });
+            // numéro → nom
+            QUESTIONS.push({
+                question: `Quel est le nom du département ?<br><span style="font-size:1.4em;">${dep.numero}</span>`,
+                correct: dep.nom,
+                options: DEPARTEMENTS.filter(d => d.nom !== dep.nom).sort(() => 0.5 - Math.random()).slice(0, 4).map(d => d.nom)
+            });
+        });
+
+        // ⏱️ Config du niveau (unique ici)
+        const levelConfig = {
+            time: 60,
+            qTime: 5,
+            lives: 5
+        };
+
+        // 🌐 Firebase init
+        const firebaseConfig = {
+            apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
+            authDomain: "quiz-master-io.firebaseapp.com",
+            projectId: "quiz-master-io",
+            storageBucket: "quiz-master-io.firebasestorage.app",
+            messagingSenderId: "773382469164",
+            appId: "1:773382469164:web:5e24a9a62ce543f5190389"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        window.currentUser = null;
+
+        // ✅ DOM
+        const quizSection = document.getElementById('quiz-section');
+        const resultSection = document.getElementById('result-section');
+        const questionBox = document.getElementById('question');
+        const answerBtns = document.querySelectorAll('.answer-btn');
+        const scoreDisplay = document.getElementById('score');
+        const livesDisplay = document.getElementById('lives');
+        const timerDisplay = document.getElementById('timer');
+        const qTimerDisplay = document.getElementById('question-timer');
+        const timerFill = document.getElementById('timer-fill');
+        const qTimerFill = document.getElementById('question-timer-fill');
+        const backBtn = document.getElementById('back-btn');
+        const mobileBackBtn = document.getElementById('mobile-back-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const homeBtn = document.getElementById('home-btn');
+        const logoutBtn = document.querySelector('.logout-btn');
+        const levelUnlockMsg = document.getElementById('level-unlock-msg');
+
+        // ✅ États du jeu
+        let score = 0, lives = 0, timeLeft = 0, qTime = 0;
+        let timerInterval = null, qTimerInterval = null, awaitingNext = false;
+        let gameCompleted = false;
+        let usedQuestions = [];
+
+        // 🔁 Fonctions utilitaires
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function updateQuizHeaderVisibility(isQuizActive) {
+            if (window.innerWidth <= 899) {
+                document.body.classList.toggle('quiz-active', isQuizActive);
+                mobileBackBtn.classList.toggle('hidden', !isQuizActive);
+            } else {
+                mobileBackBtn.classList.add('hidden');
+            }
+        }
+
+        // 🔼 Chargement du classement
+        async function renderLeaderboard() {
+            try {
+                const rankingRef = doc(db, 'leaderboards', THEME);
+                const docSnap = await getDoc(rankingRef);
+                let ranking = [];
+                if (docSnap.exists()) {
+                    ranking = docSnap.data().ranking || [];
+                }
+                const html = ranking.slice(0, 5).map((item, i) => `
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank">${i === 0 ? '👑' : i + 1}</div>
+                        <div class="leaderboard-name">${escapeHtml(item.pseudo)}</div>
+                        <div class="leaderboard-score">${item.score}</div>
+                    </div>
+                `).join('');
+                if (!html) {
+                    const errorMsg = '<div style="text-align: center; opacity: 0.6;">Aucun classement</div>';
+                    document.getElementById('leaderboard-list-desktop').innerHTML = errorMsg;
+                    document.getElementById('leaderboard-list-mobile').innerHTML = errorMsg;
+                } else {
+                    document.getElementById('leaderboard-list-desktop').innerHTML = html;
+                    document.getElementById('leaderboard-list-mobile').innerHTML = html;
+                }
+            } catch (e) {
+                console.warn('Erreur classement:', e);
+                const errorMsg = '<div style="text-align: center; opacity: 0.6;">Hors ligne</div>';
+                document.getElementById('leaderboard-list-desktop').innerHTML = errorMsg;
+                document.getElementById('leaderboard-list-mobile').innerHTML = errorMsg;
+            }
+        }
+
+        // 📥 Sauvegarde via transaction
+        async function saveScores(incrementValue) {
+            if (!window.currentUser?.uid || incrementValue <= 0) return;
+            const uid = window.currentUser.uid;
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const userRef = doc(db, 'users', uid);
+                    const userDoc = await transaction.get(userRef);
+                    if (!userDoc.exists()) throw new Error("Utilisateur introuvable");
+
+                    const currentGlobal = userDoc.data().globalScore || 0;
+                    const currentTheme = userDoc.data().quizScores?.[THEME] || 0;
+
+                    transaction.update(userRef, {
+                        globalScore: increment(incrementValue),
+                        [`quizScores.${THEME}`]: increment(incrementValue)
+                    });
+
+                    // 📥 Mettre à jour localStorage
+                    const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+                    quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
+                    localStorage.setItem('quizScores', JSON.stringify(quizScores));
+                    localStorage.setItem('globalScore', (currentGlobal + incrementValue).toString());
+                });
+            } catch (error) {
+                console.warn('Erreur sauvegarde, fallback local:', error);
+                // fallback dans localStorage
+                const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+                quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
+                const global = (parseInt(localStorage.getItem('globalScore') || '0') + incrementValue);
+                localStorage.setItem('quizScores', JSON.stringify(quizScores));
+                localStorage.setItem('globalScore', global.toString());
+            }
+        }
+
+        // 🎮 Logique de jeu
+        function startGame() {
+            if (gameCompleted) return;
+            stopAllTimers();
+            score = 0; lives = levelConfig.lives; timeLeft = levelConfig.time; qTime = levelConfig.qTime;
+            usedQuestions = [];
+            scoreDisplay.textContent = score;
+            updateLives();
+            quizSection.classList.remove('hidden');
+            resultSection.classList.add('hidden');
+            updateQuizHeaderVisibility(true);
+            renderLeaderboard();
+            generateQuestion();
+            startMainTimer();
+            window.scrollTo(0, 0);
+        }
+
+        function getRandomQuestion() {
+            if (usedQuestions.length >= QUESTIONS.length) usedQuestions = [];
+            let idx;
+            do {
+                idx = Math.floor(Math.random() * QUESTIONS.length);
+            } while (usedQuestions.includes(idx) && usedQuestions.length < QUESTIONS.length);
+            usedQuestions.push(idx);
+            return QUESTIONS[idx];
+        }
+
+        function generateQuestion() {
+            if (awaitingNext) return;
+            const q = getRandomQuestion();
+            questionBox.innerHTML = q.question;
+            const shuffled = [...q.options, q.correct].sort(() => Math.random() - 0.5);
+            answerBtns.forEach((btn, i) => {
+                btn.innerHTML = shuffled[i];
+                btn.disabled = false;
+                btn.classList.remove('correct', 'incorrect');
+                btn.onclick = () => handleAnswer(shuffled[i], q.correct);
+            });
+            qTime = levelConfig.qTime;
+            setTimeout(startQTimer, 100);
+        }
+
+        function handleAnswer(selected, correct) {
+            if (awaitingNext) return;
+            awaitingNext = true;
+            clearInterval(qTimerInterval);
+            answerBtns.forEach(btn => {
+                btn.disabled = true;
+                if (btn.innerHTML === correct) btn.classList.add('correct');
+                if (btn.innerHTML === selected && selected !== correct) btn.classList.add('incorrect');
+            });
+            if (selected === correct) score++;
+            else lives = Math.max(0, lives - 1);
+            scoreDisplay.textContent = score;
+            updateLives();
+            setTimeout(() => {
+                if (lives <= 0 || timeLeft <= 0) endGame();
+                else { awaitingNext = false; generateQuestion(); }
+            }, 1000);
+        }
+
+        function updateLives() {
+            const total = levelConfig.lives;
+            livesDisplay.textContent = '❤'.repeat(lives) + '♡'.repeat(total - lives);
+        }
+
+        function startMainTimer() {
+            clearInterval(timerInterval);
+            timerDisplay.textContent = timeLeft;
+            timerFill.style.width = '100%';
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                timerFill.style.width = (timeLeft / levelConfig.time * 100) + '%';
+                if (timeLeft <= 5) timerFill.style.background = '#dc3545';
+                else if (timeLeft <= 10) timerFill.style.background = '#ffa500';
+                else timerFill.style.background = '#9c28a7ff';
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function startQTimer() {
+            clearInterval(qTimerInterval);
+            const start = levelConfig.qTime;
+            qTime = start;
+            qTimerInterval = setInterval(() => {
+                qTime -= 0.1;
+                qTimerDisplay.textContent = qTime.toFixed(1);
+                const pct = Math.max(0, qTime / start) * 100;
+                qTimerFill.style.width = pct + '%';
+                if (qTime <= 0) {
+                    clearInterval(qTimerInterval);
+                    handleAnswer('', ''); // timeout = mauvaise réponse
+                }
+            }, 100);
+        }
+
+        async function endGame() {
+            if (gameCompleted) return;
+            gameCompleted = true;
+            await saveScores(score);
+            
+            // Charger le meilleur score précédent
+            let bestScore = localStorage.getItem(`best-score-${THEME}-n1`) || 0;
+            bestScore = parseInt(bestScore);
+            const newBest = Math.max(bestScore, score);
+            localStorage.setItem(`best-score-${THEME}-n1`, newBest.toString());
+            
+            // Mettre à jour l'UI
+            quizSection.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+            updateQuizHeaderVisibility(false);
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('best-score').textContent = newBest;
+
+            // Afficher nouveaux scores
+            const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+            const globalScore = parseInt(localStorage.getItem('globalScore') || '0');
+            const themeScore = quizScores[THEME] || 0;
+            document.getElementById('new-global-score').textContent = globalScore;
+            document.getElementById('new-theme-score').textContent = themeScore;
+
+            // Level-up ?
+            const oldTheme = themeScore - score;
+            if (Math.floor(themeScore / 50) > Math.floor(oldTheme / 50)) {
+                document.getElementById('level-up-msg').classList.remove('hidden');
+            }
+
+            // Débloquer niveau 2 ?
+            let unlocked = false;
+            if (score >= SCORE_REQUIS_N2) {
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    const niveaux = userDoc.data().niveaux || {};
+                    const niveauActuel = niveaux[THEME] || 0;
+                    if (niveauActuel === 0 || niveauActuel === 1) {
+                        await updateDoc(userRef, {
+                            [`niveaux.${THEME}`]: 2
+                        });
+                        unlocked = true;
+                    }
+                }
+            }
+            if (unlocked) {
+                levelUnlockMsg.style.display = 'block';
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        function stopAllTimers() {
+            clearInterval(timerInterval);
+            clearInterval(qTimerInterval);
+        }
+
+        // 🔄 Navigation
+        const handleBack = async () => {
+            if (!gameCompleted) await saveScores(score);
+            stopAllTimers();
+            window.location.href = 'index.html';
+        };
+        backBtn.addEventListener('click', handleBack);
+        mobileBackBtn.addEventListener('click', handleBack);
+        restartBtn.addEventListener('click', () => {
+            gameCompleted = false;
+            startGame();
+        });
+        homeBtn.addEventListener('click', handleBack);
+
+        // 🔐 Auth
+        onAuthStateChanged(auth, (user) => {
+            const navLoggedIn = document.getElementById('nav-logged-in');
+            if (user) {
+                window.currentUser = user;
+                const pseudo = localStorage.getItem('userPseudo') || user.email.split('@')[0];
+                document.getElementById('user-pseudo').textContent = escapeHtml(pseudo);
+                document.getElementById('user-global-score').textContent = localStorage.getItem('globalScore') || '0';
+                navLoggedIn.classList.remove('hidden');
+                startGame();
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => signOut(auth).then(() => window.location.href = 'index.html'));
+
+        // 🎨 Titre dynamique
+        document.querySelector('.nav-title').textContent = `🎯 ${QUIZ_TITLE}`;
+    </script>
+</body>
+</html>
+

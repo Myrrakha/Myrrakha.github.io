@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quiz Master - Départements</title>
+    <style>
+        .hidden {
+            display: none !important;
+        }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f1115, #1c1c24);
+            color: #f0f0f0;
+        }
+        header {
+            width: 100%;
+            background: rgba(20, 20, 28, 0.8);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar {
+            max-width: 1100px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+        }
+        .nav-title-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .nav-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #eaeaea;
+            letter-spacing: 1px;
+        }
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .glass-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #f0f0f0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        .logout {
+            background: rgba(220, 53, 69, 0.15);
+            border-color: rgba(220, 53, 69, 0.4);
+        }
+        .logout:hover {
+            background: rgba(220, 53, 69, 0.25);
+        }
+
+        /* LEVELS GRID */
+        #levels-section {
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .levels-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .levels-header h2 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            color: #9c28a7;
+        }
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 25px;
+            padding: 0 10px;
+        }
+        .level-card.neon-bordered {
+            position: relative;
+            background: #262633;
+            border-radius: 15px;
+            padding: 25px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, background 0.3s ease;
+            overflow: hidden;
+        }
+        .level-card.neon-bordered::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(
+                120deg,
+                #ff00ff,
+                #00eaff,
+                #8fff00,
+                #ff8800,
+                #ff00ff,
+                #00eaff,
+                #8fff00,
+                #ff8800,
+                #ff00ff
+            );
+            background-size: 600% 300%;
+            z-index: -1;
+            animation: neonMove 3s linear infinite;
+            border-radius: 17px;
+            opacity: 0.7;
+        }
+        @keyframes neonMove {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 600% 50%; }
+        }
+        .level-card h3 {
+            font-size: 1.4em;
+            margin-bottom: 12px;
+            color: #eaeaea;
+        }
+        .level-card .points-required {
+            font-size: 0.9em;
+            color: #ffa500;
+            margin-bottom: 10px;
+        }
+        .level-card.locked {
+            background: #1f1f2a;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .level-card.locked::before {
+            display: none;
+        }
+        .level-card:hover:not(.locked) {
+            transform: translateY(-5px);
+            background: #2c2c3a;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-title-container">
+                <span class="nav-title">🎯 Quiz Master</span>
+                <button id="back-btn" class="glass-btn" title="Accueil">🏠</button>
+            </div>
+            <div class="nav-actions hidden" id="nav-logged-in">
+                <a href="statistiques.html" class="glass-btn" title="Statistiques">📊</a>
+                <a href="settings.html" class="glass-btn" title="Réglages">⚙️</a>
+                <button class="glass-btn logout" id="logout-btn" title="Déconnexion">🚪</button>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <!-- LEVELS SELECTION -->
+        <section id="levels-section">
+            <div class="levels-header">
+                <h2>Choisis ton niveau</h2>
+                <p>Teste tes connaissances sur les départements français !</p>
+            </div>
+            <div class="levels-grid" id="levels-grid">
+                <!-- Levels will be generated here -->
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import {
+            getAuth, onAuthStateChanged, signOut
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import {
+            getFirestore, doc, getDoc
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // 🔑 CONFIGURATION – À MODIFIER PAR THÈME
+        const THEME = 'departements';
+        const QUIZ_TITLE = 'Départements';
+
+        // 🔑 CONFIGURATION DES NIVEAUX – MODIFIE ICI
+        const LEVELS = [
+            { id: 1, pointsRequired: 0, fileName: 'quiz-departement-n1.html' },
+            { id: 2, pointsRequired: 50, fileName: 'quiz-departement-n2.html' },
+            { id: 3, pointsRequired: 100, fileName: 'quiz-departement-n3.html' },
+            { id: 4, pointsRequired: 200, fileName: 'quiz-departement-n4.html' },
+            { id: 5, pointsRequired: 350, fileName: 'quiz-departement-n5.html' },
+            { id: 6, pointsRequired: 500, fileName: 'quiz-departement-n6.html' },
+            { id: 7, pointsRequired: 700, fileName: 'quiz-departement-n7.html' },
+            { id: 8, pointsRequired: 1000, fileName: 'quiz-departement-n8.html' },
+        ];
+
+        // 🌐 Firebase init
+        const firebaseConfig = {
+            apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
+            authDomain: "quiz-master-io.firebaseapp.com",
+            projectId: "quiz-master-io",
+            storageBucket: "quiz-master-io.firebasestorage.app",
+            messagingSenderId: "773382469164",
+            appId: "1:773382469164:web:5e24a9a62ce543f5190389"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        window.currentUser = null;
+
+        // ✅ DOM
+        const levelsGrid = document.getElementById('levels-grid');
+        const backBtn = document.getElementById('back-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const navLoggedIn = document.getElementById('nav-logged-in');
+
+        // 🔐 Auth
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                window.currentUser = user;
+                navLoggedIn.classList.remove('hidden');
+                await renderLevels();
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => signOut(auth).then(() => window.location.href = 'index.html'));
+
+        // 🎮 Rendu des niveaux
+        async function renderLevels() {
+            const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+            const userScore = quizScores[THEME] || 0;
+
+            levelsGrid.innerHTML = '';
+            for (const level of LEVELS) {
+                const isUnlocked = userScore >= level.pointsRequired;
+                const card = document.createElement('div');
+                card.className = `level-card ${isUnlocked ? 'neon-bordered' : 'locked'}`;
+                if (isUnlocked) {
+                    card.addEventListener('click', () => {
+                        window.location.href = level.fileName;
+                    });
+                }
+                card.innerHTML = `
+                    <h3>Niveau ${level.id}</h3>
+                    <div class="points-required">Points requis : ${level.pointsRequired}</div>
+                `;
+                levelsGrid.appendChild(card);
+            }
+        }
+
+        backBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>
+
