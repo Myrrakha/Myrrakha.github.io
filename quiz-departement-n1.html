@@ -178,7 +178,7 @@
                 width: 100%;
                 max-width: 1200px;
             }
-            #current-game-stats.mobile {
+            #current-game-stats {
                 margin: 0;
                 flex: 1;
                 max-width: 220px;
@@ -187,15 +187,15 @@
                 padding: 20px;
                 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             }
-            .stats-title.mobile {
+            .stats-title {
                 font-size: 1.1em;
                 margin-bottom: 10px;
             }
-            .current-score.mobile {
+            .current-score {
                 font-size: 1.8em;
                 margin: 8px 0;
             }
-            .stats-row.mobile {
+            .stats-row {
                 padding: 6px 0;
                 font-size: 0.95em;
             }
@@ -219,9 +219,9 @@
             }
         }
         @media (min-width: 900px) {
-            #current-game-stats.mobile, #mobile-quiz-ui-row { display: none !important; }
+            #mobile-quiz-ui-row { display: none !important; }
             #mobile-back-btn { display: none !important; }
-            #current-game-stats.desktop {
+            #current-game-stats {
                 background: #262633;
                 border-radius: 15px;
                 padding: 20px;
@@ -229,29 +229,29 @@
                 max-width: 300px;
                 width: 100%;
             }
-            .stats-title.desktop {
+            .stats-title {
                 text-align: center;
                 margin-bottom: 15px;
                 color: #9c28a7;
                 font-size: 1.3em;
             }
-            .current-score.desktop {
+            .current-score {
                 font-size: 2.2em;
                 font-weight: bold;
                 color: #34c759;
                 margin: 10px 0;
                 text-align: center;
             }
-            .stats-row.desktop {
+            .stats-row {
                 display: flex;
                 justify-content: space-between;
                 padding: 8px 0;
                 border-bottom: 1px solid #333;
             }
-            .stats-label.desktop {
+            .stats-label {
                 font-weight: 500;
             }
-            .stats-value.desktop {
+            .stats-value {
                 font-weight: bold;
                 color: #9c28a7;
             }
@@ -329,18 +329,6 @@
                     <button class="answer-btn"></button>
                     <button class="answer-btn"></button>
                 </div>
-                <div id="current-game-stats" class="desktop">
-                    <div class="stats-title desktop">📊 Statistiques</div>
-                    <div class="current-score desktop" id="current-score-display">0</div>
-                    <div class="stats-row desktop">
-                        <span class="stats-label desktop">Réponses fausses :</span>
-                        <span class="stats-value desktop" id="wrong-answers">0</span>
-                    </div>
-                    <div class="stats-row desktop">
-                        <span class="stats-label desktop">Meilleur score :</span>
-                        <span class="stats-value desktop" id="best-score-display">0</span>
-                    </div>
-                </div>
             </div>
             <div id="timers-container">
                 <div id="timer-bar-container">
@@ -357,14 +345,14 @@
                 <div id="lives">❤❤❤❤❤</div>
             </div>
             <div id="mobile-quiz-ui-row">
-                <div id="current-game-stats" class="mobile">
-                    <div class="stats-title mobile">📊 Stats</div>
-                    <div class="current-score mobile" id="current-score-display-mobile">0</div>
-                    <div class="stats-row mobile">
+                <div id="current-game-stats">
+                    <div class="stats-title">📊 Stats</div>
+                    <div class="current-score" id="current-score-display-mobile">0</div>
+                    <div class="stats-row">
                         <span class="stats-label">Fausses :</span>
                         <span class="stats-value" id="wrong-answers-mobile">0</span>
                     </div>
-                    <div class="stats-row mobile">
+                    <div class="stats-row">
                         <span class="stats-label">Meilleur :</span>
                         <span class="stats-value" id="best-score-display-mobile">0</span>
                     </div>
@@ -394,13 +382,13 @@
     <div id="hover-warning"></div>
 
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js  ';
         import {
             getAuth, onAuthStateChanged, signOut
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js  ';
         import {
             getFirestore, doc, updateDoc, increment, runTransaction, getDoc
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js  ';
 
         // 🔑 CONFIGURATION
         const THEME = 'departements';
@@ -491,11 +479,8 @@
         const homeBtn = document.getElementById('home-btn');
         const logoutBtn = document.querySelector('.logout-btn');
         const levelUnlockMsg = document.getElementById('level-unlock-msg');
-        const currentScoreDisplay = document.getElementById('current-score-display');
         const currentScoreDisplayMobile = document.getElementById('current-score-display-mobile');
-        const wrongAnswersDisplay = document.getElementById('wrong-answers');
         const wrongAnswersDisplayMobile = document.getElementById('wrong-answers-mobile');
-        const bestScoreDisplay = document.getElementById('best-score-display');
         const bestScoreDisplayMobile = document.getElementById('best-score-display-mobile');
 
         // ✅ États du jeu
@@ -505,6 +490,7 @@
         let usedQuestions = [];
         let currentCorrectAnswer = null;
         let wrongAnswers = 0;
+        let currentUserBestScore = 0; // Track best score from DB/localStorage
 
         // 🔁 Fonctions utilitaires
         function escapeHtml(text) {
@@ -522,8 +508,82 @@
             }
         }
 
+        // 📥 Fetch best score from DB with local fallback
+        async function fetchBestScore() {
+            if (!window.currentUser?.uid) {
+                return parseInt(localStorage.getItem(`best-score-${THEME}-n1`) || '0');
+            }
+            
+            try {
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    const bestScore = userDoc.data().bestScores?.[THEME] || 0;
+                    localStorage.setItem(`best-score-${THEME}-n1`, bestScore.toString());
+                    return bestScore;
+                }
+            } catch (error) {
+                console.warn('Erreur chargement bestScore, fallback local:', error);
+            }
+            return parseInt(localStorage.getItem(`best-score-${THEME}-n1`) || '0');
+        }
+
+        // 💾 Save best score to DB with local fallback
+        async function saveBestScore(newBest) {
+            if (!window.currentUser?.uid) {
+                localStorage.setItem(`best-score-${THEME}-n1`, newBest.toString());
+                return;
+            }
+            
+            try {
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                await updateDoc(userRef, {
+                    [`bestScores.${THEME}`]: newBest
+                });
+                localStorage.setItem(`best-score-${THEME}-n1`, newBest.toString());
+            } catch (error) {
+                console.warn('Erreur sauvegarde bestScore, fallback local:', error);
+                localStorage.setItem(`best-score-${THEME}-n1`, newBest.toString());
+            }
+        }
+
+        // 📥 Sauvegarde via transaction
+        async function saveScores(incrementValue) {
+            if (!window.currentUser?.uid || incrementValue <= 0) return;
+            const uid = window.currentUser.uid;
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const userRef = doc(db, 'users', uid);
+                    const userDoc = await transaction.get(userRef);
+                    if (!userDoc.exists()) throw new Error("Utilisateur introuvable");
+
+                    const currentGlobal = userDoc.data().globalScore || 0;
+                    const currentTheme = userDoc.data().quizScores?.[THEME] || 0;
+
+                    transaction.update(userRef, {
+                        globalScore: increment(incrementValue),
+                        [`quizScores.${THEME}`]: increment(incrementValue)
+                    });
+
+                    // 📥 Mettre à jour localStorage
+                    const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+                    quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
+                    localStorage.setItem('quizScores', JSON.stringify(quizScores));
+                    localStorage.setItem('globalScore', (currentGlobal + incrementValue).toString());
+                });
+            } catch (error) {
+                console.warn('Erreur sauvegarde, fallback local:', error);
+                // fallback dans localStorage
+                const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+                quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
+                const global = (parseInt(localStorage.getItem('globalScore') || '0') + incrementValue);
+                localStorage.setItem('quizScores', JSON.stringify(quizScores));
+                localStorage.setItem('globalScore', global.toString());
+            }
+        }
+
         // 🎮 Logique de jeu
-        function startGame() {
+        async function startGame() {
             if (gameCompleted) return;
             stopAllTimers();
             score = 0; lives = levelConfig.lives; timeLeft = levelConfig.time; qTime = levelConfig.qTime;
@@ -531,7 +591,11 @@
             usedQuestions = [];
             scoreDisplay.textContent = score;
             updateLives();
-            updateStatsDisplay();
+            
+            // Fetch best score at game start
+            currentUserBestScore = await fetchBestScore();
+            updateStatsDisplayMobile();
+            
             quizSection.classList.remove('hidden');
             resultSection.classList.add('hidden');
             updateQuizHeaderVisibility(true);
@@ -583,7 +647,7 @@
             }
             scoreDisplay.textContent = score;
             updateLives();
-            updateStatsDisplay();
+            updateStatsDisplayMobile();
             setTimeout(() => {
                 if (lives <= 0 || timeLeft <= 0) endGame();
                 else { awaitingNext = false; generateQuestion(); }
@@ -595,14 +659,10 @@
             livesDisplay.textContent = '❤'.repeat(lives) + '♡'.repeat(total - lives);
         }
 
-        function updateStatsDisplay() {
-            currentScoreDisplay.textContent = score;
+        function updateStatsDisplayMobile() {
             currentScoreDisplayMobile.textContent = score;
-            wrongAnswersDisplay.textContent = wrongAnswers;
             wrongAnswersDisplayMobile.textContent = wrongAnswers;
-            const bestScore = localStorage.getItem(`best-score-${THEME}-n1`) || 0;
-            bestScoreDisplay.textContent = bestScore;
-            bestScoreDisplayMobile.textContent = bestScore;
+            bestScoreDisplayMobile.textContent = currentUserBestScore;
         }
 
         function startMainTimer() {
@@ -645,7 +705,7 @@
                     wrongAnswers++;
                     scoreDisplay.textContent = score;
                     updateLives();
-                    updateStatsDisplay();
+                    updateStatsDisplayMobile();
                     setTimeout(() => {
                         if (lives <= 0 || timeLeft <= 0) endGame();
                         else { awaitingNext = false; generateQuestion(); }
@@ -659,18 +719,19 @@
             gameCompleted = true;
             await saveScores(score);
             
-            // Charger le meilleur score précédent
-            let bestScore = localStorage.getItem(`best-score-${THEME}-n1`) || 0;
-            bestScore = parseInt(bestScore);
-            const newBest = Math.max(bestScore, score);
-            localStorage.setItem(`best-score-${THEME}-n1`, newBest.toString());
+            // Update best score if current score is higher
+            const newBest = Math.max(currentUserBestScore, score);
+            if (newBest > currentUserBestScore) {
+                currentUserBestScore = newBest;
+                await saveBestScore(newBest);
+            }
             
             // Mettre à jour l'UI
             quizSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
             updateQuizHeaderVisibility(false);
             document.getElementById('final-score').textContent = score;
-            document.getElementById('best-score').textContent = newBest;
+            document.getElementById('best-score').textContent = currentUserBestScore;
 
             // Afficher nouveaux scores
             const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
@@ -708,52 +769,30 @@
             window.scrollTo(0, 0);
         }
 
+        async function handleBack() {
+            if (gameCompleted) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Save current score if it's a new best
+            const newBest = Math.max(currentUserBestScore, score);
+            if (newBest > currentUserBestScore) {
+                await saveBestScore(newBest);
+            }
+            
+            // Save partial score
+            await saveScores(score);
+            stopAllTimers();
+            window.location.href = 'index.html';
+        }
+
         function stopAllTimers() {
             clearInterval(timerInterval);
             clearInterval(qTimerInterval);
         }
 
-        // 📥 Sauvegarde via transaction
-        async function saveScores(incrementValue) {
-            if (!window.currentUser?.uid || incrementValue <= 0) return;
-            const uid = window.currentUser.uid;
-            try {
-                await runTransaction(db, async (transaction) => {
-                    const userRef = doc(db, 'users', uid);
-                    const userDoc = await transaction.get(userRef);
-                    if (!userDoc.exists()) throw new Error("Utilisateur introuvable");
-
-                    const currentGlobal = userDoc.data().globalScore || 0;
-                    const currentTheme = userDoc.data().quizScores?.[THEME] || 0;
-
-                    transaction.update(userRef, {
-                        globalScore: increment(incrementValue),
-                        [`quizScores.${THEME}`]: increment(incrementValue)
-                    });
-
-                    // 📥 Mettre à jour localStorage
-                    const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
-                    quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
-                    localStorage.setItem('quizScores', JSON.stringify(quizScores));
-                    localStorage.setItem('globalScore', (currentGlobal + incrementValue).toString());
-                });
-            } catch (error) {
-                console.warn('Erreur sauvegarde, fallback local:', error);
-                // fallback dans localStorage
-                const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
-                quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
-                const global = (parseInt(localStorage.getItem('globalScore') || '0') + incrementValue);
-                localStorage.setItem('quizScores', JSON.stringify(quizScores));
-                localStorage.setItem('globalScore', global.toString());
-            }
-        }
-
         // 🔄 Navigation
-        const handleBack = async () => {
-            if (!gameCompleted) await saveScores(score);
-            stopAllTimers();
-            window.location.href = 'index.html';
-        };
         backBtn.addEventListener('click', handleBack);
         mobileBackBtn.addEventListener('click', handleBack);
         restartBtn.addEventListener('click', () => {

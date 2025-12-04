@@ -95,71 +95,96 @@
             gap: 16px;
             padding: 0 10px;
         }
-        .level-card.neon-bordered {
+
+        /* 🔥 Nouveau style de CARD */
+        .level-card {
             position: relative;
-            background: #262633;
-            border-radius: 10px;
-            padding: 14px 12px;
-            text-align: center;
+            background: rgba(30, 30, 39, 0.55);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(140, 120, 255, 0.25);
+            padding: 18px;
             cursor: pointer;
-            transition: transform 0.3s ease, background 0.3s ease;
             overflow: hidden;
-            font-size: 0.9em;
-            min-height: auto;
-            height: auto;
+            transition: all .35s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 120px;
         }
-        .level-card.neon-bordered::before {
+
+        /* Glow subtil sur bord */
+        .level-card::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            background: conic-gradient(
+                from 0deg,
+                #7a33ff,
+                #0affff,
+                #8fff00,
+                #ff8800,
+                #7a33ff
+            );
+            background-size: 200% 200%;
+            z-index: -2;
+            opacity: .26;
+            border-radius: inherit;
+            animation: glow 6s linear infinite;
+        }
+
+        /* Masque pour un outline propre */
+        .level-card::after {
             content: '';
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(
-                120deg,
-                #ff00ff,
-                #00eaff,
-                #8fff00,
-                #ff8800,
-                #ff00ff,
-                #00eaff,
-                #8fff00,
-                #ff8800,
-                #ff00ff
-            );
-            background-size: 600% 300%;
+            inset: 1px;
+            background: rgba(20, 20, 29, 0.75);
+            border-radius: inherit;
             z-index: -1;
-            animation: neonMove 3s linear infinite;
+        }
+
+        /* Hover = effet "flotte" + lumière */
+        .level-card:hover:not(.locked) {
+            transform: translateY(-5px) scale(1.02);
+            border: 1px solid rgba(184, 155, 255, 0.4);
+            box-shadow: 0 0 18px rgba(145, 95, 255, 0.35);
+        }
+
+        /* Contenu */
+        .level-card-content h3 {
+            font-weight: 600;
+            font-size: 1.2em;
+            letter-spacing: 0.4px;
+            color: #dedcff;
+            margin: 0 0 6px;
+        }
+
+        /* Badge points */
+        .points-chip {
+            padding: 4px 10px;
             border-radius: 12px;
-            opacity: 0.7;
+            font-size: 0.75em;
+            color: #ffe9a6;
+            background: rgba(255, 205, 117, 0.15);
+            border: 1px solid rgba(255, 205, 117, 0.3);
         }
-        @keyframes neonMove {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 600% 50%; }
-        }
-        .level-card h3 {
-            font-size: 1.15em;
-            margin: 4px 0 6px;
-            color: #eaeaea;
-            line-height: 1.2;
-        }
-        .level-card .points-required {
-            font-size: 0.8em;
-            color: #ffa500;
-            margin: 0;
-            line-height: 1.2;
-        }
+
+        /* Locked */
         .level-card.locked {
-            background: #1f1f2a;
-            opacity: 0.6;
+            filter: grayscale(1);
+            opacity: 0.45;
             cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
         }
         .level-card.locked::before {
-            display: none;
+            opacity: 0;
         }
-        .level-card:hover:not(.locked) {
-            transform: translateY(-3px);
-            background: #2c2c3a;
+
+        /* Animation light gradient */
+        @keyframes glow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Mobile: 3 per row */
@@ -167,11 +192,11 @@
             .levels-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
-            .level-card.neon-bordered {
-                padding: 12px 8px;
+            .level-card {
+                padding: 14px;
             }
-            .level-card h3 {
-                font-size: 1.05em;
+            .level-card-content h3 {
+                font-size: 1.1em;
             }
         }
     </style>
@@ -270,16 +295,20 @@
             for (const level of LEVELS) {
                 const isUnlocked = userScore >= level.pointsRequired;
                 const card = document.createElement('div');
-                card.className = `level-card ${isUnlocked ? 'neon-bordered' : 'locked'}`;
+                card.className = `level-card ${isUnlocked ? '' : 'locked'}`;
                 if (isUnlocked) {
                     card.addEventListener('click', () => {
                         window.location.href = level.fileName;
                     });
                 }
-                card.innerHTML = `
+
+                const content = document.createElement('div');
+                content.className = 'level-card-content';
+                content.innerHTML = `
                     <h3>Niveau ${level.id}</h3>
-                    <div class="points-required">Points requis : ${level.pointsRequired}</div>
+                    <div class="points-chip">Points requis : ${level.pointsRequired}</div>
                 `;
+                card.appendChild(content);
                 levelsGrid.appendChild(card);
             }
         }
