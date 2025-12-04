@@ -110,7 +110,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 120px;
+            height: 60px;
         }
 
         /* Glow subtil sur bord */
@@ -150,23 +150,57 @@
             box-shadow: 0 0 18px rgba(145, 95, 255, 0.35);
         }
 
+        /* SCORE REQUIS EN HAUT */
+        .level-card-score {
+            position: absolute;
+            top: 6px;
+            left: 10px;
+            font-size: 0.7em;
+            opacity: 0.8;
+            color: #bdb8ff;
+            letter-spacing: 0.3px;
+            pointer-events: none;
+        }
+
+        /* CONTENU CENTRÉ */
+        .level-card-content {
+            text-align: center;
+            z-index: 2;
+        }
+
+        /* BARRE DE PROGRESSION */
+        .progress-bar-container {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            width: 70%;
+            height: 6px;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(150, 135, 255, 0.25);
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #a881ff, #7effe6);
+            transition: width .4s ease;
+        }
+
+        /* Locked → Progression éteinte */
+        .level-card.locked .progress-bar {
+            background: rgba(255,255,255,0.15);
+        }
+
         /* Contenu */
         .level-card-content h3 {
             font-weight: 600;
             font-size: 1.2em;
             letter-spacing: 0.4px;
             color: #dedcff;
-            margin: 0 0 6px;
-        }
-
-        /* Badge points */
-        .points-chip {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.75em;
-            color: #ffe9a6;
-            background: rgba(255, 205, 117, 0.15);
-            border: 1px solid rgba(255, 205, 117, 0.3);
+            margin: 0;
         }
 
         /* Locked */
@@ -302,13 +336,23 @@
                     });
                 }
 
-                const content = document.createElement('div');
-                content.className = 'level-card-content';
-                content.innerHTML = `
-                    <h3>Niveau ${level.id}</h3>
-                    <div class="points-chip">Points requis : ${level.pointsRequired}</div>
+                // Avoid division by zero for level 1 (pointsRequired = 0)
+                let progressPercent = 0;
+                if (level.pointsRequired > 0) {
+                    progressPercent = Math.min((userScore / level.pointsRequired) * 100, 100);
+                } else {
+                    progressPercent = 100;
+                }
+
+                card.innerHTML = `
+                    <div class="level-card-score">Requis : ${level.pointsRequired}</div>
+                    <div class="level-card-content">
+                        <h3>Niveau ${level.id}</h3>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: ${progressPercent}%"></div>
+                    </div>
                 `;
-                card.appendChild(content);
                 levelsGrid.appendChild(card);
             }
         }
