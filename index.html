@@ -324,11 +324,11 @@
         /* MOBILE CAROUSEL */
         @media (max-width: 899px) {
             #mobile-leaderboard-carousel {
-                width: 100%;
+                width: calc(100% - 32px); /* 16px de chaque côté */
+                max-width: 500px;
+                margin: 0 auto;
                 overflow: hidden;
                 position: relative;
-                margin: 0 auto;
-                max-width: 500px;
                 display: block !important;
             }
             #carousel-slides {
@@ -608,7 +608,6 @@
             justify-content: center;
             align-items: center;
         }
-
         /* Lien cliquable pour la carte départements */
         .stat-card-link {
             text-decoration: none;
@@ -654,7 +653,6 @@
                                 <div class="level-badge" id="dept-level">Niveau 1</div>
                             </div>
                         </a>
-
                         <!-- Autres cartes inchangées -->
                         <div class="stat-card" id="chinois-card">
                             <h3>🇨🇳 Quiz Chinois</h3>
@@ -849,7 +847,6 @@
         const db = getFirestore(app);
         window.auth = auth;
         window.db = db;
-
         // ✅ Centralisation des niveaux
         const QUIZ_LEVELS = {
             departements: [
@@ -931,7 +928,6 @@
                 { id: 5, name: "Conservation", required: 360 }
             ]
         };
-
         // ✅ Fonction centralisée pour obtenir le niveau actuel
         function getCurrentLevelLabel(theme, globalScore) {
             const levels = QUIZ_LEVELS[theme];
@@ -946,7 +942,6 @@
             }
             return `Niveau ${currentLevel}`;
         }
-
         let authStateReady = false;
         let currentUser = null;
         let isAuthMode = 'login';
@@ -960,7 +955,6 @@
             'anglais', 'neerlandais', 'allemand', 'italien',
             'espagnol', 'geographie', 'animaux'
         ];
-
         // Conventions d’URL : départements gardent l’ancien format, les autres utilisent le nouveau
         function getQuizUrl(category, levelId) {
             if (category === 'departements') {
@@ -969,7 +963,6 @@
                 return `quiz-${category}-n${levelId}.html`;
             }
         }
-
         // ✅ NOUVEAU : Récupération du leaderboard agrégé
         async function fetchLeaderboardFromFirebase() {
             const docRef = doc(db, 'leaderboards', 'global');
@@ -980,7 +973,6 @@
             const data = snapshot.data();
             return data.players || null;
         }
-
         // Ancienne fonction conservée pour compatibilité (mais non utilisée dans leaderboard)
         async function fetchAllScoresFromFirebase() {
             const snapshot = await getDocs(collection(db, 'users'));
@@ -999,16 +991,14 @@
             });
             return players;
         }
-
         function saveToLocal(players) {
             try {
                 localStorage.setItem(LEADERBOARD_LOCAL_KEY, JSON.stringify({
                     timestamp: Date.now(),
-                    data: players
+                     players
                 }));
             } catch (e) { /* ignore */ }
         }
-
         function loadFromLocal() {
             try {
                 const raw = localStorage.getItem(LEADERBOARD_LOCAL_KEY);
@@ -1023,7 +1013,6 @@
                 return null;
             }
         }
-
         async function loadLeaderboardData() {
             if (cachedPlayers && (Date.now() - lastFetchTime) < CACHE_DURATION_MS) {
                 return cachedPlayers;
@@ -1054,7 +1043,6 @@
             }
             return players || {};
         }
-
         async function getRanking(theme) {
             if (theme === 'globalScore') {
                 // Essaie d'obtenir le classement via la nouvelle méthode
@@ -1088,14 +1076,12 @@
                 .sort((a, b) => b.score - a.score)
                 .slice(0, 10);
         }
-
         async function loadLeaderboard() {
             const leaderboardList = document.getElementById('leaderboard-list');
             const mobileGlobal = document.getElementById('mobile-leaderboard-global');
             const mobileSeason = document.getElementById('mobile-leaderboard-season');
             leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;"><span class="loading-spinner"></span> Chargement…</div>';
             mobileGlobal.innerHTML = '<div style="text-align: center; opacity: 0.6;"><span class="loading-spinner"></span> Chargement…</div>';
-
             let top10 = null;
             try {
                 const globalTop = await getRanking('globalScore');
@@ -1103,7 +1089,6 @@
             } catch (error) {
                 console.error('Erreur lors du chargement du leaderboard:', error);
             }
-
             if (!top10) {
                 const local = loadFromLocal();
                 if (local) {
@@ -1114,7 +1099,6 @@
                     top10 = fallback;
                 }
             }
-
             const renderLeaderboardItem = (item, index) => {
                 const rank = index + 1;
                 const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
@@ -1130,7 +1114,6 @@
                 li.innerHTML = `<div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${escapedName}</div><div class="leaderboard-score">${item.score}</div>`;
                 return li;
             };
-
             if (top10 && top10.length > 0) {
                 leaderboardList.innerHTML = '';
                 top10.forEach((item, i) => leaderboardList.appendChild(renderLeaderboardItem(item, i)));
@@ -1140,25 +1123,20 @@
                 leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
                 mobileGlobal.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur</div>';
             }
-
             if (window.matchMedia("(max-width: 899px)").matches) {
                 document.getElementById('mobile-leaderboard-carousel').classList.remove('hidden');
             }
-
             mobileSeason.innerHTML = '<div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>';
         }
-
         function navigateTo(url) {
             window.location.href = url;
         }
-
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2000);
         }
-
         function renderLevels(category, globalScore) {
             const container = document.getElementById(`${category}-levels`);
             if (!container) return;
@@ -1192,16 +1170,13 @@
                 container.appendChild(card);
             });
         }
-
         // Initialisation sans données utilisateur → rendu vide
         Object.keys(QUIZ_LEVELS).forEach(theme => renderLevels(theme, 0));
         loadLeaderboard();
-
         document.getElementById('login-btn').addEventListener('click', showAuthModal);
         document.getElementById('logout-btn').addEventListener('click', logoutUser);
         document.querySelector('.close-modal').addEventListener('click', hideAuthModal);
         document.getElementById('auth-switch-link').addEventListener('click', toggleAuthMode);
-
         function getGlobalLevel(score) {
             if (score >= 500) return '🏆 Expert';
             else if (score >= 300) return '⭐ Avancé';
@@ -1209,7 +1184,6 @@
             else if (score >= 50) return '🌱 Apprenti';
             else return '🆕 Débutant';
         }
-
         function showHoverWarning(text, x, y) {
             const warn = document.getElementById("hover-warning");
             warn.textContent = text;
@@ -1218,7 +1192,6 @@
             warn.style.opacity = 1;
             setTimeout(() => { warn.style.opacity = 0; }, 1800);
         }
-
         function startLevel(category, levelId) {
             document.querySelectorAll('.levels-dropdown').forEach(dropdown => {
                 dropdown.classList.remove('visible');
@@ -1226,7 +1199,6 @@
             const url = getQuizUrl(category, levelId);
             window.location.href = url;
         }
-
         function setupCardListeners() {
             // Exclure 'dept' car redirige vers une autre page
             const themes = ['chinois', 'medecine', 'math', 'anglais', 'neerlandais', 'allemand', 'italien', 'espagnol', 'geographie', 'animaux'];
@@ -1242,7 +1214,6 @@
                 }
             });
         }
-
         document.addEventListener('click', function (e) {
             if (!e.target.closest('.stat-card') && !e.target.closest('.level-card-dropdown')) {
                 document.querySelectorAll('.levels-dropdown').forEach(dropdown => {
@@ -1250,7 +1221,6 @@
                 });
             }
         });
-
         function toggleAuthMode() {
             isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
             const title = document.getElementById('auth-title');
@@ -1272,7 +1242,6 @@
                 pseudoGroup.style.display = 'none';
             }
         }
-
         document.getElementById('auth-submit-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
@@ -1315,7 +1284,6 @@
                 errorDiv.classList.remove('hidden');
             }
         });
-
         function logoutUser() {
             signOut(auth)
                 .then(() => {
@@ -1325,15 +1293,12 @@
                     console.error('Erreur lors de la déconnexion:', error);
                 });
         }
-
         function showAuthModal() {
             document.getElementById('auth-modal').classList.add('visible');
         }
-
         function hideAuthModal() {
             document.getElementById('auth-modal').classList.remove('visible');
         }
-
         async function loadUserData() {
             try {
                 const userDocRef = doc(db, 'users', currentUser.uid);
@@ -1364,7 +1329,6 @@
                 }
                 const quizScores = userData.quizScores || {};
                 const globalScore = userData.globalScore || 0;
-
                 // Remplacer spinners par scores réels
                 const scoreMap = {
                     'departements': 'home-dept-score-container',
@@ -1390,7 +1354,6 @@
                     container.innerHTML = '';
                     container.appendChild(span);
                 }
-
                 // Mettre à jour badges de niveau (y compris départements)
                 document.getElementById('dept-level').textContent = getCurrentLevelLabel('departements', globalScore);
                 document.getElementById('chinois-level').textContent = getCurrentLevelLabel('chinois', globalScore);
@@ -1403,20 +1366,17 @@
                 document.getElementById('espagnol-level').textContent = getCurrentLevelLabel('espagnol', globalScore);
                 document.getElementById('geographie-level').textContent = getCurrentLevelLabel('geographie', globalScore);
                 document.getElementById('animaux-level').textContent = getCurrentLevelLabel('animaux', globalScore);
-
                 // Rendu des niveaux pour les autres thèmes
                 Object.keys(QUIZ_LEVELS).forEach(theme => renderLevels(theme, globalScore));
             } catch (error) {
                 console.error('Erreur chargement données:', error);
             }
         }
-
         document.getElementById('auth-modal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('auth-modal')) {
                 hideAuthModal();
             }
         });
-
         onAuthStateChanged(auth, async (user) => {
             const navLoggedOut = document.getElementById('nav-logged-out');
             const navLoggedIn = document.getElementById('nav-logged-in');
@@ -1432,7 +1392,6 @@
                 navLoggedIn.classList.add('hidden');
             }
         });
-
         setupCardListeners();
     </script>
 </body>

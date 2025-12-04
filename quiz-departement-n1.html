@@ -88,7 +88,6 @@
         @media (min-width: 900px) {
             .question-box { flex: 2; }
             .answers-container { flex: 1; }
-            #leaderboard-section.desktop { display: block; flex: 1; margin-top: 0; max-height: 500px; }
         }
         .question-box {
             background: #262633;
@@ -170,7 +169,6 @@
             .answers-container { gap: 10px; }
             .answer-btn { padding: 12px; font-size: 1.1em; }
             #score-lives { flex-direction: column; gap: 10px; margin-top: 15px; }
-            #leaderboard-section.desktop { display: none !important; }
             #mobile-quiz-ui-row {
                 display: flex;
                 gap: 12px;
@@ -180,10 +178,26 @@
                 width: 100%;
                 max-width: 1200px;
             }
-            #leaderboard-section.mobile {
+            #current-game-stats.mobile {
                 margin: 0;
                 flex: 1;
                 max-width: 220px;
+                background: #262633;
+                border-radius: 15px;
+                padding: 20px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            }
+            .stats-title.mobile {
+                font-size: 1.1em;
+                margin-bottom: 10px;
+            }
+            .current-score.mobile {
+                font-size: 1.8em;
+                margin: 8px 0;
+            }
+            .stats-row.mobile {
+                padding: 6px 0;
+                font-size: 0.95em;
             }
             #mobile-back-container {
                 background: #262633;
@@ -205,8 +219,42 @@
             }
         }
         @media (min-width: 900px) {
-            #leaderboard-section.mobile, #mobile-quiz-ui-row { display: none !important; }
+            #current-game-stats.mobile, #mobile-quiz-ui-row { display: none !important; }
             #mobile-back-btn { display: none !important; }
+            #current-game-stats.desktop {
+                background: #262633;
+                border-radius: 15px;
+                padding: 20px;
+                margin-top: 20px;
+                max-width: 300px;
+                width: 100%;
+            }
+            .stats-title.desktop {
+                text-align: center;
+                margin-bottom: 15px;
+                color: #9c28a7;
+                font-size: 1.3em;
+            }
+            .current-score.desktop {
+                font-size: 2.2em;
+                font-weight: bold;
+                color: #34c759;
+                margin: 10px 0;
+                text-align: center;
+            }
+            .stats-row.desktop {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 0;
+                border-bottom: 1px solid #333;
+            }
+            .stats-label.desktop {
+                font-weight: 500;
+            }
+            .stats-value.desktop {
+                font-weight: bold;
+                color: #9c28a7;
+            }
         }
 
         /* RESULT SECTION */
@@ -237,45 +285,6 @@
         }
         .action-btn:hover {
             background: #4e4e6a;
-        }
-
-        /* LEADERBOARD */
-        #leaderboard-section {
-            background: #262633;
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .leaderboard-title {
-            text-align: center;
-            margin-bottom: 15px;
-            color: #9c28a7;
-            font-size: 1.3em;
-        }
-        .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            margin: 6px 0;
-            background: #2c2c3a;
-            border-radius: 8px;
-        }
-        .leaderboard-rank {
-            font-size: 1.1em;
-            font-weight: bold;
-            width: 30px;
-        }
-        .leaderboard-name {
-            flex: 1;
-            font-weight: 500;
-        }
-        .leaderboard-score {
-            font-size: 1em;
-            color: #9c28a7;
-            font-weight: bold;
         }
 
         /* Unlock Message */
@@ -320,10 +329,16 @@
                     <button class="answer-btn"></button>
                     <button class="answer-btn"></button>
                 </div>
-                <div id="leaderboard-section" class="desktop">
-                    <h3 class="leaderboard-title">🏆 Classement</h3>
-                    <div id="leaderboard-list-desktop">
-                        <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+                <div id="current-game-stats" class="desktop">
+                    <div class="stats-title desktop">📊 Statistiques</div>
+                    <div class="current-score desktop" id="current-score-display">0</div>
+                    <div class="stats-row desktop">
+                        <span class="stats-label desktop">Réponses fausses :</span>
+                        <span class="stats-value desktop" id="wrong-answers">0</span>
+                    </div>
+                    <div class="stats-row desktop">
+                        <span class="stats-label desktop">Meilleur score :</span>
+                        <span class="stats-value desktop" id="best-score-display">0</span>
                     </div>
                 </div>
             </div>
@@ -342,10 +357,16 @@
                 <div id="lives">❤❤❤❤❤</div>
             </div>
             <div id="mobile-quiz-ui-row">
-                <div id="leaderboard-section" class="mobile">
-                    <h3 class="leaderboard-title">🏆 Classement</h3>
-                    <div id="leaderboard-list-mobile">
-                        <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+                <div id="current-game-stats" class="mobile">
+                    <div class="stats-title mobile">📊 Stats</div>
+                    <div class="current-score mobile" id="current-score-display-mobile">0</div>
+                    <div class="stats-row mobile">
+                        <span class="stats-label">Fausses :</span>
+                        <span class="stats-value" id="wrong-answers-mobile">0</span>
+                    </div>
+                    <div class="stats-row mobile">
+                        <span class="stats-label">Meilleur :</span>
+                        <span class="stats-value" id="best-score-display-mobile">0</span>
                     </div>
                 </div>
                 <div id="mobile-back-container">
@@ -470,12 +491,20 @@
         const homeBtn = document.getElementById('home-btn');
         const logoutBtn = document.querySelector('.logout-btn');
         const levelUnlockMsg = document.getElementById('level-unlock-msg');
+        const currentScoreDisplay = document.getElementById('current-score-display');
+        const currentScoreDisplayMobile = document.getElementById('current-score-display-mobile');
+        const wrongAnswersDisplay = document.getElementById('wrong-answers');
+        const wrongAnswersDisplayMobile = document.getElementById('wrong-answers-mobile');
+        const bestScoreDisplay = document.getElementById('best-score-display');
+        const bestScoreDisplayMobile = document.getElementById('best-score-display-mobile');
 
         // ✅ États du jeu
         let score = 0, lives = 0, timeLeft = 0, qTime = 0;
         let timerInterval = null, qTimerInterval = null, awaitingNext = false;
         let gameCompleted = false;
         let usedQuestions = [];
+        let currentCorrectAnswer = null;
+        let wrongAnswers = 0;
 
         // 🔁 Fonctions utilitaires
         function escapeHtml(text) {
@@ -493,85 +522,19 @@
             }
         }
 
-        // 🔼 Chargement du classement
-        async function renderLeaderboard() {
-            try {
-                const rankingRef = doc(db, 'leaderboards', THEME);
-                const docSnap = await getDoc(rankingRef);
-                let ranking = [];
-                if (docSnap.exists()) {
-                    ranking = docSnap.data().ranking || [];
-                }
-                const html = ranking.slice(0, 5).map((item, i) => `
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-rank">${i === 0 ? '👑' : i + 1}</div>
-                        <div class="leaderboard-name">${escapeHtml(item.pseudo)}</div>
-                        <div class="leaderboard-score">${item.score}</div>
-                    </div>
-                `).join('');
-                if (!html) {
-                    const errorMsg = '<div style="text-align: center; opacity: 0.6;">Aucun classement</div>';
-                    document.getElementById('leaderboard-list-desktop').innerHTML = errorMsg;
-                    document.getElementById('leaderboard-list-mobile').innerHTML = errorMsg;
-                } else {
-                    document.getElementById('leaderboard-list-desktop').innerHTML = html;
-                    document.getElementById('leaderboard-list-mobile').innerHTML = html;
-                }
-            } catch (e) {
-                console.warn('Erreur classement:', e);
-                const errorMsg = '<div style="text-align: center; opacity: 0.6;">Hors ligne</div>';
-                document.getElementById('leaderboard-list-desktop').innerHTML = errorMsg;
-                document.getElementById('leaderboard-list-mobile').innerHTML = errorMsg;
-            }
-        }
-
-        // 📥 Sauvegarde via transaction
-        async function saveScores(incrementValue) {
-            if (!window.currentUser?.uid || incrementValue <= 0) return;
-            const uid = window.currentUser.uid;
-            try {
-                await runTransaction(db, async (transaction) => {
-                    const userRef = doc(db, 'users', uid);
-                    const userDoc = await transaction.get(userRef);
-                    if (!userDoc.exists()) throw new Error("Utilisateur introuvable");
-
-                    const currentGlobal = userDoc.data().globalScore || 0;
-                    const currentTheme = userDoc.data().quizScores?.[THEME] || 0;
-
-                    transaction.update(userRef, {
-                        globalScore: increment(incrementValue),
-                        [`quizScores.${THEME}`]: increment(incrementValue)
-                    });
-
-                    // 📥 Mettre à jour localStorage
-                    const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
-                    quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
-                    localStorage.setItem('quizScores', JSON.stringify(quizScores));
-                    localStorage.setItem('globalScore', (currentGlobal + incrementValue).toString());
-                });
-            } catch (error) {
-                console.warn('Erreur sauvegarde, fallback local:', error);
-                // fallback dans localStorage
-                const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
-                quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
-                const global = (parseInt(localStorage.getItem('globalScore') || '0') + incrementValue);
-                localStorage.setItem('quizScores', JSON.stringify(quizScores));
-                localStorage.setItem('globalScore', global.toString());
-            }
-        }
-
         // 🎮 Logique de jeu
         function startGame() {
             if (gameCompleted) return;
             stopAllTimers();
             score = 0; lives = levelConfig.lives; timeLeft = levelConfig.time; qTime = levelConfig.qTime;
+            wrongAnswers = 0;
             usedQuestions = [];
             scoreDisplay.textContent = score;
             updateLives();
+            updateStatsDisplay();
             quizSection.classList.remove('hidden');
             resultSection.classList.add('hidden');
             updateQuizHeaderVisibility(true);
-            renderLeaderboard();
             generateQuestion();
             startMainTimer();
             window.scrollTo(0, 0);
@@ -590,6 +553,7 @@
         function generateQuestion() {
             if (awaitingNext) return;
             const q = getRandomQuestion();
+            currentCorrectAnswer = q.correct;
             questionBox.innerHTML = q.question;
             const shuffled = [...q.options, q.correct].sort(() => Math.random() - 0.5);
             answerBtns.forEach((btn, i) => {
@@ -611,10 +575,15 @@
                 if (btn.innerHTML === correct) btn.classList.add('correct');
                 if (btn.innerHTML === selected && selected !== correct) btn.classList.add('incorrect');
             });
-            if (selected === correct) score++;
-            else lives = Math.max(0, lives - 1);
+            if (selected === correct) {
+                score++;
+            } else {
+                lives = Math.max(0, lives - 1);
+                wrongAnswers++;
+            }
             scoreDisplay.textContent = score;
             updateLives();
+            updateStatsDisplay();
             setTimeout(() => {
                 if (lives <= 0 || timeLeft <= 0) endGame();
                 else { awaitingNext = false; generateQuestion(); }
@@ -624,6 +593,16 @@
         function updateLives() {
             const total = levelConfig.lives;
             livesDisplay.textContent = '❤'.repeat(lives) + '♡'.repeat(total - lives);
+        }
+
+        function updateStatsDisplay() {
+            currentScoreDisplay.textContent = score;
+            currentScoreDisplayMobile.textContent = score;
+            wrongAnswersDisplay.textContent = wrongAnswers;
+            wrongAnswersDisplayMobile.textContent = wrongAnswers;
+            const bestScore = localStorage.getItem(`best-score-${THEME}-n1`) || 0;
+            bestScoreDisplay.textContent = bestScore;
+            bestScoreDisplayMobile.textContent = bestScore;
         }
 
         function startMainTimer() {
@@ -655,7 +634,22 @@
                 qTimerFill.style.width = pct + '%';
                 if (qTime <= 0) {
                     clearInterval(qTimerInterval);
-                    handleAnswer('', ''); // timeout = mauvaise réponse
+                    // Handle timeout: show correct answer and mark as incorrect
+                    answerBtns.forEach(btn => {
+                        btn.disabled = true;
+                        if (btn.innerHTML === currentCorrectAnswer) {
+                            btn.classList.add('correct');
+                        }
+                    });
+                    lives = Math.max(0, lives - 1);
+                    wrongAnswers++;
+                    scoreDisplay.textContent = score;
+                    updateLives();
+                    updateStatsDisplay();
+                    setTimeout(() => {
+                        if (lives <= 0 || timeLeft <= 0) endGame();
+                        else { awaitingNext = false; generateQuestion(); }
+                    }, 1000);
                 }
             }, 100);
         }
@@ -717,6 +711,41 @@
         function stopAllTimers() {
             clearInterval(timerInterval);
             clearInterval(qTimerInterval);
+        }
+
+        // 📥 Sauvegarde via transaction
+        async function saveScores(incrementValue) {
+            if (!window.currentUser?.uid || incrementValue <= 0) return;
+            const uid = window.currentUser.uid;
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const userRef = doc(db, 'users', uid);
+                    const userDoc = await transaction.get(userRef);
+                    if (!userDoc.exists()) throw new Error("Utilisateur introuvable");
+
+                    const currentGlobal = userDoc.data().globalScore || 0;
+                    const currentTheme = userDoc.data().quizScores?.[THEME] || 0;
+
+                    transaction.update(userRef, {
+                        globalScore: increment(incrementValue),
+                        [`quizScores.${THEME}`]: increment(incrementValue)
+                    });
+
+                    // 📥 Mettre à jour localStorage
+                    const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+                    quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
+                    localStorage.setItem('quizScores', JSON.stringify(quizScores));
+                    localStorage.setItem('globalScore', (currentGlobal + incrementValue).toString());
+                });
+            } catch (error) {
+                console.warn('Erreur sauvegarde, fallback local:', error);
+                // fallback dans localStorage
+                const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+                quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
+                const global = (parseInt(localStorage.getItem('globalScore') || '0') + incrementValue);
+                localStorage.setItem('quizScores', JSON.stringify(quizScores));
+                localStorage.setItem('globalScore', global.toString());
+            }
         }
 
         // 🔄 Navigation

@@ -76,34 +76,37 @@
 
         /* LEVELS GRID */
         #levels-section {
-            padding: 40px 20px;
-            max-width: 1200px;
+            padding: 30px 15px;
+            max-width: 1000px;
             margin: 0 auto;
         }
         .levels-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         .levels-header h2 {
-            font-size: 2.2em;
-            margin-bottom: 10px;
+            font-size: 2em;
+            margin-bottom: 8px;
             color: #9c28a7;
         }
         .levels-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
             padding: 0 10px;
         }
         .level-card.neon-bordered {
             position: relative;
             background: #262633;
-            border-radius: 15px;
-            padding: 25px 20px;
+            border-radius: 10px;
+            padding: 14px 12px;
             text-align: center;
             cursor: pointer;
             transition: transform 0.3s ease, background 0.3s ease;
             overflow: hidden;
+            font-size: 0.9em;
+            min-height: auto;
+            height: auto;
         }
         .level-card.neon-bordered::before {
             content: '';
@@ -127,7 +130,7 @@
             background-size: 600% 300%;
             z-index: -1;
             animation: neonMove 3s linear infinite;
-            border-radius: 17px;
+            border-radius: 12px;
             opacity: 0.7;
         }
         @keyframes neonMove {
@@ -135,14 +138,16 @@
             100% { background-position: 600% 50%; }
         }
         .level-card h3 {
-            font-size: 1.4em;
-            margin-bottom: 12px;
+            font-size: 1.15em;
+            margin: 4px 0 6px;
             color: #eaeaea;
+            line-height: 1.2;
         }
         .level-card .points-required {
-            font-size: 0.9em;
+            font-size: 0.8em;
             color: #ffa500;
-            margin-bottom: 10px;
+            margin: 0;
+            line-height: 1.2;
         }
         .level-card.locked {
             background: #1f1f2a;
@@ -153,8 +158,21 @@
             display: none;
         }
         .level-card:hover:not(.locked) {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
             background: #2c2c3a;
+        }
+
+        /* Mobile: 3 per row */
+        @media (max-width: 768px) {
+            .levels-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .level-card.neon-bordered {
+                padding: 12px 8px;
+            }
+            .level-card h3 {
+                font-size: 1.05em;
+            }
         }
     </style>
 </head>
