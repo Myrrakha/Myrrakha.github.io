@@ -4,16 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Quiz Master - Départements</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         .hidden {
             display: none !important;
         }
+        /* GLOBAL */
         body {
             margin: 0;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f1115, #1c1c24);
-            color: #f0f0f0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+            background: radial-gradient(circle at 30% 20%, #2b2c40 0%, #0f1019 100%);
+            color: #f4f4f4;
+            /* Supprimé overflow: hidden → permet le scroll si contenu trop grand */
         }
+
         #hover-warning {
             position: absolute;
             padding: 8px 14px;
@@ -30,7 +35,7 @@
             width: 100%;
             background: rgba(20, 20, 28, 0.8);
             backdrop-filter: blur(8px);
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid rgba(140,140,255,0.1);
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -45,9 +50,10 @@
         }
         .nav-title {
             font-size: 1.4em;
-            font-weight: 600;
+            font-weight: 700;
             color: #eaeaea;
             letter-spacing: 1px;
+            text-shadow: 0 0 6px rgba(128,0,255,0.4);
         }
         .user-info {
             display: flex;
@@ -70,19 +76,31 @@
         .logout-btn:hover {
             background: #c82333;
         }
+
+        /* ✨ CENTRAGE PRINCIPAL */
+        main {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            width: 100%;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
         /* QUIZ SECTION */
         #quiz-section {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 40px;
-            padding: 0 20px;
+            width: 100%;
+            max-width: 1200px;
         }
         .quiz-container {
             display: flex;
             gap: 25px;
             width: 100%;
-            max-width: 1200px;
             justify-content: center;
         }
         @media (min-width: 900px) {
@@ -90,67 +108,93 @@
             .answers-container { flex: 1; }
         }
         .question-box {
-            background: #262633;
-            padding: 30px;
-            border-radius: 15px;
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(8px);
+            padding: 25px;
+            border-radius: 18px;
             font-size: 1.8em;
-            font-weight: 600;
+            font-weight: 700;
             min-height: 140px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 0 20px rgba(128,0,255,0.1);
+            border: 1px solid rgba(120,120,255,0.1);
+            color: #f4f4f4;
+            letter-spacing: 1px;
+            text-shadow: 0 0 6px rgba(128,0,255,0.4);
         }
         .answers-container {
             display: flex;
             flex-direction: column;
             gap: 15px;
+            align-items: center;
         }
         .answer-btn {
-            padding: 15px;
-            font-size: 1.2em;
-            border-radius: 12px;
-            background: #323248;
-            color: #f0f0f0;
-            cursor: pointer;
+            width: 380px;
+            padding: 12px 4px;
+            margin-top: 12px;
             border: none;
-            transition: 0.18s;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            background: linear-gradient(145deg,#2f3147,#181926);
+            transition: 0.25s ease-in-out;
+            color: #e6e6e6;
+            box-shadow: 0 0 6px rgba(0,0,0,0.6);
+            max-width: 100%;
         }
         .answer-btn:hover:not(:disabled) {
-            transform: scale(1.04);
-            background: #4a4a65;
+            transform: translateY(-3px);
+            background: linear-gradient(145deg,#4b4e75,#242638);
+            box-shadow: 0 0 12px rgba(136,0,255,0.35);
         }
         .answer-btn:disabled { cursor: not-allowed; }
-        .correct { background-color: #2ecc71 !important; }
-        .incorrect { background-color: #e74c3c !important; }
+        .correct { 
+            background: linear-gradient(145deg, #2ecc71, #27ae60) !important; 
+            box-shadow: 0 0 12px rgba(46, 204, 113, 0.5) !important;
+        }
+        .incorrect { 
+            background: linear-gradient(145deg, #e74c3c, #c0392b) !important; 
+            box-shadow: 0 0 12px rgba(231, 76, 60, 0.5) !important;
+        }
 
         #timers-container {
             width: 100%;
             max-width: 1000px;
             margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
         }
         #timer-bar-container, #question-timer-bar-container {
-            margin: 10px 0;
+            width: 100%;
+            max-width: 310px;
             text-align: left;
             font-size: 0.95em;
         }
         #timer-bar, #question-timer-bar {
             width: 100%;
-            height: 28px;
-            background: #2b2b3a;
-            border-radius: 10px;
+            height: 12px;
+            background: #1c1c25;
+            border-radius: 8px;
             margin-top: 6px;
             overflow: hidden;
         }
         #timer-fill, #question-timer-fill {
             height: 100%;
             width: 100%;
-            border-radius: 10px;
-            transition: width 0.15s linear;
+            border-radius: 8px;
+            transition: width 0.3s linear;
         }
-        #timer-fill { background: #9c28a7ff; }
-        #question-timer-fill { background: #a832d6; }
+        #timer-fill { 
+            background: linear-gradient(90deg,#a22aff,#d068ff,#ff72d2);
+        }
+        #question-timer-fill { 
+            background: linear-gradient(90deg,#ff72d2,#d068ff,#a22aff);
+        }
 
         #score-lives {
             margin-top: 20px;
@@ -160,18 +204,41 @@
             font-size: 1.3em;
             position: relative;
         }
-        #lives { color: #ff4b4b; font-size: 1.4em; }
+        .score-container {
+            margin-top: 10px;
+            font-size: 23px;
+            text-shadow: 0 0 6px rgba(255,130,255,0.3);
+        }
+        .heart {
+            font-size: 28px;
+            margin: 0 4px;
+            filter: drop-shadow(0 0 4px rgba(255,50,50,.6));
+        }
 
         @media (max-width: 899px) {
             body.quiz-active header { display: none; }
             .quiz-container { flex-direction: column; gap: 15px; }
-            .question-box { font-size: 1.6em; padding: 16px; min-height: 90px; }
-            .answers-container { gap: 10px; }
-            .answer-btn { padding: 12px; font-size: 1.1em; }
-            #score-lives { flex-direction: column; gap: 10px; margin-top: 15px; }
+            .question-box { 
+                font-size: 1.6em; 
+                padding: 13px; 
+                min-height: 90px;
+                width: calc(100% - 40px);
+            }
+            .answers-container { gap: 8px; }
+            .answer-btn { 
+                width: calc(100% - 40px); 
+                padding: 9px; 
+                font-size: 1.1em; 
+            }
+            #score-lives { 
+                flex-direction: column; 
+                gap: 6px; 
+                margin-top: 15px; 
+                align-items: center;
+            }
             #mobile-quiz-ui-row {
                 display: flex;
-                gap: 12px;
+                gap: 11px;
                 justify-content: center;
                 margin-top: 15px;
                 padding: 0 20px;
@@ -181,32 +248,47 @@
             #current-game-stats {
                 margin: 0;
                 flex: 1;
-                max-width: 220px;
-                background: #262633;
-                border-radius: 15px;
-                padding: 20px;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+                max-width: 200px;
+                background: rgba(255,255,255,0.05);
+                border-radius: 12px;
+                padding: 19px;
+                box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
+                border: 1px solid rgba(140,140,255,0.08);
             }
             .stats-title {
                 font-size: 1.1em;
                 margin-bottom: 10px;
+                font-weight: 700;
+                letter-spacing: 1px;
+                text-shadow: 0 0 6px rgba(128,0,255,0.4);
+                text-align: center;
             }
             .current-score {
                 font-size: 1.8em;
                 margin: 8px 0;
+                text-align: center;
+                color: #34c759;
             }
             .stats-row {
                 padding: 6px 0;
                 font-size: 0.95em;
+                display: flex;
+                justify-content: space-between;
+            }
+            .stats-label { font-weight: 500; }
+            .stats-value { 
+                font-weight: bold; 
+                color: #a22aff;
             }
             #mobile-back-container {
-                background: #262633;
+                background: rgba(255,255,255,0.05);
                 padding: 20px 16px;
-                border-radius: 15px;
+                border-radius: 12px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+                box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
+                border: 1px solid rgba(140,140,255,0.08);
                 min-width: 60px;
                 height: fit-content;
             }
@@ -216,24 +298,39 @@
                 display: block;
                 width: 100%;
                 text-align: center;
+                background: rgba(255,255,255,0.08);
+                border-radius: 12px;
+                cursor: pointer;
+                transition: .2s;
+                border: none;
+                color: #f4f4f4;
+            }
+            #mobile-back-container .action-btn:hover {
+                background: rgba(255,255,255,0.12);
+                box-shadow: 0 0 10px rgba(120,120,255,0.3);
             }
         }
         @media (min-width: 900px) {
             #mobile-quiz-ui-row { display: none !important; }
             #mobile-back-btn { display: none !important; }
             #current-game-stats {
-                background: #262633;
-                border-radius: 15px;
+                background: rgba(255,255,255,0.05);
+                border-radius: 12px;
                 padding: 20px;
                 margin-top: 20px;
                 max-width: 300px;
                 width: 100%;
+                box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
+                border: 1px solid rgba(140,140,255,0.08);
             }
             .stats-title {
                 text-align: center;
                 margin-bottom: 15px;
-                color: #9c28a7;
+                color: #a22aff;
                 font-size: 1.3em;
+                font-weight: 700;
+                letter-spacing: 1px;
+                text-shadow: 0 0 6px rgba(128,0,255,0.4);
             }
             .current-score {
                 font-size: 2.2em;
@@ -246,45 +343,60 @@
                 display: flex;
                 justify-content: space-between;
                 padding: 8px 0;
-                border-bottom: 1px solid #333;
+                border-bottom: 1px solid rgba(140,140,255,0.1);
             }
             .stats-label {
                 font-weight: 500;
             }
             .stats-value {
                 font-weight: bold;
-                color: #9c28a7;
+                color: #a22aff;
             }
         }
 
         /* RESULT SECTION */
         #result-section {
-            margin-top: 60px;
             text-align: center;
+            padding: 20px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1200px;
         }
         .result-stats {
-            background: #262633;
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(8px);
             padding: 30px;
-            border-radius: 15px;
+            border-radius: 18px;
             max-width: 500px;
             margin: 30px auto;
+            box-shadow: 0 0 20px rgba(128,0,255,0.1);
+            border: 1px solid rgba(120,120,255,0.1);
+            width: calc(100% - 40px);
         }
         .result-stats h3 {
-            color: #9c28a7;
+            color: #a22aff;
             margin-top: 0;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 0 6px rgba(128,0,255,0.4);
         }
         .action-btn {
             margin: 10px;
             padding: 12px 25px;
-            border-radius: 10px;
-            background: #3a3a50;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.08);
             border: none;
             cursor: pointer;
-            color: #f0f0f0;
-            transition: 0.25s;
+            color: #f4f4f4;
+            transition: 0.2s;
+            font-family: "Poppins", sans-serif;
+            font-size: 16px;
         }
         .action-btn:hover {
-            background: #4e4e6a;
+            background: rgba(255,255,255,0.12);
+            box-shadow: 0 0 10px rgba(120,120,255,0.3);
         }
 
         /* Unlock Message */
@@ -293,6 +405,7 @@
             margin-top: 15px;
             font-weight: bold;
             display: none;
+            text-shadow: 0 0 6px rgba(52, 199, 89, 0.4);
         }
     </style>
 </head>
@@ -341,8 +454,10 @@
                 </div>
             </div>
             <div id="score-lives">
-                <div>Score : <span id="score">0</span></div>
-                <div id="lives">❤❤❤❤❤</div>
+                <div class="score-container">Score : <span id="score">0</span></div>
+                <div id="lives">
+                    <span class="heart">❤</span><span class="heart">❤</span><span class="heart">❤</span><span class="heart">❤</span><span class="heart">❤</span>
+                </div>
             </div>
             <div id="mobile-quiz-ui-row">
                 <div id="current-game-stats">
@@ -382,18 +497,18 @@
     <div id="hover-warning"></div>
 
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js  ';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import {
             getAuth, onAuthStateChanged, signOut
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js  ';
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import {
             getFirestore, doc, updateDoc, increment, runTransaction, getDoc
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js  ';
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         // 🔑 CONFIGURATION
         const THEME = 'departements';
         const QUIZ_TITLE = 'Départements';
-        const SCORE_REQUIS_N2 = 8;
+        const SCORE_REQUIS_N2 = 18;
 
         const DEPARTEMENTS = [
             { numero: "01", nom: "Ain" },
@@ -429,13 +544,13 @@
         DEPARTEMENTS.forEach(dep => {
             // nom → numéro
             QUESTIONS.push({
-                question: `Quel est le numéro du département ?<br><span style="font-size:1.4em;">${dep.nom}</span>`,
+                question: `Quel est le numéro du département ?<br><span style="font-size:1.3em;">${dep.nom}</span>`,
                 correct: dep.numero,
                 options: DEPARTEMENTS.filter(d => d.numero !== dep.numero).sort(() => 0.5 - Math.random()).slice(0, 4).map(d => d.numero)
             });
             // numéro → nom
             QUESTIONS.push({
-                question: `Quel est le nom du département ?<br><span style="font-size:1.4em;">${dep.numero}</span>`,
+                question: `Quel est le nom du département ?<br><span style="font-size:1.3em;">${dep.numero}</span>`,
                 correct: dep.nom,
                 options: DEPARTEMENTS.filter(d => d.nom !== dep.nom).sort(() => 0.5 - Math.random()).slice(0, 4).map(d => d.nom)
             });
@@ -490,7 +605,7 @@
         let usedQuestions = [];
         let currentCorrectAnswer = null;
         let wrongAnswers = 0;
-        let currentUserBestScore = 0; // Track best score from DB/localStorage
+        let currentUserBestScore = 0;
 
         // 🔁 Fonctions utilitaires
         function escapeHtml(text) {
@@ -565,7 +680,6 @@
                         [`quizScores.${THEME}`]: increment(incrementValue)
                     });
 
-                    // 📥 Mettre à jour localStorage
                     const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
                     quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
                     localStorage.setItem('quizScores', JSON.stringify(quizScores));
@@ -573,7 +687,6 @@
                 });
             } catch (error) {
                 console.warn('Erreur sauvegarde, fallback local:', error);
-                // fallback dans localStorage
                 const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
                 quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
                 const global = (parseInt(localStorage.getItem('globalScore') || '0') + incrementValue);
@@ -592,7 +705,6 @@
             scoreDisplay.textContent = score;
             updateLives();
             
-            // Fetch best score at game start
             currentUserBestScore = await fetchBestScore();
             updateStatsDisplayMobile();
             
@@ -656,7 +768,16 @@
 
         function updateLives() {
             const total = levelConfig.lives;
-            livesDisplay.textContent = '❤'.repeat(lives) + '♡'.repeat(total - lives);
+            const hearts = livesDisplay.querySelectorAll('.heart');
+            hearts.forEach((heart, i) => {
+                if (i < lives) {
+                    heart.textContent = '❤';
+                    heart.style.filter = 'drop-shadow(0 0 4px rgba(255,50,50,.6))';
+                } else {
+                    heart.textContent = '♡';
+                    heart.style.filter = 'drop-shadow(0 0 4px rgba(150,150,180,.4))';
+                }
+            });
         }
 
         function updateStatsDisplayMobile() {
@@ -673,9 +794,13 @@
                 timeLeft--;
                 timerDisplay.textContent = timeLeft;
                 timerFill.style.width = (timeLeft / levelConfig.time * 100) + '%';
-                if (timeLeft <= 5) timerFill.style.background = '#dc3545';
-                else if (timeLeft <= 10) timerFill.style.background = '#ffa500';
-                else timerFill.style.background = '#9c28a7ff';
+                if (timeLeft <= 5) {
+                    timerFill.style.background = 'linear-gradient(90deg, #ff4757, #ff6b81)';
+                } else if (timeLeft <= 10) {
+                    timerFill.style.background = 'linear-gradient(90deg, #ffa502, #ff7b25)';
+                } else {
+                    timerFill.style.background = 'linear-gradient(90deg,#a22aff,#d068ff,#ff72d2)';
+                }
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     endGame();
@@ -694,7 +819,6 @@
                 qTimerFill.style.width = pct + '%';
                 if (qTime <= 0) {
                     clearInterval(qTimerInterval);
-                    // Handle timeout: show correct answer and mark as incorrect
                     answerBtns.forEach(btn => {
                         btn.disabled = true;
                         if (btn.innerHTML === currentCorrectAnswer) {
@@ -719,34 +843,29 @@
             gameCompleted = true;
             await saveScores(score);
             
-            // Update best score if current score is higher
             const newBest = Math.max(currentUserBestScore, score);
             if (newBest > currentUserBestScore) {
                 currentUserBestScore = newBest;
                 await saveBestScore(newBest);
             }
             
-            // Mettre à jour l'UI
             quizSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
             updateQuizHeaderVisibility(false);
             document.getElementById('final-score').textContent = score;
             document.getElementById('best-score').textContent = currentUserBestScore;
 
-            // Afficher nouveaux scores
             const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
             const globalScore = parseInt(localStorage.getItem('globalScore') || '0');
             const themeScore = quizScores[THEME] || 0;
             document.getElementById('new-global-score').textContent = globalScore;
             document.getElementById('new-theme-score').textContent = themeScore;
 
-            // Level-up ?
             const oldTheme = themeScore - score;
             if (Math.floor(themeScore / 50) > Math.floor(oldTheme / 50)) {
                 document.getElementById('level-up-msg').classList.remove('hidden');
             }
 
-            // Débloquer niveau 2 ?
             let unlocked = false;
             if (score >= SCORE_REQUIS_N2) {
                 const userRef = doc(db, 'users', window.currentUser.uid);
@@ -771,17 +890,15 @@
 
         async function handleBack() {
             if (gameCompleted) {
-                window.location.href = 'index.html';
+                window.location.href = 'dossier-quiz-departement.html';
                 return;
             }
             
-            // Save current score if it's a new best
             const newBest = Math.max(currentUserBestScore, score);
             if (newBest > currentUserBestScore) {
                 await saveBestScore(newBest);
             }
             
-            // Save partial score
             await saveScores(score);
             stopAllTimers();
             window.location.href = 'index.html';
@@ -823,4 +940,3 @@
     </script>
 </body>
 </html>
-

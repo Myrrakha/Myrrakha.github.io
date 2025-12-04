@@ -368,8 +368,8 @@
                 position: absolute;
                 inset: 0;
                 border: 3px solid transparent;
-                background: linear-gradient(
-                    120deg,
+                background: conic-gradient(
+                    from 0deg,
                     #ff00ff,
                     #00eaff,
                     #8fff00,
@@ -378,7 +378,7 @@
                 ) border-box;
                 background-size: 300% 300%;
                 animation: neonMove 6s linear infinite, neonPulse 4s ease-in-out infinite;
-                mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+                mask: conic-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
                 mask-composite: exclude;
                 -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
                 -webkit-mask-composite: xor;
