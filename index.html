@@ -32,6 +32,7 @@
             background: linear-gradient(135deg, #0f1115, #1c1c24);
             color: #f0f0f0;
             overflow-x: hidden;
+            font-size: 0.9em;
         }
         #hover-warning {
             position: absolute;
@@ -53,7 +54,7 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-            height: 60px;
+            height: 42px;
         }
         .navbar {
             max-width: 1100px;
@@ -61,34 +62,34 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
+            padding: 0 16px;
             height: 100%;
         }
         .nav-title {
-            font-size: 1.4em;
+            font-size: 1.2em;
             font-weight: 600;
             color: #eaeaea;
             letter-spacing: 1px;
         }
         .user-info {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
         }
         .glass-btn {
-            width: 42px;
-            height: 42px;
+            width: 30px;
+            height: 30px;
             display: flex;
             justify-content: center;
             align-items: center;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(80, 80, 100, 0.3);
-            border-radius: 8px;
+            border-radius: 6px;
             color: #e0e0e0;
             cursor: pointer;
             transition: all 0.2s ease;
             backdrop-filter: blur(4px);
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             padding: 0;
             text-decoration: none;
@@ -111,7 +112,7 @@
         }
         /* HOME SECTION */
         #home-section {
-            padding: 0 16px 20px;
+            padding: 0 14px 16px;
             text-align: center;
         }
         .home-content {
@@ -119,7 +120,7 @@
             flex-direction: column;
             max-width: 1100px;
             margin: 0 auto;
-            gap: 30px;
+            gap: 24px;
         }
         @media (min-width: 900px) {
             .home-content {
@@ -137,7 +138,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
             width: 100%;
         }
         .stats-grid-container {
@@ -145,46 +146,56 @@
         }
         .stat-card {
             background: #262633;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
             position: relative;
-            cursor: pointer;
             transition: transform 0.25s;
             width: 100%;
             box-sizing: border-box;
         }
-        .stat-card:hover {
-            transform: translateY(-3px);
-        }
         .stat-card h3 {
             margin-top: 0;
+            margin-bottom: 8px;
             color: #9c28a7;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            font-size: 1.2em;
         }
         .stat-value {
-            font-size: 2.5em;
+            font-size: 2em;
             font-weight: bold;
             color: #f0f0f0;
         }
+        .level-completion-summary {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            color: #aaa;
+            margin-top: 6px;
+        }
+        .level-completion-summary span {
+            color: #9c28a7;
+            font-weight: bold;
+        }
         .level-badge {
             display: inline-block;
-            padding: 8px 16px;
+            padding: 6px 12px;
             background: linear-gradient(135deg, #9c28a7, #7d1f85);
-            border-radius: 20px;
+            border-radius: 16px;
             font-weight: 600;
-            margin-top: 10px;
+            margin-top: 8px;
+            font-size: 0.9em;
         }
         .levels-dropdown {
             background: linear-gradient(135deg, #0f1115, #1c1c24);
-            border-radius: 12px;
-            padding: 0 15px;
+            border-radius: 10px;
+            padding: 0 12px;
             width: 100%;
-            margin: 15px auto;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            margin: 12px auto;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
             overflow: hidden;
             max-height: 0;
             transition: max-height 0.3s ease, padding 0.3s ease;
@@ -201,22 +212,22 @@
             bottom: -2px;
             background: linear-gradient(45deg, #9c28a7, #7d1f85);
             z-index: -1;
-            border-radius: 14px;
+            border-radius: 12px;
             opacity: 0.8;
         }
         .levels-dropdown.visible {
             max-height: 600px;
-            padding: 15px;
+            padding: 12px;
         }
         .levels-grid-dropdown {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+            gap: 10px;
         }
         .level-card-dropdown {
             background: #2c2c3a;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 6px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
@@ -229,73 +240,144 @@
             cursor: not-allowed;
         }
         .level-number-dropdown {
-            font-size: 1.2em;
+            font-size: 1.1em;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             color: #9c28a7;
         }
         .level-name-dropdown {
-            font-size: 0.9em;
-            margin-bottom: 4px;
+            font-size: 0.85em;
+            margin-bottom: 3px;
         }
         .level-requirement-dropdown {
-            font-size: 0.8em;
+            font-size: 0.75em;
             color: #ff4b4b;
             opacity: 0.8;
         }
-        .unlock-status-dropdown {
-            font-size: 0.8em;
-            color: #2ecc71;
-            margin-top: 3px;
+        /* Style pour toutes les cartes avec les deux sous-boutons */
+        .quiz-card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
-        .unlock-icon {
+        .quiz-progress-bar {
+            height: 5px;
+            background: #2c2c3a;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .quiz-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #9c28a7, #7d1f85);
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+        .quiz-subcards {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .quiz-subcard {
+            flex: 1;
+            background: #2c2c3a;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .quiz-subcard:hover {
+            background: #3a3a4a;
+            transform: translateY(-2px);
+        }
+        .subcard-title {
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+            color: #9c28a7;
+        }
+        .subcard-level {
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+        .subcard-thumb {
+            width: 34px;
+            height: 34px;
+            background: #1c1c24;
+            border-radius: 5px;
+            margin: 3px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1rem;
+            color: #9c28a7;
+        }
+        .subcard-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .subcard-progress {
+            height: 3px;
+            background: #222;
+            border-radius: 1px;
+            margin-top: 3px;
+            overflow: hidden;
+        }
+        .subcard-progress-fill {
+            height: 100%;
+            background: #2ecc71;
+            border-radius: 1px;
+        }
+        .level-completed {
             color: #2ecc71;
-            margin-right: 3px;
         }
         /* LEADERBOARD */
         #leaderboard-section {
             max-width: 800px;
             margin: 0 auto;
-            padding: 0 16px;
+            padding: 0 14px;
         }
         .leaderboard-container {
             background: #262633;
-            border-radius: 15px;
-            padding: 25px;
+            border-radius: 12px;
+            padding: 16px;
         }
         .leaderboard-title {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             color: #9c28a7;
+            font-size: 1.2em;
         }
         .leaderboard-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 15px;
-            margin: 8px 0;
+            padding: 10px 12px;
+            margin: 6px 0;
             background: #2c2c3a;
-            border-radius: 8px;
+            border-radius: 6px;
         }
         .leaderboard-rank {
-            font-size: 1.3em;
+            font-size: 1.2em;
             font-weight: bold;
-            width: 40px;
+            width: 36px;
         }
         .leaderboard-name {
             flex: 1;
             font-weight: 500;
+            font-size: 0.95em;
         }
         .leaderboard-score {
-            font-size: 1.1em;
+            font-size: 1em;
             color: #9c28a7;
             font-weight: bold;
         }
         .loading-spinner {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
             border-radius: 50%;
             border-top-color: #9c28a7;
             animation: spin 1s ease-in-out infinite;
@@ -306,17 +388,18 @@
         /* TOAST */
         #toast {
             position: fixed;
-            bottom: 20px;
+            bottom: 16px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.85);
             color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 8px 16px;
+            border-radius: 6px;
             z-index: 9999;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s;
+            font-size: 0.85em;
         }
         #toast.show {
             opacity: 1;
@@ -324,7 +407,7 @@
         /* MOBILE CAROUSEL */
         @media (max-width: 899px) {
             #mobile-leaderboard-carousel {
-                width: calc(100% - 32px); /* 16px de chaque côté */
+                width: calc(100% - 28px);
                 max-width: 500px;
                 margin: 0 auto;
                 overflow: hidden;
@@ -338,7 +421,7 @@
                 scroll-snap-type: x mandatory;
                 scroll-behavior: smooth;
                 -webkit-overflow-scrolling: touch;
-                height: 300px;
+                height: 260px;
                 width: 100%;
                 -ms-overflow-style: none;
                 scrollbar-width: none;
@@ -355,11 +438,11 @@
                 justify-content: center;
                 align-items: flex-start;
                 box-sizing: border-box;
-                padding: 0 10px;
+                padding: 0 8px;
             }
             .neon-bordered {
                 position: relative;
-                padding: 12px;
+                padding: 10px;
                 height: 100%;
                 width: 100%;
             }
@@ -367,7 +450,7 @@
                 content: "";
                 position: absolute;
                 inset: 0;
-                border: 3px solid transparent;
+                border: 2px solid transparent;
                 background: conic-gradient(
                     from 0deg,
                     #ff00ff,
@@ -390,13 +473,13 @@
             }
             @keyframes neonPulse {
                 0%, 90%, 100% { filter: brightness(1); }
-                92% { filter: brightness(3); }
+                92% { filter: brightness(2.5); }
             }
             .leaderboard-highlight {
                 position: absolute;
                 left: 0;
                 right: 0;
-                height: 40px;
+                height: 36px;
                 background: linear-gradient(
                     to right,
                     transparent,
@@ -417,10 +500,10 @@
             }
             .glass-inner {
                 background: rgba(10, 10, 20, 0.35);
-                backdrop-filter: blur(12px);
-                -webkit-backdrop-filter: blur(12px);
-                border-radius: 8px;
-                padding: 16px;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border-radius: 6px;
+                padding: 12px;
                 position: relative;
                 z-index: 1;
                 max-height: 100%;
@@ -432,13 +515,13 @@
                 width: 0px;
             }
             .slide-title {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
                 font-weight: 600;
-                margin-bottom: 8px;
+                margin-bottom: 6px;
                 color: #fff;
             }
             .leaderboard-container > div {
-                padding: 6px 0;
+                padding: 5px 0;
             }
             .fade-in {
                 opacity: 0;
@@ -457,15 +540,6 @@
             #desktop-leaderboard {
                 display: none;
             }
-            #random-top h4,
-            #random-top ol {
-                margin: 0 !important;
-                padding: 0;
-            }
-            #random-top ol {
-                list-style-position: inside;
-                font-size: 0.95rem;
-            }
         }
         @media (min-width: 900px) {
             #mobile-leaderboard-carousel {
@@ -483,7 +557,7 @@
             #leaderboard-section {
                 order: -1;
                 max-width: 100%;
-                padding: 0 16px;
+                padding: 0 14px;
             }
             html, body {
                 overflow-x: hidden;
@@ -496,12 +570,12 @@
                 display: none;
             }
             .stat-card {
-                width: calc(100% - 16px);
-                margin: 0 8px;
+                width: calc(100% - 14px);
+                margin: 0 7px;
             }
             .levels-dropdown {
-                width: calc(100% - 16px);
-                margin: 15px 8px;
+                width: calc(100% - 14px);
+                margin: 12px 7px;
             }
         }
         /* Auth modal */
@@ -526,21 +600,21 @@
         }
         .auth-modal-container {
             background: #1f1f28;
-            padding: 40px;
-            border-radius: 15px;
+            padding: 32px;
+            border-radius: 12px;
             width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 380px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
             position: relative;
         }
         .close-modal {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 12px;
+            right: 12px;
             background: none;
             border: none;
             color: #aaa;
-            font-size: 1.5em;
+            font-size: 1.4em;
             cursor: pointer;
         }
         .close-modal:hover {
@@ -549,29 +623,30 @@
         .auth-container h2 {
             margin-top: 0;
             text-align: center;
+            font-size: 1.3em;
         }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-size: 0.95em;
+            margin-bottom: 6px;
+            font-size: 0.9em;
         }
         .form-group input {
             width: 100%;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 6px;
             border: 1px solid #333;
             background: #2c2c3a;
             color: #f0f0f0;
-            font-size: 1em;
+            font-size: 0.95em;
             box-sizing: border-box;
         }
         .auth-btn {
             width: 100%;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 6px;
             border: none;
             background: #9c28a7;
             color: white;
@@ -579,15 +654,15 @@
             font-weight: 600;
             cursor: pointer;
             transition: 0.25s;
-            margin-top: 10px;
+            margin-top: 8px;
         }
         .auth-btn:hover {
             background: #7d1f85;
         }
         .auth-switch {
             text-align: center;
-            margin-top: 20px;
-            font-size: 0.9em;
+            margin-top: 16px;
+            font-size: 0.85em;
         }
         .auth-switch a {
             color: #9c28a7;
@@ -596,27 +671,17 @@
         }
         .error-msg {
             background: #dc3545;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 12px;
             text-align: center;
+            font-size: 0.9em;
         }
-        /* Score placeholder container */
         .score-placeholder {
-            min-height: 64px;
+            min-height: 56px;
             display: flex;
             justify-content: center;
             align-items: center;
-        }
-        /* Lien cliquable pour la carte départements */
-        .stat-card-link {
-            text-decoration: none;
-            color: inherit;
-            display: block;
-            width: 100%;
-        }
-        .stat-card-link:hover .stat-card {
-            transform: translateY(-3px);
         }
     </style>
 </head>
@@ -643,115 +708,336 @@
             <div class="home-content">
                 <div class="stats-grid-container">
                     <div class="stats-grid">
-                        <!-- Carte départements remplacée par un lien -->
-                        <a href="dossier-quiz-departement.html" class="stat-card-link">
-                            <div class="stat-card" id="dept-card">
-                                <h3>🗺️ Quiz Départements</h3>
+                        <!-- Carte départements -->
+                        <div class="stat-card" id="dept-card">
+                            <h3>🗺️ Quiz Départements</h3>
+                            <div class="quiz-card-content">
                                 <div class="score-placeholder" id="home-dept-score-container">
                                     <span class="loading-spinner"></span>
                                 </div>
-                                <div class="level-badge" id="dept-level">Niveau 1</div>
+                                <div class="level-completion-summary" id="dept-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="dept-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="dept-niveaux100-ratio">0</span>/6</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="dept-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="dept-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="dept-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="dept-next-level-number">1</div>
+                                        <div class="subcard-thumb" id="dept-next-level-thumb">
+                                            <img id="dept-next-level-thumb-img" src="images/departements1.png" alt="Niveau 1" />
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="dept-next-level-progress" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </a>
-                        <!-- Autres cartes inchangées -->
+                        </div>
+                        <!-- Autres cartes réunifiées -->
                         <div class="stat-card" id="chinois-card">
                             <h3>🇨🇳 Quiz Chinois</h3>
-                            <div class="score-placeholder" id="home-chinois-score-container">
-                                <span class="loading-spinner"></span>
-                            </div>
-                            <div class="level-badge" id="chinois-level">Niveau 1</div>
-                            <div class="levels-dropdown" id="chinois-dropdown">
-                                <div class="levels-grid-dropdown" id="chinois-levels"></div>
+                            <div class="quiz-card-content">
+                                <div class="score-placeholder" id="home-chinois-score-container">
+                                    <span class="loading-spinner"></span>
+                                </div>
+                                <div class="level-completion-summary" id="chinois-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="chinois-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="chinois-niveaux100-ratio">0</span>/5</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="chinois-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="chinois-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="chinois-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="chinois-next-level-number">1</div>
+                                        <div class="subcard-thumb">
+                                            <span>🔢</span>
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="chinois-next-level-progress" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="stat-card" id="medecine-card">
                             <h3>🩺 Quiz Médecine</h3>
-                            <div class="score-placeholder" id="home-medecine-score-container">
-                                <span class="loading-spinner"></span>
-                            </div>
-                            <div class="level-badge" id="medecine-level">Niveau 1</div>
-                            <div class="levels-dropdown" id="medecine-dropdown">
-                                <div class="levels-grid-dropdown" id="medecine-levels"></div>
+                            <div class="quiz-card-content">
+                                <div class="score-placeholder" id="home-medecine-score-container">
+                                    <span class="loading-spinner"></span>
+                                </div>
+                                <div class="level-completion-summary" id="medecine-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="medecine-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="medecine-niveaux100-ratio">0</span>/5</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="medecine-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="medecine-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="medecine-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="medecine-next-level-number">1</div>
+                                        <div class="subcard-thumb">
+                                            <span>💊</span>
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="medecine-next-level-progress" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="stat-card" id="math-card">
                             <h3>➗ Quiz Mathématiques</h3>
-                            <div class="score-placeholder" id="home-math-score-container">
-                                <span class="loading-spinner"></span>
-                            </div>
-                            <div class="level-badge" id="math-level">Niveau 1</div>
-                            <div class="levels-dropdown" id="math-dropdown">
-                                <div class="levels-grid-dropdown" id="math-levels"></div>
+                            <div class="quiz-card-content">
+                                <div class="score-placeholder" id="home-math-score-container">
+                                    <span class="loading-spinner"></span>
+                                </div>
+                                <div class="level-completion-summary" id="math-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="math-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="math-niveaux100-ratio">0</span>/5</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="math-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="math-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="math-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="math-next-level-number">1</div>
+                                        <div class="subcard-thumb">
+                                            <span>∑</span>
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="math-next-level-progress" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="stat-card" id="anglais-card">
                             <h3>🇬🇧 Quiz Anglais</h3>
-                            <div class="score-placeholder" id="home-anglais-score-container">
-                                <span class="loading-spinner"></span>
-                            </div>
-                            <div class="level-badge" id="anglais-level">Niveau 1</div>
-                            <div class="levels-dropdown" id="anglais-dropdown">
-                                <div class="levels-grid-dropdown" id="anglais-levels"></div>
+                            <div class="quiz-card-content">
+                                <div class="score-placeholder" id="home-anglais-score-container">
+                                    <span class="loading-spinner"></span>
+                                </div>
+                                <div class="level-completion-summary" id="anglais-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="anglais-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="anglais-niveaux100-ratio">0</span>/5</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="anglais-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="anglais-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="anglais-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="anglais-next-level-number">1</div>
+                                        <div class="subcard-thumb">
+                                            <span>🇬🇧</span>
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="anglais-next-level-progress" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="stat-card" id="neerlandais-card">
                             <h3>🇳🇱 Quiz Néerlandais</h3>
-                            <div class="score-placeholder" id="home-neerlandais-score-container">
-                                <span class="loading-spinner"></span>
-                            </div>
-                            <div class="level-badge" id="neerlandais-level">Niveau 1</div>
-                            <div class="levels-dropdown" id="neerlandais-dropdown">
-                                <div class="levels-grid-dropdown" id="neerlandais-levels"></div>
+                            <div class="quiz-card-content">
+                                <div class="score-placeholder" id="home-neerlandais-score-container">
+                                    <span class="loading-spinner"></span>
+                                </div>
+                                <div class="level-completion-summary" id="neerlandais-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="neerlandais-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="neerlandais-niveaux100-ratio">0</span>/5</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="neerlandais-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="neerlandais-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="neerlandais-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="neerlandais-next-level-number">1</div>
+                                        <div class="subcard-thumb">
+                                            <span>🇳🇱</span>
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="neerlandais-next-level-progress" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="stat-card" id="allemand-card">
                             <h3>🇩🇪 Quiz Allemand</h3>
-                            <div class="score-placeholder" id="home-allemand-score-container">
-                                <span class="loading-spinner"></span>
-                            </div>
-                            <div class="level-badge" id="allemand-level">Niveau 1</div>
-                            <div class="levels-dropdown" id="allemand-dropdown">
-                                <div class="levels-grid-dropdown" id="allemand-levels"></div>
+                            <div class="quiz-card-content">
+                                <div class="score-placeholder" id="home-allemand-score-container">
+                                    <span class="loading-spinner"></span>
+                                </div>
+                                <div class="level-completion-summary" id="allemand-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="allemand-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="allemand-niveaux100-ratio">0</span>/5</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="allemand-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="allemand-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="allemand-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="allemand-next-level-number">1</div>
+                                        <div class="subcard-thumb">
+                                            <span>🇩🇪</span>
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="allemand-next-level-progress" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="stat-card" id="italien-card">
                             <h3>🇮🇹 Quiz Italien</h3>
-                            <div class="score-placeholder" id="home-italien-score-container">
-                                <span class="loading-spinner"></span>
-                            </div>
-                            <div class="level-badge" id="italien-level">Niveau 1</div>
-                            <div class="levels-dropdown" id="italien-dropdown">
-                                <div class="levels-grid-dropdown" id="italien-levels"></div>
+                            <div class="quiz-card-content">
+                                <div class="score-placeholder" id="home-italien-score-container">
+                                    <span class="loading-spinner"></span>
+                                </div>
+                                <div class="level-completion-summary" id="italien-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="italien-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="italien-niveaux100-ratio">0</span>/5</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="italien-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="italien-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="italien-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="italien-next-level-number">1</div>
+                                        <div class="subcard-thumb">
+                                            <span>🇮🇹</span>
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="italien-next-level-progress" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="stat-card" id="espagnol-card">
                             <h3>🇪🇸 Quiz Espagnol</h3>
-                            <div class="score-placeholder" id="home-espagnol-score-container">
-                                <span class="loading-spinner"></span>
-                            </div>
-                            <div class="level-badge" id="espagnol-level">Niveau 1</div>
-                            <div class="levels-dropdown" id="espagnol-dropdown">
-                                <div class="levels-grid-dropdown" id="espagnol-levels"></div>
+                            <div class="quiz-card-content">
+                                <div class="score-placeholder" id="home-espagnol-score-container">
+                                    <span class="loading-spinner"></span>
+                                </div>
+                                <div class="level-completion-summary" id="espagnol-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="espagnol-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="espagnol-niveaux100-ratio">0</span>/5</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="espagnol-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="espagnol-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="espagnol-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="espagnol-next-level-number">1</div>
+                                        <div class="subcard-thumb">
+                                            <span>🇪🇸</span>
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="espagnol-next-level-progress" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="stat-card" id="geographie-card">
                             <h3>🌍 Quiz Géographie</h3>
-                            <div class="score-placeholder" id="home-geographie-score-container">
-                                <span class="loading-spinner"></span>
-                            </div>
-                            <div class="level-badge" id="geographie-level">Niveau 1</div>
-                            <div class="levels-dropdown" id="geographie-dropdown">
-                                <div class="levels-grid-dropdown" id="geographie-levels"></div>
+                            <div class="quiz-card-content">
+                                <div class="score-placeholder" id="home-geographie-score-container">
+                                    <span class="loading-spinner"></span>
+                                </div>
+                                <div class="level-completion-summary" id="geographie-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="geographie-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="geographie-niveaux100-ratio">0</span>/5</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="geographie-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="geographie-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="geographie-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="geographie-next-level-number">1</div>
+                                        <div class="subcard-thumb">
+                                            <span>🗺️</span>
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="geographie-next-level-progress" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="stat-card" id="animaux-card">
                             <h3>🐾 Quiz Animaux</h3>
-                            <div class="score-placeholder" id="home-animaux-score-container">
-                                <span class="loading-spinner"></span>
-                            </div>
-                            <div class="level-badge" id="animaux-level">Niveau 1</div>
-                            <div class="levels-dropdown" id="animaux-dropdown">
-                                <div class="levels-grid-dropdown" id="animaux-levels"></div>
+                            <div class="quiz-card-content">
+                                <div class="score-placeholder" id="home-animaux-score-container">
+                                    <span class="loading-spinner"></span>
+                                </div>
+                                <div class="level-completion-summary" id="animaux-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="animaux-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="animaux-niveaux100-ratio">0</span>/5</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="animaux-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="animaux-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="animaux-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="animaux-next-level-number">1</div>
+                                        <div class="subcard-thumb">
+                                            <span>🐾</span>
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="animaux-next-level-progress" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -833,7 +1119,8 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
             authDomain: "quiz-master-io.firebaseapp.com",
@@ -842,12 +1129,13 @@
             messagingSenderId: "773382469164",
             appId: "1:773382469164:web:5e24a9a62ce543f5190389"
         };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         window.auth = auth;
         window.db = db;
-        // ✅ Centralisation des niveaux
+
         const QUIZ_LEVELS = {
             departements: [
                 { id: 1, name: "Nom → Numéro", required: 0 },
@@ -928,7 +1216,22 @@
                 { id: 5, name: "Conservation", required: 360 }
             ]
         };
-        // ✅ Fonction centralisée pour obtenir le niveau actuel
+
+        const THEMES = ['departements', 'chinois', 'medecine', 'math', 'anglais', 'neerlandais', 'allemand', 'italien', 'espagnol', 'geographie', 'animaux'];
+        const UI_THEMES = {
+            departements: 'dept',
+            chinois: 'chinois',
+            medecine: 'medecine',
+            math: 'math',
+            anglais: 'anglais',
+            neerlandais: 'neerlandais',
+            allemand: 'allemand',
+            italien: 'italien',
+            espagnol: 'espagnol',
+            geographie: 'geographie',
+            animaux: 'animaux'
+        };
+
         function getCurrentLevelLabel(theme, globalScore) {
             const levels = QUIZ_LEVELS[theme];
             if (!levels) return "Niveau 1";
@@ -942,6 +1245,7 @@
             }
             return `Niveau ${currentLevel}`;
         }
+
         let authStateReady = false;
         let currentUser = null;
         let isAuthMode = 'login';
@@ -949,89 +1253,59 @@
         let cachedPlayers = null;
         let lastFetchTime = 0;
         const LEADERBOARD_LOCAL_KEY = 'leaderboard_cache_v2';
-        const ALL_THEMES = [
-            'globalScore',
-            'departements', 'chinois', 'medecine', 'math',
-            'anglais', 'neerlandais', 'allemand', 'italien',
-            'espagnol', 'geographie', 'animaux'
-        ];
-        // Conventions d’URL : départements gardent l’ancien format, les autres utilisent le nouveau
+
         function getQuizUrl(category, levelId) {
             if (category === 'departements') {
-                return `quiz-departement.html#${levelId}`;
+                return `quiz-departement-n${levelId}.html`;
             } else {
                 return `quiz-${category}-n${levelId}.html`;
             }
         }
-        // ✅ NOUVEAU : Récupération du leaderboard agrégé
-        async function fetchLeaderboardFromFirebase() {
-            const docRef = doc(db, 'leaderboards', 'global');
-            const snapshot = await getDoc(docRef);
-            if (!snapshot.exists()) {
-                return null;
-            }
-            const data = snapshot.data();
-            return data.players || null;
-        }
-        // Ancienne fonction conservée pour compatibilité (mais non utilisée dans leaderboard)
-        async function fetchAllScoresFromFirebase() {
-            const snapshot = await getDocs(collection(db, 'users'));
+
+        async function fetchGlobalScoresOnly() {
+            const usersSnapshot = await getDocs(collection(db, 'users'));
             const players = {};
-            snapshot.forEach(doc => {
-                const d = doc.data();
-                const pseudo = d.pseudo;
-                if (!pseudo) return;
-                players[pseudo] = {};
-                players[pseudo].globalScore = d.globalScore ?? 0;
-                const quizScores = d.quizScores || {};
-                for (const theme of ALL_THEMES) {
-                    if (theme === 'globalScore') continue;
-                    players[pseudo][theme] = quizScores[theme] ?? 0;
+            usersSnapshot.forEach(doc => {
+                const data = doc.data();
+                const pseudo = data.pseudo;
+                if (pseudo) {
+                    players[pseudo] = { globalScore: data.globalScore ?? 0 };
                 }
             });
             return players;
         }
+
         function saveToLocal(players) {
             try {
                 localStorage.setItem(LEADERBOARD_LOCAL_KEY, JSON.stringify({
                     timestamp: Date.now(),
-                     players
+                    players
                 }));
             } catch (e) { /* ignore */ }
         }
+
         function loadFromLocal() {
             try {
                 const raw = localStorage.getItem(LEADERBOARD_LOCAL_KEY);
                 if (!raw) return null;
-                const { timestamp, data } = JSON.parse(raw);
+                const { timestamp, players } = JSON.parse(raw);
                 if (Date.now() - timestamp > CACHE_DURATION_MS) {
                     localStorage.removeItem(LEADERBOARD_LOCAL_KEY);
                     return null;
                 }
-                return data;
+                return players;
             } catch (e) {
                 return null;
             }
         }
+
         async function loadLeaderboardData() {
             if (cachedPlayers && (Date.now() - lastFetchTime) < CACHE_DURATION_MS) {
                 return cachedPlayers;
             }
             let players = null;
             try {
-                // ✅ Essaie d'abord le leaderboard agrégé
-                let topPlayers = await fetchLeaderboardFromFirebase();
-                if (topPlayers && topPlayers.length > 0) {
-                    players = {};
-                    topPlayers.forEach(p => {
-                        if (p.pseudo) {
-                            players[p.pseudo] = { globalScore: p.score || 0 };
-                        }
-                    });
-                } else {
-                    // ✅ Si pas de données agrégées, charge toute la collection
-                    players = await fetchAllScoresFromFirebase();
-                }
+                players = await fetchGlobalScoresOnly();
                 cachedPlayers = players;
                 lastFetchTime = Date.now();
                 saveToLocal(players);
@@ -1043,39 +1317,15 @@
             }
             return players || {};
         }
+
         async function getRanking(theme) {
-            if (theme === 'globalScore') {
-                // Essaie d'obtenir le classement via la nouvelle méthode
-                try {
-                    let topPlayers = await fetchLeaderboardFromFirebase();
-                    if (topPlayers && topPlayers.length > 0) {
-                        return topPlayers.slice(0, 10).map((p, i) => ({
-                            name: p.pseudo || `Joueur ${i + 1}`,
-                            score: p.score || 0
-                        }));
-                    }
-                    // Sinon, fallback sur l'ancienne méthode
-                    const players = await loadLeaderboardData();
-                    return Object.entries(players)
-                        .map(([name, scores]) => ({ name, score: scores.globalScore ?? 0 }))
-                        .sort((a, b) => b.score - a.score)
-                        .slice(0, 10);
-                } catch (e) {
-                    // fallback total
-                    const players = await loadLeaderboardData();
-                    return Object.entries(players)
-                        .map(([name, scores]) => ({ name, score: scores.globalScore ?? 0 }))
-                        .sort((a, b) => b.score - a.score)
-                        .slice(0, 10);
-                }
-            }
-            // Ancien comportement pour les autres thèmes
             const players = await loadLeaderboardData();
             return Object.entries(players)
-                .map(([name, scores]) => ({ name, score: scores[theme] ?? 0 }))
+                .map(([name, scores]) => ({ name, score: scores.globalScore ?? 0 }))
                 .sort((a, b) => b.score - a.score)
                 .slice(0, 10);
         }
+
         async function loadLeaderboard() {
             const leaderboardList = document.getElementById('leaderboard-list');
             const mobileGlobal = document.getElementById('mobile-leaderboard-global');
@@ -1104,7 +1354,6 @@
                 const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
                 const li = document.createElement('div');
                 li.className = 'leaderboard-item';
-                // Échappement du pseudo pour XSS
                 const escapedName = item.name
                     .replace(/&/g, "&amp;")
                     .replace(/</g, "&lt;")
@@ -1128,62 +1377,18 @@
             }
             mobileSeason.innerHTML = '<div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>';
         }
+
         function navigateTo(url) {
             window.location.href = url;
         }
+
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2000);
         }
-        function renderLevels(category, globalScore) {
-            const container = document.getElementById(`${category}-levels`);
-            if (!container) return;
-            const levels = QUIZ_LEVELS[category];
-            if (!levels) return;
-            levels.forEach(level => {
-                const isUnlocked = globalScore >= level.required;
-                const card = document.createElement('div');
-                card.className = `level-card-dropdown ${isUnlocked ? '' : 'locked'}`;
-                if (!isUnlocked) {
-                    card.title = `Débloqué à ${level.required} points globaux`;
-                }
-                card.innerHTML = `
-                    <div class="level-number-dropdown">${level.id}</div>
-                    <div class="level-name-dropdown">${level.name}</div>
-                    ${isUnlocked ?
-                        '<div class="unlock-status-dropdown"><span class="unlock-icon">✓</span>Débloqué</div>' :
-                        `<div class="level-requirement-dropdown">Requis: ${level.required} pts</div>`
-                    }
-                `;
-                if (isUnlocked) {
-                    card.addEventListener('click', () => startLevel(category, level.id));
-                } else {
-                    card.addEventListener('click', () => {
-                        showToast(`Débloqué à ${level.required} points globaux`);
-                    });
-                    card.addEventListener('mouseenter', function (e) {
-                        showHoverWarning(`Débloqué à ${level.required} points globaux`, e.pageX, e.pageY);
-                    });
-                }
-                container.appendChild(card);
-            });
-        }
-        // Initialisation sans données utilisateur → rendu vide
-        Object.keys(QUIZ_LEVELS).forEach(theme => renderLevels(theme, 0));
-        loadLeaderboard();
-        document.getElementById('login-btn').addEventListener('click', showAuthModal);
-        document.getElementById('logout-btn').addEventListener('click', logoutUser);
-        document.querySelector('.close-modal').addEventListener('click', hideAuthModal);
-        document.getElementById('auth-switch-link').addEventListener('click', toggleAuthMode);
-        function getGlobalLevel(score) {
-            if (score >= 500) return '🏆 Expert';
-            else if (score >= 300) return '⭐ Avancé';
-            else if (score >= 150) return '📚 Intermédiaire';
-            else if (score >= 50) return '🌱 Apprenti';
-            else return '🆕 Débutant';
-        }
+
         function showHoverWarning(text, x, y) {
             const warn = document.getElementById("hover-warning");
             warn.textContent = text;
@@ -1192,35 +1397,31 @@
             warn.style.opacity = 1;
             setTimeout(() => { warn.style.opacity = 0; }, 1800);
         }
-        function startLevel(category, levelId) {
-            document.querySelectorAll('.levels-dropdown').forEach(dropdown => {
-                dropdown.classList.remove('visible');
-            });
-            const url = getQuizUrl(category, levelId);
-            window.location.href = url;
-        }
+
         function setupCardListeners() {
-            // Exclure 'dept' car redirige vers une autre page
-            const themes = ['chinois', 'medecine', 'math', 'anglais', 'neerlandais', 'allemand', 'italien', 'espagnol', 'geographie', 'animaux'];
-            themes.forEach(theme => {
-                const card = document.getElementById(`${theme}-card`);
-                const dropdown = document.getElementById(`${theme}-dropdown`);
-                if (card && dropdown) {
-                    card.addEventListener('click', function (e) {
-                        if (!e.target.closest('.level-card-dropdown')) {
-                            dropdown.classList.toggle('visible');
-                        }
+            // Ajout des listeners pour TOUS les boutons "Tous les niveaux" et "Prochain niveau"
+            THEMES.forEach(theme => {
+                const uiKey = UI_THEMES[theme];
+                const accessBtn = document.getElementById(`${uiKey}-levels-access`);
+                const nextBtn = document.getElementById(`${uiKey}-next-level`);
+
+                if (accessBtn) {
+                    accessBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        navigateTo(`dossier-quiz-${theme}.html`);
+                    });
+                }
+
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const levelId = parseInt(document.getElementById(`${uiKey}-next-level-number`).textContent.trim(), 10);
+                        navigateTo(getQuizUrl(theme, levelId));
                     });
                 }
             });
         }
-        document.addEventListener('click', function (e) {
-            if (!e.target.closest('.stat-card') && !e.target.closest('.level-card-dropdown')) {
-                document.querySelectorAll('.levels-dropdown').forEach(dropdown => {
-                    dropdown.classList.remove('visible');
-                });
-            }
-        });
+
         function toggleAuthMode() {
             isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
             const title = document.getElementById('auth-title');
@@ -1242,6 +1443,7 @@
                 pseudoGroup.style.display = 'none';
             }
         }
+
         document.getElementById('auth-submit-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
@@ -1258,19 +1460,7 @@
                     await setDoc(doc(db, 'users', user.uid), {
                         pseudo: pseudo.trim(),
                         email: email,
-                        quizScores: {
-                            departements: 0,
-                            chinois: 0,
-                            medecine: 0,
-                            math: 0,
-                            anglais: 0,
-                            neerlandais: 0,
-                            allemand: 0,
-                            italien: 0,
-                            espagnol: 0,
-                            geographie: 0,
-                            animaux: 0
-                        },
+                        quizScores: THEMES.reduce((acc, t) => ({ ...acc, [t]: 0 }), {}),
                         globalScore: 0,
                         createdAt: new Date().toISOString()
                     });
@@ -1284,6 +1474,7 @@
                 errorDiv.classList.remove('hidden');
             }
         });
+
         function logoutUser() {
             signOut(auth)
                 .then(() => {
@@ -1293,12 +1484,57 @@
                     console.error('Erreur lors de la déconnexion:', error);
                 });
         }
+
         function showAuthModal() {
             document.getElementById('auth-modal').classList.add('visible');
         }
+
         function hideAuthModal() {
             document.getElementById('auth-modal').classList.remove('visible');
         }
+
+        async function updateQuizCardUI(theme, globalScore, quizNiveaux = {}) {
+            const levels = QUIZ_LEVELS[theme];
+            if (!levels) return;
+            const totalLevels = levels.length;
+            const completedLevels = Object.values(quizNiveaux).filter(score => score >= 10).length;
+            const progressPercent = Math.min(100, Math.round((completedLevels / totalLevels) * 100));
+            const uiTheme = UI_THEMES[theme];
+
+            // Mise à jour barre de progression
+            const progressFill = document.getElementById(`${uiTheme}-progress-fill`);
+            if (progressFill) {
+                progressFill.style.width = `${progressPercent}%`;
+            }
+
+            // Trouver le prochain niveau non complété
+            let nextLevelId = 1;
+            for (let lvl = 1; lvl <= totalLevels; lvl++) {
+                const score = quizNiveaux[lvl] ?? 0;
+                if (score < 10) {
+                    nextLevelId = lvl;
+                    break;
+                }
+            }
+
+            // Mettre à jour les éléments du "prochain niveau"
+            const nextLevelNumberEl = document.getElementById(`${uiTheme}-next-level-number`);
+            const nextLevelProgressEl = document.getElementById(`${uiTheme}-next-level-progress`);
+
+            if (nextLevelNumberEl) nextLevelNumberEl.textContent = nextLevelId;
+            if (theme === 'departements') {
+                document.getElementById('dept-next-level-thumb-img').src = `images/departements${nextLevelId}.png`;
+                document.getElementById('dept-next-level-thumb-img').alt = `Niveau ${nextLevelId}`;
+            }
+
+            const currentScore = quizNiveaux[nextLevelId] ?? 0;
+            const subProgress = Math.min(100, Math.round((currentScore / 10) * 100));
+            if (nextLevelProgressEl) nextLevelProgressEl.style.width = `${subProgress}%`;
+
+            document.getElementById(`${uiTheme}-niveaux100`).textContent = completedLevels;
+            document.getElementById(`${uiTheme}-niveaux100-ratio`).textContent = completedLevels;
+        }
+
         async function loadUserData() {
             try {
                 const userDocRef = doc(db, 'users', currentUser.uid);
@@ -1308,75 +1544,66 @@
                     const defaultData = {
                         pseudo: currentUser.email.split('@')[0],
                         email: currentUser.email,
-                        quizScores: {
-                            departements: 0,
-                            chinois: 0,
-                            medecine: 0,
-                            math: 0,
-                            anglais: 0,
-                            neerlandais: 0,
-                            allemand: 0,
-                            italien: 0,
-                            espagnol: 0,
-                            geographie: 0,
-                            animaux: 0
-                        },
+                        quizScores: THEMES.reduce((acc, t) => ({ ...acc, [t]: 0 }), {}),
                         globalScore: 0,
+                        ...THEMES.reduce((acc, t) => ({ ...acc, [`${t}_niveaux`]: {} }), {}),
                         createdAt: new Date().toISOString()
                     };
                     await setDoc(userDocRef, defaultData);
                     userData = defaultData;
+                } else {
+                    const updates = {};
+                    THEMES.forEach(theme => {
+                        if (!userData[`${theme}_niveaux`]) {
+                            updates[`${theme}_niveaux`] = {};
+                        }
+                    });
+                    if (Object.keys(updates).length > 0) {
+                        await updateDoc(userDocRef, updates);
+                        userData = { ...userData, ...updates };
+                    }
                 }
                 const quizScores = userData.quizScores || {};
                 const globalScore = userData.globalScore || 0;
-                // Remplacer spinners par scores réels
-                const scoreMap = {
-                    'departements': 'home-dept-score-container',
-                    'chinois': 'home-chinois-score-container',
-                    'medecine': 'home-medecine-score-container',
-                    'math': 'home-math-score-container',
-                    'anglais': 'home-anglais-score-container',
-                    'neerlandais': 'home-neerlandais-score-container',
-                    'allemand': 'home-allemand-score-container',
-                    'italien': 'home-italien-score-container',
-                    'espagnol': 'home-espagnol-score-container',
-                    'geographie': 'home-geographie-score-container',
-                    'animaux': 'home-animaux-score-container'
-                };
-                for (const [theme, containerId] of Object.entries(scoreMap)) {
-                    // Pour la carte départements, on garde le spinner ou le score mais sans dropdown
+                const allNiveaux = THEMES.reduce((acc, theme) => {
+                    acc[theme] = userData[`${theme}_niveaux`] || {};
+                    return acc;
+                }, {});
+
+                // Mise à jour scores
+                THEMES.forEach(theme => {
+                    const containerId = `home-${UI_THEMES[theme]}-score-container`;
                     const container = document.getElementById(containerId);
                     const score = quizScores[theme] || 0;
                     const span = document.createElement('div');
                     span.className = 'stat-value';
-                    span.id = `home-${theme}-score`;
+                    span.id = `home-${UI_THEMES[theme]}-score`;
                     span.textContent = score;
                     container.innerHTML = '';
                     container.appendChild(span);
-                }
-                // Mettre à jour badges de niveau (y compris départements)
-                document.getElementById('dept-level').textContent = getCurrentLevelLabel('departements', globalScore);
-                document.getElementById('chinois-level').textContent = getCurrentLevelLabel('chinois', globalScore);
-                document.getElementById('medecine-level').textContent = getCurrentLevelLabel('medecine', globalScore);
-                document.getElementById('math-level').textContent = getCurrentLevelLabel('math', globalScore);
-                document.getElementById('anglais-level').textContent = getCurrentLevelLabel('anglais', globalScore);
-                document.getElementById('neerlandais-level').textContent = getCurrentLevelLabel('neerlandais', globalScore);
-                document.getElementById('allemand-level').textContent = getCurrentLevelLabel('allemand', globalScore);
-                document.getElementById('italien-level').textContent = getCurrentLevelLabel('italien', globalScore);
-                document.getElementById('espagnol-level').textContent = getCurrentLevelLabel('espagnol', globalScore);
-                document.getElementById('geographie-level').textContent = getCurrentLevelLabel('geographie', globalScore);
-                document.getElementById('animaux-level').textContent = getCurrentLevelLabel('animaux', globalScore);
-                // Rendu des niveaux pour les autres thèmes
-                Object.keys(QUIZ_LEVELS).forEach(theme => renderLevels(theme, globalScore));
+                });
+
+                // Maj résumé niveaux à 100%
+                THEMES.forEach(theme => {
+                    updateQuizCardUI(theme, globalScore, allNiveaux[theme]);
+                });
+
+                // Maj badges
+                THEMES.forEach(theme => {
+                    const badgeId = `${UI_THEMES[theme]}-level`;
+                    document.getElementById(badgeId).textContent = getCurrentLevelLabel(theme, globalScore);
+                });
             } catch (error) {
                 console.error('Erreur chargement données:', error);
             }
         }
+
         document.getElementById('auth-modal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('auth-modal')) {
                 hideAuthModal();
             }
         });
+
         onAuthStateChanged(auth, async (user) => {
             const navLoggedOut = document.getElementById('nav-logged-out');
             const navLoggedIn = document.getElementById('nav-logged-in');
@@ -1392,7 +1619,13 @@
                 navLoggedIn.classList.add('hidden');
             }
         });
+
         setupCardListeners();
+        loadLeaderboard();
+        document.getElementById('login-btn').addEventListener('click', showAuthModal);
+        document.getElementById('logout-btn').addEventListener('click', logoutUser);
+        document.querySelector('.close-modal').addEventListener('click', hideAuthModal);
+        document.getElementById('auth-switch-link').addEventListener('click', toggleAuthMode);
     </script>
 </body>
 </html>
