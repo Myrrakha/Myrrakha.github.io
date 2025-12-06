@@ -4,55 +4,55 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- SEO de la page d'accueil -->
-    <title>Quiz Master - Accueil</title>
+    <title>Quiz Master - Plus de Quiz</title>
     <meta name="description"
-        content="Testez vos connaissances avec notre quiz des départements français. 5 niveaux de difficulté, corrections instantanées et progression suivie.">
+        content="Testez vos connaissances avec nos quiz variés : médecine, mathématiques, langues étrangères, géographie, animaux et plus encore.">
     <meta name="keywords"
-        content="quiz, départements, france, géographie, jeu, apprendre les départements, quiz france, test géographie">
-    <link rel="canonical" href="https://myrrakha.github.io/index.html">
+        content="quiz, médecine, mathématiques, néerlandais, allemand, italien, espagnol, géographie, animaux, jeu, apprendre">
+    <link rel="canonical" href="https://myrrakha.github.io/index2.html">
     <!-- OpenGraph pour réseaux sociaux -->
-    <meta property="og:title" content="Quiz des Départements Français">
-    <meta property="og:description" content="Saurez-vous reconnaître les 101 départements ? 5 niveaux de difficulté.">
+    <meta property="og:title" content="Plus de Quiz - Quiz Master">
+    <meta property="og:description" content="Découvrez une variété de quiz pour tester vos connaissances.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://myrrakha.github.io/index.html">
+    <meta property="og:url" content="https://myrrakha.github.io/index2.html">
     <meta property="og:image" content="https://myrrakha.github.io/images/logo.jpg">
     <!-- Twitter card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Quiz des Départements Français">
+    <meta name="twitter:title" content="Plus de Quiz - Quiz Master">
     <meta name="twitter:description"
-        content="Mettez votre connaissance de la France à l'épreuve avec nos quiz niveaux 1 à 5.">
+        content="Quiz variés : médecine, maths, langues, géographie, animaux…">
     <meta name="twitter:image" content="https://myrrakha.github.io/images/preview.jpg">
     <style>
         /* ==========================
-           Palette & variables (fusionnées en une seule déclaration)
+           Palette & variables
            ========================== */
-        :root {
-          /* Couleurs */
-          --bg-dark: #0b0f14;
+        :root{
+          --bg-dark: #0b0f14;      /* très sombre */
           --panel-dark: rgba(12,16,22,0.6);
-          --glass-bg: rgba(255,255,255,0.03);
           --glass-border: rgba(255,255,255,0.06);
-          --muted-teal: #6ea8a3;
-          --warm-peach: #d69a7a;
+          --muted-teal: #6ea8a3;   /* stabilisant */
+          --warm-peach: #d69a7a;   /* chaleureux */
           --soft-amber: #e6c89a;
-          --violet-main: #7f63cc;
-          --violet-dark: #5b3bbd;
-          --violet-accent: #9b71ff;
-          /* Dimensions & espacements */
+          --violet-main: #7f63cc;  /* titres (moins criard) */
+          --violet-accent: #9b71ff; /* touche décalée mais maîtrisée */
           --radius: 14px;
           --gap: 1rem;
-          --spacing-unit: 0.8em;
-          /* Typographie */
-          --text-scale: 0.9;
-          /* Boutons */
+          --text-scale: 0.95;
           --btn-h: 36px;
-          --header-btn-height: 40px;
-          --next-btn-height: 56px;
-          --next-btn-font-size: 1.3em;
         }
         /* Respect reduced motion */
-        @media (prefers-reduced-motion: reduce) {
-          :root { --reduced: 1; }
+        @media (prefers-reduced-motion: reduce){
+          :root{ --reduced: 1; }
+        }
+        /* Keep original variables but override with new palette */
+        :root {
+          --spacing-unit: 0.8em;
+          --button-height: 15px;
+          --text-scale: 0.9;
+          --violet-main: #7f63cc;
+          --violet-dark: #5b3bbd;
+          --glass-bg: rgba(255,255,255,0.03);
+          --glass-border: rgba(255,255,255,0.06);
         }
         * { box-sizing: border-box; font-size: calc(16px * var(--text-scale)); }
         body {
@@ -71,10 +71,16 @@
         }
         /* cosmic layer - replaces original background effects */
         .cosmic {
-          position: fixed; inset: 0; z-index: -3; pointer-events: none; mix-blend-mode: screen;
+          position:fixed; inset:0; z-index:-3; pointer-events:none; mix-blend-mode:screen;
           background:
             conic-gradient(from 140deg at 50% 50%, rgba(127,99,204,0.06), rgba(110,168,163,0.04), rgba(214,154,122,0.03), rgba(127,99,204,0.06));
           filter: blur(14px) saturate(110%);
+        }
+        /* beam layer - replaces original rays */
+        .beam-layer{position:fixed;inset:0;z-index:-2;pointer-events:none;}
+        .beam{position:absolute;left:50%;top:50%;width:16vmax;height:160vmax;transform-origin:center top;opacity:0;filter:blur(30px);mix-blend-mode:screen;border-radius:50%;}
+        .hidden {
+            display: none !important;
         }
         header {
             width: calc(100% - 2 * var(--spacing-unit));
@@ -102,7 +108,7 @@
         }
         /* Refined button style */
         .glass-btn {
-            height: var(--header-btn-height);
+            height: var(--button-height);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -173,6 +179,15 @@
             border-color: rgba(200, 50, 60, 0.6);
             box-shadow: 0 10px 30px rgba(220, 53, 69, 0.25), 0 0 28px rgba(220, 53, 69, 0.12);
         }
+        .glass-btn.back {
+            background: linear-gradient(180deg, rgba(71, 159, 255, 0.12), rgba(71, 159, 255, 0.08));
+            border-color: rgba(50, 130, 220, 0.4);
+        }
+        .glass-btn.back:hover {
+            background: linear-gradient(180deg, rgba(71, 159, 255, 0.18), rgba(71, 159, 255, 0.12));
+            border-color: rgba(60, 140, 230, 0.6);
+            box-shadow: 0 10px 30px rgba(71, 159, 255, 0.25), 0 0 28px rgba(71, 159, 255, 0.12);
+        }
         /* HOME SECTION */
         #home-section {
             text-align: center;
@@ -189,11 +204,9 @@
                 gap: var(--spacing-unit);
             }
             .stats-grid-container {
-                flex: 2;
-            }
-            #leaderboard-section {
                 flex: 1;
-                margin-top: 0;
+                margin: 0 auto;
+                max-width: 800px;
             }
         }
         .stats-grid {
@@ -329,77 +342,6 @@
         .level-completed {
             color: #2ecc71;
         }
-        /* LEADERBOARD */
-        #leaderboard-section {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .leaderboard-container {
-            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            padding: calc(var(--spacing-unit) * 1);
-            backdrop-filter: blur(12px) saturate(180%);
-            box-shadow: 0 6px 30px rgba(2,6,12,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
-            position: relative;
-            overflow: hidden;
-        }
-        .leaderboard-container::after{
-            content:""; 
-            position:absolute; 
-            inset:0; 
-            pointer-events:none; 
-            border-radius:inherit;
-            background: conic-gradient(from 180deg at 50% 50%, rgba(127,99,204,0.06), rgba(110,168,163,0.05), rgba(214,154,122,0.04));
-            mix-blend-mode:overlay; 
-            opacity:0.45;
-        }
-        .leaderboard-title {
-            text-align: center;
-            margin-bottom: 16px;
-            color: var(--violet-main);
-            font-size: 1.2em;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 0.4em;
-        }
-        .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 12px;
-            margin: 6px 0;
-            background: var(--glass-bg);
-            border-radius: 6px;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 2px 8px rgba(2,6,12,0.3);
-        }
-        .leaderboard-rank {
-            font-size: 1.2em;
-            font-weight: bold;
-            width: 36px;
-        }
-        .leaderboard-name {
-            flex: 1;
-            font-weight: 500;
-            font-size: 0.95em;
-        }
-        .leaderboard-score {
-            font-size: 1em;
-            color: var(--violet-main);
-            font-weight: bold;
-        }
-        .loading-spinner {
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: var(--violet-main);
-            animation: spin 1s ease-in-out infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
         /* TOAST */
         #toast {
             position: fixed;
@@ -418,147 +360,6 @@
         }
         #toast.show {
             opacity: 1;
-        }
-        /* MOBILE CAROUSEL — Updated style */
-        @media (max-width: 899px) {
-            #mobile-leaderboard-carousel {
-                position: relative;
-                border-radius: 20px;
-                padding: 16px;
-                background: rgba(255,255,255,0.08);
-                backdrop-filter: blur(14px) saturate(1.7);
-                overflow: hidden;
-            }
-            #mobile-leaderboard-carousel::before {
-                content: "";
-                position: absolute;
-                inset: 0;
-                border-radius: inherit;
-                padding: 3px;
-                background: linear-gradient(90deg, #ff9a3c, #ffe060, #fff4b0, #00ff9d, #00c8ff, #8b00ff, #ff9a3c);
-                background-size: 400% 400%;
-                mask: 
-                    linear-gradient(#fff 0 0) content-box, 
-                    linear-gradient(#fff 0 0);
-                mask-composite: exclude;
-                -webkit-mask: 
-                    linear-gradient(#fff 0 0) content-box, 
-                    linear-gradient(#fff 0 0);
-                -webkit-mask-composite: xor;
-                animation: gradientShift 6s ease-in-out infinite;
-            }
-            @keyframes gradientShift {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
-            }
-            #carousel-slides {
-                display: flex;
-                gap: 18px;
-                width: 100%;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
-                padding: 4px 0;
-            }
-            #mobile-leaderboard-carousel::-webkit-scrollbar {
-                display: none;
-            }
-            .carousel-slide {
-                min-width: 100%;
-                flex: 0 0 auto;
-                position: relative;
-                display: flex;
-                align-items: stretch;
-            }
-            .neon-bordered {
-                position: relative;
-                width: 100%;
-                height: 100%;
-                padding: 10px;
-                display: flex;
-                flex-direction: column;
-            }
-            .glass-inner {
-                background: rgba(255,255,255,0.10);
-                border: 1px solid rgba(255,255,255,0.16);
-                border-radius: 16px;
-                padding: 16px;
-                position: relative;
-                z-index: 1;
-                backdrop-filter: blur(14px);
-                -webkit-backdrop-filter: blur(14px);
-                box-shadow: 0 0 25px rgba(0,0,0,0.35);
-                transition: transform 0.25s ease, box-shadow 0.4s ease;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                align-items: stretch;
-                flex: 1;
-                min-height: 0;
-            }
-            .glass-inner:hover {
-                transform: scale(1.02);
-                box-shadow: 0 0 32px rgba(255,255,255,0.20), 0 0 60px rgba(255,255,255,0.15);
-            }
-            .slide-title {
-                text-align: center;
-                font-size: 1.15rem;
-                margin-bottom: 12px;
-                font-weight: 600;
-                background: linear-gradient(90deg, #ff8a00, #ffe600, #00ff9d, #00c8ff);
-                background-size: 400% 400%;
-                -webkit-background-clip: text;
-                background-clip: text;
-                -webkit-text-fill-color: transparent;
-                color: transparent;
-                animation: titleGradientShift 4s ease-in-out infinite;
-            }
-            @keyframes titleGradientShift {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
-            }
-            .leaderboard-item {
-                display: flex;
-                justify-content: space-between;
-                padding: 7px 0;
-                border-bottom: 1px solid rgba(255,255,255,0.06);
-                font-size: 0.95rem;
-            }
-            .leaderboard-item:last-child {
-                border-bottom: none;
-            }
-            #mobile-leaderboard-global,
-            #mobile-leaderboard-season {
-                display: flex;
-                flex-direction: column;
-                overflow-y: auto;
-                max-height: calc(100vh - 280px);
-                padding-right: 4px;
-            }
-            #leaderboard-section {
-                order: -1;
-                max-width: 100%;
-            }
-            html, body {
-                overflow-x: hidden;
-                overflow-y: auto;
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-            }
-            html::-webkit-scrollbar,
-            body::-webkit-scrollbar {
-                display: none;
-            }
-            #desktop-leaderboard {
-                display: none;
-            }
-        }
-        @media (min-width: 900px) {
-            #mobile-leaderboard-carousel {
-                display: none !important;
-            }
         }
         /* Auth modal */
         #auth-modal {
@@ -672,31 +473,28 @@
         /* === ADDED STYLES FOR HORIZONTAL ALIGNMENT === */
         .user-info {
             display: flex;
-            gap: 0.8rem;
+            gap: 0.5rem;
             flex-wrap: nowrap;
             align-items: center;
         }
-        .next-page-btn {
-            display: block;
-            margin: var(--spacing-unit) auto 0;
-            width: fit-content;
-            height: var(--next-btn-height);
-            font-size: var(--next-btn-font-size);
-            padding: 0 24px;
-            line-height: var(--next-btn-height);
+        #back-btn-container {
+            display: flex;
+            justify-content: center;
+            margin-top: var(--spacing-unit);
         }
     </style>
 </head>
 <body>
     <!-- visual layers -->
     <div class="cosmic" aria-hidden="true"></div>
+    <div class="beam-layer" id="beam-layer" aria-hidden="true"></div>
     <header>
         <nav class="navbar">
             <div class="nav-left">
-                <span class="nav-title">🎯 Quiz Master</span>
+                <span class="nav-title">🎯 Plus de Quiz</span>
             </div>
             <div class="nav-right" id="nav-logged-out">
-                <!-- Bouton de connexion supprimé temporairement -->
+                <button class="glass-btn" id="login-btn" title="Connexion">👤</button>
             </div>
             <div class="nav-right hidden" id="nav-logged-in">
                 <div class="user-info">
@@ -712,135 +510,242 @@
             <div class="home-content">
                 <div class="stats-grid-container">
                     <div class="stats-grid">
-                        <!-- Carte départements -->
-                        <div class="stat-card" id="dept-card">
-                            <h3>🗺️ Quiz Départements</h3>
+                        <div class="stat-card" id="medecine-card">
+                            <h3>🩺 Quiz Médecine</h3>
                             <div class="quiz-card-content">
-                                <div class="score-placeholder" id="home-dept-score-container">
+                                <div class="score-placeholder" id="home-medecine-score-container">
                                     <span class="loading-spinner"></span>
                                 </div>
-                                <div class="level-completion-summary" id="dept-completion-summary">
-                                    <span>Niveaux complétés à 100% : <span id="dept-niveaux100">0</span></span>
-                                    <span>Progression totale : <span id="dept-niveaux100-ratio">0</span>/6</span>
+                                <div class="level-completion-summary" id="medecine-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="medecine-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="medecine-niveaux100-ratio">0</span>/5</span>
                                 </div>
                                 <div class="quiz-progress-bar">
-                                    <div class="quiz-progress-fill" id="dept-progress-fill" style="width: 0%"></div>
+                                    <div class="quiz-progress-fill" id="medecine-progress-fill" style="width: 0%"></div>
                                 </div>
                                 <div class="quiz-subcards">
-                                    <div class="quiz-subcard" id="dept-levels-access">
+                                    <div class="quiz-subcard" id="medecine-levels-access">
                                         <div class="subcard-title">Tous les niveaux</div>
                                     </div>
-                                    <div class="quiz-subcard" id="dept-next-level">
+                                    <div class="quiz-subcard" id="medecine-next-level">
                                         <div class="subcard-title">Prochain niveau</div>
-                                        <div class="subcard-level" id="dept-next-level-number">1</div>
-                                        <div class="subcard-thumb" id="dept-next-level-thumb">
-                                            <img id="dept-next-level-thumb-img" src="images/departements1.png" alt="Niveau 1" />
-                                        </div>
-                                        <div class="subcard-progress">
-                                            <div class="subcard-progress-fill" id="dept-next-level-progress" style="width: 0%"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Carte chinois -->
-                        <div class="stat-card" id="chinois-card">
-                            <h3>🇨🇳 Quiz Chinois</h3>
-                            <div class="quiz-card-content">
-                                <div class="score-placeholder" id="home-chinois-score-container">
-                                    <span class="loading-spinner"></span>
-                                </div>
-                                <div class="level-completion-summary" id="chinois-completion-summary">
-                                    <span>Niveaux complétés à 100% : <span id="chinois-niveaux100">0</span></span>
-                                    <span>Progression totale : <span id="chinois-niveaux100-ratio">0</span>/5</span>
-                                </div>
-                                <div class="quiz-progress-bar">
-                                    <div class="quiz-progress-fill" id="chinois-progress-fill" style="width: 0%"></div>
-                                </div>
-                                <div class="quiz-subcards">
-                                    <div class="quiz-subcard" id="chinois-levels-access">
-                                        <div class="subcard-title">Tous les niveaux</div>
-                                    </div>
-                                    <div class="quiz-subcard" id="chinois-next-level">
-                                        <div class="subcard-title">Prochain niveau</div>
-                                        <div class="subcard-level" id="chinois-next-level-number">1</div>
+                                        <div class="subcard-level" id="medecine-next-level-number">1</div>
                                         <div class="subcard-thumb">
-                                            <span>🔢</span>
+                                            <span>💊</span>
                                         </div>
                                         <div class="subcard-progress">
-                                            <div class="subcard-progress-fill" id="chinois-next-level-progress" style="width: 0%"></div>
+                                            <div class="subcard-progress-fill" id="medecine-next-level-progress" style="width: 0%"></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- Carte anglais -->
-                        <div class="stat-card" id="anglais-card">
-                            <h3>🇬🇧 Quiz Anglais</h3>
+                        <div class="stat-card" id="math-card">
+                            <h3>➗ Quiz Mathématiques</h3>
                             <div class="quiz-card-content">
-                                <div class="score-placeholder" id="home-anglais-score-container">
+                                <div class="score-placeholder" id="home-math-score-container">
                                     <span class="loading-spinner"></span>
                                 </div>
-                                <div class="level-completion-summary" id="anglais-completion-summary">
-                                    <span>Niveaux complétés à 100% : <span id="anglais-niveaux100">0</span></span>
-                                    <span>Progression totale : <span id="anglais-niveaux100-ratio">0</span>/5</span>
+                                <div class="level-completion-summary" id="math-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="math-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="math-niveaux100-ratio">0</span>/5</span>
                                 </div>
                                 <div class="quiz-progress-bar">
-                                    <div class="quiz-progress-fill" id="anglais-progress-fill" style="width: 0%"></div>
+                                    <div class="quiz-progress-fill" id="math-progress-fill" style="width: 0%"></div>
                                 </div>
                                 <div class="quiz-subcards">
-                                    <div class="quiz-subcard" id="anglais-levels-access">
+                                    <div class="quiz-subcard" id="math-levels-access">
                                         <div class="subcard-title">Tous les niveaux</div>
                                     </div>
-                                    <div class="quiz-subcard" id="anglais-next-level">
+                                    <div class="quiz-subcard" id="math-next-level">
                                         <div class="subcard-title">Prochain niveau</div>
-                                        <div class="subcard-level" id="anglais-next-level-number">1</div>
+                                        <div class="subcard-level" id="math-next-level-number">1</div>
                                         <div class="subcard-thumb">
-                                            <span>🇬🇧</span>
+                                            <span>∑</span>
                                         </div>
                                         <div class="subcard-progress">
-                                            <div class="subcard-progress-fill" id="anglais-next-level-progress" style="width: 0%"></div>
+                                            <div class="subcard-progress-fill" id="math-next-level-progress" style="width: 0%"></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div id="leaderboard-section">
-                    <div id="desktop-leaderboard" class="leaderboard-container">
-                        <h2 class="leaderboard-title">🏆 Classement Mondial</h2>
-                        <div id="leaderboard-list">
-                            <div style="text-align: center; opacity: 0.6;">
-                                <span class="loading-spinner"></span> Chargement…
-                            </div>
-                        </div>
-                    </div>
-                    <div id="mobile-leaderboard-carousel" class="hidden">
-                        <div id="carousel-slides">
-                            <div class="carousel-slide neon-bordered">
-                                <div class="glass-inner">
-                                    <h3 class="slide-title">🏆 Classement Mondial</h3>
-                                    <div id="mobile-leaderboard-global">
-                                        <div style="text-align: center; opacity: 0.6;">
-                                            <span class="loading-spinner"></span> Chargement…
+                        <div class="stat-card" id="neerlandais-card">
+                            <h3>🇳🇱 Quiz Néerlandais</h3>
+                            <div class="quiz-card-content">
+                                <div class="score-placeholder" id="home-neerlandais-score-container">
+                                    <span class="loading-spinner"></span>
+                                </div>
+                                <div class="level-completion-summary" id="neerlandais-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="neerlandais-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="neerlandais-niveaux100-ratio">0</span>/5</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="neerlandais-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="neerlandais-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="neerlandais-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="neerlandais-next-level-number">1</div>
+                                        <div class="subcard-thumb">
+                                            <span>🇳🇱</span>
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="neerlandais-next-level-progress" style="width: 0%"></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="carousel-slide neon-bordered">
-                                <div class="glass-inner">
-                                    <h3 class="slide-title">📅 Classement Saison</h3>
-                                    <div id="mobile-leaderboard-season">
-                                        <div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>
+                        </div>
+                        <div class="stat-card" id="allemand-card">
+                            <h3>🇩🇪 Quiz Allemand</h3>
+                            <div class="quiz-card-content">
+                                <div class="score-placeholder" id="home-allemand-score-container">
+                                    <span class="loading-spinner"></span>
+                                </div>
+                                <div class="level-completion-summary" id="allemand-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="allemand-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="allemand-niveaux100-ratio">0</span>/5</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="allemand-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="allemand-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="allemand-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="allemand-next-level-number">1</div>
+                                        <div class="subcard-thumb">
+                                            <span>🇩🇪</span>
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="allemand-next-level-progress" style="width: 0%"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="carousel-slide neon-bordered">
-                                <div class="glass-inner">
-                                    <h3 class="slide-title">💡 Astuce du Jour</h3>
-                                    <div style="text-align: center; font-size: 0.95rem; opacity: 0.85;">
-                                        Révisez 10 min par jour pour progresser rapidement !
+                        </div>
+                        <div class="stat-card" id="italien-card">
+                            <h3>🇮🇹 Quiz Italien</h3>
+                            <div class="quiz-card-content">
+                                <div class="score-placeholder" id="home-italien-score-container">
+                                    <span class="loading-spinner"></span>
+                                </div>
+                                <div class="level-completion-summary" id="italien-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="italien-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="italien-niveaux100-ratio">0</span>/5</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="italien-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="italien-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="italien-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="italien-next-level-number">1</div>
+                                        <div class="subcard-thumb">
+                                            <span>🇮🇹</span>
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="italien-next-level-progress" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card" id="espagnol-card">
+                            <h3>🇪🇸 Quiz Espagnol</h3>
+                            <div class="quiz-card-content">
+                                <div class="score-placeholder" id="home-espagnol-score-container">
+                                    <span class="loading-spinner"></span>
+                                </div>
+                                <div class="level-completion-summary" id="espagnol-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="espagnol-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="espagnol-niveaux100-ratio">0</span>/5</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="espagnol-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="espagnol-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="espagnol-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="espagnol-next-level-number">1</div>
+                                        <div class="subcard-thumb">
+                                            <span>🇪🇸</span>
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="espagnol-next-level-progress" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card" id="geographie-card">
+                            <h3>🌍 Quiz Géographie</h3>
+                            <div class="quiz-card-content">
+                                <div class="score-placeholder" id="home-geographie-score-container">
+                                    <span class="loading-spinner"></span>
+                                </div>
+                                <div class="level-completion-summary" id="geographie-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="geographie-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="geographie-niveaux100-ratio">0</span>/5</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="geographie-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="geographie-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="geographie-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="geographie-next-level-number">1</div>
+                                        <div class="subcard-thumb">
+                                            <span>🗺️</span>
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="geographie-next-level-progress" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card" id="animaux-card">
+                            <h3>🐾 Quiz Animaux</h3>
+                            <div class="quiz-card-content">
+                                <div class="score-placeholder" id="home-animaux-score-container">
+                                    <span class="loading-spinner"></span>
+                                </div>
+                                <div class="level-completion-summary" id="animaux-completion-summary">
+                                    <span>Niveaux complétés à 100% : <span id="animaux-niveaux100">0</span></span>
+                                    <span>Progression totale : <span id="animaux-niveaux100-ratio">0</span>/5</span>
+                                </div>
+                                <div class="quiz-progress-bar">
+                                    <div class="quiz-progress-fill" id="animaux-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="quiz-subcards">
+                                    <div class="quiz-subcard" id="animaux-levels-access">
+                                        <div class="subcard-title">Tous les niveaux</div>
+                                    </div>
+                                    <div class="quiz-subcard" id="animaux-next-level">
+                                        <div class="subcard-title">Prochain niveau</div>
+                                        <div class="subcard-level" id="animaux-next-level-number">1</div>
+                                        <div class="subcard-thumb">
+                                            <span>🐾</span>
+                                        </div>
+                                        <div class="subcard-progress">
+                                            <div class="subcard-progress-fill" id="animaux-next-level-progress" style="width: 0%"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -848,7 +753,9 @@
                     </div>
                 </div>
             </div>
-            <a href="index2.html" class="glass-btn next-page-btn">➡️ Plus de quiz</a>
+            <div id="back-btn-container">
+                <a href="index.html" class="glass-btn back">← Retour aux quiz principaux</a>
+            </div>
         </section>
     </main>
     <div id="auth-modal">
@@ -879,6 +786,72 @@
     </div>
     <div id="hover-warning"></div>
     <div id="toast">Débloqué à {{points}} points globaux</div>
+    <!-- Beam layer generator script -->
+    <script>
+    // =============================
+    // Beam generator — pop aléatoire
+    // =============================
+    (function(){
+      const layer = document.getElementById('beam-layer');
+      const palette = [
+        ['#7f63cc','#6ea8a3','#d69a7a'],
+        ['#6ea8a3','#e6c89a','#7f63cc'],
+        ['#d69a7a','#7f63cc','#6ea8a3']
+      ];
+      function rand(min,max){return Math.random()*(max-min)+min}
+      // create a single beam
+      function createBeam(){
+        const b = document.createElement('div');
+        b.className = 'beam';
+        // position + rotation
+        const angle = rand(-40,40);
+        b.style.transform = `translate(-50%, -20%) rotate(${angle}deg)`;
+        // choose gradient palette and a random start color
+        const g = palette[Math.floor(Math.random()*palette.length)];
+        const start = g[Math.floor(Math.random()*g.length)];
+        const end = g[(Math.floor(Math.random()*g.length)+1)%g.length];
+        // conic / linear mix to emulate a ray beginning at a color of the main gradient
+        b.style.background = `linear-gradient(180deg, ${hexWithAlpha(start,0.22)} 0%, ${hexWithAlpha(end,0.06)} 45%, transparent 70%)`;
+        // size & origin
+        b.style.left = rand(10,90)+'%';
+        b.style.top = rand(-20,40)+'%';
+        b.style.width = rand(10,30)+'vw';
+        b.style.height = rand(60,140)+'vh';
+        b.style.opacity = 0;
+        layer.appendChild(b);
+        // animate in/out
+        const inT = rand(600,1400);
+        const hold = rand(1200,2800);
+        const outT = rand(800,1600);
+        // fade in
+        requestAnimationFrame(()=>{ b.style.transition = `opacity ${inT}ms ease-out, transform ${inT}ms ease-out`; b.style.opacity = rand(0.18,0.62); b.style.transform += ' scale(1.02)'; });
+        // schedule fade out & removal
+        setTimeout(()=>{
+          b.style.transition = `opacity ${outT}ms ease-in, transform ${outT}ms ease-in`; b.style.opacity = 0; b.style.transform += ' scale(1.06)';
+          setTimeout(()=> b.remove(), outT+40);
+        }, inT+hold);
+      }
+      function hexWithAlpha(hex,alpha){
+        // accept #rrggbb
+        const h = hex.replace('#','');
+        const r = parseInt(h.substr(0,2),16);
+        const g = parseInt(h.substr(2,2),16);
+        const b = parseInt(h.substr(4,2),16);
+        return `rgba(${r},${g},${b},${alpha})`;
+      }
+      // spawn beams occasionally; keep CPU low
+      let spawnInterval = setInterval(()=>{
+        // spawn 1-2 beams, sometimes 0 for sparsity
+        const n = Math.random()<0.6 ? 1 : (Math.random()<0.25 ? 2 : 0);
+        for(let i=0;i<n;i++) createBeam();
+      }, 700);
+      // stop spawning when tab hidden (perf)
+      document.addEventListener('visibilitychange', ()=>{
+        if(document.hidden){ clearInterval(spawnInterval); }
+        else { spawnInterval = setInterval(()=>{ const n = Math.random()<0.6 ? 1 : (Math.random()<0.25 ? 2 : 0); for(let i=0;i<n;i++) createBeam(); }, 700); }
+      });
+    })();
+    </script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -896,145 +869,36 @@
         const db = getFirestore(app);
         window.auth = auth;
         window.db = db;
-        const THEMES = ['departements', 'chinois', 'anglais'];
+        const THEMES = ['medecine', 'math', 'neerlandais', 'allemand', 'italien', 'espagnol', 'geographie', 'animaux'];
         const UI_THEMES = {
-            departements: 'dept',
-            chinois: 'chinois',
-            anglais: 'anglais'
+            medecine: 'medecine',
+            math: 'math',
+            neerlandais: 'neerlandais',
+            allemand: 'allemand',
+            italien: 'italien',
+            espagnol: 'espagnol',
+            geographie: 'geographie',
+            animaux: 'animaux'
         };
         let authStateReady = false;
         let currentUser = null;
         let isAuthMode = 'login';
-        const CACHE_DURATION_MS = 40 * 60 * 1000;
-        let cachedPlayers = null;
-        let lastFetchTime = 0;
-        const LEADERBOARD_LOCAL_KEY = 'leaderboard_cache_v2';
+
         function getQuizUrl(category, levelId) {
-            if (category === 'departements') {
-                return `quiz-departement-n${levelId}.html`;
-            } else {
-                return `quiz-${category}-n${levelId}.html`;
-            }
+            return `quiz-${category}-n${levelId}.html`;
         }
-        async function fetchGlobalScoresOnly() {
-            const usersSnapshot = await getDocs(collection(db, 'users'));
-            const players = {};
-            usersSnapshot.forEach(doc => {
-                const data = doc.data();
-                const pseudo = data.pseudo;
-                if (pseudo) {
-                    players[pseudo] = { globalScore: data.globalScore ?? 0 };
-                }
-            });
-            return players;
-        }
-        function saveToLocal(players) {
-            try {
-                localStorage.setItem(LEADERBOARD_LOCAL_KEY, JSON.stringify({
-                    timestamp: Date.now(),
-                    players
-                }));
-            } catch (e) { /* ignore */ }
-        }
-        function loadFromLocal() {
-            try {
-                const raw = localStorage.getItem(LEADERBOARD_LOCAL_KEY);
-                if (!raw) return null;
-                const { timestamp, players } = JSON.parse(raw);
-                if (Date.now() - timestamp > CACHE_DURATION_MS) {
-                    localStorage.removeItem(LEADERBOARD_LOCAL_KEY);
-                    return null;
-                }
-                return players;
-            } catch (e) {
-                return null;
-            }
-        }
-        async function loadLeaderboardData() {
-            if (cachedPlayers && (Date.now() - lastFetchTime) < CACHE_DURATION_MS) {
-                return cachedPlayers;
-            }
-            let players = null;
-            try {
-                players = await fetchGlobalScoresOnly();
-                cachedPlayers = players;
-                lastFetchTime = Date.now();
-                saveToLocal(players);
-            } catch (error) {
-                console.warn('Impossible de charger depuis Firebase → tentative depuis localStorage');
-            }
-            if (!players) {
-                players = loadFromLocal();
-            }
-            return players || {};
-        }
-        async function getRanking(theme) {
-            const players = await loadLeaderboardData();
-            return Object.entries(players)
-                .map(([name, scores]) => ({ name, score: scores.globalScore ?? 0 }))
-                .sort((a, b) => b.score - a.score)
-                .slice(0, 10);
-        }
-        async function loadLeaderboard() {
-            const leaderboardList = document.getElementById('leaderboard-list');
-            const mobileGlobal = document.getElementById('mobile-leaderboard-global');
-            const mobileSeason = document.getElementById('mobile-leaderboard-season');
-            leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;"><span class="loading-spinner"></span> Chargement…</div>';
-            mobileGlobal.innerHTML = '<div style="text-align: center; opacity: 0.6;"><span class="loading-spinner"></span> Chargement…</div>';
-            let top10 = null;
-            try {
-                const globalTop = await getRanking('globalScore');
-                top10 = globalTop.length > 0 ? globalTop : null;
-            } catch (error) {
-                console.error('Erreur lors du chargement du leaderboard:', error);
-            }
-            if (!top10) {
-                const local = loadFromLocal();
-                if (local) {
-                    const fallback = Object.entries(local)
-                        .map(([name, scores]) => ({ name, score: scores.globalScore ?? 0 }))
-                        .sort((a, b) => b.score - a.score)
-                        .slice(0, 10);
-                    top10 = fallback;
-                }
-            }
-            const renderLeaderboardItem = (item, index) => {
-                const rank = index + 1;
-                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
-                const li = document.createElement('div');
-                li.className = 'leaderboard-item';
-                const escapedName = item.name
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;");
-                li.innerHTML = `<div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${escapedName}</div><div class="leaderboard-score">${item.score}</div>`;
-                return li;
-            };
-            if (top10 && top10.length > 0) {
-                leaderboardList.innerHTML = '';
-                top10.forEach((item, i) => leaderboardList.appendChild(renderLeaderboardItem(item, i)));
-                mobileGlobal.innerHTML = '';
-                top10.forEach((item, i) => mobileGlobal.appendChild(renderLeaderboardItem(item, i)));
-            } else {
-                leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
-                mobileGlobal.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur</div>';
-            }
-            if (window.matchMedia("(max-width: 899px)").matches) {
-                document.getElementById('mobile-leaderboard-carousel').classList.remove('hidden');
-            }
-            mobileSeason.innerHTML = '<div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>';
-        }
+
         function navigateTo(url) {
             window.location.href = url;
         }
+
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2000);
         }
+
         function showHoverWarning(text, x, y) {
             const warn = document.getElementById("hover-warning");
             warn.textContent = text;
@@ -1043,6 +907,7 @@
             warn.style.opacity = 1;
             setTimeout(() => { warn.style.opacity = 0; }, 1800);
         }
+
         function setupCardListeners() {
             THEMES.forEach(theme => {
                 const uiKey = UI_THEMES[theme];
@@ -1063,6 +928,7 @@
                 }
             });
         }
+
         function toggleAuthMode() {
             isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
             const title = document.getElementById('auth-title');
@@ -1084,6 +950,7 @@
                 pseudoGroup.style.display = 'none';
             }
         }
+
         document.getElementById('auth-submit-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
@@ -1116,6 +983,7 @@
                 errorDiv.classList.remove('hidden');
             }
         });
+
         function logoutUser() {
             signOut(auth)
                 .then(() => {
@@ -1125,14 +993,17 @@
                     console.error('Erreur lors de la déconnexion:', error);
                 });
         }
+
         function showAuthModal() {
             document.getElementById('auth-modal').classList.add('visible');
         }
+
         function hideAuthModal() {
             document.getElementById('auth-modal').classList.remove('visible');
         }
+
         async function updateQuizCardUI(theme, globalScore, quizNiveaux = {}, quizNiveaux100 = {}) {
-            const totalLevels = theme === 'departements' ? 6 : 5;
+            const totalLevels = 5;
             const completedLevels = quizNiveaux100[theme] || 0;
             const progressPercent = Math.min(100, Math.round((completedLevels / totalLevels) * 100));
             const uiTheme = UI_THEMES[theme];
@@ -1147,13 +1018,11 @@
             if (nextLevelProgressEl) nextLevelProgressEl.style.width = `${subProgress}%`;
             const nextLevelNumberEl = document.getElementById(`${uiTheme}-next-level-number`);
             if (nextLevelNumberEl) nextLevelNumberEl.textContent = nextLevelId;
-            if (theme === 'departements') {
-                document.getElementById('dept-next-level-thumb-img').src = `images/departements${nextLevelId}.png`;
-                document.getElementById('dept-next-level-thumb-img').alt = `Niveau ${nextLevelId}`;
-            }
+
             document.getElementById(`${uiTheme}-niveaux100`).textContent = completedLevels;
             document.getElementById(`${uiTheme}-niveaux100-ratio`).textContent = completedLevels;
         }
+
         async function loadUserData() {
             try {
                 const userDocRef = doc(db, 'users', currentUser.uid);
@@ -1182,7 +1051,6 @@
                     }
                 }
                 const quizScores = userData.quizScores || {};
-                const globalScore = userData.globalScore || 0;
                 const quizNiveaux = userData.niveaux || {};
                 const quizNiveaux100 = userData.niveaux100 || {};
                 THEMES.forEach(theme => {
@@ -1197,17 +1065,19 @@
                     container.appendChild(span);
                 });
                 THEMES.forEach(theme => {
-                    updateQuizCardUI(theme, globalScore, quizNiveaux, quizNiveaux100);
+                    updateQuizCardUI(theme, 0, quizNiveaux, quizNiveaux100);
                 });
             } catch (error) {
                 console.error('Erreur chargement données:', error);
             }
         }
+
         document.getElementById('auth-modal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('auth-modal')) {
                 hideAuthModal();
             }
         });
+
         onAuthStateChanged(auth, async (user) => {
             const navLoggedOut = document.getElementById('nav-logged-out');
             const navLoggedIn = document.getElementById('nav-logged-in');
@@ -1223,11 +1093,15 @@
                 navLoggedIn.classList.add('hidden');
             }
         });
+
         setupCardListeners();
-        loadLeaderboard();
+
+        document.getElementById('login-btn').addEventListener('click', showAuthModal);
         document.getElementById('logout-btn').addEventListener('click', logoutUser);
         document.querySelector('.close-modal').addEventListener('click', hideAuthModal);
         document.getElementById('auth-switch-link').addEventListener('click', toggleAuthMode);
+
+        // Add vibration effect to buttons
         (function(){
             const buttons = document.querySelectorAll('.glass-btn');
             function triggerVibe(el){
