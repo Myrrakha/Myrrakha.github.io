@@ -9,12 +9,12 @@
         content="Testez vos connaissances avec notre quiz des départements français. 5 niveaux de difficulté, corrections instantanées et progression suivie.">
     <meta name="keywords"
         content="quiz, départements, france, géographie, jeu, apprendre les départements, quiz france, test géographie">
-    <link rel="canonical" href="https://myrrakha.github.io/index.html">
+    <link rel="canonical" href="https://myrrakha.github.io/accueil.html">
     <!-- OpenGraph pour réseaux sociaux -->
     <meta property="og:title" content="Quiz des Départements Français">
     <meta property="og:description" content="Saurez-vous reconnaître les 101 départements ? 5 niveaux de difficulté.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://myrrakha.github.io/index.html">
+    <meta property="og:url" content="https://myrrakha.github.io/accueil.html">
     <meta property="og:image" content="https://myrrakha.github.io/images/logo.jpg">
     <!-- Twitter card -->
     <meta name="twitter:card" content="summary_large_image">
@@ -163,6 +163,15 @@
             opacity: 0.35;
             cursor: not-allowed;
             filter: grayscale(0.3);
+        }
+        .glass-btn.logout {
+            background: linear-gradient(180deg, rgba(220, 53, 69, 0.12), rgba(220, 53, 69, 0.08));
+            border-color: rgba(180, 40, 50, 0.4);
+        }
+        .glass-btn.logout:hover {
+            background: linear-gradient(180deg, rgba(220, 53, 69, 0.18), rgba(220, 53, 69, 0.12));
+            border-color: rgba(200, 50, 60, 0.6);
+            box-shadow: 0 10px 30px rgba(220, 53, 69, 0.25), 0 0 28px rgba(220, 53, 69, 0.12);
         }
         /* HOME SECTION */
         #home-section {
@@ -410,9 +419,6 @@
         #toast.show {
             opacity: 1;
         }
-        .hidden {
-            display: none !important;
-        }
         /* MOBILE CAROUSEL — Updated style */
         @media (max-width: 899px) {
             #mobile-leaderboard-carousel {
@@ -554,6 +560,115 @@
                 display: none !important;
             }
         }
+        /* Auth modal */
+        #auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        #auth-modal.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .auth-modal-container {
+            background: rgba(31, 31, 40, 0.95);
+            padding: 32px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            position: relative;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .close-modal {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 1.4em;
+            cursor: pointer;
+        }
+        .close-modal:hover {
+            color: #fff;
+        }
+        .auth-container h2 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 1.3em;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.9em;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            color: #f0f0f0;
+            font-size: 0.95em;
+            box-sizing: border-box;
+            backdrop-filter: blur(4px);
+        }
+        .auth-btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            background: var(--violet-main);
+            color: white;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.25s;
+            margin-top: 8px;
+        }
+        .auth-btn:hover {
+            background: var(--violet-dark);
+            box-shadow: 0 0 12px rgba(155, 113, 255, 0.6);
+        }
+        .auth-switch {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.85em;
+        }
+        .auth-switch a {
+            color: var(--violet-main);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .error-msg {
+            background: #dc3545;
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        .score-placeholder {
+            min-height: 56px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
         /* === ADDED STYLES FOR HORIZONTAL ALIGNMENT === */
         .user-info {
             display: flex;
@@ -562,32 +677,20 @@
             align-items: center;
         }
         .next-page-btn {
-            display: block;
-            margin: var(--spacing-unit) auto 0;
-            width: fit-content;
-            height: var(--next-btn-height);
-            font-size: var(--next-btn-font-size);
-            padding: 0 24px;
-            line-height: var(--next-btn-height);
+            display: none;
         }
-        /* Loading screen during auth check */
-        .loading-auth {
-            position: fixed;
-            inset: 0;
-            background: var(--bg-dark);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 99999;
-            font-size: 1.2em;
-            color: #d7e6f2;
+        .quiz-subcard.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .quiz-subcard.disabled:hover {
+            background: var(--glass-bg);
+            box-shadow: 0 4px 12px rgba(2,6,12,0.4);
+            transform: none;
         }
     </style>
 </head>
 <body>
-    <!-- loading screen -->
-    <div class="loading-auth" id="auth-check-screen">Vérification de la session…</div>
-
     <!-- visual layers -->
     <div class="cosmic" aria-hidden="true"></div>
     <header>
@@ -595,12 +698,11 @@
             <div class="nav-left">
                 <span class="nav-title">🎯 Quiz Master</span>
             </div>
-            <div class="nav-right" id="nav-logged-in">
-                <div class="user-info">
-                    <a href="statistiques.html" class="glass-btn" title="Statistiques">📊</a>
-                    <a href="settings.html" class="glass-btn" title="Réglages">⚙️</a>
-                    <button class="glass-btn logout" id="logout-btn" title="Déconnexion">🚪</button>
-                </div>
+            <div class="nav-right" id="nav-logged-out">
+                <button class="glass-btn" id="login-btn">🔑 Connexion</button>
+            </div>
+            <div class="nav-right hidden" id="nav-logged-in">
+                <button class="glass-btn logout" id="logout-btn" title="Déconnexion">🚪</button>
             </div>
         </nav>
     </header>
@@ -624,7 +726,7 @@
                                     <div class="quiz-progress-fill" id="dept-progress-fill" style="width: 0%"></div>
                                 </div>
                                 <div class="quiz-subcards">
-                                    <div class="quiz-subcard" id="dept-levels-access">
+                                    <div class="quiz-subcard disabled" id="dept-levels-access">
                                         <div class="subcard-title">Tous les niveaux</div>
                                     </div>
                                     <div class="quiz-subcard" id="dept-next-level">
@@ -655,7 +757,7 @@
                                     <div class="quiz-progress-fill" id="chinois-progress-fill" style="width: 0%"></div>
                                 </div>
                                 <div class="quiz-subcards">
-                                    <div class="quiz-subcard" id="chinois-levels-access">
+                                    <div class="quiz-subcard disabled" id="chinois-levels-access">
                                         <div class="subcard-title">Tous les niveaux</div>
                                     </div>
                                     <div class="quiz-subcard" id="chinois-next-level">
@@ -686,7 +788,7 @@
                                     <div class="quiz-progress-fill" id="anglais-progress-fill" style="width: 0%"></div>
                                 </div>
                                 <div class="quiz-subcards">
-                                    <div class="quiz-subcard" id="anglais-levels-access">
+                                    <div class="quiz-subcard disabled" id="anglais-levels-access">
                                         <div class="subcard-title">Tous les niveaux</div>
                                     </div>
                                     <div class="quiz-subcard" id="anglais-next-level">
@@ -725,36 +827,45 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="carousel-slide neon-bordered">
-                                <div class="glass-inner">
-                                    <h3 class="slide-title">📅 Classement Saison</h3>
-                                    <div id="mobile-leaderboard-season">
-                                        <div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="carousel-slide neon-bordered">
-                                <div class="glass-inner">
-                                    <h3 class="slide-title">💡 Astuce du Jour</h3>
-                                    <div style="text-align: center; font-size: 0.95rem; opacity: 0.85;">
-                                        Révisez 10 min par jour pour progresser rapidement !
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <a href="index2.html" class="glass-btn next-page-btn">➡️ Plus de quiz</a>
+            <!-- Next page button already hidden via CSS -->
         </section>
     </main>
+    <div id="auth-modal">
+        <div class="auth-modal-container">
+            <button class="close-modal">&times;</button>
+            <h2 id="auth-title">Connexion</h2>
+            <div id="auth-error" class="error-msg hidden"></div>
+            <form id="auth-form" onsubmit="return false;">
+                <div class="form-group" id="pseudo-group" style="display:none;">
+                    <label>Pseudo</label>
+                    <input type="text" id="auth-pseudo" placeholder="Ton pseudo">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="auth-email" placeholder="ton@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="auth-password" placeholder="••••••••" required>
+                </div>
+                <button class="auth-btn" id="auth-submit-btn">Se connecter</button>
+            </form>
+            <div class="auth-switch">
+                <span id="auth-switch-text">Pas encore de compte ? </span>
+                <a id="auth-switch-link">S'inscrire</a>
+            </div>
+        </div>
+    </div>
     <div id="hover-warning"></div>
     <div id="toast">Débloqué à {{points}} points globaux</div>
-
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc, updateDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
@@ -768,6 +879,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        window.auth = auth;
         window.db = db;
 
         const THEMES = ['departements', 'chinois', 'anglais'];
@@ -777,27 +889,14 @@
             anglais: 'anglais'
         };
 
+        let authStateReady = false;
+        let currentUser = null;
+        let isAuthMode = 'login';
         const CACHE_DURATION_MS = 40 * 60 * 1000;
         let cachedPlayers = null;
         let lastFetchTime = 0;
         const LEADERBOARD_LOCAL_KEY = 'leaderboard_cache_v2';
 
-        // ============ AUTH CHECK ============
-        let authResolved = false;
-
-        function showLoading() {
-            document.getElementById('auth-check-screen').style.display = 'flex';
-        }
-
-        function hideLoading() {
-            document.getElementById('auth-check-screen').style.display = 'none';
-        }
-
-        function redirectToLogin() {
-            window.location.href = 'accueil.html';
-        }
-
-        // ============ UTILS ============
         function getQuizUrl(category, levelId) {
             if (category === 'departements') {
                 return `quiz-departement-n${levelId}.html`;
@@ -862,7 +961,7 @@
             return players || {};
         }
 
-        async function getRanking() {
+        async function getRanking(theme) {
             const players = await loadLeaderboardData();
             return Object.entries(players)
                 .map(([name, scores]) => ({ name, score: scores.globalScore ?? 0 }))
@@ -879,7 +978,7 @@
 
             let top10 = null;
             try {
-                const globalTop = await getRanking();
+                const globalTop = await getRanking('globalScore');
                 top10 = globalTop.length > 0 ? globalTop : null;
             } catch (error) {
                 console.error('Erreur lors du chargement du leaderboard:', error);
@@ -924,8 +1023,6 @@
             if (window.matchMedia("(max-width: 899px)").matches) {
                 document.getElementById('mobile-leaderboard-carousel').classList.remove('hidden');
             }
-
-            document.getElementById('mobile-leaderboard-season').innerHTML = '<div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>';
         }
 
         function navigateTo(url) {
@@ -951,22 +1048,93 @@
         function setupCardListeners() {
             THEMES.forEach(theme => {
                 const uiKey = UI_THEMES[theme];
-                const accessBtn = document.getElementById(`${uiKey}-levels-access`);
                 const nextBtn = document.getElementById(`${uiKey}-next-level`);
-                if (accessBtn) {
-                    accessBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        navigateTo(`dossier-quiz-${theme}.html`);
-                    });
-                }
                 if (nextBtn) {
                     nextBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
+                        if (!currentUser) {
+                            showToast("Connectez-vous pour accéder au quiz");
+                            showAuthModal();
+                            return;
+                        }
                         const levelId = parseInt(document.getElementById(`${uiKey}-next-level-number`).textContent.trim(), 10);
                         navigateTo(getQuizUrl(theme, levelId));
                     });
                 }
             });
+        }
+
+        function toggleAuthMode() {
+            isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
+            const title = document.getElementById('auth-title');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const switchText = document.getElementById('auth-switch-text');
+            const switchLink = document.getElementById('auth-switch-link');
+            const pseudoGroup = document.getElementById('pseudo-group');
+            if (isAuthMode === 'signup') {
+                title.textContent = 'Inscription';
+                submitBtn.textContent = "S'inscrire";
+                switchText.textContent = 'Déjà un compte ? ';
+                switchLink.textContent = 'Se connecter';
+                pseudoGroup.style.display = 'block';
+            } else {
+                title.textContent = 'Connexion';
+                submitBtn.textContent = 'Se connecter';
+                switchText.textContent = "Pas encore de compte ? ";
+                switchLink.textContent = "S'inscrire";
+                pseudoGroup.style.display = 'none';
+            }
+        }
+
+        document.getElementById('auth-submit-btn').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const pseudo = document.getElementById('auth-pseudo').value;
+            const errorDiv = document.getElementById('auth-error');
+            errorDiv.classList.add('hidden');
+            try {
+                if (isAuthMode === 'signup') {
+                    if (!pseudo || pseudo.trim().length < 3) {
+                        throw new Error('Le pseudo doit contenir au moins 3 caractères');
+                    }
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    await setDoc(doc(db, 'users', user.uid), {
+                        pseudo: pseudo.trim(),
+                        email: email,
+                        quizScores: THEMES.reduce((acc, t) => ({ ...acc, [t]: 0 }), {}),
+                        globalScore: 0,
+                        niveaux: THEMES.reduce((acc, t) => ({ ...acc, [t]: 1 }), {}),
+                        niveaux100: THEMES.reduce((acc, t) => ({ ...acc, [t]: 0 }), {}),
+                        createdAt: new Date().toISOString()
+                    });
+                    hideAuthModal();
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    hideAuthModal();
+                }
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+            }
+        });
+
+        function logoutUser() {
+            signOut(auth)
+                .then(() => {
+                    console.log('Déconnexion réussie');
+                })
+                .catch((error) => {
+                    console.error('Erreur lors de la déconnexion:', error);
+                });
+        }
+
+        function showAuthModal() {
+            document.getElementById('auth-modal').classList.add('visible');
+        }
+
+        function hideAuthModal() {
+            document.getElementById('auth-modal').classList.remove('visible');
         }
 
         async function updateQuizCardUI(theme, globalScore, quizNiveaux = {}, quizNiveaux100 = {}) {
@@ -993,32 +1161,37 @@
             document.getElementById(`${uiTheme}-niveaux100-ratio`).textContent = completedLevels;
         }
 
-        async function loadUserData(user) {
+        async function loadUserData() {
             try {
-                const userDocRef = doc(db, 'users', user.uid);
+                const userDocRef = doc(db, 'users', currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
                 let userData = userDoc.data();
                 if (!userData) {
-                    // This should not happen since auth is valid, but safe fallback
-                    redirectToLogin();
-                    return;
+                    const defaultData = {
+                        pseudo: currentUser.email.split('@')[0],
+                        email: currentUser.email,
+                        quizScores: THEMES.reduce((acc, t) => ({ ...acc, [t]: 0 }), {}),
+                        globalScore: 0,
+                        niveaux: THEMES.reduce((acc, t) => ({ ...acc, [t]: 1 }), {}),
+                        niveaux100: THEMES.reduce((acc, t) => ({ ...acc, [t]: 0 }), {}),
+                        createdAt: new Date().toISOString()
+                    };
+                    await setDoc(userDocRef, defaultData);
+                    userData = defaultData;
+                } else {
+                    if (!userData.niveaux) {
+                        userData.niveaux = THEMES.reduce((acc, t) => ({ ...acc, [t]: 1 }), {});
+                        await updateDoc(userDocRef, { niveaux: userData.niveaux });
+                    }
+                    if (!userData.niveaux100) {
+                        userData.niveaux100 = THEMES.reduce((acc, t) => ({ ...acc, [t]: 0 }), {});
+                        await updateDoc(userDocRef, { niveaux100: userData.niveaux100 });
+                    }
                 }
-
-                // Ensure required fields exist
-                if (!userData.niveaux) {
-                    userData.niveaux = THEMES.reduce((acc, t) => ({ ...acc, [t]: 1 }), {});
-                    await updateDoc(userDocRef, { niveaux: userData.niveaux });
-                }
-                if (!userData.niveaux100) {
-                    userData.niveaux100 = THEMES.reduce((acc, t) => ({ ...acc, [t]: 0 }), {});
-                    await updateDoc(userDocRef, { niveaux100: userData.niveaux100 });
-                }
-
                 const quizScores = userData.quizScores || {};
                 const globalScore = userData.globalScore || 0;
                 const quizNiveaux = userData.niveaux || {};
                 const quizNiveaux100 = userData.niveaux100 || {};
-
                 THEMES.forEach(theme => {
                     const containerId = `home-${UI_THEMES[theme]}-score-container`;
                     const container = document.getElementById(containerId);
@@ -1030,67 +1203,59 @@
                     container.innerHTML = '';
                     container.appendChild(span);
                 });
-
                 THEMES.forEach(theme => {
                     updateQuizCardUI(theme, globalScore, quizNiveaux, quizNiveaux100);
                 });
             } catch (error) {
                 console.error('Erreur chargement données:', error);
-                showToast('Erreur de chargement');
             }
         }
 
-        function logoutUser() {
-            signOut(auth)
-                .then(() => {
-                    window.location.href = 'accueil.html';
-                })
-                .catch((error) => {
-                    console.error('Erreur lors de la déconnexion:', error);
-                    showToast('Erreur lors de la déconnexion');
-                });
-        }
-
-        // ============ PAGE INIT ============
-        async function initPage(user) {
-            hideLoading();
-            await loadUserData(user);
-            loadLeaderboard();
-            setupCardListeners();
-            document.getElementById('logout-btn').addEventListener('click', logoutUser);
-        }
-
-        // ============ AUTH HANDLER ============
-        onAuthStateChanged(auth, (user) => {
-            authResolved = true;
-            if (user) {
-                initPage(user);
-            } else {
-                redirectToLogin();
+        document.getElementById('auth-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('auth-modal')) {
+                hideAuthModal();
             }
         });
 
-        // Optional: hide loading if auth resolves instantly (unlikely but safe)
-        setTimeout(() => {
-            if (!authResolved) return;
-            hideLoading();
-        }, 500);
-    </script>
+        onAuthStateChanged(auth, async (user) => {
+            const navLoggedOut = document.getElementById('nav-logged-out');
+            const navLoggedIn = document.getElementById('nav-logged-in');
+            if (user) {
+                currentUser = user;
+                navLoggedOut.classList.add('hidden');
+                navLoggedIn.classList.remove('hidden');
+                await loadUserData();
+                hideAuthModal();
+            } else {
+                currentUser = null;
+                navLoggedOut.classList.remove('hidden');
+                navLoggedIn.classList.add('hidden');
+            }
+        });
 
-    <style>
-        #hover-warning {
-            position: absolute;
-            background: rgba(0,0,0,0.85);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            z-index: 2001;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-    </style>
+        setupCardListeners();
+        loadLeaderboard();
+        document.getElementById('logout-btn').addEventListener('click', logoutUser);
+        document.getElementById('login-btn').addEventListener('click', showAuthModal);
+        document.querySelector('.close-modal').addEventListener('click', hideAuthModal);
+        document.getElementById('auth-switch-link').addEventListener('click', toggleAuthMode);
+
+        (function(){
+            const buttons = document.querySelectorAll('.glass-btn');
+            function triggerVibe(el){
+                if(el.disabled) return;
+                el.classList.add('vibrating','glow');
+                setTimeout(()=> el.classList.remove('vibrating'), 760);
+                setTimeout(()=> el.classList.remove('glow'), 1200);
+            }
+            buttons.forEach(b=>{
+                b.addEventListener('pointerdown', (e)=>{ triggerVibe(b); });
+                b.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); triggerVibe(b); } });
+                b.addEventListener('focus', ()=> b.classList.add('selected'));
+                b.addEventListener('blur', ()=> b.classList.remove('selected'));
+            });
+        })();
+    </script>
 </body>
 </html>
 
