@@ -23,108 +23,162 @@
         content="Mettez votre connaissance de la France à l'épreuve avec nos quiz niveaux 1 à 5.">
     <meta name="twitter:image" content="https://myrrakha.github.io/images/preview.jpg">
     <style>
+        :root {
+          --spacing-unit: 0.8em;
+          --button-height: 15px;
+          --text-scale: 0.9;
+          --violet-main: #9b71ff;
+          --violet-dark: #5b3bbd;
+          --glass-bg: rgba(255,255,255,0.1);
+          --glass-border: rgba(255,255,255,0.2);
+        }
+        * { box-sizing: border-box; font-size: calc(16px * var(--text-scale)); }
+        body {
+          margin: 0;
+          padding: var(--spacing-unit);
+          background: radial-gradient(circle at 20% 20%, #14121d, #0c0b11 60%, #0a0a0f);
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          color: #eaeaea;
+          line-height: 1.5;
+          overflow-x: hidden;
+        }
+        body::before {
+          content: "";
+          position: fixed;
+          inset: 0;
+          background: conic-gradient(from 90deg at 50% 50%, #3a6ea5, #6c4784, #a06f9e, #3a6ea5);
+          opacity: 0.18;
+          filter: blur(160px);
+          animation: rotateBG 40s linear infinite;
+          z-index: -3;
+        }
+        @keyframes rotateBG {
+          to { transform: rotate(360deg); }
+        }
+
+        /* random light rays */
+        .ray {
+          position: fixed;
+          width: 40vw;
+          height: 200vh;
+          top: -50vh;
+          left: -10vw;
+          background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.12), transparent);
+          transform: rotate(var(--angle));
+          filter: blur(6px);
+          opacity: 0.25;
+          animation: rayMove 12s ease-in-out infinite;
+          z-index: -2;
+        }
+        @keyframes rayMove {
+          50% {
+            transform: translateY(10vh) rotate(var(--angle));
+            opacity: 0.4;
+          }
+        }
+        .ray:nth-child(1) { --angle: 12deg; }
+        .ray:nth-child(2) { --angle: 48deg; }
+        .ray:nth-child(3) { --angle: 92deg; }
+        .ray:nth-child(4) { --angle: 130deg; }
+
         .hidden {
             display: none !important;
         }
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f1115, #1c1c24);
-            color: #f0f0f0;
-            overflow-x: hidden;
-            font-size: 0.9em;
-        }
-        #hover-warning {
-            position: absolute;
-            padding: 8px 14px;
-            background: rgba(0, 0, 0, 0.85);
-            color: white;
-            font-size: 14px;
-            border-radius: 6px;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            z-index: 9999;
-        }
+
         header {
-            width: 100%;
-            background: rgba(20, 20, 28, 0.8);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid #333;
+            width: calc(100% - 2 * var(--spacing-unit));
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: calc(var(--spacing-unit) * 0.5);
+            margin: var(--spacing-unit) auto;
             position: sticky;
-            top: 0;
+            top: var(--spacing-unit);
             z-index: 1000;
-            height: 42px;
         }
+
         .navbar {
-            max-width: 1100px;
-            margin: auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 16px;
-            height: 100%;
         }
+
         .nav-title {
             font-size: 1.2em;
             font-weight: 600;
-            color: #eaeaea;
+            color: var(--violet-main);
             letter-spacing: 1px;
         }
-        .user-info {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
+
         .glass-btn {
-            width: 30px;
-            height: 30px;
+            height: var(--button-height);
             display: flex;
             justify-content: center;
             align-items: center;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(80, 80, 100, 0.3);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
             border-radius: 6px;
             color: #e0e0e0;
             cursor: pointer;
             transition: all 0.2s ease;
             backdrop-filter: blur(4px);
-            font-size: 14px;
+            font-size: calc(14px * var(--text-scale));
             font-weight: 600;
-            padding: 0;
+            padding: 0 12px;
             text-decoration: none;
         }
+
         .glass-btn:hover {
-            background: rgba(255, 255, 255, 0.18);
-            border-color: rgba(100, 100, 130, 0.5);
-            transform: translateY(-1px);
+            box-shadow: 0 0 12px rgba(155, 113, 255, 0.6);
+            transform: scale(1.08) rotate(-1deg);
         }
+
         .glass-btn:active {
-            transform: translateY(0);
+            transform: scale(0.98) rotate(1deg);
         }
+
+        .glass-btn:focus {
+            animation: vibrate 0.2s linear infinite alternate;
+        }
+
+        @keyframes vibrate {
+            from { transform: translateX(-1px); }
+            to { transform: translateX(1px); }
+        }
+
+        .glass-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
         .glass-btn.logout {
             background: rgba(220, 53, 69, 0.12);
             border-color: rgba(180, 40, 50, 0.4);
         }
+
         .glass-btn.logout:hover {
             background: rgba(220, 53, 69, 0.2);
             border-color: rgba(200, 50, 60, 0.6);
+            box-shadow: 0 0 12px rgba(220, 53, 69, 0.4);
         }
+
         /* HOME SECTION */
         #home-section {
-            padding: 0 14px 16px;
             text-align: center;
+            width: 100%;
         }
+
         .home-content {
             display: flex;
             flex-direction: column;
-            max-width: 1100px;
-            margin: 0 auto;
-            gap: 24px;
+            gap: var(--spacing-unit);
         }
+
         @media (min-width: 900px) {
             .home-content {
                 flex-direction: row;
+                gap: var(--spacing-unit);
             }
             .stats-grid-container {
                 flex: 2;
@@ -134,41 +188,54 @@
                 margin-top: 0;
             }
         }
+
         .stats-grid {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 16px;
+            align-items: stretch;
+            gap: var(--spacing-unit);
             width: 100%;
         }
-        .stats-grid-container {
-            width: 100%;
-        }
+
         .stat-card {
-            background: #262633;
-            padding: 16px;
-            border-radius: 12px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: calc(var(--spacing-unit) * 1);
+            backdrop-filter: blur(12px) saturate(180%);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
             position: relative;
-            transition: transform 0.25s;
-            width: 100%;
-            box-sizing: border-box;
+            overflow: hidden;
         }
+
+        .stat-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: conic-gradient(from 180deg at 50% 50%, rgba(255,255,255,0.05), rgba(155,113,255,0.1), rgba(255,255,255,0.05));
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
         .stat-card h3 {
             margin-top: 0;
             margin-bottom: 8px;
-            color: #9c28a7;
+            color: var(--violet-main);
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 6px;
             font-size: 1.2em;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 0.4em;
         }
+
         .stat-value {
             font-size: 2em;
             font-weight: bold;
             color: #f0f0f0;
         }
+
         .level-completion-summary {
             display: flex;
             justify-content: space-between;
@@ -176,215 +243,178 @@
             color: #aaa;
             margin-top: 6px;
         }
+
         .level-completion-summary span {
-            color: #9c28a7;
+            color: var(--violet-main);
             font-weight: bold;
         }
-        .level-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            background: linear-gradient(135deg, #9c28a7, #7d1f85);
-            border-radius: 16px;
-            font-weight: 600;
-            margin-top: 8px;
-            font-size: 0.9em;
-        }
-        .levels-dropdown {
-            background: linear-gradient(135deg, #0f1115, #1c1c24);
-            border-radius: 10px;
-            padding: 0 12px;
-            width: 100%;
-            margin: 12px auto;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-            overflow: hidden;
-            max-height: 0;
-            transition: max-height 0.3s ease, padding 0.3s ease;
-            border: 2px solid transparent;
-            position: relative;
-            box-sizing: border-box;
-        }
-        .levels-dropdown::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, #9c28a7, #7d1f85);
-            z-index: -1;
-            border-radius: 12px;
-            opacity: 0.8;
-        }
-        .levels-dropdown.visible {
-            max-height: 600px;
-            padding: 12px;
-        }
-        .levels-grid-dropdown {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-        .level-card-dropdown {
-            background: #2c2c3a;
-            padding: 10px;
-            border-radius: 6px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .level-card-dropdown:hover {
-            background: #3a3a4a;
-        }
-        .level-card-dropdown.locked {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        .level-number-dropdown {
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-bottom: 3px;
-            color: #9c28a7;
-        }
-        .level-name-dropdown {
-            font-size: 0.85em;
-            margin-bottom: 3px;
-        }
-        .level-requirement-dropdown {
-            font-size: 0.75em;
-            color: #ff4b4b;
-            opacity: 0.8;
-        }
-        /* Style pour toutes les cartes avec les deux sous-boutons */
-        .quiz-card-content {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+
         .quiz-progress-bar {
             height: 5px;
-            background: #2c2c3a;
+            background: rgba(255,255,255,0.1);
             border-radius: 2px;
             overflow: hidden;
+            margin: 8px 0;
         }
+
         .quiz-progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #9c28a7, #7d1f85);
+            background: linear-gradient(90deg, var(--violet-main), var(--violet-dark));
             border-radius: 2px;
             transition: width 0.5s ease;
         }
+
         .quiz-subcards {
             display: flex;
             gap: 8px;
             margin-top: 8px;
         }
+
         .quiz-subcard {
             flex: 1;
-            background: #2c2c3a;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
             border-radius: 8px;
             padding: 10px;
             cursor: pointer;
             transition: all 0.2s;
             text-align: center;
+            backdrop-filter: blur(4px);
         }
+
         .quiz-subcard:hover {
-            background: #3a3a4a;
-            transform: translateY(-2px);
+            background: rgba(255,255,255,0.18);
+            box-shadow: 0 0 12px rgba(155, 113, 255, 0.6);
+            transform: scale(1.03);
         }
+
         .subcard-title {
             font-size: 0.85rem;
             margin-bottom: 4px;
-            color: #9c28a7;
+            color: var(--violet-main);
         }
+
         .subcard-level {
             font-weight: bold;
             font-size: 1rem;
             margin-bottom: 3px;
         }
+
         .subcard-thumb {
             width: 34px;
             height: 34px;
-            background: #1c1c24;
+            background: rgba(0,0,0,0.2);
             border-radius: 5px;
             margin: 3px auto;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 1.1rem;
-            color: #9c28a7;
+            color: var(--violet-main);
         }
+
         .subcard-thumb img {
             width: 100%;
             height: 100%;
             object-fit: contain;
         }
+
         .subcard-progress {
             height: 3px;
-            background: #222;
+            background: rgba(255,255,255,0.1);
             border-radius: 1px;
             margin-top: 3px;
             overflow: hidden;
         }
+
         .subcard-progress-fill {
             height: 100%;
             background: #2ecc71;
             border-radius: 1px;
         }
+
         .level-completed {
             color: #2ecc71;
         }
+
         /* LEADERBOARD */
         #leaderboard-section {
             max-width: 800px;
             margin: 0 auto;
-            padding: 0 14px;
         }
+
         .leaderboard-container {
-            background: #262633;
-            border-radius: 12px;
-            padding: 16px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: calc(var(--spacing-unit) * 1);
+            backdrop-filter: blur(12px) saturate(180%);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
         }
+
+        .leaderboard-container::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: conic-gradient(from 180deg at 50% 50%, rgba(255,255,255,0.05), rgba(155,113,255,0.1), rgba(255,255,255,0.05));
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
         .leaderboard-title {
             text-align: center;
             margin-bottom: 16px;
-            color: #9c28a7;
+            color: var(--violet-main);
             font-size: 1.2em;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 0.4em;
         }
+
         .leaderboard-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 10px 12px;
             margin: 6px 0;
-            background: #2c2c3a;
+            background: var(--glass-bg);
             border-radius: 6px;
+            backdrop-filter: blur(4px);
         }
+
         .leaderboard-rank {
             font-size: 1.2em;
             font-weight: bold;
             width: 36px;
         }
+
         .leaderboard-name {
             flex: 1;
             font-weight: 500;
             font-size: 0.95em;
         }
+
         .leaderboard-score {
             font-size: 1em;
-            color: #9c28a7;
+            color: var(--violet-main);
             font-weight: bold;
         }
+
         .loading-spinner {
             display: inline-block;
             width: 18px;
             height: 18px;
             border: 2px solid rgba(255,255,255,0.3);
             border-radius: 50%;
-            border-top-color: #9c28a7;
+            border-top-color: var(--violet-main);
             animation: spin 1s ease-in-out infinite;
         }
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
         /* TOAST */
         #toast {
             position: fixed;
@@ -401,19 +431,22 @@
             transition: opacity 0.3s;
             font-size: 0.85em;
         }
+
         #toast.show {
             opacity: 1;
         }
+
         /* MOBILE CAROUSEL */
         @media (max-width: 899px) {
             #mobile-leaderboard-carousel {
-                width: calc(100% - 28px);
+                width: 100%;
                 max-width: 500px;
                 margin: 0 auto;
                 overflow: hidden;
                 position: relative;
                 display: block !important;
             }
+
             #carousel-slides {
                 display: flex;
                 overflow-x: auto;
@@ -426,9 +459,11 @@
                 -ms-overflow-style: none;
                 scrollbar-width: none;
             }
+
             #carousel-slides::-webkit-scrollbar {
                 display: none;
             }
+
             .carousel-slide {
                 flex: 0 0 100%;
                 height: 100%;
@@ -440,12 +475,14 @@
                 box-sizing: border-box;
                 padding: 0 8px;
             }
+
             .neon-bordered {
                 position: relative;
                 padding: 10px;
                 height: 100%;
                 width: 100%;
             }
+
             .neon-bordered::before {
                 content: "";
                 position: absolute;
@@ -467,14 +504,17 @@
                 -webkit-mask-composite: xor;
                 pointer-events: none;
             }
+
             @keyframes neonMove {
                 0% { background-position: 0% 50%; }
                 100% { background-position: 200% 50%; }
             }
+
             @keyframes neonPulse {
                 0%, 90%, 100% { filter: brightness(1); }
                 92% { filter: brightness(2.5); }
             }
+
             .leaderboard-highlight {
                 position: absolute;
                 left: 0;
@@ -491,6 +531,7 @@
                 top: 0;
                 opacity: 0;
             }
+
             @keyframes sweep {
                 0% { top: -20px; opacity: 0; }
                 10% { opacity: 1; }
@@ -498,6 +539,7 @@
                 90% { opacity: 1; }
                 100% { opacity: 0; top: -20px; }
             }
+
             .glass-inner {
                 background: rgba(10, 10, 20, 0.35);
                 backdrop-filter: blur(10px);
@@ -511,73 +553,74 @@
                 height: 100%;
                 box-sizing: border-box;
             }
+
             .glass-inner::-webkit-scrollbar {
                 width: 0px;
             }
+
             .slide-title {
                 font-size: 1.1rem;
                 font-weight: 600;
                 margin-bottom: 6px;
                 color: #fff;
             }
+
             .leaderboard-container > div {
                 padding: 5px 0;
             }
+
             .fade-in {
                 opacity: 0;
                 animation: fadeIn 1s forwards;
             }
+
             .fade-out {
                 opacity: 1;
                 animation: fadeOut 1s forwards;
             }
+
             @keyframes fadeIn {
                 to { opacity: 1; }
             }
+
             @keyframes fadeOut {
                 to { opacity: 0; }
             }
+
             #desktop-leaderboard {
                 display: none;
             }
         }
+
         @media (min-width: 900px) {
             #mobile-leaderboard-carousel {
                 display: none !important;
             }
         }
+
         @media (max-width: 899px) {
             .levels-grid-dropdown {
                 grid-template-columns: 1fr;
             }
-            .stats-grid {
-                width: 100%;
-                padding: 0;
-            }
+
             #leaderboard-section {
                 order: -1;
                 max-width: 100%;
-                padding: 0 14px;
             }
+
             html, body {
                 overflow-x: hidden;
                 overflow-y: auto;
                 -ms-overflow-style: none;
                 scrollbar-width: none;
             }
+
             html::-webkit-scrollbar,
             body::-webkit-scrollbar {
                 display: none;
             }
-            .stat-card {
-                width: calc(100% - 14px);
-                margin: 0 7px;
-            }
-            .levels-dropdown {
-                width: calc(100% - 14px);
-                margin: 12px 7px;
-            }
         }
+
         /* Auth modal */
         #auth-modal {
             position: fixed;
@@ -594,19 +637,24 @@
             visibility: hidden;
             transition: opacity 0.3s, visibility 0.3s;
         }
+
         #auth-modal.visible {
             opacity: 1;
             visibility: visible;
         }
+
         .auth-modal-container {
-            background: #1f1f28;
+            background: rgba(31, 31, 40, 0.95);
             padding: 32px;
             border-radius: 12px;
             width: 90%;
             max-width: 380px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
             position: relative;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.2);
         }
+
         .close-modal {
             position: absolute;
             top: 12px;
@@ -617,38 +665,45 @@
             font-size: 1.4em;
             cursor: pointer;
         }
+
         .close-modal:hover {
             color: #fff;
         }
+
         .auth-container h2 {
             margin-top: 0;
             text-align: center;
             font-size: 1.3em;
         }
+
         .form-group {
             margin-bottom: 16px;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 6px;
             font-size: 0.9em;
         }
+
         .form-group input {
             width: 100%;
             padding: 10px;
             border-radius: 6px;
-            border: 1px solid #333;
-            background: #2c2c3a;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
             color: #f0f0f0;
             font-size: 0.95em;
             box-sizing: border-box;
+            backdrop-filter: blur(4px);
         }
+
         .auth-btn {
             width: 100%;
             padding: 10px;
             border-radius: 6px;
             border: none;
-            background: #9c28a7;
+            background: var(--violet-main);
             color: white;
             font-size: 1em;
             font-weight: 600;
@@ -656,19 +711,24 @@
             transition: 0.25s;
             margin-top: 8px;
         }
+
         .auth-btn:hover {
-            background: #7d1f85;
+            background: var(--violet-dark);
+            box-shadow: 0 0 12px rgba(155, 113, 255, 0.6);
         }
+
         .auth-switch {
             text-align: center;
             margin-top: 16px;
             font-size: 0.85em;
         }
+
         .auth-switch a {
-            color: #9c28a7;
+            color: var(--violet-main);
             cursor: pointer;
             text-decoration: underline;
         }
+
         .error-msg {
             background: #dc3545;
             padding: 8px;
@@ -677,6 +737,7 @@
             text-align: center;
             font-size: 0.9em;
         }
+
         .score-placeholder {
             min-height: 56px;
             display: flex;
@@ -686,6 +747,10 @@
     </style>
 </head>
 <body>
+    <div class="ray"></div>
+    <div class="ray"></div>
+    <div class="ray"></div>
+    <div class="ray"></div>
     <header>
         <nav class="navbar">
             <div class="nav-left">
@@ -1120,7 +1185,6 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
             authDomain: "quiz-master-io.firebaseapp.com",
@@ -1129,13 +1193,11 @@
             messagingSenderId: "773382469164",
             appId: "1:773382469164:web:5e24a9a62ce543f5190389"
         };
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         window.auth = auth;
         window.db = db;
-
         const QUIZ_LEVELS = {
             departements: [
                 { id: 1, name: "Nom → Numéro", required: 0 },
@@ -1216,7 +1278,6 @@
                 { id: 5, name: "Conservation", required: 360 }
             ]
         };
-
         const THEMES = ['departements', 'chinois', 'medecine', 'math', 'anglais', 'neerlandais', 'allemand', 'italien', 'espagnol', 'geographie', 'animaux'];
         const UI_THEMES = {
             departements: 'dept',
@@ -1231,7 +1292,6 @@
             geographie: 'geographie',
             animaux: 'animaux'
         };
-
         function getCurrentLevelLabel(theme, globalScore) {
             const levels = QUIZ_LEVELS[theme];
             if (!levels) return "Niveau 1";
@@ -1245,7 +1305,6 @@
             }
             return `Niveau ${currentLevel}`;
         }
-
         let authStateReady = false;
         let currentUser = null;
         let isAuthMode = 'login';
@@ -1253,7 +1312,6 @@
         let cachedPlayers = null;
         let lastFetchTime = 0;
         const LEADERBOARD_LOCAL_KEY = 'leaderboard_cache_v2';
-
         function getQuizUrl(category, levelId) {
             if (category === 'departements') {
                 return `quiz-departement-n${levelId}.html`;
@@ -1261,7 +1319,6 @@
                 return `quiz-${category}-n${levelId}.html`;
             }
         }
-
         async function fetchGlobalScoresOnly() {
             const usersSnapshot = await getDocs(collection(db, 'users'));
             const players = {};
@@ -1274,7 +1331,6 @@
             });
             return players;
         }
-
         function saveToLocal(players) {
             try {
                 localStorage.setItem(LEADERBOARD_LOCAL_KEY, JSON.stringify({
@@ -1283,7 +1339,6 @@
                 }));
             } catch (e) { /* ignore */ }
         }
-
         function loadFromLocal() {
             try {
                 const raw = localStorage.getItem(LEADERBOARD_LOCAL_KEY);
@@ -1298,7 +1353,6 @@
                 return null;
             }
         }
-
         async function loadLeaderboardData() {
             if (cachedPlayers && (Date.now() - lastFetchTime) < CACHE_DURATION_MS) {
                 return cachedPlayers;
@@ -1317,7 +1371,6 @@
             }
             return players || {};
         }
-
         async function getRanking(theme) {
             const players = await loadLeaderboardData();
             return Object.entries(players)
@@ -1325,7 +1378,6 @@
                 .sort((a, b) => b.score - a.score)
                 .slice(0, 10);
         }
-
         async function loadLeaderboard() {
             const leaderboardList = document.getElementById('leaderboard-list');
             const mobileGlobal = document.getElementById('mobile-leaderboard-global');
@@ -1377,18 +1429,15 @@
             }
             mobileSeason.innerHTML = '<div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>';
         }
-
         function navigateTo(url) {
             window.location.href = url;
         }
-
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2000);
         }
-
         function showHoverWarning(text, x, y) {
             const warn = document.getElementById("hover-warning");
             warn.textContent = text;
@@ -1397,21 +1446,17 @@
             warn.style.opacity = 1;
             setTimeout(() => { warn.style.opacity = 0; }, 1800);
         }
-
         function setupCardListeners() {
-            // Ajout des listeners pour TOUS les boutons "Tous les niveaux" et "Prochain niveau"
             THEMES.forEach(theme => {
                 const uiKey = UI_THEMES[theme];
                 const accessBtn = document.getElementById(`${uiKey}-levels-access`);
                 const nextBtn = document.getElementById(`${uiKey}-next-level`);
-
                 if (accessBtn) {
                     accessBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         navigateTo(`dossier-quiz-${theme}.html`);
                     });
                 }
-
                 if (nextBtn) {
                     nextBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -1421,7 +1466,6 @@
                 }
             });
         }
-
         function toggleAuthMode() {
             isAuthMode = isAuthMode === 'login' ? 'signup' : 'login';
             const title = document.getElementById('auth-title');
@@ -1443,7 +1487,6 @@
                 pseudoGroup.style.display = 'none';
             }
         }
-
         document.getElementById('auth-submit-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
@@ -1462,6 +1505,8 @@
                         email: email,
                         quizScores: THEMES.reduce((acc, t) => ({ ...acc, [t]: 0 }), {}),
                         globalScore: 0,
+                        niveaux: THEMES.reduce((acc, t) => ({ ...acc, [t]: 1 }), {}),
+                        niveaux100: THEMES.reduce((acc, t) => ({ ...acc, [t]: 0 }), {}),
                         createdAt: new Date().toISOString()
                     });
                     hideAuthModal();
@@ -1474,7 +1519,6 @@
                 errorDiv.classList.remove('hidden');
             }
         });
-
         function logoutUser() {
             signOut(auth)
                 .then(() => {
@@ -1484,57 +1528,37 @@
                     console.error('Erreur lors de la déconnexion:', error);
                 });
         }
-
         function showAuthModal() {
             document.getElementById('auth-modal').classList.add('visible');
         }
-
         function hideAuthModal() {
             document.getElementById('auth-modal').classList.remove('visible');
         }
-
-        async function updateQuizCardUI(theme, globalScore, quizNiveaux = {}) {
+        async function updateQuizCardUI(theme, globalScore, quizNiveaux = {}, quizNiveaux100 = {}) {
             const levels = QUIZ_LEVELS[theme];
             if (!levels) return;
             const totalLevels = levels.length;
-            const completedLevels = Object.values(quizNiveaux).filter(score => score >= 10).length;
+            const completedLevels = quizNiveaux100[theme] || 0;
             const progressPercent = Math.min(100, Math.round((completedLevels / totalLevels) * 100));
             const uiTheme = UI_THEMES[theme];
-
-            // Mise à jour barre de progression
             const progressFill = document.getElementById(`${uiTheme}-progress-fill`);
             if (progressFill) {
                 progressFill.style.width = `${progressPercent}%`;
             }
-
-            // Trouver le prochain niveau non complété
-            let nextLevelId = 1;
-            for (let lvl = 1; lvl <= totalLevels; lvl++) {
-                const score = quizNiveaux[lvl] ?? 0;
-                if (score < 10) {
-                    nextLevelId = lvl;
-                    break;
-                }
-            }
-
-            // Mettre à jour les éléments du "prochain niveau"
-            const nextLevelNumberEl = document.getElementById(`${uiTheme}-next-level-number`);
+            let nextLevelId = (quizNiveaux[theme] || 1);
+            const currentScore = quizNiveaux[`${theme}_n${nextLevelId}`] ?? 0;
+            const subProgress = Math.min(100, Math.round((currentScore / 10) * 100));
             const nextLevelProgressEl = document.getElementById(`${uiTheme}-next-level-progress`);
-
+            if (nextLevelProgressEl) nextLevelProgressEl.style.width = `${subProgress}%`;
+            const nextLevelNumberEl = document.getElementById(`${uiTheme}-next-level-number`);
             if (nextLevelNumberEl) nextLevelNumberEl.textContent = nextLevelId;
             if (theme === 'departements') {
                 document.getElementById('dept-next-level-thumb-img').src = `images/departements${nextLevelId}.png`;
                 document.getElementById('dept-next-level-thumb-img').alt = `Niveau ${nextLevelId}`;
             }
-
-            const currentScore = quizNiveaux[nextLevelId] ?? 0;
-            const subProgress = Math.min(100, Math.round((currentScore / 10) * 100));
-            if (nextLevelProgressEl) nextLevelProgressEl.style.width = `${subProgress}%`;
-
             document.getElementById(`${uiTheme}-niveaux100`).textContent = completedLevels;
             document.getElementById(`${uiTheme}-niveaux100-ratio`).textContent = completedLevels;
         }
-
         async function loadUserData() {
             try {
                 const userDocRef = doc(db, 'users', currentUser.uid);
@@ -1546,31 +1570,26 @@
                         email: currentUser.email,
                         quizScores: THEMES.reduce((acc, t) => ({ ...acc, [t]: 0 }), {}),
                         globalScore: 0,
-                        ...THEMES.reduce((acc, t) => ({ ...acc, [`${t}_niveaux`]: {} }), {}),
+                        niveaux: THEMES.reduce((acc, t) => ({ ...acc, [t]: 1 }), {}),
+                        niveaux100: THEMES.reduce((acc, t) => ({ ...acc, [t]: 0 }), {}),
                         createdAt: new Date().toISOString()
                     };
                     await setDoc(userDocRef, defaultData);
                     userData = defaultData;
                 } else {
-                    const updates = {};
-                    THEMES.forEach(theme => {
-                        if (!userData[`${theme}_niveaux`]) {
-                            updates[`${theme}_niveaux`] = {};
-                        }
-                    });
-                    if (Object.keys(updates).length > 0) {
-                        await updateDoc(userDocRef, updates);
-                        userData = { ...userData, ...updates };
+                    if (!userData.niveaux) {
+                        userData.niveaux = THEMES.reduce((acc, t) => ({ ...acc, [t]: 1 }), {});
+                        await updateDoc(userDocRef, { niveaux: userData.niveaux });
+                    }
+                    if (!userData.niveaux100) {
+                        userData.niveaux100 = THEMES.reduce((acc, t) => ({ ...acc, [t]: 0 }), {});
+                        await updateDoc(userDocRef, { niveaux100: userData.niveaux100 });
                     }
                 }
                 const quizScores = userData.quizScores || {};
                 const globalScore = userData.globalScore || 0;
-                const allNiveaux = THEMES.reduce((acc, theme) => {
-                    acc[theme] = userData[`${theme}_niveaux`] || {};
-                    return acc;
-                }, {});
-
-                // Mise à jour scores
+                const quizNiveaux = userData.niveaux || {};
+                const quizNiveaux100 = userData.niveaux100 || {};
                 THEMES.forEach(theme => {
                     const containerId = `home-${UI_THEMES[theme]}-score-container`;
                     const container = document.getElementById(containerId);
@@ -1582,13 +1601,9 @@
                     container.innerHTML = '';
                     container.appendChild(span);
                 });
-
-                // Maj résumé niveaux à 100%
                 THEMES.forEach(theme => {
-                    updateQuizCardUI(theme, globalScore, allNiveaux[theme]);
+                    updateQuizCardUI(theme, globalScore, quizNiveaux, quizNiveaux100);
                 });
-
-                // Maj badges
                 THEMES.forEach(theme => {
                     const badgeId = `${UI_THEMES[theme]}-level`;
                     document.getElementById(badgeId).textContent = getCurrentLevelLabel(theme, globalScore);
@@ -1597,13 +1612,11 @@
                 console.error('Erreur chargement données:', error);
             }
         }
-
         document.getElementById('auth-modal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('auth-modal')) {
                 hideAuthModal();
             }
         });
-
         onAuthStateChanged(auth, async (user) => {
             const navLoggedOut = document.getElementById('nav-logged-out');
             const navLoggedIn = document.getElementById('nav-logged-in');
@@ -1619,7 +1632,6 @@
                 navLoggedIn.classList.add('hidden');
             }
         });
-
         setupCardListeners();
         loadLeaderboard();
         document.getElementById('login-btn').addEventListener('click', showAuthModal);
