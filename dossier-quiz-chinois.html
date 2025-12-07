@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quiz Master - Culture Chinoise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        .hidden { display: none !important; }
+        body {
+            margin: 0;
+            font-family: "Noto Serif SC", serif;
+            background: linear-gradient(135deg, #0b0d10, #141820, #1e1e24);
+            color: #3c1a1a;
+            background-image: url('https://i.imgur.com/3gQ6j9C.png');
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        header {
+            width: 100%;
+            background: rgba(255, 245, 230, 0.9);
+            backdrop-filter: blur(8px);
+            border-bottom: 2px solid rgba(160, 20, 20, 0.4);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(160, 20, 20, 0.25);
+        }
+        .navbar {
+            max-width: 1100px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+        }
+        .nav-title-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .nav-title {
+            font-size: 1.5em;
+            color: #b40000;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 0 6px rgba(200, 0, 0, 0.3);
+        }
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .glass-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            background: rgba(255, 230, 210, 0.45);
+            border: 1px solid rgba(255, 180, 150, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+        .glass-btn:hover {
+            transform: scale(1.15);
+            background: rgba(255, 215, 200, 0.75);
+        }
+        .logout {
+            background: rgba(230, 60, 60, 0.25);
+            border-color: rgba(230, 60, 60, 0.4);
+        }
+        .logout:hover {
+            background: rgba(230, 60, 60, 0.38);
+        }
+
+        /* LEVELS GRID */
+        #levels-section {
+            padding: 35px 20px;
+            max-width: 1000px;
+            margin: auto;
+        }
+        .levels-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .levels-header h2 {
+            font-size: 2em;
+            color: #b40000;
+            text-shadow: 0 0 7px rgba(200, 40, 40, 0.4);
+        }
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+            padding: 0 10px;
+        }
+
+        .level-card {
+            position: relative;
+            cursor: pointer;
+            background: rgba(255, 245, 235, 0.75);
+            border-radius: 16px;
+            padding: 18px;
+            height: 60px;
+            border: 2px solid rgba(120, 0, 0, 0.25);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 12px rgba(160, 30, 30, 0.35);
+            transition: all 0.35s;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .level-card:hover:not(.locked) {
+            transform: translateY(-6px) scale(1.03);
+            border-color: rgba(180, 0, 0, 0.55);
+            box-shadow: 0 0 18px rgba(200, 40, 40, 0.45);
+        }
+
+        .level-card::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            background: conic-gradient(from 0deg, #b40000, #ff4d2e, #ff9b00, #b40000);
+            opacity: 0.18;
+            z-index: -2;
+            border-radius: inherit;
+            animation: fengshui 6s linear infinite;
+        }
+
+        .level-card::after {
+            content: "";
+            position: absolute;
+            inset: 2px;
+            z-index: -1;
+            border-radius: inherit;
+            background: rgba(255, 250, 240, 0.88);
+        }
+
+        @keyframes fengshui {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .level-card-score {
+            position: absolute;
+            top: 6px;
+            left: 10px;
+            font-size: 0.7em;
+            color: #8b0000;
+            pointer-events: none;
+        }
+
+        .level-card-content h3 {
+            margin: 0;
+            font-size: 1.2em;
+            color: #6b0000;
+        }
+
+        .progress-bar-container {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            height: 6px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(180, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #b40000, #ff4d2e, #ff9b00);
+            transition: width 0.4s;
+        }
+
+        .level-card.locked {
+            filter: grayscale(1);
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .levels-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .level-card {
+                padding: 14px;
+            }
+            .level-card-content h3 {
+                font-size: 1.1em;
+            }
+            .nav-actions {
+                gap: 8px;
+            }
+            .glass-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-title-container">
+                <span class="nav-title">🐉 Quiz – Culture Chinoise</span>
+                <button id="back-btn" class="glass-btn" title="Accueil">🏠</button>
+            </div>
+            <div class="nav-actions hidden" id="nav-logged-in">
+                <a href="statistiques.html" class="glass-btn" title="Statistiques">📊</a>
+                <a href="settings.html" class="glass-btn" title="Réglages">⚙️</a>
+                <button class="glass-btn logout" id="logout-btn" title="Déconnexion">🚪</button>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section id="levels-section">
+            <div class="levels-header">
+                <h2>Choisis ton niveau</h2>
+                <p>Teste tes connaissances sur la Chine et sa culture millénaire 🌸</p>
+            </div>
+            <div class="levels-grid" id="levels-grid">
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import {
+            getAuth, onAuthStateChanged, signOut
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import {
+            getFirestore, doc, getDoc
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const THEME = 'chinois';
+        const QUIZ_TITLE = 'Culture Chinoise';
+
+        const LEVELS = [
+            { id: 1, pointsRequired: 0, fileName: 'quiz-chinois-n1.html', scoreRequiredPercent: 0 },
+            { id: 2, pointsRequired: 50, fileName: 'quiz-chinois-n2.html', scoreRequiredPercent: 50 },
+            { id: 3, pointsRequired: 100, fileName: 'quiz-chinois-n3.html', scoreRequiredPercent: 50 },
+            { id: 4, pointsRequired: 150, fileName: 'quiz-chinois-n4.html', scoreRequiredPercent: 50 },
+            { id: 5, pointsRequired: 200, fileName: 'quiz-chinois-n5.html', scoreRequiredPercent: 50 },
+            { id: 6, pointsRequired: 250, fileName: 'quiz-chinois-n6.html', scoreRequiredPercent: 50 },
+            { id: 7, pointsRequired: 300, fileName: 'quiz-chinois-n7.html', scoreRequiredPercent: 50 },
+            { id: 8, pointsRequired: 350, fileName: 'quiz-chinois-n8.html', scoreRequiredPercent: 50 },
+            { id: 9, pointsRequired: 400, fileName: 'quiz-chinois-n9.html', scoreRequiredPercent: 50 },
+            { id: 10, pointsRequired: 450, fileName: 'quiz-chinois-n10.html', scoreRequiredPercent: 50 },
+            { id: 11, pointsRequired: 500, fileName: 'quiz-chinois-n11.html', scoreRequiredPercent: 50 },
+            { id: 12, pointsRequired: 550, fileName: 'quiz-chinois-n12.html', scoreRequiredPercent: 50 },
+            { id: 13, pointsRequired: 600, fileName: 'quiz-chinois-n13.html', scoreRequiredPercent: 50 },
+        ];
+
+        const SCORE_REQUIS_N2 = 25;
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
+            authDomain: "quiz-master-io.firebaseapp.com",
+            projectId: "quiz-master-io",
+            storageBucket: "quiz-master-io.firebasestorage.app",
+            messagingSenderId: "773382469164",
+            appId: "1:773382469164:web:5e24a9a62ce543f5190389"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        window.currentUser = null;
+
+        const levelsGrid = document.getElementById('levels-grid');
+        const backBtn = document.getElementById('back-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const navLoggedIn = document.getElementById('nav-logged-in');
+
+        // Fonction utilitaire pour obtenir les scores locaux
+        function getLocalScores() {
+            const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+            const bestScores = JSON.parse(localStorage.getItem('bestScores') || '{}');
+            return {
+                globalScore: quizScores[THEME] || 0,
+                bestScore: bestScores[THEME] || 0
+            };
+        }
+
+        // Fonction pour charger les données utilisateur depuis Firebase (avec fallback local)
+        async function loadUserScoresFromFirestore(uid) {
+            try {
+                const userDoc = await getDoc(doc(db, 'users', uid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    const niveaux = data.niveaux || {};
+                    const chinoisData = niveaux[THEME] || {};
+
+                    // Extrait le globalScore et bestScore depuis la structure Firebase
+                    const globalScore = chinoisData.globalScore || 0;
+                    const bestScore = chinoisData.bestScore || 0;
+
+                    // Met à jour localStorage avec les données Firebase
+                    const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+                    const bestScores = JSON.parse(localStorage.getItem('bestScores') || '{}');
+                    quizScores[THEME] = globalScore;
+                    bestScores[THEME] = bestScore;
+                    localStorage.setItem('quizScores', JSON.stringify(quizScores));
+                    localStorage.setItem('bestScores', JSON.stringify(bestScores));
+
+                    return { globalScore, bestScore };
+                } else {
+                    console.warn("Document utilisateur non trouvé dans Firestore.");
+                    return getLocalScores();
+                }
+            } catch (error) {
+                console.error("Erreur lors du chargement depuis Firestore, fallback sur localStorage :", error);
+                return getLocalScores();
+            }
+        }
+
+        // Fonction pour rendre les cartes de niveau
+        function renderLevelsUI(globalScore, bestScore) {
+            levelsGrid.innerHTML = '';
+            for (const level of LEVELS) {
+                let isUnlocked = false;
+                if (level.id === 1) {
+                    isUnlocked = true;
+                } else {
+                    const requiredScoreFromBest = (level.scoreRequiredPercent / 100) * SCORE_REQUIS_N2;
+                    isUnlocked = (globalScore >= level.pointsRequired) && (bestScore >= requiredScoreFromBest);
+                }
+
+                const card = document.createElement('div');
+                card.className = `level-card ${isUnlocked ? '' : 'locked'}`;
+                if (isUnlocked) {
+                    card.addEventListener('click', () => {
+                        window.location.href = level.fileName;
+                    });
+                }
+
+                let progressPercent = 0;
+                if (level.pointsRequired > 0) {
+                    progressPercent = Math.min((bestScore / level.pointsRequired) * 100, 100);
+                } else {
+                    progressPercent = 100;
+                }
+
+                card.innerHTML = `
+                    <div class="level-card-score">Requis : ${level.pointsRequired}</div>
+                    <div class="level-card-content">
+                        <h3>Niveau ${level.id}</h3>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: ${progressPercent}%"></div>
+                    </div>
+                `;
+                levelsGrid.appendChild(card);
+            }
+        }
+
+        // Gestion de l'état d'authentification
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                window.currentUser = user;
+                navLoggedIn.classList.remove('hidden');
+
+                // Tente de charger les scores depuis Firebase
+                const { globalScore, bestScore } = await loadUserScoresFromFirestore(user.uid);
+                renderLevelsUI(globalScore, bestScore);
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => signOut(auth).then(() => window.location.href = 'index.html'));
+
+        backBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>
+
