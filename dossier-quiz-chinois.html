@@ -12,13 +12,13 @@
             font-family: "Noto Serif SC", serif;
             background: linear-gradient(135deg, #0b0d10, #141820, #1e1e24);
             color: #3c1a1a;
-            background-image: url('https://i.imgur.com/3gQ6j9C.png');
+            background-image: url('images/cloud-pattern2.png');
             background-size: cover;
             background-attachment: fixed;
         }
         header {
             width: 100%;
-            background: rgba(255, 245, 230, 0.9);
+            background: rgba(255, 245, 230, 0.27);
             backdrop-filter: blur(8px);
             border-bottom: 2px solid rgba(160, 20, 20, 0.4);
             position: sticky;
@@ -246,25 +246,22 @@
         } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const THEME = 'chinois';
-        const QUIZ_TITLE = 'Culture Chinoise';
 
         const LEVELS = [
-            { id: 1, pointsRequired: 0, fileName: 'quiz-chinois-n1.html', scoreRequiredPercent: 0 },
-            { id: 2, pointsRequired: 50, fileName: 'quiz-chinois-n2.html', scoreRequiredPercent: 50 },
-            { id: 3, pointsRequired: 100, fileName: 'quiz-chinois-n3.html', scoreRequiredPercent: 50 },
-            { id: 4, pointsRequired: 150, fileName: 'quiz-chinois-n4.html', scoreRequiredPercent: 50 },
-            { id: 5, pointsRequired: 200, fileName: 'quiz-chinois-n5.html', scoreRequiredPercent: 50 },
-            { id: 6, pointsRequired: 250, fileName: 'quiz-chinois-n6.html', scoreRequiredPercent: 50 },
-            { id: 7, pointsRequired: 300, fileName: 'quiz-chinois-n7.html', scoreRequiredPercent: 50 },
-            { id: 8, pointsRequired: 350, fileName: 'quiz-chinois-n8.html', scoreRequiredPercent: 50 },
-            { id: 9, pointsRequired: 400, fileName: 'quiz-chinois-n9.html', scoreRequiredPercent: 50 },
-            { id: 10, pointsRequired: 450, fileName: 'quiz-chinois-n10.html', scoreRequiredPercent: 50 },
-            { id: 11, pointsRequired: 500, fileName: 'quiz-chinois-n11.html', scoreRequiredPercent: 50 },
-            { id: 12, pointsRequired: 550, fileName: 'quiz-chinois-n12.html', scoreRequiredPercent: 50 },
-            { id: 13, pointsRequired: 600, fileName: 'quiz-chinois-n13.html', scoreRequiredPercent: 50 },
+            { id: 1, pointsRequired: 0, fileName: 'quiz-chinois-n1.html' },
+            { id: 2, pointsRequired: 50, fileName: 'quiz-chinois-n2.html' },
+            { id: 3, pointsRequired: 100, fileName: 'quiz-chinois-n3.html' },
+            { id: 4, pointsRequired: 150, fileName: 'quiz-chinois-n4.html' },
+            { id: 5, pointsRequired: 200, fileName: 'quiz-chinois-n5.html' },
+            { id: 6, pointsRequired: 250, fileName: 'quiz-chinois-n6.html' },
+            { id: 7, pointsRequired: 300, fileName: 'quiz-chinois-n7.html' },
+            { id: 8, pointsRequired: 350, fileName: 'quiz-chinois-n8.html' },
+            { id: 9, pointsRequired: 400, fileName: 'quiz-chinois-n9.html' },
+            { id: 10, pointsRequired: 450, fileName: 'quiz-chinois-n10.html' },
+            { id: 11, pointsRequired: 500, fileName: 'quiz-chinois-n11.html' },
+            { id: 12, pointsRequired: 550, fileName: 'quiz-chinois-n12.html' },
+            { id: 13, pointsRequired: 600, fileName: 'quiz-chinois-n13.html' },
         ];
-
-        const SCORE_REQUIS_N2 = 25;
 
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
@@ -277,66 +274,42 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        window.currentUser = null;
 
         const levelsGrid = document.getElementById('levels-grid');
         const backBtn = document.getElementById('back-btn');
         const logoutBtn = document.getElementById('logout-btn');
         const navLoggedIn = document.getElementById('nav-logged-in');
 
-        // Fonction utilitaire pour obtenir les scores locaux
-        function getLocalScores() {
-            const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
-            const bestScores = JSON.parse(localStorage.getItem('bestScores') || '{}');
-            return {
-                globalScore: quizScores[THEME] || 0,
-                bestScore: bestScores[THEME] || 0
-            };
-        }
-
-        // Fonction pour charger les données utilisateur depuis Firebase (avec fallback local)
+        // Fonction pour charger les données utilisateur depuis Firebase
         async function loadUserScoresFromFirestore(uid) {
             try {
                 const userDoc = await getDoc(doc(db, 'users', uid));
                 if (userDoc.exists()) {
                     const data = userDoc.data();
                     const niveaux = data.niveaux || {};
-                    const chinoisData = niveaux[THEME] || {};
+                    const maxLevelUnlocked = niveaux[THEME] || 1;
 
-                    // Extrait le globalScore et bestScore depuis la structure Firebase
-                    const globalScore = chinoisData.globalScore || 0;
-                    const bestScore = chinoisData.bestScore || 0;
+                    const quizScores = data.quizScores || {};
+                    const globalScore = quizScores[THEME] || 0;
 
-                    // Met à jour localStorage avec les données Firebase
-                    const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
-                    const bestScores = JSON.parse(localStorage.getItem('bestScores') || '{}');
-                    quizScores[THEME] = globalScore;
-                    bestScores[THEME] = bestScore;
-                    localStorage.setItem('quizScores', JSON.stringify(quizScores));
-                    localStorage.setItem('bestScores', JSON.stringify(bestScores));
-
-                    return { globalScore, bestScore };
+                    return { globalScore, maxLevelUnlocked };
                 } else {
-                    console.warn("Document utilisateur non trouvé dans Firestore.");
-                    return getLocalScores();
+                    console.warn("Document utilisateur non trouvé.");
+                    return { globalScore: 0, maxLevelUnlocked: 1 };
                 }
             } catch (error) {
-                console.error("Erreur lors du chargement depuis Firestore, fallback sur localStorage :", error);
-                return getLocalScores();
+                console.error("Erreur Firestore, fallback local:", error);
+                return { globalScore: 0, maxLevelUnlocked: 1 };
             }
         }
 
-        // Fonction pour rendre les cartes de niveau
-        function renderLevelsUI(globalScore, bestScore) {
+        // Rendu des cartes avec condition AND
+        function renderLevelsUI(globalScore, maxLevelUnlocked) {
             levelsGrid.innerHTML = '';
             for (const level of LEVELS) {
-                let isUnlocked = false;
-                if (level.id === 1) {
-                    isUnlocked = true;
-                } else {
-                    const requiredScoreFromBest = (level.scoreRequiredPercent / 100) * SCORE_REQUIS_N2;
-                    isUnlocked = (globalScore >= level.pointsRequired) && (bestScore >= requiredScoreFromBest);
-                }
+                const hasEnoughPoints = globalScore >= level.pointsRequired || level.id === 1;
+                const isLevelUnlockedByProgress = level.id <= maxLevelUnlocked;
+                const isUnlocked = hasEnoughPoints && isLevelUnlockedByProgress;
 
                 const card = document.createElement('div');
                 card.className = `level-card ${isUnlocked ? '' : 'locked'}`;
@@ -346,12 +319,9 @@
                     });
                 }
 
-                let progressPercent = 0;
-                if (level.pointsRequired > 0) {
-                    progressPercent = Math.min((bestScore / level.pointsRequired) * 100, 100);
-                } else {
-                    progressPercent = 100;
-                }
+                const progressPercent = level.pointsRequired > 0
+                    ? Math.min((globalScore / level.pointsRequired) * 100, 100)
+                    : 100;
 
                 card.innerHTML = `
                     <div class="level-card-score">Requis : ${level.pointsRequired}</div>
@@ -369,22 +339,16 @@
         // Gestion de l'état d'authentification
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                window.currentUser = user;
                 navLoggedIn.classList.remove('hidden');
-
-                // Tente de charger les scores depuis Firebase
-                const { globalScore, bestScore } = await loadUserScoresFromFirestore(user.uid);
-                renderLevelsUI(globalScore, bestScore);
+                const { globalScore, maxLevelUnlocked } = await loadUserScoresFromFirestore(user.uid);
+                renderLevelsUI(globalScore, maxLevelUnlocked);
             } else {
                 window.location.href = 'index.html';
             }
         });
 
         logoutBtn.addEventListener('click', () => signOut(auth).then(() => window.location.href = 'index.html'));
-
-        backBtn.addEventListener('click', () => {
-            window.location.href = 'index.html';
-        });
+        backBtn.addEventListener('click', () => window.location.href = 'index.html');
     </script>
 </body>
 </html>
