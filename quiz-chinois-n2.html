@@ -375,11 +375,11 @@
         /* RESULT SECTION - CORRECTED CENTERING */
         #result-section {
             width: 100%;
-            min-height: 80vh; /* Ensure it takes most of the viewport height */
+            min-height: 80vh;
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Vertical centering */
-            align-items: center; /* Horizontal centering */
+            justify-content: center;
+            align-items: center;
             padding: 20px;
             box-sizing: border-box;
             text-align: center;
@@ -525,7 +525,8 @@
         const THEME = 'chinois';
         const QUIZ_TITLE = 'Chinois N2';
         const SCORE_REQUIS_N3 = 10;
-        const SCORE_PARFAIT_N2 = 11;
+        const SCORE_PARFAIT_N2 = 20;
+        const TOTAL_QUESTIONS = 25; 
         const NOMBRES_CHINOIS = [
             { nombre: 0, caractere: "零", pinyin: "líng" },
             { nombre: 1, caractere: "一", pinyin: "yī" },
@@ -546,9 +547,9 @@
             pinyin: num.pinyin
         }));
         const levelConfig = {
-            quizTime: 60,          // Timer quiz = 60s
-            questionTime: 8,       // Timer question = 8s
-            lives: 5
+            quizTime: 60,
+            questionTime: 10,
+            lives: 4
         };
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
@@ -588,7 +589,7 @@
         let quizTimeLeft = 0, questionTimeLeft = 0;
         let quizTimerInterval = null, questionTimerInterval = null;
         let gameCompleted = false;
-        let usedQuestions = [];
+        let usedQuestions = []; // Stocke l'historique des questions pour éviter les répétitions consécutives
         let currentQuestion = null;
         let currentWriter = null;
         let currentUserBestScore = 0;
@@ -714,7 +715,6 @@
             }, 1000);
         }
         function startQuestionTimer() {
-            // Clear any existing question timer first
             if (questionTimerInterval) clearInterval(questionTimerInterval);
             questionTimeLeft = levelConfig.questionTime;
             questionTimerDisplay.textContent = questionTimeLeft;
@@ -749,10 +749,9 @@
             updateLives();
             updateStatsDisplayMobile();
             feedbackEl.innerHTML = '⏰ Temps écoulé !';
-            // Added 400ms delay before proceeding
             setTimeout(() => {
                 if (!isQuizActive) return;
-                if (lives <= 0 || usedQuestions.length >= QUESTIONS.length) {
+                if (lives <= 0 || usedQuestions.length >= TOTAL_QUESTIONS) {
                     endGame();
                 } else {
                     generateQuestion();
@@ -763,7 +762,7 @@
             if (gameCompleted) return;
             stopTimers();
             score = 0; lives = levelConfig.lives; wrongAnswers = 0;
-            usedQuestions = [];
+            usedQuestions = []; // Réinitialise l'historique des questions
             scoreDisplay.textContent = score;
             updateLives();
             currentUserBestScore = await fetchBestScore();
@@ -777,17 +776,22 @@
             window.scrollTo(0, 0);
         }
         function getRandomQuestion() {
-            if (usedQuestions.length >= QUESTIONS.length) usedQuestions = [];
             let idx;
-            do {
+            // Si c'est la première question, on choisit n'importe quel index
+            if (usedQuestions.length === 0) {
                 idx = Math.floor(Math.random() * QUESTIONS.length);
-            } while (usedQuestions.includes(idx) && usedQuestions.length < QUESTIONS.length);
+            } else {
+                // Sinon, on évite la dernière question utilisée
+                const lastIdx = usedQuestions[usedQuestions.length - 1];
+                do {
+                    idx = Math.floor(Math.random() * QUESTIONS.length);
+                } while (idx === lastIdx && QUESTIONS.length > 1);
+            }
             usedQuestions.push(idx);
             return QUESTIONS[idx];
         }
         function cleanupCurrentQuestion() {
             if (currentWriter) {
-                // HanziWriter doesn't have a destroy method, but we can clear the container
                 drawingArea.innerHTML = '';
                 currentWriter = null;
             }
@@ -799,7 +803,8 @@
         }
         function generateQuestion() {
             cleanupCurrentQuestion();
-            if (usedQuestions.length >= QUESTIONS.length) {
+            // Vérifie si on a atteint le nombre total de questions
+            if (usedQuestions.length >= TOTAL_QUESTIONS) {
                 endGame();
                 return;
             }
@@ -831,7 +836,7 @@
                         feedbackEl.innerHTML = '✅ Correct !';
                         updateStatsDisplayMobile();
                         setTimeout(() => {
-                            if (usedQuestions.length < QUESTIONS.length) {
+                            if (usedQuestions.length < TOTAL_QUESTIONS) {
                                 generateQuestion();
                             } else {
                                 endGame();
@@ -843,13 +848,14 @@
                         updateLives();
                         updateStatsDisplayMobile();
                         feedbackEl.innerHTML = '❌ Presque !';
-                        // Added 400ms delay before proceeding
                         setTimeout(() => {
                             if (!isQuizActive) return;
                             if (lives <= 0) {
                                 endGame();
-                            } else {
+                            } else if (usedQuestions.length < TOTAL_QUESTIONS) {
                                 generateQuestion();
+                            } else {
+                                endGame();
                             }
                         }, 400);
                     }
@@ -900,14 +906,22 @@
                     }
                 }
             }
+            // Check for perfect score achievement with sequential requirement
             if (score >= SCORE_PARFAIT_N2 && window.currentUser?.uid) {
                 const userRef = doc(db, 'users', window.currentUser.uid);
                 const userDoc = await getDoc(userRef);
                 if (userDoc.exists()) {
-                    await updateDoc(userRef, {
-                        [`niveaux100.${THEME}`]: 2
-                    });
-                    perfectAchieved = true;
+                    const data = userDoc.data();
+                    const niveaux100 = data.niveaux100 || {};
+                    const currentPerfectLevel = niveaux100[THEME] || 0;
+                    
+                    // Only allow progression from level 1 to 2
+                    if (currentPerfectLevel === 1) {
+                        await updateDoc(userRef, {
+                            [`niveaux100.${THEME}`]: 2
+                        });
+                        perfectAchieved = true;
+                    }
                 }
             }
             if (unlocked) {
