@@ -114,9 +114,9 @@
         }
         #drawing-area {
             position: relative;
-            width: 300px;
-            height: 300px;
-            margin: 10px 0;
+            width: 285px;
+            height: 285px;
+            margin: 10px 0 2px 0;
             background: white;
             border: 2px solid #b40000;
             border-radius: 10px;
@@ -132,11 +132,11 @@
         #timers-container {
             width: 100%;
             max-width: 1000px;
-            margin-top: 12px;
+            margin-top: 2px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         .timer-bar-container {
             width: 100%;
@@ -151,7 +151,7 @@
             height: 10px;
             background: #fde3d0;
             border-radius: 7px;
-            margin-top: 5px;
+            margin-top: 4px;
             overflow: hidden;
             border: 1px solid rgba(180, 0, 0, 0.2);
         }
@@ -166,7 +166,7 @@
             background: linear-gradient(90deg, #b40000, #ff4d2e, #ff9b00);
         }
         #score-lives {
-            margin-top: 10px;
+            margin-top: 8px;
             display: flex;
             gap: 50px;
             justify-content: center;
@@ -187,7 +187,7 @@
             text-shadow: 0 0 4px rgba(211, 89, 73, 0.6);
         }
         #feedback {
-            margin-top: 12px;
+            margin-top: 10px;
             font-size: 1.2em;
             min-height: 28px;
             font-weight: bold;
@@ -219,8 +219,9 @@
                 width: calc(100% - 30px);
             }
             #drawing-area {
-                width: 250px;
-                height: 250px;
+                width: 285px;
+                height: 285px;
+                margin: 8px 0 3px 0;
             }
             #correct-display {
                 font-size: 6em;
@@ -742,16 +743,17 @@
             if (currentWriter) {
                 drawingArea.innerHTML = '';
                 currentWriter = HanziWriter.create('drawing-area', currentQuestion.caractere, {
-                    width: 300,
-                    height: 300,
-                    padding: 20,  // Augmenté pour mieux centrer
+                    width: 285,
+                    height: 285,
+                    padding: 20,
                     showOutline: true,
                     showCharacter: false,
                     strokeAnimationSpeed: 1,
                     delayBetweenStrokes: 0,
                     strokeColor: '#b40000',
                     outlineColor: '#ddd',
-                    renderer: 'canvas'
+                    renderer: 'canvas',
+                    drawingWidth: 20  // ✨ Épaisseur du trait x5 (valeur par défaut = 4)
                 });
                 isQuizActive = true;
                 currentWriter.quiz({
@@ -773,16 +775,17 @@
             questionBox.innerHTML = currentQuestion.question;
             drawingArea.innerHTML = '';
             currentWriter = HanziWriter.create('drawing-area', currentQuestion.caractere, {
-                width: 300,
-                height: 300,
-                padding: 20,  // Augmenté pour mieux centrer
+                width: 285,
+                height: 285,
+                padding: 18,
                 showOutline: true,
                 showCharacter: false,
                 strokeAnimationSpeed: 1,
                 delayBetweenStrokes: 0,
                 strokeColor: '#b40000',
                 outlineColor: '#ddd',
-                renderer: 'canvas'
+                renderer: 'canvas',
+                drawingWidth: 20  // ✨ Épaisseur du trait x5 (valeur par défaut = 4)
             });
             isQuizActive = true;
             currentWriter.quiz({
