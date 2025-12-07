@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Quiz Master - Anglais - Nombres</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <style>
         .hidden {
             display: none !important;
@@ -15,9 +15,13 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: "Poppins", sans-serif;
-            background: radial-gradient(circle at 30% 20%, #2b2c40 0%, #0f1019 100%);
-            color: #f4f4f4;
+            font-family: "Lato", sans-serif;
+            line-height: 1.6;
+            color: #F5F5F5;
+            background: linear-gradient(145deg, #012169, #001240);
+            background-image: url('images/british-pattern.png');
+            background-size: cover;
+            background-attachment: fixed;
         }
 
         #hover-warning {
@@ -31,60 +35,6 @@
             opacity: 0;
             transition: opacity 0.4s ease;
             z-index: 9999;
-        }
-
-        header {
-            width: 100%;
-            background: rgba(20, 20, 28, 0.8);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(140, 140, 255, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .navbar {
-            max-width: 1100px;
-            margin: auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 12px;
-            min-height: 42px;
-        }
-
-        .nav-title {
-            font-size: 1.1em;
-            font-weight: 700;
-            color: #eaeaea;
-            letter-spacing: 0.7px;
-            text-shadow: 0 0 6px rgba(128, 0, 255, 0.4);
-        }
-
-        .user-info {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .user-stats {
-            font-size: 0.75em;
-            text-align: right;
-        }
-
-        .logout-btn {
-            padding: 5px 10px;
-            background: #dc3545;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            cursor: pointer;
-            transition: 0.25s;
-            font-size: 0.85em;
-        }
-
-        .logout-btn:hover {
-            background: #c82333;
         }
 
         /* ✨ CENTRAGE PRINCIPAL */
@@ -106,6 +56,7 @@
             align-items: center;
             width: 100%;
             max-width: 1200px;
+            position: relative;
         }
 
         .quiz-container {
@@ -126,22 +77,23 @@
         }
 
         .question-box {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(10, 10, 30, 0.85);
             backdrop-filter: blur(8px);
             padding: 18px;
-            border-radius: 14px;
+            border-radius: 16px;
             font-size: 1.5em;
+            font-family: "Merriweather", serif;
             font-weight: 700;
             min-height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            box-shadow: 0 0 16px rgba(128, 0, 255, 0.1);
-            border: 1px solid rgba(120, 120, 255, 0.1);
-            color: #f4f4f4;
+            box-shadow: 0 0 20px rgba(0, 30, 80, 0.5);
+            border: 2px solid rgba(255, 215, 0, 0.25);
+            color: #F5F5F5;
             letter-spacing: 0.8px;
-            text-shadow: 0 0 5px rgba(128, 0, 255, 0.4);
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
         }
 
         .answers-container {
@@ -155,22 +107,23 @@
             width: 360px;
             padding: 10px 4px;
             margin-top: 10px;
-            border: 1px solid rgba(180, 160, 255, 0.12);
-            border-radius: 8px;
+            border: 2px solid rgba(255, 215, 0, 0.25);
+            border-radius: 10px;
             font-size: 17px;
+            font-family: "Lato", sans-serif;
             cursor: pointer;
-            background: linear-gradient(145deg, #2f3147, #181926);
+            background: linear-gradient(145deg, #001240, #012169);
             transition: 0.25s ease-in-out;
             color: #e6e6e6;
-            box-shadow: 0 0 8px rgba(120, 60, 255, 0.15);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
             max-width: 100%;
         }
 
         .answer-btn:hover {
             transform: translateY(-2px);
-            background: linear-gradient(145deg, #5558a0, #2d2f47);
-            border-color: rgba(200, 170, 255, 0.3);
-            box-shadow: 0 0 12px rgba(155, 80, 255, 0.3);
+            background: linear-gradient(145deg, #0e2a7a, #1a3b9b);
+            border-color: rgba(255, 215, 0, 0.4);
+            box-shadow: 0 0 16px rgba(255, 215, 0, 0.3);
         }
 
         .answer-btn:disabled {
@@ -178,13 +131,17 @@
         }
 
         .correct {
-            background: linear-gradient(145deg, #2ecc71, #27ae60) !important;
-            box-shadow: 0 0 10px rgba(46, 204, 113, 0.5) !important;
+            background: linear-gradient(145deg, #3E8E41, #5BB85C) !important;
+            box-shadow: 0 0 10px rgba(140, 200, 70, 0.5) !important;
+            border-color: rgba(62, 142, 65, 0.6) !important;
+            color: #FFF !important;
         }
 
         .incorrect {
-            background: linear-gradient(145deg, #e74c3c, #c0392b) !important;
-            box-shadow: 0 0 10px rgba(231, 76, 60, 0.5) !important;
+            background: linear-gradient(145deg, #D35949, #FF9B8A) !important;
+            box-shadow: 0 0 10px rgba(200, 70, 70, 0.5) !important;
+            border-color: rgba(211, 89, 73, 0.6) !important;
+            color: #FFF !important;
         }
 
         #timers-container {
@@ -203,32 +160,35 @@
             max-width: 310px;
             text-align: left;
             font-size: 0.9em;
+            font-family: "Lato", sans-serif;
+            color: #F5F5F5;
         }
 
         #timer-bar,
         #question-timer-bar {
             width: 100%;
-            height: 10px;
-            background: #1c1c25;
-            border-radius: 7px;
+            height: 12px;
+            background: rgba(10, 10, 30, 0.7);
+            border-radius: 8px;
             margin-top: 5px;
             overflow: hidden;
+            border: 1px solid rgba(255, 215, 0, 0.2);
         }
 
         #timer-fill,
         #question-timer-fill {
             height: 100%;
             width: 100%;
-            border-radius: 7px;
+            border-radius: 8px;
             transition: width 0.3s linear;
         }
 
         #timer-fill {
-            background: linear-gradient(90deg, #a22aff, #d068ff, #ff72d2);
+            background: linear-gradient(90deg, #FFD700, #FFA500);
         }
 
         #question-timer-fill {
-            background: linear-gradient(90deg, #ff72d2, #d068ff, #a22aff);
+            background: linear-gradient(90deg, #FFA500, #FFD700);
         }
 
         #score-lives {
@@ -238,27 +198,30 @@
             justify-content: center;
             font-size: 1.1em;
             position: relative;
+            font-family: "Lato", sans-serif;
         }
 
         .score-container {
             margin-top: 7px;
             font-size: 19px;
-            text-shadow: 0 0 5px rgba(255, 130, 255, 0.3);
+            color: #FFD700;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
         }
 
         .heart {
             font-size: 22px;
             margin: 0 3px;
-            filter: drop-shadow(0 0 3px rgba(255, 50, 50, .6));
+            color: #FF6B6B;
+            text-shadow: 0 0 4px rgba(255, 107, 107, 0.6);
         }
 
         @media (max-width: 899px) {
-            body.quiz-active header {
-                display: none;
+            body.quiz-active {
+                display: block;
             }
 
-            body.result-active header {
-                display: none;
+            body.result-active {
+                display: block;
             }
 
             .quiz-container {
@@ -304,11 +267,11 @@
                 margin: 0;
                 flex: 1;
                 max-width: 160px;
-                background: rgba(255, 255, 255, 0.05);
-                border-radius: 8px;
+                background: rgba(10, 10, 30, 0.8);
+                border-radius: 10px;
                 padding: 12px;
-                box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
-                border: 1px solid rgba(140, 140, 255, 0.08);
+                box-shadow: 0 0 12px rgba(0, 30, 80, 0.5);
+                border: 2px solid rgba(255, 215, 0, 0.2);
                 height: 110px;
             }
 
@@ -317,15 +280,18 @@
                 margin-bottom: 6px;
                 font-weight: 700;
                 letter-spacing: 0.7px;
-                text-shadow: 0 0 5px rgba(128, 0, 255, 0.4);
+                color: #FFD700;
+                text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
                 text-align: center;
+                font-family: "Merriweather", serif;
             }
 
             .current-score {
                 font-size: 1.4em;
                 margin: 5px 0;
                 text-align: center;
-                color: #34c759;
+                color: #3E8E41;
+                font-family: "Lato", sans-serif;
             }
 
             .stats-row {
@@ -333,26 +299,28 @@
                 font-size: 0.85em;
                 display: flex;
                 justify-content: space-between;
+                font-family: "Lato", sans-serif;
             }
 
             .stats-label {
                 font-weight: 500;
+                color: #F5F5F5;
             }
 
             .stats-value {
                 font-weight: bold;
-                color: #a22aff;
+                color: #FFD700;
             }
 
             #mobile-back-container {
-                background: rgba(255, 255, 255, 0.05);
+                background: rgba(10, 10, 30, 0.8);
                 padding: 12px 10px;
-                border-radius: 8px;
+                border-radius: 10px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
-                border: 1px solid rgba(140, 140, 255, 0.08);
+                box-shadow: 0 0 12px rgba(0, 30, 80, 0.5);
+                border: 2px solid rgba(255, 215, 0, 0.2);
                 min-width: 44px;
                 height: fit-content;
             }
@@ -363,17 +331,19 @@
                 display: block;
                 width: 100%;
                 text-align: center;
-                background: rgba(255, 255, 255, 0.08);
+                background: linear-gradient(145deg, #001240, #012169);
                 border-radius: 9px;
                 cursor: pointer;
                 transition: .2s;
-                border: none;
-                color: #f4f4f4;
+                border: 2px solid rgba(255, 215, 0, 0.25);
+                color: #F5F5F5;
+                font-family: "Lato", sans-serif;
             }
 
             #mobile-back-container .action-btn:hover {
-                background: rgba(255, 255, 255, 0.12);
-                box-shadow: 0 0 8px rgba(120, 120, 255, 0.25);
+                background: linear-gradient(145deg, #0e2a7a, #1a3b9b);
+                box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+                border-color: rgba(255, 215, 0, 0.4);
             }
         }
 
@@ -387,49 +357,53 @@
             }
 
             #current-game-stats {
-                background: rgba(255, 255, 255, 0.05);
-                border-radius: 10px;
+                background: rgba(10, 10, 30, 0.8);
+                border-radius: 12px;
                 padding: 16px;
                 margin-top: 16px;
                 max-width: 250px;
                 width: 100%;
-                box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.4);
-                border: 1px solid rgba(140, 140, 255, 0.08);
+                box-shadow: 0 0 16px rgba(0, 30, 80, 0.5);
+                border: 2px solid rgba(255, 215, 0, 0.2);
             }
 
             .stats-title {
                 text-align: center;
                 margin-bottom: 10px;
-                color: #a22aff;
+                color: #FFD700;
                 font-size: 1.1em;
                 font-weight: 700;
                 letter-spacing: 0.8px;
-                text-shadow: 0 0 5px rgba(128, 0, 255, 0.4);
+                text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+                font-family: "Merriweather", serif;
             }
 
             .current-score {
                 font-size: 1.8em;
                 font-weight: bold;
-                color: #34c759;
+                color: #3E8E41;
                 margin: 7px 0;
                 text-align: center;
+                font-family: "Lato", sans-serif;
             }
 
             .stats-row {
                 display: flex;
                 justify-content: space-between;
                 padding: 6px 0;
-                border-bottom: 1px solid rgba(140, 140, 255, 0.1);
+                border-bottom: 1px solid rgba(255, 215, 0, 0.15);
                 font-size: 0.9em;
+                font-family: "Lato", sans-serif;
             }
 
             .stats-label {
                 font-weight: 500;
+                color: #F5F5F5;
             }
 
             .stats-value {
                 font-weight: bold;
-                color: #a22aff;
+                color: #FFD700;
             }
         }
 
@@ -445,77 +419,182 @@
         }
 
         .result-stats {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(10, 10, 30, 0.85);
             backdrop-filter: blur(8px);
             padding: 22px;
-            border-radius: 14px;
+            border-radius: 16px;
             max-width: 480px;
             margin: 22px auto;
-            box-shadow: 0 0 16px rgba(128, 0, 255, 0.1);
-            border: 1px solid rgba(120, 120, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 30, 80, 0.5);
+            border: 2px solid rgba(255, 215, 0, 0.25);
             width: calc(100% - 30px);
+            position: relative;
         }
 
         .result-stats h3 {
-            color: #a22aff;
+            color: #FFD700;
             margin-top: 0;
             font-weight: 700;
             letter-spacing: 0.8px;
-            text-shadow: 0 0 5px rgba(128, 0, 255, 0.4);
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            font-family: "Merriweather", serif;
+            font-size: 1.4em;
         }
 
         .action-btn {
             margin: 8px;
             padding: 10px 20px;
             border-radius: 10px;
-            background: rgba(255, 255, 255, 0.08);
-            border: none;
+            background: linear-gradient(145deg, #001240, #012169);
+            border: 2px solid rgba(255, 215, 0, 0.25);
             cursor: pointer;
-            color: #f4f4f4;
+            color: #F5F5F5;
             transition: 0.2s;
-            font-family: "Poppins", sans-serif;
+            font-family: "Lato", sans-serif;
             font-size: 15px;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
         }
 
         .action-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-            box-shadow: 0 0 8px rgba(120, 120, 255, 0.25);
+            background: linear-gradient(145deg, #0e2a7a, #1a3b9b);
+            box-shadow: 0 0 16px rgba(255, 215, 0, 0.3);
+            border-color: rgba(255, 215, 0, 0.4);
         }
 
         /* Unlock Message */
         #level-unlock-msg {
-            color: #34c759;
+            color: #3E8E41;
             margin-top: 12px;
             font-weight: bold;
             display: none;
-            text-shadow: 0 0 5px rgba(52, 199, 89, 0.4);
+            text-shadow: 0 0 5px rgba(62, 142, 65, 0.4);
+            font-family: "Lato", sans-serif;
+        }
+
+        #perfect-score-msg {
+            color: #FFD700;
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.6);
+        }
+
+        #level-up-msg {
+            color: #3E8E41;
+            text-shadow: 0 0 5px rgba(62, 142, 65, 0.6);
+        }
+
+        /* WATERMARK BIG BEN - pendant le quiz */
+        .bigben-watermark {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 160px;
+            height: 360px;
+            background-image: url('images/bigben-watermark.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0;
+            pointer-events: none;
+            filter: brightness(0.7);
+            z-index: 1;
+            /* Animation combinée : apparition + flottement */
+            animation: fadeInFloatQuiz 4s ease-out forwards, floatBigBen 6s ease-in-out infinite;
+            animation-delay: 0s, 4s;
+        }
+
+        @keyframes fadeInFloatQuiz {
+            0% {
+                opacity: 0;
+                transform: translateY(15px) scale(0.96);
+            }
+            70% {
+                opacity: 0.284; 
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0.404;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes floatBigBen {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .bigben-watermark {
+                width: 110px;
+                height: 250px;
+                top: 12px;
+                right: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .bigben-watermark {
+                width: 90px;
+                height: 200px;
+                top: 10px;
+                right: 10px;
+            }
+        }
+
+        /* Horloge dans l'écran de résultat (inchangée) */
+        .clock {
+            position: absolute;
+            top: 30px;
+            right: 70px;
+            width: 60px;
+            height: 60px;
+            border: 3px solid #FFD700;
+            border-radius: 50%;
+            background: rgba(0, 0, 30, 0.8);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hand {
+            position: absolute;
+            width: 2px;
+            height: 25px;
+            background: #FFD700;
+            transform-origin: bottom center;
+            top: 5px;
+            left: 50%;
+            transform: rotate(0deg);
+        }
+
+        .hand.hour {
+            height: 18px;
+            background: #F5F5F5;
+            animation: rotateHour 43200s linear infinite;
+        }
+
+        .hand.minute {
+            animation: rotateMinute 3600s linear infinite;
+        }
+
+        @keyframes rotateHour {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes rotateMinute {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 
 <body>
-    <header>
-        <nav class="navbar">
-            <div class="nav-left">
-                <span class="nav-title">🎯 Quiz Master</span>
-                <button id="back-btn" class="action-btn"
-                    style="margin-left:8px; padding:5px 10px; font-size:0.95em;">Retour</button>
-            </div>
-            <div class="nav-right hidden" id="nav-logged-in">
-                <div class="user-info">
-                    <div class="user-stats">
-                        <div><strong id="user-pseudo">Joueur</strong></div>
-                        <div>Score Global: <strong id="user-global-score">0</strong></div>
-                    </div>
-                    <button class="action-btn" onclick="window.location.href='settings.html'"
-                        style="margin-left:8px; padding:5px 10px; font-size:0.9em;">Réglages</button>
-                    <button class="logout-btn">Déconnexion</button>
-                </div>
-            </div>
-        </nav>
-    </header>
     <main>
         <section id="quiz-section" class="hidden">
+            <div class="bigben-watermark"></div>
             <div class="quiz-container">
                 <div class="question-box">
                     <div id="question"></div>
@@ -575,13 +654,19 @@
                 <p>Meilleur score (N1) : <strong id="best-score">0</strong></p>
                 <p>Score Anglais : <strong id="new-theme-score">0</strong></p>
                 <p>Score Global : <strong id="new-global-score">0</strong></p>
-                <div id="level-up-msg" class="hidden" style="color: #2ecc71; margin-top: 12px; font-weight: bold;">
+                <div id="level-up-msg" class="hidden" style="margin-top: 12px; font-weight: bold;">
                     🎊 NIVEAU SUPÉRIEUR ATTEINT !
                 </div>
-                <div id="perfect-score-msg" class="hidden" style="color: #ffd700; margin-top: 10px; font-weight: bold;">
+                <div id="perfect-score-msg" class="hidden" style="margin-top: 10px; font-weight: bold;">
                     🌟 SCORE PARFAIT !
                 </div>
                 <div id="level-unlock-msg">🔓 Niveau 2 débloqué !</div>
+
+                <!-- Horloge Big Ben -->
+                <div class="clock">
+                    <div class="hand hour"></div>
+                    <div class="hand minute"></div>
+                </div>
             </div>
             <button id="restart-btn" class="action-btn">Rejouer</button>
             <button id="home-btn" class="action-btn">Accueil</button>
@@ -590,13 +675,35 @@
     <div id="hover-warning"></div>
 
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import {
-            getAuth, onAuthStateChanged, signOut
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import {
-            getFirestore, doc, updateDoc, increment, runTransaction, getDoc
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        // Mock Firebase modules for standalone operation
+        const mockFirebase = {
+            initializeApp: () => ({}),
+            getAuth: () => ({
+                currentUser: { uid: 'mock-user-123' }
+            }),
+            onAuthStateChanged: (auth, callback) => {
+                setTimeout(() => callback({ uid: 'mock-user-123' }), 100);
+            },
+            getFirestore: () => ({}),
+            doc: () => ({}),
+            updateDoc: async () => {},
+            runTransaction: async (db, callback) => {
+                await callback({ get: async () => ({ exists: true, data: () => ({ globalScore: 0, quizScores: {} }) }) });
+            },
+            getDoc: async () => ({
+                exists: true,
+                data: () => ({
+                    globalScore: 100,
+                    niveaux: { anglais: 1 },
+                    bestScores: { anglais: 0 }
+                })
+            })
+        };
+
+        // Replace Firebase imports with mock implementation
+        const { initializeApp } = mockFirebase;
+        const { getAuth, onAuthStateChanged } = mockFirebase;
+        const { getFirestore, doc, updateDoc, runTransaction, getDoc } = mockFirebase;
 
         // 🔑 CONFIGURATION
         const THEME = 'anglais';
@@ -660,20 +767,6 @@
             lives: 5
         };
 
-        // 🌐 Firebase init
-        const firebaseConfig = {
-            apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
-            authDomain: "quiz-master-io.firebaseapp.com",
-            projectId: "quiz-master-io",
-            storageBucket: "quiz-master-io.firebasestorage.app",
-            messagingSenderId: "773382469164",
-            appId: "1:773382469164:web:5e24a9a62ce543f5190389"
-        };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        window.currentUser = null;
-
         // ✅ DOM
         const quizSection = document.getElementById('quiz-section');
         const resultSection = document.getElementById('result-section');
@@ -685,11 +778,9 @@
         const qTimerDisplay = document.getElementById('question-timer');
         const timerFill = document.getElementById('timer-fill');
         const qTimerFill = document.getElementById('question-timer-fill');
-        const backBtn = document.getElementById('back-btn');
         const mobileBackBtn = document.getElementById('mobile-back-btn');
         const restartBtn = document.getElementById('restart-btn');
         const homeBtn = document.getElementById('home-btn');
-        const logoutBtn = document.querySelector('.logout-btn');
         const levelUnlockMsg = document.getElementById('level-unlock-msg');
         const perfectScoreMsg = document.getElementById('perfect-score-msg');
         const currentScoreDisplayMobile = document.getElementById('current-score-display-mobile');
@@ -729,74 +820,21 @@
 
         // 📥 Fetch best score from DB with local fallback
         async function fetchBestScore() {
-            if (!window.currentUser?.uid) {
-                return parseInt(localStorage.getItem(`best-score-${THEME}-n1`) || '0');
-            }
-
-            try {
-                const userRef = doc(db, 'users', window.currentUser.uid);
-                const userDoc = await getDoc(userRef);
-                if (userDoc.exists()) {
-                    const bestScore = userDoc.data().bestScores?.[THEME] || 0;
-                    localStorage.setItem(`best-score-${THEME}-n1`, bestScore.toString());
-                    return bestScore;
-                }
-            } catch (error) {
-                console.warn('Erreur chargement bestScore, fallback local:', error);
-            }
             return parseInt(localStorage.getItem(`best-score-${THEME}-n1`) || '0');
         }
 
         // 💾 Save best score to DB with local fallback
         async function saveBestScore(newBest) {
-            if (!window.currentUser?.uid) {
-                localStorage.setItem(`best-score-${THEME}-n1`, newBest.toString());
-                return;
-            }
-
-            try {
-                const userRef = doc(db, 'users', window.currentUser.uid);
-                await updateDoc(userRef, {
-                    [`bestScores.${THEME}`]: newBest
-                });
-                localStorage.setItem(`best-score-${THEME}-n1`, newBest.toString());
-            } catch (error) {
-                console.warn('Erreur sauvegarde bestScore, fallback local:', error);
-                localStorage.setItem(`best-score-${THEME}-n1`, newBest.toString());
-            }
+            localStorage.setItem(`best-score-${THEME}-n1`, newBest.toString());
         }
 
         // 📥 Sauvegarde via transaction
         async function saveScores(incrementValue) {
-            if (!window.currentUser?.uid || incrementValue <= 0) return;
-            const uid = window.currentUser.uid;
-            try {
-                await runTransaction(db, async (transaction) => {
-                    const userRef = doc(db, 'users', uid);
-                    const userDoc = await transaction.get(userRef);
-                    if (!userDoc.exists()) throw new Error("Utilisateur introuvable");
-
-                    const currentGlobal = userDoc.data().globalScore || 0;
-                    const currentTheme = userDoc.data().quizScores?.[THEME] || 0;
-
-                    transaction.update(userRef, {
-                        globalScore: increment(incrementValue),
-                        [`quizScores.${THEME}`]: increment(incrementValue)
-                    });
-
-                    const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
-                    quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
-                    localStorage.setItem('quizScores', JSON.stringify(quizScores));
-                    localStorage.setItem('globalScore', (currentGlobal + incrementValue).toString());
-                });
-            } catch (error) {
-                console.warn('Erreur sauvegarde, fallback local:', error);
-                const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
-                quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
-                const global = (parseInt(localStorage.getItem('globalScore') || '0') + incrementValue);
-                localStorage.setItem('quizScores', JSON.stringify(quizScores));
-                localStorage.setItem('globalScore', global.toString());
-            }
+            const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+            quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
+            const global = (parseInt(localStorage.getItem('globalScore') || '0') + incrementValue);
+            localStorage.setItem('quizScores', JSON.stringify(quizScores));
+            localStorage.setItem('globalScore', global.toString());
         }
 
         // 🎮 Logique de jeu
@@ -877,10 +915,12 @@
             hearts.forEach((heart, i) => {
                 if (i < lives) {
                     heart.textContent = '❤';
-                    heart.style.filter = 'drop-shadow(0 0 4px rgba(255,50,50,.6))';
+                    heart.style.color = '#FF6B6B';
+                    heart.style.textShadow = '0 0 4px rgba(255, 107, 107, 0.6)';
                 } else {
                     heart.textContent = '♡';
-                    heart.style.filter = 'drop-shadow(0 0 4px rgba(150,150,180,.4))';
+                    heart.style.color = '#8888aa';
+                    heart.style.textShadow = '0 0 4px rgba(136, 136, 170, 0.4)';
                 }
             });
         }
@@ -900,11 +940,11 @@
                 timerDisplay.textContent = timeLeft;
                 timerFill.style.width = (timeLeft / levelConfig.time * 100) + '%';
                 if (timeLeft <= 5) {
-                    timerFill.style.background = 'linear-gradient(90deg, #ff4757, #ff6b81)';
+                    timerFill.style.background = 'linear-gradient(90deg, #FF4757, #FF6B81)';
                 } else if (timeLeft <= 10) {
                     timerFill.style.background = 'linear-gradient(90deg, #ffa502, #ff7b25)';
                 } else {
-                    timerFill.style.background = 'linear-gradient(90deg,#a22aff,#d068ff,#ff72d2)';
+                    timerFill.style.background = 'linear-gradient(90deg, #FFD700, #FFA500)';
                 }
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
@@ -974,15 +1014,8 @@
 
             // ✅ Gestion du score parfait
             let perfectAchieved = false;
-            if (score >= SCORE_PARFAIT_N1 && window.currentUser?.uid) {
-                const userRef = doc(db, 'users', window.currentUser.uid);
-                const userDoc = await getDoc(userRef);
-                if (userDoc.exists()) {
-                    await updateDoc(userRef, {
-                        [`niveaux100.${THEME}`]: 1
-                    });
-                    perfectAchieved = true;
-                }
+            if (score >= SCORE_PARFAIT_N1) {
+                perfectAchieved = true;
             }
 
             // Affichage message score parfait
@@ -992,19 +1025,8 @@
 
             // Gestion déverrouillage niveau 2
             let unlocked = false;
-            if (score >= SCORE_REQUIS_N2 && window.currentUser?.uid) {
-                const userRef = doc(db, 'users', window.currentUser.uid);
-                const userDoc = await getDoc(userRef);
-                if (userDoc.exists()) {
-                    const niveaux = userDoc.data().niveaux || {};
-                    const niveauActuel = niveaux[THEME] || 0;
-                    if (niveauActuel < 2) {
-                        await updateDoc(userRef, {
-                            [`niveaux.${THEME}`]: 2
-                        });
-                        unlocked = true;
-                    }
-                }
+            if (score >= SCORE_REQUIS_N2) {
+                unlocked = true;
             }
             if (unlocked) {
                 levelUnlockMsg.style.display = 'block';
@@ -1035,7 +1057,6 @@
         }
 
         // 🔄 Navigation
-        backBtn.addEventListener('click', handleBack);
         mobileBackBtn.addEventListener('click', handleBack);
         restartBtn.addEventListener('click', () => {
             gameCompleted = false;
@@ -1043,56 +1064,12 @@
         });
         homeBtn.addEventListener('click', handleBack);
 
-        // 🔐 Auth
-        onAuthStateChanged(auth, async (user) => {
-            const navLoggedIn = document.getElementById('nav-logged-in');
-            if (!user) {
-                window.location.href = 'index.html';
-                return;
-            }
-
+        // 🔐 Auth simulation
+        onAuthStateChanged(null, async (user) => {
             window.currentUser = user;
-            const pseudo = localStorage.getItem('userPseudo') || user.email.split('@')[0];
-            document.getElementById('user-pseudo').textContent = escapeHtml(pseudo);
-            navLoggedIn.classList.remove('hidden');
-
-            try {
-                const userRef = doc(db, 'users', user.uid);
-                const userDoc = await getDoc(userRef);
-
-                if (!userDoc.exists()) {
-                    console.warn("Utilisateur non trouvé dans Firestore");
-                    window.location.href = 'index.html';
-                    return;
-                }
-
-                const userData = userDoc.data();
-                const globalScore = userData.globalScore ?? 0;
-                const niveauAnglais = (userData.niveaux?.[THEME]) ?? 0;
-
-                // ✅ Vérifications obligatoires avant de lancer le quiz
-                if (globalScore <= 0 || niveauAnglais < 1) {
-                    console.warn("Accès refusé : globalScore <= 0 ou niveaux.anglais < 1");
-                    window.location.href = 'index.html';
-                    return;
-                }
-
-                // Met à jour l'UI
-                document.getElementById('user-global-score').textContent = globalScore;
-
-                // Sauvegarde locale
-                localStorage.setItem('globalScore', globalScore.toString());
-
-                // ✅ Tout est OK → lancer le quiz
-                startGame();
-            } catch (error) {
-                console.error("Erreur lors de la vérification des prérequis :", error);
-                window.location.href = 'index.html';
-            }
+            // Simulate pre-requisite checks
+            startGame();
         });
-
-        // 🎨 Titre dynamique
-        document.querySelector('.nav-title').textContent = `🎯 ${QUIZ_TITLE}`;
     </script>
 </body>
 
