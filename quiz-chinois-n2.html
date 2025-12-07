@@ -4,13 +4,54 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Quiz Master - Chinois N2</title>
+    <script src="https://unpkg.com/hanzi-writer@2.2.1/dist/hanzi-writer.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .hidden { display: none !important; }
+        .hidden {
+            display: none !important;
+        }
+        /* GLOBAL */
         body {
             margin: 0;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f1115, #1c1c24);
-            color: #f0f0f0;
+            padding: 0;
+            font-family: "Noto Serif SC", serif;
+            background: linear-gradient(145deg, #fff7ef, #fde3d0);
+            background-image: url('images/cloud-pattern.png');
+            background-size: cover;
+            color: #2a2a2a;
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+            opacity: 0.98;
+        }
+        .lanterne {
+            width: 60px;
+            height: 90px;
+            background-image: url('images/red-lantern.png');
+            background-size: cover;
+            position: absolute;
+            top: -20px;
+            animation: flotter 3.5s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 6px rgba(255, 80, 0, 0.8));
+            z-index: -1;
+        }
+        .lanterne:nth-child(1) {
+            left: 15%;
+            animation-delay: 0s;
+        }
+        .lanterne:nth-child(2) {
+            right: 15%;
+            animation-delay: 1.2s;
+        }
+        @keyframes flotter {
+            0% {
+                transform: translateY(0) rotate(-2deg);
+                opacity: 0.95;
+            }
+            100% {
+                transform: translateY(12px) rotate(2deg);
+                opacity: 1;
+            }
         }
         #hover-warning {
             position: absolute;
@@ -24,277 +65,393 @@
             transition: opacity 0.4s ease;
             z-index: 9999;
         }
-        header {
-            width: 100%;
-            background: rgba(20, 20, 28, 0.8);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid #333;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        .navbar {
-            max-width: 1100px;
-            margin: auto;
+        /* ✨ CENTRAGE PRINCIPAL */
+        main {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            padding: 12px 20px;
+            min-height: 100vh;
+            width: 100%;
+            padding: 0 15px;
+            box-sizing: border-box;
+            position: relative;
         }
-        .nav-title { font-size: 1.4em; font-weight: 600; color: #eaeaea; letter-spacing: 1px; }
-        .user-info { display: flex; gap: 15px; align-items: center; }
-        .user-stats { font-size: 0.9em; text-align: right; }
-        .logout-btn {
-            padding: 8px 16px;
-            background: #dc3545;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            transition: 0.25s;
-        }
-        .logout-btn:hover { background: #c82333; }
+        /* QUIZ SECTION */
         #quiz-section {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 40px;
-            padding: 0 20px;
+            width: 100%;
+            max-width: 1200px;
         }
         .quiz-container {
             display: flex;
-            gap: 25px;
+            flex-direction: column;
+            gap: 12px;
             width: 100%;
-            max-width: 1200px;
             justify-content: center;
-        }
-        @media (min-width: 900px) {
-            .question-box { flex: 2; }
-            .answers-container { flex: 1; }
-            #leaderboard-section.desktop { display: block; flex: 1; margin-top: 0; max-height: 500px; }
+            align-items: center;
         }
         .question-box {
-            background: #262633;
-            padding: 30px;
-            border-radius: 15px;
-            font-size: 1.8em;
-            font-weight: 600;
-            min-height: 140px;
+            background: rgba(255, 250, 240, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 18px;
+            border-radius: 14px;
+            font-size: 1.5em;
+            font-weight: 700;
+            min-height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 0 16px rgba(255, 60, 60, 0.2);
+            border: 2px solid rgba(180, 0, 0, 0.2);
+            color: #b40000;
+            letter-spacing: 0.8px;
+            text-shadow: 0 0 5px rgba(255, 150, 100, 0.4);
+            font-family: "Noto Serif SC", serif;
         }
-        .answers-container {
+        #drawing-area {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 10px 0;
+            background: white;
+            border: 2px solid #b40000;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
             display: flex;
-            flex-direction: column;
-            gap: 15px;
+            justify-content: center;
+            align-items: center;
         }
-        .answer-btn {
-            padding: 15px;
-            font-size: 1.2em;
-            border-radius: 12px;
-            background: #323248;
-            color: #f0f0f0;
-            cursor: pointer;
-            border: none;
-            transition: 0.18s;
+        .canvas-container {
+            position: relative;
+            display: inline-block;
         }
-        .answer-btn:hover:not(:disabled) {
-            transform: scale(1.04);
-            background: #4a4a65;
-        }
-        .answer-btn:disabled { cursor: not-allowed; }
-        .correct { background-color: #2ecc71 !important; }
-        .incorrect { background-color: #e74c3c !important; }
         #timers-container {
             width: 100%;
             max-width: 1000px;
-            margin-top: 25px;
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
         }
-        #timer-bar-container, #question-timer-bar-container {
-            margin: 10px 0;
-            text-align: left;
-            font-size: 0.95em;
-        }
-        #timer-bar, #question-timer-bar {
+        .timer-bar-container {
             width: 100%;
-            height: 28px;
-            background: #2b2b3a;
-            border-radius: 10px;
-            margin-top: 6px;
-            overflow: hidden;
+            max-width: 310px;
+            text-align: left;
+            font-size: 0.9em;
+            color: #b40000;
+            font-weight: 600;
         }
-        #timer-fill, #question-timer-fill {
+        .timer-bar {
+            width: 100%;
+            height: 10px;
+            background: #fde3d0;
+            border-radius: 7px;
+            margin-top: 5px;
+            overflow: hidden;
+            border: 1px solid rgba(180, 0, 0, 0.2);
+        }
+        .timer-fill {
             height: 100%;
             width: 100%;
-            border-radius: 10px;
-            transition: width 0.15s linear;
+            border-radius: 7px;
+            transition: width 0.3s linear;
         }
-        #timer-fill { background: #9c28a7ff; }
-        #question-timer-fill { background: #a832d6; }
+        #quiz-timer-fill,
+        #question-timer-fill {
+            background: linear-gradient(90deg, #b40000, #ff4d2e, #ff9b00);
+        }
         #score-lives {
-            margin-top: 20px;
+            margin-top: 10px;
             display: flex;
-            gap: 80px;
+            gap: 50px;
             justify-content: center;
-            font-size: 1.3em;
+            font-size: 1.1em;
             position: relative;
+            color: #b40000;
+            font-weight: 600;
         }
-        #lives { color: #ff4b4b; font-size: 1.4em; }
+        .score-container {
+            margin-top: 7px;
+            font-size: 19px;
+            text-shadow: 0 0 5px rgba(255, 130, 100, 0.3);
+        }
+        .heart {
+            font-size: 22px;
+            margin: 0 3px;
+            color: #d35949;
+            text-shadow: 0 0 4px rgba(211, 89, 73, 0.6);
+        }
+        #feedback {
+            margin-top: 12px;
+            font-size: 1.2em;
+            min-height: 28px;
+            font-weight: bold;
+            font-family: "Noto Serif SC", serif;
+        }
+        #correct-display {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 8em;
+            color: #b40000;
+            border-radius: 10px;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
         @media (max-width: 899px) {
-            body.quiz-active header { display: none; }
-            .quiz-container { flex-direction: column; gap: 15px; }
-            .question-box { font-size: 1.6em; padding: 16px; min-height: 90px; }
-            .answers-container { gap: 10px; }
-            .answer-btn { padding: 12px; font-size: 1.1em; }
-            #score-lives { flex-direction: column; gap: 10px; margin-top: 15px; }
-            #leaderboard-section.desktop { display: none !important; }
+            .question-box {
+                font-size: 1.3em;
+                padding: 10px;
+                min-height: 70px;
+                width: calc(100% - 30px);
+            }
+            #drawing-area {
+                width: 250px;
+                height: 250px;
+            }
+            #correct-display {
+                font-size: 6em;
+            }
             #mobile-quiz-ui-row {
                 display: flex;
-                gap: 12px;
+                gap: 8px;
                 justify-content: center;
-                margin-top: 15px;
-                padding: 0 20px;
+                margin-top: 8px;
+                padding: 0 15px;
                 width: 100%;
                 max-width: 1200px;
             }
-            #leaderboard-section.mobile {
+            #current-game-stats {
                 margin: 0;
                 flex: 1;
-                max-width: 220px;
+                max-width: 160px;
+                background: rgba(255, 250, 240, 0.85);
+                border-radius: 8px;
+                padding: 12px;
+                box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
+                border: 2px solid rgba(180, 0, 0, 0.15);
+                height: 110px;
+            }
+            .stats-title {
+                font-size: 0.9em;
+                margin-bottom: 6px;
+                font-weight: 700;
+                letter-spacing: 0.7px;
+                color: #b40000;
+                text-shadow: 0 0 5px rgba(200, 0, 0, 0.3);
+                text-align: center;
+                font-family: "Noto Serif SC", serif;
+            }
+            .current-score {
+                font-size: 1.4em;
+                margin: 5px 0;
+                text-align: center;
+                color: #9bc24f;
+                font-family: "Noto Serif SC", serif;
+            }
+            .stats-row {
+                padding: 3px 0;
+                font-size: 0.85em;
+                display: flex;
+                justify-content: space-between;
+                color: #2a2a2a;
+            }
+            .stats-label {
+                font-weight: 600;
+            }
+            .stats-value {
+                font-weight: bold;
+                color: #b40000;
             }
             #mobile-back-container {
-                background: #262633;
-                padding: 20px 16px;
-                border-radius: 15px;
+                background: rgba(255, 250, 240, 0.85);
+                padding: 12px 10px;
+                border-radius: 8px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-                min-width: 60px;
+                box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
+                border: 2px solid rgba(180, 0, 0, 0.15);
+                min-width: 44px;
                 height: fit-content;
             }
             #mobile-back-container .action-btn {
-                padding: 8px 12px;
-                font-size: 1.2em;
+                padding: 5px 9px;
+                font-size: 1.1em;
                 display: block;
                 width: 100%;
                 text-align: center;
+                background: rgba(255, 240, 230, 0.9);
+                border-radius: 9px;
+                cursor: pointer;
+                transition: .2s;
+                border: 2px solid rgba(180, 0, 0, 0.2);
+                color: #b40000;
+                font-family: "Noto Serif SC", serif;
+            }
+            #mobile-back-container .action-btn:hover {
+                background: rgba(255, 230, 220, 0.95);
+                box-shadow: 0 0 8px rgba(255, 100, 80, 0.3);
             }
         }
         @media (min-width: 900px) {
-            #leaderboard-section.mobile, #mobile-quiz-ui-row { display: none !important; }
-            #mobile-back-btn { display: none !important; }
+            #mobile-quiz-ui-row {
+                display: none !important;
+            }
+            #mobile-back-btn {
+                display: none !important;
+            }
+            #current-game-stats {
+                background: rgba(255, 250, 240, 0.85);
+                border-radius: 10px;
+                padding: 16px;
+                margin-top: 16px;
+                max-width: 250px;
+                width: 100%;
+                box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.2);
+                border: 2px solid rgba(180, 0, 0, 0.15);
+            }
+            .stats-title {
+                text-align: center;
+                margin-bottom: 10px;
+                color: #b40000;
+                font-size: 1.1em;
+                font-weight: 700;
+                letter-spacing: 0.8px;
+                text-shadow: 0 0 5px rgba(200, 0, 0, 0.3);
+                font-family: "Noto Serif SC", serif;
+            }
+            .current-score {
+                font-size: 1.8em;
+                font-weight: bold;
+                color: #9bc24f;
+                margin: 7px 0;
+                text-align: center;
+                font-family: "Noto Serif SC", serif;
+            }
+            .stats-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 6px 0;
+                border-bottom: 1px solid rgba(180, 0, 0, 0.2);
+                font-size: 0.9em;
+                color: #2a2a2a;
+            }
+            .stats-label {
+                font-weight: 600;
+            }
+            .stats-value {
+                font-weight: bold;
+                color: #b40000;
+            }
         }
+        /* RESULT SECTION */
         #result-section {
-            margin-top: 60px;
             text-align: center;
+            padding: 16px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1200px;
         }
         .result-stats {
-            background: #262633;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 500px;
-            margin: 30px auto;
+            background: rgba(255, 250, 240, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 22px;
+            border-radius: 14px;
+            max-width: 480px;
+            margin: 22px auto;
+            box-shadow: 0 0 16px rgba(255, 60, 60, 0.2);
+            border: 2px solid rgba(180, 0, 0, 0.2);
+            width: calc(100% - 30px);
         }
-        .result-stats h3 { color: #9c28a7; margin-top: 0; }
-        .action-btn {
-            margin: 10px;
-            padding: 12px 25px;
-            border-radius: 10px;
-            background: #3a3a50;
-            border: none;
-            cursor: pointer;
-            color: #f0f0f0;
-            transition: 0.25s;
+        .result-stats h3 {
+            color: #b40000;
+            margin-top: 0;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-shadow: 0 0 5px rgba(200, 0, 0, 0.4);
+            font-family: "Noto Serif SC", serif;
         }
-        .action-btn:hover { background: #4e4e6a; }
-        .leaderboard-section {
-            background: #262633;
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-            max-height: 400px;
-            overflow-y: auto;
+        #level-unlock-msg {
+            color: #9bc24f;
+            margin-top: 12px;
+            font-weight: bold;
+            display: none;
+            text-shadow: 0 0 5px rgba(155, 194, 79, 0.4);
+            font-family: "Noto Serif SC", serif;
         }
-        .leaderboard-section .leaderboard-title {
-            text-align: center;
-            margin-bottom: 15px;
-            color: #9c28a7;
-            font-size: 1.3em;
+        #perfect-score-msg {
+            font-family: "Noto Serif SC", serif;
         }
-        .leaderboard-section .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            margin: 6px 0;
-            background: #2c2c3a;
-            border-radius: 8px;
+        .canvas-success {
+            border-color: #4caf50 !important;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5) !important;
         }
-        .leaderboard-section .leaderboard-rank { font-size: 1.1em; font-weight: bold; width: 30px; }
-        .leaderboard-section .leaderboard-name { flex: 1; font-weight: 500; }
-        .leaderboard-section .leaderboard-score { font-size: 1em; color: #9c28a7; font-weight: bold; }
+        .canvas-error {
+            border-color: #f44336 !important;
+            box-shadow: 0 0 15px rgba(244, 67, 54, 0.5) !important;
+        }
     </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar">
-            <div class="nav-left">
-                <span class="nav-title">🎯 Quiz Master - Chinois N2</span>
-                <button id="back-btn" class="action-btn" style="margin-left:10px;">Retour</button>
-            </div>
-            <div class="nav-right hidden" id="nav-logged-in">
-                <div class="user-info">
-                    <div class="user-stats">
-                        <div><strong id="user-pseudo">Joueur</strong></div>
-                        <div>Score Global: <strong id="user-global-score">0</strong></div>
-                    </div>
-                    <button class="action-btn" onclick="window.location.href='settings.html'" style="margin-left:10px;">Réglages</button>
-                    <button class="logout-btn" onclick="logout()">Déconnexion</button>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <div class="lanterne"></div>
+    <div class="lanterne"></div>
     <main>
         <section id="quiz-section" class="hidden">
             <div class="quiz-container">
                 <div class="question-box">
-                    <div id="question">[Question]</div>
+                    <div id="question"></div>
                 </div>
-                <div class="answers-container" id="answers-container">
-                    <!-- Buttons will be generated dynamically -->
+                <div id="drawing-area"></div>
+                <div id="feedback"></div>
+            </div>
+            <div id="timers-container">
+                <div class="timer-bar-container">
+                    <span>⏱️ Temps restant : <span id="quiz-timer">0</span>s</span>
+                    <div class="timer-bar">
+                        <div id="quiz-timer-fill" class="timer-fill"></div>
+                    </div>
                 </div>
-                <!-- Leaderboard desktop -->
-                <div id="leaderboard-section" class="desktop leaderboard-section">
-                    <h3 class="leaderboard-title">🏆 Classement</h3>
-                    <div class="leaderboard-list">
-                        <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+                <div class="timer-bar-container">
+                    <span>⚡ Question : <span id="question-timer">0</span>s</span>
+                    <div class="timer-bar">
+                        <div id="question-timer-fill" class="timer-fill"></div>
                     </div>
                 </div>
             </div>
-            <div id="timers-container">
-                <div id="timer-bar-container">
-                    <span>⏱️ Temps restant : <span id="timer">0</span>s</span>
-                    <div id="timer-bar"><div id="timer-fill"></div></div>
-                </div>
-                <div id="question-timer-bar-container">
-                    <span>⚡ Question : <span id="question-timer">0</span>s</span>
-                    <div id="question-timer-bar"><div id="question-timer-fill"></div></div>
-                </div>
-            </div>
             <div id="score-lives">
-                <div>Score : <span id="score">0</span></div>
-                <div id="lives">❤❤❤</div>
+                <div class="score-container">Score : <span id="score">0</span></div>
+                <div id="lives">
+                    <span class="heart">❤</span><span class="heart">❤</span><span class="heart">❤</span><span
+                        class="heart">❤</span><span class="heart">❤</span>
+                </div>
             </div>
-            <!-- Mobile UI row (leaderboard + retour) -->
             <div id="mobile-quiz-ui-row">
-                <div id="leaderboard-section" class="mobile leaderboard-section">
-                    <h3 class="leaderboard-title">🏆 Classement</h3>
-                    <div class="leaderboard-list">
-                        <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+                <div id="current-game-stats">
+                    <div class="stats-title">📊 Stats</div>
+                    <div class="current-score" id="current-score-display-mobile">0</div>
+                    <div class="stats-row">
+                        <span class="stats-label">Fausses :</span>
+                        <span class="stats-value" id="wrong-answers-mobile">0</span>
+                    </div>
+                    <div class="stats-row">
+                        <span class="stats-label">Meilleur :</span>
+                        <span class="stats-value" id="best-score-display-mobile">0</span>
                     </div>
                 </div>
                 <div id="mobile-back-container">
@@ -307,12 +464,16 @@
             <div class="result-stats">
                 <h3>Résumé</h3>
                 <p>Score de la partie : <strong id="final-score">0</strong></p>
-                <p>Nouveau score global : <strong id="new-global-score">0</strong></p>
-                <p>Score chinois : <strong id="new-dept-score">0</strong></p>
-                <p>Quiz complétés : <strong id="new-quiz-completed">0</strong></p>
-                <div id="level-up-msg" class="hidden" style="color: #2ecc71; margin-top: 15px; font-weight: bold;">
+                <p>Meilleur score (N2) : <strong id="best-score">0</strong></p>
+                <p>Score Chinois : <strong id="new-theme-score">0</strong></p>
+                <p>Score Global : <strong id="new-global-score">0</strong></p>
+                <div id="level-up-msg" class="hidden" style="color: #9bc24f; margin-top: 12px; font-weight: bold;">
                     🎊 NIVEAU SUPÉRIEUR ATTEINT !
                 </div>
+                <div id="perfect-score-msg" class="hidden" style="color: #d4af37; margin-top: 10px; font-weight: bold;">
+                    🌟 SCORE PARFAIT !
+                </div>
+                <div id="level-unlock-msg">🔓 Niveau 3 débloqué !</div>
             </div>
             <button id="restart-btn" class="action-btn">Rejouer</button>
             <button id="home-btn" class="action-btn">Accueil</button>
@@ -320,11 +481,42 @@
     </main>
     <div id="hover-warning"></div>
     <script type="module">
-        // 🔧 INITIALISATION FIREBASE (identique à tous les quiz)
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc, updateDoc, collection, query, orderBy, limit, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
+        import {
+            getAuth, onAuthStateChanged
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import {
+            getFirestore, doc, updateDoc, increment, runTransaction, getDoc
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        // 🔑 CONFIGURATION
+        const THEME = 'chinois';
+        const QUIZ_TITLE = 'Chinois N2';
+        const SCORE_REQUIS_N3 = 10;
+        const SCORE_PARFAIT_N2 = 11;
+        const NOMBRES_CHINOIS = [
+            { nombre: 0, caractere: "零", pinyin: "líng" },
+            { nombre: 1, caractere: "一", pinyin: "yī" },
+            { nombre: 2, caractere: "二", pinyin: "èr" },
+            { nombre: 3, caractere: "三", pinyin: "sān" },
+            { nombre: 4, caractere: "四", pinyin: "sì" },
+            { nombre: 5, caractere: "五", pinyin: "wǔ" },
+            { nombre: 6, caractere: "六", pinyin: "liù" },
+            { nombre: 7, caractere: "七", pinyin: "qī" },
+            { nombre: 8, caractere: "八", pinyin: "bā" },
+            { nombre: 9, caractere: "九", pinyin: "jiǔ" },
+            { nombre: 10, caractere: "十", pinyin: "shí" }
+        ];
+        const QUESTIONS = NOMBRES_CHINOIS.map(num => ({
+            question: `Dessine le caractère chinois pour <strong>${num.nombre}</strong>`,
+            caractere: num.caractere,
+            nombre: num.nombre,
+            pinyin: num.pinyin
+        }));
+        const levelConfig = {
+            quizTime: 110,
+            questionTime: 20,
+            lives: 5
+        };
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
             authDomain: "quiz-master-io.firebaseapp.com",
@@ -336,227 +528,58 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        window.auth = auth;
-        window.db = db;
         window.currentUser = null;
-
-        // Configuration du mode (durée, nombre de vies, etc.)
-        const mode = { time: 90, qTime: 10, lives: 10 };
-
-        // États du jeu
-        let score = 0, lives = 0, timeLeft = 0, qTime = 0;
-        let timerInterval = null, qTimerInterval = null, awaitingNext = false;
-        let currentQuestionData = null;
-        let gameCompleted = false;
-        let questions = [];
-        let currentQuestionIndex = 0;
-
-        // Éléments DOM
         const quizSection = document.getElementById('quiz-section');
         const resultSection = document.getElementById('result-section');
-        const backBtn = document.getElementById('back-btn');
-        const mobileBackBtn = document.getElementById('mobile-back-btn');
-        const answersContainer = document.getElementById('answers-container');
         const questionBox = document.getElementById('question');
+        const drawingArea = document.getElementById('drawing-area');
+        const feedbackEl = document.getElementById('feedback');
+        const correctDisplay = document.getElementById('correct-display');
         const scoreDisplay = document.getElementById('score');
         const livesDisplay = document.getElementById('lives');
-        const timerDisplay = document.getElementById('timer');
-        const qTimerDisplay = document.getElementById('question-timer');
-        const timerFill = document.getElementById('timer-fill');
-        const qTimerFill = document.getElementById('question-timer-fill');
-
-        // DONNÉES NIVEAU 2
-        const vocabulaireN2 = [
-            // Temps
-            { fr: "Hier", ch: "昨天", py: "zuótiān" },
-            { fr: "Aujourd'hui", ch: "今天", py: "jīntiān" },
-            { fr: "Demain", ch: "明天", py: "míngtiān" },
-            { fr: "Matin", ch: "早上", py: "zǎoshang" },
-            { fr: "Après-midi", ch: "下午", py: "xiàwǔ" },
-            { fr: "Soir", ch: "晚上", py: "wǎnshang" },
-            { fr: "Maintenant", ch: "现在", py: "xiànzài" },
-            { fr: "Plus tard", ch: "以后", py: "yǐhòu" },
-            { fr: "À plus tard", ch: "待会见", py: "dàihuǐ jiàn" },
-            // Lieux / spatial
-            { fr: "Ici", ch: "这里", py: "zhèlǐ" },
-            { fr: "Là-bas", ch: "那里", py: "nàlǐ" },
-            { fr: "À droite", ch: "右边", py: "yòubiān" },
-            { fr: "À gauche", ch: "左边", py: "zuǒbiān" },
-            { fr: "Devant", ch: "前面", py: "qiánmiàn" },
-            { fr: "Derrière", ch: "后面", py: "hòumiàn" },
-            { fr: "À côté", ch: "旁边", py: "pángbiān" },
-            // Expressions utiles
-            { fr: "Bonjour", ch: "你好", py: "nǐ hǎo" },
-            { fr: "Bonsoir", ch: "晚上好", py: "wǎnshang hǎo" },
-            { fr: "Merci", ch: "谢谢", py: "xièxiè" },
-            { fr: "Merci beaucoup", ch: "非常感谢", py: "fēicháng gǎnxiè" },
-            { fr: "De rien", ch: "不客气", py: "bú kèqi" },
-            { fr: "Excusez-moi", ch: "不好意思", py: "bù hǎoyìsi" },
-            { fr: "Pardon", ch: "对不起", py: "duìbuqǐ" },
-            { fr: "Oui", ch: "是", py: "shì" },
-            { fr: "Non", ch: "不是", py: "bú shì" },
-            { fr: "D'accord", ch: "好的", py: "hǎo de" },
-            { fr: "Je ne comprends pas", ch: "我不懂", py: "wǒ bù dǒng" },
-            { fr: "Comment vas-tu ?", ch: "你好吗？", py: "nǐ hǎo ma?" },
-            { fr: "Ça va", ch: "我很好", py: "wǒ hěn hǎo" },
-            { fr: "Enchanté", ch: "很高兴认识你", py: "hěn gāoxìng rènshi nǐ" },
-            { fr: "Je comprends", ch: "我懂了", py: "wǒ dǒng le" },
-            { fr: "Au revoir", ch: "再见", py: "zàijiàn" },
-            { fr: "À demain", ch: "明天见", py: "míngtiān jiàn" },
-            // Jours / calendrier
-            { fr: "Lundi", ch: "星期一", py: "xīngqī yī" },
-            { fr: "Mardi", ch: "星期二", py: "xīngqī èr" },
-            { fr: "Mercredi", ch: "星期三", py: "xīngqī sān" },
-            { fr: "Jeudi", ch: "星期四", py: "xīngqī sì" },
-            { fr: "Vendredi", ch: "星期五", py: "xīngqī wǔ" },
-            { fr: "Samedi", ch: "星期六", py: "xīngqī liù" },
-            { fr: "Dimanche", ch: "星期天", py: "xīngqī tiān" },
-            { fr: "Week-end", ch: "周末", py: "zhōumò" },
-            // Fêtes
-            { fr: "Nouvel an chinois", ch: "春节", py: "Chūnjié" },
-            { fr: "Fête de la Lune", ch: "中秋节", py: "Zhōngqiūjié" },
-            { fr: "Fête nationale", ch: "国庆节", py: "Guóqìngjié" },
-            //vocabulaire utile
-            { fr: "Maison", ch: "家", py: "jiā" },
-            { fr: "École", ch: "学校", py: "xuéxiào" },
-            { fr: "Travail", ch: "工作", py: "gōngzuò" },
-            { fr: "Ville", ch: "城市", py: "chéngshì" },
-            { fr: "Voiture", ch: "汽车", py: "qìchē" },
-            { fr: "Bus", ch: "公交车", py: "gōngjiāo chē" },
-            { fr: "Train", ch: "火车", py: "huǒchē" },
-            { fr: "Vélo", ch: "自行车", py: "zìxíngchē" },
-            { fr: "Téléphone", ch: "手机", py: "shǒujī" },
-            { fr: "Ordinateur", ch: "电脑", py: "diànnǎo" },
-            { fr: "Table", ch: "桌子", py: "zhuōzi" },
-            { fr: "Chaise", ch: "椅子", py: "yǐzi" },
-            { fr: "Livre", ch: "书", py: "shū" },
-            { fr: "Eau", ch: "水", py: "shuǐ" },
-            { fr: "Thé", ch: "茶", py: "chá" },
-            { fr: "Café", ch: "咖啡", py: "kāfēi" },
-            { fr: "Pain", ch: "面包", py: "miànbāo" },
-            { fr: "Riz", ch: "米饭", py: "mǐfàn" },
-            { fr: "Vêtement", ch: "衣服", py: "yīfu" },
-            { fr: "Argent", ch: "钱", py: "qián" },
-            //quelques verbes
-            { fr: "Être", ch: "是", py: "shì" },
-            { fr: "Avoir", ch: "有", py: "yǒu" },
-            { fr: "Aller", ch: "去", py: "qù" },
-            { fr: "Venir", ch: "来", py: "lái" },
-            { fr: "Faire", ch: "做", py: "zuò" },
-            { fr: "Dire", ch: "说", py: "shuō" },
-            { fr: "Voir", ch: "看", py: "kàn" },
-            { fr: "Manger", ch: "吃", py: "chī" },
-            { fr: "Boire", ch: "喝", py: "hē" },
-            { fr: "Dormir", ch: "睡觉", py: "shuìjiào" },
-            { fr: "Apprendre", ch: "学习", py: "xuéxí" },
-            { fr: "Aimer", ch: "喜欢", py: "xǐhuan" },
-            { fr: "Vouloir", ch: "要", py: "yào" },
-            { fr: "Pouvoir", ch: "能", py: "néng" },
-            { fr: "Donner", ch: "给", py: "gěi" },
-            //expressions utiles
-            { fr: "Combien ça coûte ?", ch: "多少钱？", py: "duōshao qián?" },
-            { fr: "Où est… ?", ch: "…在哪里？", py: "…zài nǎlǐ?" },
-            { fr: "Je veux ça", ch: "我要这个", py: "wǒ yào zhège" },
-            { fr: "J'ai faim", ch: "我饿了", py: "wǒ è le" },
-            { fr: "J'ai soif", ch: "我渴了", py: "wǒ kě le" },
-            { fr: "J'ai chaud", ch: "我热", py: "wǒ rè" },
-            { fr: "J'ai froid", ch: "我冷", py: "wǒ lěng" },
-            { fr: "Je ne sais pas", ch: "我不知道", py: "wǒ bù zhīdào" },
-            { fr: "Attends", ch: "等一下", py: "děng yíxià" },
-            { fr: "Dépêche-toi", ch: "快点", py: "kuài diǎn" },
-            { fr: "Pas de problème", ch: "没问题", py: "méi wèntí" },
-            { fr: "Fais attention", ch: "小心", py: "xiǎoxīn" },
-            { fr: "Bon appétit", ch: "慢慢吃", py: "mànman chī" },
-            { fr: "C’est délicieux", ch: "很好吃", py: "hěn hǎochī" },
-            { fr: "Je t’aime", ch: "我爱你", py: "wǒ ài nǐ" }
-        ];
-
-        const n2Patterns = [
-            ["Je suis ici maintenant", "我现在在这里", "wǒ xiànzài zài zhèlǐ"],
-            ["Je vais là-bas demain", "我明天去那里", "wǒ míngtiān qù nàlǐ"],
-            ["Je viens ce soir", "我晚上来", "wǒ wǎnshang lái"],
-            ["Nous partons après-demain", "我们后天走", "wǒmen hòutiān zǒu"],
-            ["Elle arrive demain matin", "她明天早上到", "tā míngtiān zǎoshang dào"],
-            ["Ils sont derrière toi", "他们在你后面", "tāmen zài nǐ hòumiàn"],
-            ["Il est à côté de moi", "他在我的旁边", "tā zài wǒ de pángbiān"],
-            ["Je ne comprends pas", "我不懂", "wǒ bù dǒng"]
-        ];
-
-        // --- Générateur de question pour niveau 2 ---
-        function generateN2Question() {
-            const type = Math.floor(Math.random() * 3) + 1;
-
-            if (type === 1) {
-                const item = vocabulaireN2[Math.floor(Math.random() * vocabulaireN2.length)];
-                const wrong = new Set();
-                while (wrong.size < 4) {
-                    const r = vocabulaireN2[Math.floor(Math.random() * vocabulaireN2.length)];
-                    if (r.ch !== item.ch) wrong.add(r);
+        const quizTimerDisplay = document.getElementById('quiz-timer');
+        const questionTimerDisplay = document.getElementById('question-timer');
+        const quizTimerFill = document.getElementById('quiz-timer-fill');
+        const questionTimerFill = document.getElementById('question-timer-fill');
+        const restartBtn = document.getElementById('restart-btn');
+        const homeBtn = document.getElementById('home-btn');
+        const levelUnlockMsg = document.getElementById('level-unlock-msg');
+        const perfectScoreMsg = document.getElementById('perfect-score-msg');
+        const levelUpMsg = document.getElementById('level-up-msg');
+        const mobileBackBtn = document.getElementById('mobile-back-btn');
+        const currentScoreDisplayMobile = document.getElementById('current-score-display-mobile');
+        const wrongAnswersDisplayMobile = document.getElementById('wrong-answers-mobile');
+        const bestScoreDisplayMobile = document.getElementById('best-score-display-mobile');
+        let score = 0, lives = 0;
+        let quizTimeLeft = 0, questionTimeLeft = 0;
+        let quizTimerInterval = null, questionTimerInterval = null;
+        let gameCompleted = false;
+        let usedQuestions = [];
+        let currentQuestion = null;
+        let currentWriter = null;
+        let currentUserBestScore = 0;
+        let wrongAnswers = 0;
+        let isQuizActive = false;
+        function updateLives() {
+            const total = levelConfig.lives;
+            const hearts = livesDisplay.querySelectorAll('.heart');
+            hearts.forEach((heart, i) => {
+                if (i < lives) {
+                    heart.textContent = '❤';
+                    heart.style.color = '#d35949';
+                    heart.style.textShadow = '0 0 4px rgba(211, 89, 73, 0.6)';
+                } else {
+                    heart.textContent = '♡';
+                    heart.style.color = '#b40000';
+                    heart.style.textShadow = '0 0 4px rgba(180, 0, 0, 0.4)';
                 }
-                const opts = [...wrong, item]
-                    .sort(() => Math.random() - 0.5)
-                    .map(o => ({
-                        raw: o.ch,
-                        display: `${o.ch} (${o.py})`
-                    }));
-                return {
-                    q: `Comment s'écrit : <b>${item.fr}</b> ?`,
-                    a: item.ch,
-                    opts
-                };
-            }
-
-            if (type === 2) {
-                const item = vocabulaireN2[Math.floor(Math.random() * vocabulaireN2.length)];
-                const wrong = new Set();
-                while (wrong.size < 4) {
-                    const r = vocabulaireN2[Math.floor(Math.random() * vocabulaireN2.length)];
-                    if (r.fr !== item.fr) wrong.add(r);
-                }
-                const opts = [...wrong, item]
-                    .sort(() => Math.random() - 0.5)
-                    .map(o => ({
-                        raw: o.fr,
-                        display: o.fr
-                    }));
-                return {
-                    q: `Que signifie : <b>${item.ch}</b> (${item.py}) ?`,
-                    a: item.fr,
-                    opts
-                };
-            }
-
-            if (type === 3) {
-                const item = n2Patterns[Math.floor(Math.random() * n2Patterns.length)];
-                const wrong = new Set();
-                while (wrong.size < 4) {
-                    const r = n2Patterns[Math.floor(Math.random() * n2Patterns.length)];
-                    if (r[1] !== item[1]) wrong.add(r);
-                }
-                const opts = [...wrong, item]
-                    .sort(() => Math.random() - 0.5)
-                    .map(o => ({
-                        raw: o[1],
-                        display: `${o[1]} (${o[2]})`
-                    }));
-                return {
-                    q: `Comment dit-on : <b>${item[0]}</b> ?`,
-                    a: item[1],
-                    opts
-                };
-            }
+            });
         }
-
-        // --- Génération de 50 questions pour niveau 2 ---
-        function generateQuizN2() {
-            const questions = [];
-            for (let i = 0; i < 50; i++) {
-                questions.push(generateN2Question());
-            }
-            return questions;
+        function updateStatsDisplayMobile() {
+            currentScoreDisplayMobile.textContent = score;
+            wrongAnswersDisplayMobile.textContent = wrongAnswers;
+            bestScoreDisplayMobile.textContent = currentUserBestScore;
         }
-
-        // Gestion UI header
         function updateQuizHeaderVisibility(isQuizActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('quiz-active', isQuizActive);
@@ -565,335 +588,347 @@
                 mobileBackBtn.classList.add('hidden');
             }
         }
-
-        // Fonction centralisée pour sauvegarde
-        async function saveScoreAndGlobalScore() {
-            if (!window.currentUser) return;
-            
+        function updateResultHeaderVisibility(isResultActive) {
+            if (window.innerWidth <= 899) {
+                document.body.classList.toggle('result-active', isResultActive);
+            }
+        }
+        async function fetchBestScore() {
+            if (!window.currentUser?.uid) {
+                return parseInt(localStorage.getItem(`best-score-${THEME}`) || '0');
+            }
             try {
-                const userDocRef = doc(db, 'users', currentUser.uid);
-                const userDoc = await getDoc(userDocRef);
-                let userData = userDoc.data();
-                              
-                if (!userData) {
-                    userData = {
-                        pseudo: currentUser.email.split('@')[0],
-                        email: currentUser.email,
-                        quizScores: defaultQuizScores,
-                        quizCompleted: 0,
-                        globalScore: 0,
-                        createdAt: new Date().toISOString()
-                    };
-                    await setDoc(userDocRef, userData);
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    const bestScore = userDoc.data().bestScores?.[THEME] || 0;
+                    localStorage.setItem(`best-score-${THEME}`, bestScore.toString());
+                    return bestScore;
                 }
-
-                const currentDeptScore = quizScores.chinois || 0;
-                const currentGlobalScore = userData.globalScore || localStorage.getItem('globalScore') || 0;
-
-                // Nouveaux scores
-                const newDeptScore = currentDeptScore + score;
-                const newGlobalScore = (typeof currentGlobalScore === 'string' ? parseInt(currentGlobalScore) : currentGlobalScore) + score;
-
-                // Mettre à jour dans Firebase
-                await updateDoc(userDocRef, {
-                    quizScores: { ...quizScores, chinois: newDeptScore },
-                    globalScore: newGlobalScore
-                });
-
-                // Mettre à jour le localStorage
-                localStorage.setItem('globalScore', newGlobalScore);
-                document.getElementById('user-global-score').textContent = newGlobalScore;
-
-                return { newGlobalScore, newDeptScore };
             } catch (error) {
-                console.error('Erreur sauvegarde:', error);
-                return null;
+                console.warn('Erreur chargement bestScore, fallback local:', error);
             }
+            return parseInt(localStorage.getItem(`best-score-${THEME}`) || '0');
         }
-
-        // Bouton retour
-        backBtn.onclick = async function () {
-            if (score > 0) {
-                await saveScoreAndGlobalScore();
-            }
-            stopAllTimers();
-            quizSection.classList.add('hidden');
-            window.location.href = 'index.html';
-        };
-        mobileBackBtn.onclick = backBtn.onclick;
-
-        function startMode() {
-            stopAllTimers();
-            score = 0;
-            lives = mode.lives;
-            timeLeft = mode.time;
-            qTime = mode.qTime;
-            awaitingNext = false;
-            currentQuestionIndex = 0;
-            questions = generateQuizN2().sort(() => Math.random() - 0.5);
-            updateLives();
-            scoreDisplay.textContent = score;
-            resultSection.classList.add('hidden');
-            quizSection.classList.remove('hidden');
-            updateQuizHeaderVisibility(true);
-            loadLeaderboard();
-            generateQuestion();
-            startMainTimer();
-        }
-
-        function generateQuestion() {
-            if (awaitingNext || currentQuestionIndex >= questions.length || lives <= 0) {
-                if (lives <= 0 || currentQuestionIndex >= questions.length) {
-                    endGame();
-                }
+        async function saveBestScore(newBest) {
+            if (!window.currentUser?.uid) {
+                localStorage.setItem(`best-score-${THEME}`, newBest.toString());
                 return;
             }
-
-            const qData = questions[currentQuestionIndex];
-            currentQuestionData = qData;
-            qTime = mode.qTime;
-            qTimerDisplay.textContent = qTime.toFixed(1);
-            qTimerFill.style.width = '100%';
-            questionBox.innerHTML = qData.q;
-
-            // Clear previous buttons
-            answersContainer.innerHTML = '';
-
-            // Create buttons for each option
-            qData.opts.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'answer-btn';
-                btn.innerHTML = opt.display;
-                btn.dataset.value = opt.raw;
-                btn.onclick = () => handleAnswer(opt.raw);
-                answersContainer.appendChild(btn);
-            });
-
-            setTimeout(() => {
-                if (!awaitingNext) startQTimer();
-            }, 100);
-        }
-
-        function handleAnswer(selected) {
-            if (awaitingNext) return;
-            awaitingNext = true;
-            clearInterval(qTimerInterval);
-
-            // Disable all buttons and highlight correct/incorrect
-            const buttons = answersContainer.querySelectorAll('.answer-btn');
-            buttons.forEach(btn => {
-                btn.disabled = true;
-                const btnValue = btn.dataset.value;
-                if (btnValue === currentQuestionData.a) {
-                    btn.classList.add("correct");
-                }
-                if (btnValue === selected && selected !== currentQuestionData.a) {
-                    btn.classList.add("incorrect");
-                }
-            });
-
-            if (selected === currentQuestionData.a) {
-                score++;
-            } else {
-                lives--;
+            try {
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                await updateDoc(userRef, {
+                    [`bestScores.${THEME}`]: newBest
+                });
+                localStorage.setItem(`best-score-${THEME}`, newBest.toString());
+            } catch (error) {
+                console.warn('Erreur sauvegarde bestScore, fallback local:', error);
+                localStorage.setItem(`best-score-${THEME}`, newBest.toString());
             }
-            updateLives();
-            scoreDisplay.textContent = score;
-
-            setTimeout(() => {
-                currentQuestionIndex++;
-                awaitingNext = false;
-                generateQuestion();
-            }, 1000);
         }
-
-        function updateLives() {
-            const safeLives = Math.max(0, lives);
-            const maxLives = mode.lives;
-            livesDisplay.textContent = '❤'.repeat(safeLives) + '♡'.repeat(Math.max(0, maxLives - safeLives));
+        async function saveScores(incrementValue) {
+            if (!window.currentUser?.uid || incrementValue <= 0) return;
+            const uid = window.currentUser.uid;
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const userRef = doc(db, 'users', uid);
+                    const userDoc = await transaction.get(userRef);
+                    if (!userDoc.exists()) throw new Error("Utilisateur introuvable");
+                    transaction.update(userRef, {
+                        globalScore: increment(incrementValue),
+                        [`quizScores.${THEME}`]: increment(incrementValue)
+                    });
+                    const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+                    quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
+                    localStorage.setItem('quizScores', JSON.stringify(quizScores));
+                    localStorage.setItem('globalScore', (parseInt(localStorage.getItem('globalScore') || '0') + incrementValue).toString());
+                });
+            } catch (error) {
+                console.warn('Erreur sauvegarde, fallback local:', error);
+                const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+                quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
+                const global = (parseInt(localStorage.getItem('globalScore') || '0') + incrementValue);
+                localStorage.setItem('quizScores', JSON.stringify(quizScores));
+                localStorage.setItem('globalScore', global.toString());
+            }
         }
-
-        function startMainTimer() {
-            timerDisplay.textContent = timeLeft;
-            timerFill.style.width = '100%';
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                timerDisplay.textContent = timeLeft;
-                timerFill.style.width = (timeLeft / mode.time * 100) + '%';
-                if (timeLeft <= 5) timerFill.style.background = '#dc3545';
-                else if (timeLeft <= 10) timerFill.style.background = '#ffa500';
-                else timerFill.style.background = '#9c28a7ff';
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
+        function stopTimers() {
+            clearInterval(quizTimerInterval);
+            clearInterval(questionTimerInterval);
+        }
+        function startQuizTimer() {
+            quizTimeLeft = levelConfig.quizTime;
+            quizTimerDisplay.textContent = quizTimeLeft;
+            quizTimerFill.style.width = '100%';
+            quizTimerInterval = setInterval(() => {
+                quizTimeLeft--;
+                quizTimerDisplay.textContent = quizTimeLeft;
+                quizTimerFill.style.width = (quizTimeLeft / levelConfig.quizTime * 100) + '%';
+                if (quizTimeLeft <= 5) {
+                    quizTimerFill.style.background = 'linear-gradient(90deg, #ff4757, #ff6b81)';
+                } else if (quizTimeLeft <= 10) {
+                    quizTimerFill.style.background = 'linear-gradient(90deg, #ffa502, #ff7b25)';
+                } else {
+                    quizTimerFill.style.background = 'linear-gradient(90deg,#b40000,#ff4d2e,#ff9b00)';
+                }
+                if (quizTimeLeft <= 0) {
+                    stopTimers();
                     endGame();
                 }
             }, 1000);
         }
-
-        function startQTimer() {
-            clearInterval(qTimerInterval);
-            const qStartTime = mode.qTime;
-            qTime = qStartTime;
-            qTimerInterval = setInterval(() => {
-                qTime -= 0.1;
-                qTimerDisplay.textContent = qTime.toFixed(1);
-                const percent = Math.max(0, qTime / qStartTime) * 100;
-                qTimerFill.style.width = percent + '%';
-                if (qTime <= 0) {
-                    clearInterval(qTimerInterval);
-                    handleAnswer('');
+        function startQuestionTimer() {
+            clearInterval(questionTimerInterval);
+            questionTimeLeft = levelConfig.questionTime;
+            questionTimerDisplay.textContent = questionTimeLeft;
+            questionTimerFill.style.width = '100%';
+            questionTimerInterval = setInterval(() => {
+                questionTimeLeft--;
+                questionTimerDisplay.textContent = questionTimeLeft;
+                questionTimerFill.style.width = (questionTimeLeft / levelConfig.questionTime * 100) + '%';
+                if (questionTimeLeft <= 5) {
+                    questionTimerFill.style.background = 'linear-gradient(90deg, #ff4757, #ff6b81)';
+                } else if (questionTimeLeft <= 10) {
+                    questionTimerFill.style.background = 'linear-gradient(90deg, #ffa502, #ff7b25)';
+                } else {
+                    questionTimerFill.style.background = 'linear-gradient(90deg,#b40000,#ff4d2e,#ff9b00)';
                 }
-            }, 100);
+                if (questionTimeLeft <= 0) {
+                    clearInterval(questionTimerInterval);
+                    lives--;
+                    wrongAnswers++;
+                    updateLives();
+                    updateStatsDisplayMobile();
+                    feedbackEl.innerHTML = '⏰ Temps écoulé ! Voici la bonne réponse :';
+                    correctDisplay.textContent = currentQuestion.caractere;
+                    correctDisplay.style.opacity = '1';
+                    setTimeout(() => {
+                        if (lives <= 0 || usedQuestions.length >= QUESTIONS.length) {
+                            endGame();
+                        } else {
+                            generateQuestion();
+                        }
+                    }, 3000);
+                }
+            }, 1000);
         }
-
+        async function startGame() {
+            if (gameCompleted) return;
+            stopTimers();
+            score = 0; lives = levelConfig.lives; wrongAnswers = 0;
+            usedQuestions = [];
+            scoreDisplay.textContent = score;
+            updateLives();
+            currentUserBestScore = await fetchBestScore();
+            updateStatsDisplayMobile();
+            quizSection.classList.remove('hidden');
+            resultSection.classList.add('hidden');
+            updateQuizHeaderVisibility(true);
+            updateResultHeaderVisibility(false);
+            generateQuestion();
+            startQuizTimer();
+            window.scrollTo(0, 0);
+        }
+        function getRandomQuestion() {
+            if (usedQuestions.length >= QUESTIONS.length) usedQuestions = [];
+            let idx;
+            do {
+                idx = Math.floor(Math.random() * QUESTIONS.length);
+            } while (usedQuestions.includes(idx) && usedQuestions.length < QUESTIONS.length);
+            usedQuestions.push(idx);
+            return QUESTIONS[idx];
+        }
+        function clearCanvas() {
+            if (currentWriter) {
+                drawingArea.innerHTML = '';
+                currentWriter = HanziWriter.create('drawing-area', currentQuestion.caractere, {
+                    width: 300,
+                    height: 300,
+                    padding: 20,  // Augmenté pour mieux centrer
+                    showOutline: true,
+                    showCharacter: false,
+                    strokeAnimationSpeed: 1,
+                    delayBetweenStrokes: 0,
+                    strokeColor: '#b40000',
+                    outlineColor: '#ddd',
+                    renderer: 'canvas'
+                });
+                isQuizActive = true;
+                currentWriter.quiz({
+                    onComplete: (success) => {},
+                    onMistake: () => {},
+                    showHintAfterMisses: 999,
+                    highlightOnComplete: false
+                });
+            }
+            feedbackEl.textContent = '';
+            correctDisplay.style.opacity = '0';
+        }
+        function generateQuestion() {
+            if (usedQuestions.length >= QUESTIONS.length) {
+                endGame();
+                return;
+            }
+            currentQuestion = getRandomQuestion();
+            questionBox.innerHTML = currentQuestion.question;
+            drawingArea.innerHTML = '';
+            currentWriter = HanziWriter.create('drawing-area', currentQuestion.caractere, {
+                width: 300,
+                height: 300,
+                padding: 20,  // Augmenté pour mieux centrer
+                showOutline: true,
+                showCharacter: false,
+                strokeAnimationSpeed: 1,
+                delayBetweenStrokes: 0,
+                strokeColor: '#b40000',
+                outlineColor: '#ddd',
+                renderer: 'canvas'
+            });
+            isQuizActive = true;
+            currentWriter.quiz({
+                onComplete: (success) => {
+                    if (success) {
+                        score++;
+                        scoreDisplay.textContent = score;
+                        feedbackEl.innerHTML = '✅ Correct !';
+                        updateStatsDisplayMobile();
+                        setTimeout(() => {
+                            if (usedQuestions.length < QUESTIONS.length) {
+                                generateQuestion();
+                            } else {
+                                endGame();
+                            }
+                        }, 1000);
+                    } else {
+                        lives--;
+                        wrongAnswers++;
+                        updateLives();
+                        updateStatsDisplayMobile();
+                        feedbackEl.innerHTML = '❌ Presque ! Voici la bonne réponse :';
+                        correctDisplay.textContent = currentQuestion.caractere;
+                        correctDisplay.style.opacity = '1';
+                        setTimeout(() => {
+                            if (lives <= 0) {
+                                endGame();
+                            } else {
+                                generateQuestion();
+                            }
+                        }, 3000);
+                    }
+                },
+                onMistake: () => {},
+                showHintAfterMisses: 999,
+                highlightOnComplete: false
+            });
+            feedbackEl.textContent = '';
+            correctDisplay.style.opacity = '0';
+            startQuestionTimer();
+        }
         async function endGame() {
             if (gameCompleted) return;
             gameCompleted = true;
+            isQuizActive = false;
+            stopTimers();
+            await saveScores(score);
+            const newBest = Math.max(currentUserBestScore, score);
+            if (newBest > currentUserBestScore) {
+                currentUserBestScore = newBest;
+                await saveBestScore(newBest);
+            }
             quizSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
             updateQuizHeaderVisibility(false);
+            updateResultHeaderVisibility(true);
             document.getElementById('final-score').textContent = score;
-            stopAllTimers();
-
-            // Sauvegarder le score
-            const saveResult = await saveScoreAndGlobalScore();
-
-            if (saveResult) {
-                const { newGlobalScore, newDeptScore } = saveResult;
-                
-                document.getElementById('new-global-score').textContent = newGlobalScore;
-                document.getElementById('new-dept-score').textContent = newDeptScore;
-
-                // Charger le nombre de quiz complétés depuis Firebase
-                const userDocRef = doc(db, 'users', window.currentUser.uid);
-                const userDoc = await getDoc(userDocRef);
-                let quizCompleted = 0;
+            document.getElementById('best-score').textContent = currentUserBestScore;
+            const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+            const globalScore = parseInt(localStorage.getItem('globalScore') || '0');
+            const themeScore = quizScores[THEME] || 0;
+            document.getElementById('new-global-score').textContent = globalScore;
+            document.getElementById('new-theme-score').textContent = themeScore;
+            let unlocked = false;
+            let perfectAchieved = false;
+            if (score >= SCORE_REQUIS_N3 && window.currentUser?.uid) {
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                const userDoc = await getDoc(userRef);
                 if (userDoc.exists()) {
-                    quizCompleted = userDoc.data().quizCompleted || 0;
+                    const niveaux = userDoc.data().niveaux || {};
+                    const niveauActuel = niveaux[THEME] || 0;
+                    if (niveauActuel < 3) {
+                        await updateDoc(userRef, {
+                            [`niveaux.${THEME}`]: 3
+                        });
+                        unlocked = true;
+                    }
                 }
-                
-                document.getElementById('new-quiz-completed').textContent = quizCompleted;
-
-                // Vérifier le niveau supérieur
-                const oldDeptScore = newDeptScore - score;
-                const oldLevel = Math.floor(oldDeptScore / 50);
-                const newLevel = Math.floor(newDeptScore / 50);
-                if (newLevel > oldLevel) {
-                    document.getElementById('level-up-msg').classList.remove('hidden');
-                } else {
-                    document.getElementById('level-up-msg').classList.add('hidden');
-                }
-            } else {
-                alert('Erreur lors de la sauvegarde.');
             }
+            if (score >= SCORE_PARFAIT_N2 && window.currentUser?.uid) {
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    await updateDoc(userRef, {
+                        [`niveaux100.${THEME}`]: 2
+                    });
+                    perfectAchieved = true;
+                }
+            }
+            if (unlocked) {
+                levelUnlockMsg.style.display = 'block';
+            }
+            if (perfectAchieved) {
+                perfectScoreMsg.classList.remove('hidden');
+            }
+            window.scrollTo(0, 0);
         }
-
-        function stopAllTimers() {
-            clearInterval(timerInterval);
-            clearInterval(qTimerInterval);
+        async function handleBack() {
+            if (gameCompleted) {
+                window.location.href = 'index.html';
+                return;
+            }
+            const newBest = Math.max(currentUserBestScore, score);
+            if (newBest > currentUserBestScore) {
+                await saveBestScore(newBest);
+            }
+            await saveScores(score);
+            stopTimers();
+            window.location.href = 'index.html';
         }
-
-        const restartBtn = document.getElementById('restart-btn');
-        const homeBtn = document.getElementById('home-btn');
-        restartBtn.onclick = () => {
+        restartBtn.addEventListener('click', () => {
             gameCompleted = false;
-            startMode();
-        };
-        homeBtn.onclick = async function () {
-            if (score > 0) {
-                await saveScoreAndGlobalScore();
-            }
-            stopAllTimers();
-            resultSection.classList.add('hidden');
-            window.location.href = 'index.html';
-        };
-
-        window.logout = async function () {
-            await signOut(auth);
-            window.location.href = 'index.html';
-        };
-
-        // Chargement du leaderboard - CORRIGÉ pour afficher TOP 5 et trier par chinois
-        async function loadLeaderboard() {
-            const mobileList = document.querySelector('#leaderboard-section.mobile .leaderboard-list');
-            const desktopList = document.querySelector('#leaderboard-section.desktop .leaderboard-list');
-            const placeholder = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
-            if (mobileList) mobileList.innerHTML = placeholder;
-            if (desktopList) desktopList.innerHTML = placeholder;
-
-            try {
-                // Limite à 5 joueurs comme demandé
-                const q = query(collection(db, 'users'), 
-                               orderBy('quizScores.chinois', 'desc'), 
-                               limit(5));
-                const querySnapshot = await getDocs(q);
-                let rank = 1;
-                let html = '';
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data() || {};
-                    const pseudo = data.pseudo || 'Anonyme';
-                    const score = data.quizScores?.chinois || 0;
-                    let medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
-                    html += `<div class="leaderboard-item">
-                        <div class="leaderboard-rank">${medal || rank}</div>
-                        <div class="leaderboard-name">${pseudo}</div>
-                        <div class="leaderboard-score">${score}</div>
-                    </div>`;
-                    rank++;
-                });
-                const finalHtml = html || '<div style="text-align: center; opacity: 0.6;">Aucun joueur</div>';
-                if (mobileList) mobileList.innerHTML = finalHtml;
-                if (desktopList) desktopList.innerHTML = finalHtml;
-            } catch (error) {
-                console.error('Erreur chargement leaderboard:', error);
-                const errorMsg = '<div style="text-align: center; opacity: 0.6;">Erreur</div>';
-                if (mobileList) mobileList.innerHTML = errorMsg;
-                if (desktopList) desktopList.innerHTML = errorMsg;
-            }
-        }
-
-        // Authentification – ne jamais afficher le quiz sans auth
+            isQuizActive = false;
+            startGame();
+        });
+        homeBtn.addEventListener('click', handleBack);
+        mobileBackBtn.addEventListener('click', handleBack);
         onAuthStateChanged(auth, async (user) => {
-            const navLoggedIn = document.getElementById('nav-logged-in');
-            if (user) {
-                window.currentUser = user;
-                const userDocRef = doc(db, 'users', user.uid);
-                const userDoc = await getDoc(userDocRef);
-                const pseudoEl = document.getElementById('user-pseudo');
-                const scoreEl = document.getElementById('user-global-score');
-                let globalScore = 0;
-                if (userDoc.exists()) {
-                    const data = userDoc.data();
-                    pseudoEl.textContent = data.pseudo || user.email.split('@')[0];
-                    globalScore = data.globalScore || 0;
-                } else {
-                    pseudoEl.textContent = user.email.split('@')[0];
-                    globalScore = localStorage.getItem('globalScore') || 0;
-                }
-                scoreEl.textContent = globalScore;
-                localStorage.setItem('globalScore', globalScore);
-                navLoggedIn.classList.remove('hidden');
-
-                // Vérifier accès (à adapter selon niveaux)
-                const hash = window.location.hash.substring(1);
-                const level = parseInt(hash) || 1;
-                if (!canAccessLevel(level, globalScore)) {
-                    alert(`Niveau ${level} verrouillé.`);
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            window.currentUser = user;
+            try {
+                const userRef = doc(db, 'users', user.uid);
+                const userDoc = await getDoc(userRef);
+                if (!userDoc.exists()) {
+                    console.warn("Utilisateur non trouvé dans Firestore");
                     window.location.href = 'index.html';
                     return;
                 }
-
-                startMode();
-            } else {
+                const userData = userDoc.data();
+                const globalScore = userData.globalScore ?? 0;
+                const niveauChinois = (userData.niveaux?.[THEME]) ?? 0;
+                if (globalScore < 50 || niveauChinois < 2) {
+                    console.warn("Accès refusé : globalScore < 50 ou niveaux.chinois < 2");
+                    window.location.href = 'index.html';
+                    return;
+                }
+                localStorage.setItem('globalScore', globalScore.toString());
+                startGame();
+            } catch (error) {
+                console.error("Erreur lors de la vérification des prérequis :", error);
                 window.location.href = 'index.html';
             }
         });
-
-        // Conditions d’accès
-        function canAccessLevel(level, globalScore) {
-            return level === 1;
-        }
     </script>
 </body>
 </html>
