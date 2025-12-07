@@ -33,60 +33,6 @@
             z-index: 9999;
         }
 
-        header {
-            width: 100%;
-            background: rgba(20, 20, 28, 0.8);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(140, 140, 255, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .navbar {
-            max-width: 1100px;
-            margin: auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 12px;
-            min-height: 42px;
-        }
-
-        .nav-title {
-            font-size: 1.1em;
-            font-weight: 700;
-            color: #eaeaea;
-            letter-spacing: 0.7px;
-            text-shadow: 0 0 6px rgba(128, 0, 255, 0.4);
-        }
-
-        .user-info {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .user-stats {
-            font-size: 0.75em;
-            text-align: right;
-        }
-
-        .logout-btn {
-            padding: 5px 10px;
-            background: #dc3545;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            cursor: pointer;
-            transition: 0.25s;
-            font-size: 0.85em;
-        }
-
-        .logout-btn:hover {
-            background: #c82333;
-        }
-
         /* ✨ CENTRAGE PRINCIPAL */
         main {
             display: flex;
@@ -253,14 +199,6 @@
         }
 
         @media (max-width: 899px) {
-            body.quiz-active header {
-                display: none;
-            }
-
-            body.result-active header {
-                display: none;
-            }
-
             .quiz-container {
                 flex-direction: column;
                 gap: 10px;
@@ -494,25 +432,6 @@
 </head>
 
 <body>
-    <header>
-        <nav class="navbar">
-            <div class="nav-left">
-                <span class="nav-title">🎯 Quiz Master</span>
-                <button id="back-btn" class="action-btn" style="margin-left:8px; padding:5px 10px; font-size:0.95em;">Retour</button>
-            </div>
-            <div class="nav-right hidden" id="nav-logged-in">
-                <div class="user-info">
-                    <div class="user-stats">
-                        <div><strong id="user-pseudo">Joueur</strong></div>
-                        <div>Score Global: <strong id="user-global-score">0</strong></div>
-                    </div>
-                    <button class="action-btn" onclick="window.location.href='settings.html'"
-                        style="margin-left:8px; padding:5px 10px; font-size:0.9em;">Réglages</button>
-                    <button class="logout-btn">Déconnexion</button>
-                </div>
-            </div>
-        </nav>
-    </header>
     <main>
         <section id="quiz-section" class="hidden">
             <div class="quiz-container">
@@ -577,6 +496,9 @@
                 <div id="level-up-msg" class="hidden" style="color: #2ecc71; margin-top: 12px; font-weight: bold;">
                     🎊 NIVEAU SUPÉRIEUR ATTEINT !
                 </div>
+                <div id="perfect-score-msg" class="hidden" style="color: #ffd700; margin-top: 10px; font-weight: bold;">
+                    🌟 SCORE PARFAIT !
+                </div>
                 <div id="level-unlock-msg">🔓 Niveau 2 débloqué !</div>
             </div>
             <button id="restart-btn" class="action-btn">Rejouer</button>
@@ -598,6 +520,7 @@
         const THEME = 'departements';
         const QUIZ_TITLE = 'Départements';
         const SCORE_REQUIS_N2 = 18;
+        const SCORE_PARFAIT_N1 = 25; // Score parfait = 100%
 
         const DEPARTEMENTS = [
             { numero: "01", nom: "Ain" },
@@ -677,12 +600,12 @@
         const qTimerDisplay = document.getElementById('question-timer');
         const timerFill = document.getElementById('timer-fill');
         const qTimerFill = document.getElementById('question-timer-fill');
-        const backBtn = document.getElementById('back-btn');
         const mobileBackBtn = document.getElementById('mobile-back-btn');
         const restartBtn = document.getElementById('restart-btn');
         const homeBtn = document.getElementById('home-btn');
-        const logoutBtn = document.querySelector('.logout-btn');
+        const logoutBtn = null; // Not used anymore
         const levelUnlockMsg = document.getElementById('level-unlock-msg');
+        const perfectScoreMsg = document.getElementById('perfect-score-msg');
         const currentScoreDisplayMobile = document.getElementById('current-score-display-mobile');
         const wrongAnswersDisplayMobile = document.getElementById('wrong-answers-mobile');
         const bestScoreDisplayMobile = document.getElementById('best-score-display-mobile');
@@ -831,6 +754,7 @@
             answerBtns.forEach((btn, i) => {
                 btn.innerHTML = shuffled[i];
                 btn.disabled = false;
+                // ✅ Réinitialisation explicite des styles à chaque nouvelle question
                 btn.classList.remove('correct', 'incorrect');
                 btn.onclick = () => handleAnswer(shuffled[i], q.correct);
             });
@@ -857,8 +781,12 @@
             updateLives();
             updateStatsDisplayMobile();
             setTimeout(() => {
-                if (lives <= 0 || timeLeft <= 0) endGame();
-                else { awaitingNext = false; generateQuestion(); }
+                if (lives <= 0 || timeLeft <= 0) {
+                    endGame();
+                } else {
+                    awaitingNext = false;
+                    generateQuestion();
+                }
             }, 1000);
         }
 
@@ -963,14 +891,33 @@
                 document.getElementById('level-up-msg').classList.remove('hidden');
             }
 
+            // ✅ Gestion du score parfait
+            let perfectAchieved = false;
+            if (score >= SCORE_PARFAIT_N1 && window.currentUser?.uid) {
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    await updateDoc(userRef, {
+                        [`niveaux100.${THEME}`]: 1
+                    });
+                    perfectAchieved = true;
+                }
+            }
+
+            // Affichage message score parfait
+            if (perfectAchieved) {
+                perfectScoreMsg.classList.remove('hidden');
+            }
+
+            // Gestion déverrouillage niveau 2
             let unlocked = false;
-            if (score >= SCORE_REQUIS_N2) {
+            if (score >= SCORE_REQUIS_N2 && window.currentUser?.uid) {
                 const userRef = doc(db, 'users', window.currentUser.uid);
                 const userDoc = await getDoc(userRef);
                 if (userDoc.exists()) {
                     const niveaux = userDoc.data().niveaux || {};
                     const niveauActuel = niveaux[THEME] || 0;
-                    if (niveauActuel === 0 || niveauActuel === 1) {
+                    if (niveauActuel < 2) {
                         await updateDoc(userRef, {
                             [`niveaux.${THEME}`]: 2
                         });
@@ -987,7 +934,7 @@
 
         async function handleBack() {
             if (gameCompleted) {
-                window.location.href = 'dossier-quiz-departement.html';
+                window.location.href = 'index.html';
                 return;
             }
 
@@ -1007,7 +954,6 @@
         }
 
         // 🔄 Navigation
-        backBtn.addEventListener('click', handleBack);
         mobileBackBtn.addEventListener('click', handleBack);
         restartBtn.addEventListener('click', () => {
             gameCompleted = false;
@@ -1016,24 +962,46 @@
         homeBtn.addEventListener('click', handleBack);
 
         // 🔐 Auth
-        onAuthStateChanged(auth, (user) => {
-            const navLoggedIn = document.getElementById('nav-logged-in');
-            if (user) {
-                window.currentUser = user;
-                const pseudo = localStorage.getItem('userPseudo') || user.email.split('@')[0];
-                document.getElementById('user-pseudo').textContent = escapeHtml(pseudo);
-                document.getElementById('user-global-score').textContent = localStorage.getItem('globalScore') || '0';
-                navLoggedIn.classList.remove('hidden');
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            window.currentUser = user;
+            const pseudo = localStorage.getItem('userPseudo') || user.email.split('@')[0];
+
+            try {
+                const userRef = doc(db, 'users', user.uid);
+                const userDoc = await getDoc(userRef);
+
+                if (!userDoc.exists()) {
+                    console.warn("Utilisateur non trouvé dans Firestore");
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                const userData = userDoc.data();
+                const globalScore = userData.globalScore ?? 0;
+                const niveauDepartements = (userData.niveaux?.[THEME]) ?? 0;
+
+                // ✅ Vérifications obligatoires avant de lancer le quiz
+                if (globalScore < 0 || niveauDepartements < 1) {
+                    console.warn("Accès refusé : globalScore < 0 ou niveaux.departements < 1");
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                // Sauvegarde locale
+                localStorage.setItem('globalScore', globalScore.toString());
+
+                // ✅ Tout est OK → lancer le quiz
                 startGame();
-            } else {
+            } catch (error) {
+                console.error("Erreur lors de la vérification des prérequis :", error);
                 window.location.href = 'index.html';
             }
         });
-
-        logoutBtn.addEventListener('click', () => signOut(auth).then(() => window.location.href = 'index.html'));
-
-        // 🎨 Titre dynamique
-        document.querySelector('.nav-title').textContent = `🎯 ${QUIZ_TITLE}`;
     </script>
 </body>
 
