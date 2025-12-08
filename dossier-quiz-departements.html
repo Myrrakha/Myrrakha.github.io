@@ -250,13 +250,13 @@
     </main>
 
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js  ';
         import {
             getAuth, onAuthStateChanged, signOut
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js  ';
         import {
             getFirestore, doc, getDoc
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js  ';
 
         const THEME = 'departements';
         const QUIZ_TITLE = 'Départements';
@@ -339,17 +339,25 @@
             }
         }
 
+        // Fonction pour vérifier si un niveau est déverrouillé
+        function isLevelUnlocked(levelId, globalScore, niveaux) {
+            // Calculer le nombre de niveaux déverrouillables basé sur le score global
+            const unlockedByGlobalScore = Math.floor(globalScore / 50) + 1;
+            
+            // Récupérer le niveau atteint pour ce thème spécifique
+            const niveauAtteint = niveaux[THEME] || 0;
+            
+            // Le niveau est déverrouillé si :
+            // - le numéro du niveau est <= au nombre de niveaux déverrouillés par le score global
+            // - ET le numéro du niveau est <= au niveau atteint dans ce thème
+            return levelId <= unlockedByGlobalScore && levelId <= niveauAtteint;
+        }
+
         // Fonction pour rendre les cartes de niveau
-        function renderLevelsUI(globalScore, bestScore) {
+        function renderLevelsUI(globalScore, bestScore, niveaux) {
             levelsGrid.innerHTML = '';
             for (const level of LEVELS) {
-                let isUnlocked = false;
-                if (level.id === 1) {
-                    isUnlocked = true;
-                } else {
-                    const requiredScoreFromBest = (level.scoreRequiredPercent / 100) * SCORE_REQUIS_N2;
-                    isUnlocked = (globalScore >= level.pointsRequired) && (bestScore >= requiredScoreFromBest);
-                }
+                const isUnlocked = isLevelUnlocked(level.id, globalScore, niveaux);
 
                 const card = document.createElement('div');
                 card.className = `level-card ${isUnlocked ? '' : 'locked'}`;
@@ -387,7 +395,21 @@
 
                 // Tente de charger les scores depuis Firebase
                 const { globalScore, bestScore } = await loadUserScoresFromFirestore(user.uid);
-                renderLevelsUI(globalScore, bestScore);
+                
+                // Charger les niveaux atteints pour tous les thèmes
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        const niveaux = userData.niveaux || {};
+                        renderLevelsUI(globalScore, bestScore, niveaux);
+                    } else {
+                        renderLevelsUI(globalScore, bestScore, {});
+                    }
+                } catch (error) {
+                    console.error("Erreur lors du chargement des niveaux atteints :", error);
+                    renderLevelsUI(globalScore, bestScore, {});
+                }
             } else {
                 window.location.href = 'index.html';
             }
