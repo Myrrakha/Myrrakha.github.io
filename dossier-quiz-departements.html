@@ -250,34 +250,32 @@
     </main>
 
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js  ';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import {
             getAuth, onAuthStateChanged, signOut
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js  ';
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import {
             getFirestore, doc, getDoc
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js  ';
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const THEME = 'departements';
         const QUIZ_TITLE = 'Départements';
 
         const LEVELS = [
-            { id: 1, pointsRequired: 0, fileName: 'quiz-departement-n1.html', scoreRequiredPercent: 0 },
-            { id: 2, pointsRequired: 50, fileName: 'quiz-departement-n2.html', scoreRequiredPercent: 50 },
-            { id: 3, pointsRequired: 100, fileName: 'quiz-departement-n3.html', scoreRequiredPercent: 50 },
-            { id: 4, pointsRequired: 150, fileName: 'quiz-departement-n4.html', scoreRequiredPercent: 50 },
-            { id: 5, pointsRequired: 200, fileName: 'quiz-departement-n5.html', scoreRequiredPercent: 50 },
-            { id: 6, pointsRequired: 250, fileName: 'quiz-departement-n6.html', scoreRequiredPercent: 50 },
-            { id: 7, pointsRequired: 300, fileName: 'quiz-departement-n7.html', scoreRequiredPercent: 50 },
-            { id: 8, pointsRequired: 350, fileName: 'quiz-departement-n8.html', scoreRequiredPercent: 50 },
-            { id: 9, pointsRequired: 400, fileName: 'quiz-departement-n9.html', scoreRequiredPercent: 50 },
-            { id: 10, pointsRequired: 450, fileName: 'quiz-departement-n10.html', scoreRequiredPercent: 50 },
-            { id: 11, pointsRequired: 500, fileName: 'quiz-departement-n11.html', scoreRequiredPercent: 50 },
-            { id: 12, pointsRequired: 550, fileName: 'quiz-departement-n12.html', scoreRequiredPercent: 50 },
-            { id: 13, pointsRequired: 600, fileName: 'quiz-departement-n13.html', scoreRequiredPercent: 50 },
+            { id: 1, pointsRequired: 0, fileName: 'quiz-departement-n1.html' },
+            { id: 2, pointsRequired: 50, fileName: 'quiz-departement-n2.html' },
+            { id: 3, pointsRequired: 100, fileName: 'quiz-departement-n3.html' },
+            { id: 4, pointsRequired: 150, fileName: 'quiz-departement-n4.html' },
+            { id: 5, pointsRequired: 200, fileName: 'quiz-departement-n5.html' },
+            { id: 6, pointsRequired: 250, fileName: 'quiz-departement-n6.html' },
+            { id: 7, pointsRequired: 300, fileName: 'quiz-departement-n7.html' },
+            { id: 8, pointsRequired: 350, fileName: 'quiz-departement-n8.html' },
+            { id: 9, pointsRequired: 400, fileName: 'quiz-departement-n9.html' },
+            { id: 10, pointsRequired: 450, fileName: 'quiz-departement-n10.html' },
+            { id: 11, pointsRequired: 500, fileName: 'quiz-departement-n11.html' },
+            { id: 12, pointsRequired: 550, fileName: 'quiz-departement-n12.html' },
+            { id: 13, pointsRequired: 600, fileName: 'quiz-departement-n13.html' },
         ];
-
-        const SCORE_REQUIS_N2 = 25;
 
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
@@ -297,81 +295,66 @@
         const logoutBtn = document.getElementById('logout-btn');
         const navLoggedIn = document.getElementById('nav-logged-in');
 
-        // Fonction utilitaire pour obtenir les scores locaux
-        function getLocalScores() {
-            const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
-            const bestScores = JSON.parse(localStorage.getItem('bestScores') || '{}');
-            return {
-                globalScore: quizScores[THEME] || 0,
-                bestScore: bestScores[THEME] || 0
-            };
+        // Fonction pour vérifier si un niveau est déverrouillé
+        function isLevelUnlocked(levelId, globalScore, themeLevel) {
+            // Deux conditions obligatoires :
+            // 1. Le score global total doit être suffisant (50 points par niveau)
+            // 2. Le niveau atteint dans ce thème spécifique doit être suffisant
+            return globalScore >= (levelId-1) * 50 && themeLevel >= levelId;
         }
 
-        // Fonction pour charger les données utilisateur depuis Firebase (avec fallback local)
-        async function loadUserScoresFromFirestore(uid) {
+        // Fonction pour charger les données utilisateur depuis Firebase
+        async function loadUserData(uid) {
             try {
                 const userDoc = await getDoc(doc(db, 'users', uid));
                 if (userDoc.exists()) {
                     const data = userDoc.data();
+                    
+                    // Structure réelle selon vos précisions :
+                    // - globalScore est à la racine (score total cumulé de tous les quiz)
+                    // - niveaux est un objet où chaque thème a un niveau atteint (nombre entier)
+                    const globalScore = data.globalScore || 0;
                     const niveaux = data.niveaux || {};
-                    const departementsData = niveaux[THEME] || {};
-
-                    // Extrait le globalScore et bestScore depuis la structure Firebase
-                    const globalScore = departementsData.globalScore || 0;
-                    const bestScore = departementsData.bestScore || 0;
-
-                    // Met à jour localStorage avec les données Firebase (fallback proactif)
-                    const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
-                    const bestScores = JSON.parse(localStorage.getItem('bestScores') || '{}');
-                    quizScores[THEME] = globalScore;
-                    bestScores[THEME] = bestScore;
-                    localStorage.setItem('quizScores', JSON.stringify(quizScores));
-                    localStorage.setItem('bestScores', JSON.stringify(bestScores));
-
-                    return { globalScore, bestScore };
-                } else {
-                    console.warn("Document utilisateur non trouvé dans Firestore.");
-                    return getLocalScores();
+                    const themeLevel = niveaux[THEME] || 0; // Ex: niveaux.departements = 2
+                    
+                    return { globalScore, themeLevel };
                 }
             } catch (error) {
-                console.error("Erreur lors du chargement depuis Firestore, fallback sur localStorage :", error);
-                return getLocalScores();
+                console.error("Erreur lors du chargement des données utilisateur :", error);
             }
-        }
-
-        // Fonction pour vérifier si un niveau est déverrouillé
-        function isLevelUnlocked(levelId, globalScore, niveaux) {
-            // Calculer le nombre de niveaux déverrouillables basé sur le score global
-            const unlockedByGlobalScore = Math.floor(globalScore / 50) + 1;
             
-            // Récupérer le niveau atteint pour ce thème spécifique
-            const niveauAtteint = niveaux[THEME] || 0;
-            
-            // Le niveau est déverrouillé si :
-            // - le numéro du niveau est <= au nombre de niveaux déverrouillés par le score global
-            // - ET le numéro du niveau est <= au niveau atteint dans ce thème
-            return levelId <= unlockedByGlobalScore && levelId <= niveauAtteint;
+            // Fallback sur localStorage si nécessaire
+            const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+            return {
+                globalScore: quizScores.global || 0,
+                themeLevel: 0
+            };
         }
 
         // Fonction pour rendre les cartes de niveau
-        function renderLevelsUI(globalScore, bestScore, niveaux) {
+        function renderLevelsUI(globalScore, themeLevel) {
             levelsGrid.innerHTML = '';
             for (const level of LEVELS) {
-                const isUnlocked = isLevelUnlocked(level.id, globalScore, niveaux);
+                const isUnlocked = isLevelUnlocked(level.id, globalScore, themeLevel);
+                
+                // Calcul de la progression basé sur le niveau atteint dans le thème
+                // Ex: si themeLevel = 2 et level.id = 3, progression = (2/3)*100 = 66%
+                let progressPercent = 0;
+                if (themeLevel >= level.id) {
+                    progressPercent = 100;
+                } else if (level.id > 1) {
+                    progressPercent = Math.min((themeLevel / level.id) * 100, 100);
+                } else {
+                    progressPercent = themeLevel > 0 ? 100 : 0;
+                }
 
                 const card = document.createElement('div');
                 card.className = `level-card ${isUnlocked ? '' : 'locked'}`;
+                
                 if (isUnlocked) {
                     card.addEventListener('click', () => {
                         window.location.href = level.fileName;
                     });
-                }
-
-                let progressPercent = 0;
-                if (level.pointsRequired > 0) {
-                    progressPercent = Math.min((bestScore / level.pointsRequired) * 100, 100);
-                } else {
-                    progressPercent = 100;
                 }
 
                 card.innerHTML = `
@@ -392,24 +375,10 @@
             if (user) {
                 window.currentUser = user;
                 navLoggedIn.classList.remove('hidden');
-
-                // Tente de charger les scores depuis Firebase
-                const { globalScore, bestScore } = await loadUserScoresFromFirestore(user.uid);
                 
-                // Charger les niveaux atteints pour tous les thèmes
-                try {
-                    const userDoc = await getDoc(doc(db, 'users', user.uid));
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        const niveaux = userData.niveaux || {};
-                        renderLevelsUI(globalScore, bestScore, niveaux);
-                    } else {
-                        renderLevelsUI(globalScore, bestScore, {});
-                    }
-                } catch (error) {
-                    console.error("Erreur lors du chargement des niveaux atteints :", error);
-                    renderLevelsUI(globalScore, bestScore, {});
-                }
+                // Charger les données utilisateur avec la structure correcte
+                const { globalScore, themeLevel } = await loadUserData(user.uid);
+                renderLevelsUI(globalScore, themeLevel);
             } else {
                 window.location.href = 'index.html';
             }
