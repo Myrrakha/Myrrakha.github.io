@@ -981,7 +981,8 @@
                 const correctAnswerDiv = document.createElement('div');
                 correctAnswerDiv.style.marginTop = '10px';
                 correctAnswerDiv.style.fontStyle = 'italic';
-                correctAnswerDiv.style.color = '#9c28a7';
+                correctAnswerDiv.style.fontWeight = 'bold'; // Ajout de la mise en gras
+                correctAnswerDiv.style.color = '#F5F5F5'; // Changement de la couleur en blanc
                 correctAnswerDiv.innerHTML = `<em>Bonne réponse : ${currentCorrectAnswer}</em>`;
                 feedbackContainer.appendChild(feedbackHtml);
                 feedbackContainer.appendChild(correctAnswerDiv);
