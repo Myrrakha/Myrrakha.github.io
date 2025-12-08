@@ -3,14 +3,23 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Quiz Master - Anglais N2</title>
+    <title>Quiz Master - Anglais Niveau 2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        .hidden { display: none !important; }
+        .hidden {
+            display: none !important;
+        }
+        /* GLOBAL */
         body {
             margin: 0;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f1115, #1c1c24);
-            color: #f0f0f0;
+            padding: 0;
+            font-family: "Lato", sans-serif;
+            line-height: 1.6;
+            color: #F5F5F5;
+            background: linear-gradient(145deg, #012169, #001240);
+            background-image: url('images/british-pattern.png');
+            background-size: cover;
+            background-attachment: fixed;
         }
         #hover-warning {
             position: absolute;
@@ -24,301 +33,581 @@
             transition: opacity 0.4s ease;
             z-index: 9999;
         }
-        header {
-            width: 100%;
-            background: rgba(20, 20, 28, 0.8);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid #333;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        .navbar {
-            max-width: 1100px;
-            margin: auto;
+        /* ✨ CENTRAGE PRINCIPAL */
+        main {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            padding: 12px 20px;
+            min-height: 100vh;
+            width: 100%;
+            padding: 0 15px;
+            box-sizing: border-box;
         }
-        .nav-title { font-size: 1.4em; font-weight: 600; color: #eaeaea; letter-spacing: 1px; }
-        .user-info { display: flex; gap: 15px; align-items: center; }
-        .user-stats { font-size: 0.9em; text-align: right; }
-        .logout-btn {
-            padding: 8px 16px;
-            background: #dc3545;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            transition: 0.25s;
-        }
-        .logout-btn:hover { background: #c82333; }
+        /* QUIZ SECTION */
         #quiz-section {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 40px;
-            padding: 0 20px;
+            width: 100%;
+            max-width: 1200px;
+            position: relative;
         }
         .quiz-container {
             display: flex;
-            gap: 25px;
+            gap: 12px;
             width: 100%;
-            max-width: 1200px;
             justify-content: center;
         }
         @media (min-width: 900px) {
-            .question-box { flex: 2; }
-            .answers-container { flex: 1; }
-            #leaderboard-section.desktop { 
-                display: block; 
-                flex: 1; 
-                margin-top: 0; 
-                max-height: 500px; 
+            .question-box {
+                flex: 2;
+            }
+            .input-container {
+                flex: 1;
             }
         }
         .question-box {
-            background: #262633;
-            padding: 30px;
-            border-radius: 15px;
-            font-size: 1.8em;
-            font-weight: 600;
-            min-height: 140px;
+            background: rgba(10, 10, 30, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 18px;
+            border-radius: 16px;
+            font-size: 1.5em;
+            font-family: "Merriweather", serif;
+            font-weight: 700;
+            min-height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 0 20px rgba(0, 30, 80, 0.5);
+            border: 2px solid rgba(255, 215, 0, 0.25);
+            color: #F5F5F5;
+            letter-spacing: 0.8px;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
         }
-        .answers-container {
+        .input-container {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 8px;
+            align-items: center;
         }
-        .answer-btn {
-            padding: 15px;
-            font-size: 1.2em;
-            border-radius: 12px;
-            background: #323248;
-            color: #f0f0f0;
+        #user-input {
+            width: 360px;
+            padding: 10px 4px;
+            margin-top: 10px;
+            border: 2px solid rgba(255, 215, 0, 0.25);
+            border-radius: 10px;
+            font-size: 17px;
+            font-family: "Lato", sans-serif;
+            background: linear-gradient(145deg, #001240, #012169);
+            color: #e6e6e6;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+            max-width: 100%;
+            text-align: center;
+        }
+        #user-input:focus {
+            outline: none;
+            border-color: rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 16px rgba(255, 215, 0, 0.3);
+        }
+        #validate-btn {
+            width: 360px;
+            padding: 10px 4px;
+            margin-top: 10px;
+            border: 2px solid rgba(255, 215, 0, 0.25);
+            border-radius: 10px;
+            font-size: 17px;
+            font-family: "Lato", sans-serif;
             cursor: pointer;
-            border: none;
-            transition: 0.18s;
+            background: linear-gradient(145deg, #001240, #012169);
+            transition: 0.25s ease-in-out;
+            color: #e6e6e6;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+            max-width: 100%;
         }
-        .answer-btn:hover:not(:disabled) {
-            transform: scale(1.04);
-            background: #4a4a65;
+        #validate-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(145deg, #0e2a7a, #1a3b9b);
+            border-color: rgba(255, 215, 0, 0.4);
+            box-shadow: 0 0 16px rgba(255, 215, 0, 0.3);
         }
-        .answer-btn:disabled { cursor: not-allowed; }
-        .correct { background-color: #2ecc71 !important; }
-        .incorrect { background-color: #e74c3c !important; }
+        #validate-btn:disabled {
+            cursor: not-allowed;
+        }
+        .feedback-container {
+            min-height: 60px;
+            margin: 20px 0;
+            font-size: 1.4em;
+            text-align: center;
+        }
+        .correct {
+            color: #4caf50;
+        }
+        .incorrect {
+            color: #f44336;
+        }
+        .partially-correct {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+            font-size: 1.4em;
+        }
+        .char-correct {
+            color: #4caf50;
+        }
+        .char-incorrect {
+            color: #f44336;
+        }
+        .char-missing {
+            color: #f44336;
+            text-decoration: underline;
+        }
+        .char-extra {
+            color: #f44336;
+            text-decoration: line-through;
+        }
         #timers-container {
             width: 100%;
             max-width: 1000px;
-            margin-top: 25px;
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
         }
-        #timer-bar-container, #question-timer-bar-container {
-            margin: 10px 0;
-            text-align: left;
-            font-size: 0.95em;
-        }
-        #timer-bar, #question-timer-bar {
+        #timer-bar-container,
+        #question-timer-bar-container {
             width: 100%;
-            height: 28px;
-            background: #2b2b3a;
-            border-radius: 10px;
-            margin-top: 6px;
-            overflow: hidden;
+            max-width: 310px;
+            text-align: left;
+            font-size: 0.9em;
+            font-family: "Lato", sans-serif;
+            color: #F5F5F5;
         }
-        #timer-fill, #question-timer-fill {
+        #timer-bar,
+        #question-timer-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(10, 10, 30, 0.7);
+            border-radius: 8px;
+            margin-top: 5px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        #timer-fill,
+        #question-timer-fill {
             height: 100%;
             width: 100%;
-            border-radius: 10px;
-            transition: width 0.15s linear;
+            border-radius: 8px;
+            transition: width 0.3s linear;
         }
-        #timer-fill { background: #9c28a7ff; }
-        #question-timer-fill { background: #a832d6; }
+        #timer-fill {
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+        }
+        #question-timer-fill {
+            background: linear-gradient(90deg, #FFA500, #FFD700);
+        }
         #score-lives {
-            margin-top: 20px;
+            margin-top: 10px;
             display: flex;
-            gap: 80px;
+            gap: 50px;
             justify-content: center;
-            font-size: 1.3em;
+            font-size: 1.1em;
             position: relative;
+            font-family: "Lato", sans-serif;
         }
-        #lives { color: #ff4b4b; font-size: 1.4em; }
+        .score-container {
+            margin-top: 7px;
+            font-size: 19px;
+            color: #FFD700;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        .heart {
+            font-size: 22px;
+            margin: 0 3px;
+            color: #FF6B6B;
+            text-shadow: 0 0 4px rgba(255, 107, 107, 0.6);
+        }
         @media (max-width: 899px) {
-            body.quiz-active header { display: none; }
-            .quiz-container { flex-direction: column; gap: 15px; }
-            .question-box { font-size: 1.6em; padding: 16px; min-height: 90px; }
-            .answers-container { gap: 10px; }
-            .answer-btn { padding: 12px; font-size: 1.1em; }
-            #score-lives { flex-direction: column; gap: 10px; margin-top: 15px; }
-            #leaderboard-section.desktop { display: none !important; }
+            body.quiz-active {
+                display: block;
+            }
+            body.result-active {
+                display: block;
+            }
+            .quiz-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .question-box {
+                font-size: 1.3em;
+                padding: 10px;
+                min-height: 70px;
+                width: calc(100% - 30px);
+            }
+            .input-container {
+                gap: 5px;
+            }
+            #user-input, #validate-btn {
+                width: calc(100% - 30px);
+                padding: 8px;
+                font-size: 1em;
+            }
+            #score-lives {
+                flex-direction: column;
+                gap: 4px;
+                margin-top: 10px;
+                align-items: center;
+            }
             #mobile-quiz-ui-row {
                 display: flex;
-                gap: 12px;
+                gap: 8px;
                 justify-content: center;
-                margin-top: 15px;
-                padding: 0 20px;
+                margin-top: 8px;
+                padding: 0 15px;
                 width: 100%;
                 max-width: 1200px;
             }
-            #leaderboard-section.mobile {
+            #current-game-stats {
                 margin: 0;
                 flex: 1;
-                max-width: 220px;
+                max-width: 160px;
+                background: rgba(10, 10, 30, 0.8);
+                border-radius: 10px;
+                padding: 12px;
+                box-shadow: 0 0 12px rgba(0, 30, 80, 0.5);
+                border: 2px solid rgba(255, 215, 0, 0.2);
+                height: 110px;
+            }
+            .stats-title {
+                font-size: 0.9em;
+                margin-bottom: 6px;
+                font-weight: 700;
+                letter-spacing: 0.7px;
+                color: #FFD700;
+                text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+                text-align: center;
+                font-family: "Merriweather", serif;
+            }
+            .current-score {
+                font-size: 1.4em;
+                margin: 5px 0;
+                text-align: center;
+                color: #3E8E41;
+                font-family: "Lato", sans-serif;
+            }
+            .stats-row {
+                padding: 3px 0;
+                font-size: 0.85em;
+                display: flex;
+                justify-content: space-between;
+                font-family: "Lato", sans-serif;
+            }
+            .stats-label {
+                font-weight: 500;
+                color: #F5F5F5;
+            }
+            .stats-value {
+                font-weight: bold;
+                color: #FFD700;
             }
             #mobile-back-container {
-                background: #262633;
-                padding: 20px 16px;
-                border-radius: 15px;
+                background: rgba(10, 10, 30, 0.8);
+                padding: 12px 10px;
+                border-radius: 10px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-                min-width: 60px;
+                box-shadow: 0 0 12px rgba(0, 30, 80, 0.5);
+                border: 2px solid rgba(255, 215, 0, 0.2);
+                min-width: 44px;
                 height: fit-content;
             }
             #mobile-back-container .action-btn {
-                padding: 8px 12px;
-                font-size: 1.2em;
+                padding: 5px 9px;
+                font-size: 1.1em;
                 display: block;
                 width: 100%;
                 text-align: center;
+                background: linear-gradient(145deg, #001240, #012169);
+                border-radius: 9px;
+                cursor: pointer;
+                transition: .2s;
+                border: 2px solid rgba(255, 215, 0, 0.25);
+                color: #F5F5F5;
+                font-family: "Lato", sans-serif;
+            }
+            #mobile-back-container .action-btn:hover {
+                background: linear-gradient(145deg, #0e2a7a, #1a3b9b);
+                box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+                border-color: rgba(255, 215, 0, 0.4);
             }
         }
         @media (min-width: 900px) {
-            #leaderboard-section.mobile, #mobile-quiz-ui-row { display: none !important; }
-            #mobile-back-btn { display: none !important; }
+            #mobile-quiz-ui-row {
+                display: none !important;
+            }
+            #mobile-back-btn {
+                display: none !important;
+            }
+            #current-game-stats {
+                background: rgba(10, 10, 30, 0.8);
+                border-radius: 12px;
+                padding: 16px;
+                margin-top: 16px;
+                max-width: 250px;
+                width: 100%;
+                box-shadow: 0 0 16px rgba(0, 30, 80, 0.5);
+                border: 2px solid rgba(255, 215, 0, 0.2);
+            }
+            .stats-title {
+                text-align: center;
+                margin-bottom: 10px;
+                color: #FFD700;
+                font-size: 1.1em;
+                font-weight: 700;
+                letter-spacing: 0.8px;
+                text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+                font-family: "Merriweather", serif;
+            }
+            .current-score {
+                font-size: 1.8em;
+                font-weight: bold;
+                color: #3E8E41;
+                margin: 7px 0;
+                text-align: center;
+                font-family: "Lato", sans-serif;
+            }
+            .stats-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 6px 0;
+                border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+                font-size: 0.9em;
+                font-family: "Lato", sans-serif;
+            }
+            .stats-label {
+                font-weight: 500;
+                color: #F5F5F5;
+            }
+            .stats-value {
+                font-weight: bold;
+                color: #FFD700;
+            }
         }
+        /* RESULT SECTION */
         #result-section {
-            margin-top: 60px;
             text-align: center;
+            padding: 16px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1200px;
         }
         .result-stats {
-            background: #262633;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 500px;
-            margin: 30px auto;
+            background: rgba(10, 10, 30, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 22px;
+            border-radius: 16px;
+            max-width: 480px;
+            margin: 22px auto;
+            box-shadow: 0 0 20px rgba(0, 30, 80, 0.5);
+            border: 2px solid rgba(255, 215, 0, 0.25);
+            width: calc(100% - 30px);
+            position: relative;
         }
-        .result-stats h3 { color: #9c28a7; margin-top: 0; }
+        .result-stats h3 {
+            color: #FFD700;
+            margin-top: 0;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            font-family: "Merriweather", serif;
+            font-size: 1.4em;
+        }
         .action-btn {
-            margin: 10px;
-            padding: 12px 25px;
+            margin: 8px;
+            padding: 10px 20px;
             border-radius: 10px;
-            background: #3a3a50;
-            border: none;
+            background: linear-gradient(145deg, #001240, #012169);
+            border: 2px solid rgba(255, 215, 0, 0.25);
             cursor: pointer;
-            color: #f0f0f0;
-            transition: 0.25s;
+            color: #F5F5F5;
+            transition: 0.2s;
+            font-family: "Lato", sans-serif;
+            font-size: 15px;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
         }
-        .action-btn:hover { background: #4e4e6a; }
-        .leaderboard-section {
-            background: #262633;
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-            max-height: 400px;
-            overflow: hidden;
+        .action-btn:hover {
+            background: linear-gradient(145deg, #0e2a7a, #1a3b9b);
+            box-shadow: 0 0 16px rgba(255, 215, 0, 0.3);
+            border-color: rgba(255, 215, 0, 0.4);
         }
-        .leaderboard-section .leaderboard-title {
-            text-align: center;
-            margin-bottom: 15px;
-            color: #9c28a7;
-            font-size: 1.3em;
+        /* Unlock Message */
+        #level-unlock-msg {
+            color: #3E8E41;
+            margin-top: 12px;
+            font-weight: bold;
+            display: none;
+            text-shadow: 0 0 5px rgba(62, 142, 65, 0.4);
+            font-family: "Lato", sans-serif;
         }
-        .leaderboard-section .leaderboard-list {
-            max-height: 320px;
-            overflow-y: auto;
+        #perfect-score-msg {
+            color: #FFD700;
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.6);
         }
-        .leaderboard-section .leaderboard-list::-webkit-scrollbar {
-            width: 8px;
+        #level-up-msg {
+            color: #3E8E41;
+            text-shadow: 0 0 5px rgba(62, 142, 65, 0.6);
         }
-        .leaderboard-section .leaderboard-list::-webkit-scrollbar-track {
-            background: #1e1e29;
-            border-radius: 4px;
+        /* WATERMARK BIG BEN - pendant le quiz */
+        .bigben-watermark {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 160px;
+            height: 360px;
+            background-image: url('images/bigben-watermark.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0;
+            pointer-events: none;
+            filter: brightness(0.7);
+            z-index: 1;
+            /* Animation combinée : apparition + flottement */
+            animation: fadeInFloatQuiz 4s ease-out forwards, floatBigBen 6s ease-in-out infinite;
+            animation-delay: 0s, 4s;
         }
-        .leaderboard-section .leaderboard-list::-webkit-scrollbar-thumb {
-            background: #9c28a7;
-            border-radius: 4px;
+        @keyframes fadeInFloatQuiz {
+            0% {
+                opacity: 0;
+                transform: translateY(15px) scale(0.96);
+            }
+            70% {
+                opacity: 0.284; 
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0.404;
+                transform: translateY(0) scale(1);
+            }
         }
-        .leaderboard-section .leaderboard-item {
+        @keyframes floatBigBen {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+        @media (max-width: 768px) {
+            .bigben-watermark {
+                width: 110px;
+                height: 250px;
+                top: 12px;
+                right: 12px;
+            }
+        }
+        @media (max-width: 480px) {
+            .bigben-watermark {
+                width: 90px;
+                height: 200px;
+                top: 10px;
+                right: 10px;
+            }
+        }
+        /* Horloge dans l'écran de résultat (inchangée) */
+        .clock {
+            position: absolute;
+            top: 30px;
+            right: 70px;
+            width: 60px;
+            height: 60px;
+            border: 3px solid #FFD700;
+            border-radius: 50%;
+            background: rgba(0, 0, 30, 0.8);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            padding: 8px 12px;
-            margin: 6px 0;
-            background: #2c2c3a;
-            border-radius: 8px;
         }
-        .leaderboard-section .leaderboard-rank { font-size: 1.1em; font-weight: bold; width: 30px; }
-        .leaderboard-section .leaderboard-name { flex: 1; font-weight: 500; }
-        .leaderboard-section .leaderboard-score { font-size: 1em; color: #9c28a7; font-weight: bold; }
+        .hand {
+            position: absolute;
+            width: 2px;
+            height: 25px;
+            background: #FFD700;
+            transform-origin: bottom center;
+            top: 5px;
+            left: 50%;
+            transform: rotate(0deg);
+        }
+        .hand.hour {
+            height: 18px;
+            background: #F5F5F5;
+            animation: rotateHour 43200s linear infinite;
+        }
+        .hand.minute {
+            animation: rotateMinute 3600s linear infinite;
+        }
+        @keyframes rotateHour {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes rotateMinute {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar">
-            <div class="nav-left">
-                <span class="nav-title">🎯 Quiz Master</span>
-                <button id="back-btn" class="action-btn" style="margin-left:10px;">Retour</button>
-            </div>
-            <div class="nav-right hidden" id="nav-logged-in">
-                <div class="user-info">
-                    <div class="user-stats">
-                        <div><strong id="user-pseudo">Joueur</strong></div>
-                        <div>Score Global: <strong id="user-global-score">0</strong></div>
-                    </div>
-                    <button class="action-btn" onclick="window.location.href='settings.html'" style="margin-left:10px;">Réglages</button>
-                    <button class="logout-btn" onclick="logout()">Déconnexion</button>
-                </div>
-            </div>
-        </nav>
-    </header>
     <main>
         <section id="quiz-section" class="hidden">
+            <div class="bigben-watermark"></div>
             <div class="quiz-container">
                 <div class="question-box">
-                    <div id="question">[Question]</div>
+                    <div id="question">Chargement...</div>
                 </div>
-                <div class="answers-container">
-                    <button class="answer-btn"></button>
-                    <button class="answer-btn"></button>
-                    <button class="answer-btn"></button>
-                    <button class="answer-btn"></button>
-                    <button class="answer-btn"></button>
-                </div>
-                <!-- Leaderboard desktop -->
-                <div id="leaderboard-section" class="desktop leaderboard-section">
-                    <h3 class="leaderboard-title">🏆 Classement</h3>
-                    <div class="leaderboard-list">
-                        <div style="text-align: center; opacity: 0.6;">Chargement...</div>
-                    </div>
+                <div class="input-container">
+                    <input type="text" id="user-input" placeholder="Écrivez votre réponse ici..." autocomplete="off" />
+                    <button id="validate-btn">Valider</button>
                 </div>
             </div>
+            <div class="feedback-container" id="feedback-container"></div>
             <div id="timers-container">
                 <div id="timer-bar-container">
                     <span>⏱️ Temps restant : <span id="timer">0</span>s</span>
-                    <div id="timer-bar"><div id="timer-fill"></div></div>
+                    <div id="timer-bar">
+                        <div id="timer-fill"></div>
+                    </div>
                 </div>
                 <div id="question-timer-bar-container">
                     <span>⚡ Question : <span id="question-timer">0</span>s</span>
-                    <div id="question-timer-bar"><div id="question-timer-fill"></div></div>
+                    <div id="question-timer-bar">
+                        <div id="question-timer-fill"></div>
+                    </div>
                 </div>
             </div>
             <div id="score-lives">
-                <div>Score : <span id="score">0</span></div>
-                <div id="lives">❤❤❤</div>
+                <div class="score-container">Score : <span id="score">0</span></div>
+                <div id="lives">
+                    <span class="heart">❤</span><span class="heart">❤</span><span class="heart">❤</span><span
+                        class="heart">❤</span><span class="heart">❤</span>
+                </div>
             </div>
-            <!-- Mobile UI row (leaderboard + retour) -->
             <div id="mobile-quiz-ui-row">
-                <div id="leaderboard-section" class="mobile leaderboard-section">
-                    <h3 class="leaderboard-title">🏆 Classement</h3>
-                    <div class="leaderboard-list">
-                        <div style="text-align: center; opacity: 0.6;">Chargement...</div>
+                <div id="current-game-stats">
+                    <div class="stats-title">📊 Stats</div>
+                    <div class="current-score" id="current-score-display-mobile">0</div>
+                    <div class="stats-row">
+                        <span class="stats-label">Fausses :</span>
+                        <span class="stats-value" id="wrong-answers-mobile">0</span>
+                    </div>
+                    <div class="stats-row">
+                        <span class="stats-label">Meilleur :</span>
+                        <span class="stats-value" id="best-score-display-mobile">0</span>
                     </div>
                 </div>
                 <div id="mobile-back-container">
@@ -331,10 +620,20 @@
             <div class="result-stats">
                 <h3>Résumé</h3>
                 <p>Score de la partie : <strong id="final-score">0</strong></p>
-                <p>Nouveau score global : <strong id="new-global-score">0</strong></p>
-                <p>Score anglais : <strong id="new-dept-score">0</strong></p>
-                <div id="level-up-msg" class="hidden" style="color: #2ecc71; margin-top: 15px; font-weight: bold;">
+                <p>Meilleur score (N2) : <strong id="best-score">0</strong></p>
+                <p>Score Anglais : <strong id="new-theme-score">0</strong></p>
+                <p>Score Global : <strong id="new-global-score">0</strong></p>
+                <div id="level-up-msg" class="hidden" style="margin-top: 12px; font-weight: bold;">
                     🎊 NIVEAU SUPÉRIEUR ATTEINT !
+                </div>
+                <div id="perfect-score-msg" class="hidden" style="margin-top: 10px; font-weight: bold;">
+                    🌟 SCORE PARFAIT !
+                </div>
+                <div id="level-unlock-msg">🔓 Niveau 3 débloqué !</div>
+                <!-- Horloge Big Ben -->
+                <div class="clock">
+                    <div class="hand hour"></div>
+                    <div class="hand minute"></div>
                 </div>
             </div>
             <button id="restart-btn" class="action-btn">Rejouer</button>
@@ -343,10 +642,14 @@
     </main>
     <div id="hover-warning"></div>
     <script type="module">
-        // 🔧 INITIALISATION FIREBASE
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, onAuthStateChanged, signOut, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc, updateDoc, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import {
+            getAuth, onAuthStateChanged, signOut
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import {
+            getFirestore, doc, updateDoc, increment, runTransaction, getDoc
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        // 🌐 Firebase init
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
             authDomain: "quiz-master-io.firebaseapp.com",
@@ -358,210 +661,90 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        window.auth = auth;
-        window.db = db;
         window.currentUser = null;
-
-        // On conserve la logique simplifiée, mais on ne reset plus globalScore à 0
-        // Et on lit directement globalScore (via localStorage ou Firebase) sans le forcer à quizScores.anglais
-
-        const mode = { time: 60, qTime: 5, lives: 3 };
-        const irregularVerbs = [
-          { base: "arise", past: "arose", ppart: "arisen", fr: "survenir" },
-          { base: "awake", past: "awoke", ppart: "awoken", fr: "se réveiller" },
-          { base: "be", past: "was/were", ppart: "been", fr: "être" },
-          { base: "bear", past: "bore", ppart: "borne/born", fr: "porter/supporter" },
-          { base: "beat", past: "beat", ppart: "beaten", fr: "battre" },
-          { base: "become", past: "became", ppart: "become", fr: "devenir" },
-          { base: "begin", past: "began", ppart: "begun", fr: "commencer" },
-          { base: "bend", past: "bent", ppart: "bent", fr: "plier" },
-          { base: "bet", past: "bet", ppart: "bet", fr: "parier" },
-          { base: "bind", past: "bound", ppart: "bound", fr: "lier" },
-          { base: "bite", past: "bit", ppart: "bitten", fr: "mordre" },
-          { base: "bleed", past: "bled", ppart: "bled", fr: "saigner" },
-          { base: "blow", past: "blew", ppart: "blown", fr: "souffler" },
-          { base: "break", past: "broke", ppart: "broken", fr: "casser" },
-          { base: "breed", past: "bred", ppart: "bred", fr: "élever (animaux)" },
-          { base: "bring", past: "brought", ppart: "brought", fr: "apporter" },
-          { base: "broadcast", past: "broadcast", ppart: "broadcast", fr: "diffuser" },
-          { base: "build", past: "built", ppart: "built", fr: "construire" },
-          { base: "burn", past: "burnt/burned", ppart: "burnt/burned", fr: "brûler" },
-          { base: "burst", past: "burst", ppart: "burst", fr: "éclater" },
-          { base: "buy", past: "bought", ppart: "bought", fr: "acheter" },
-          { base: "cast", past: "cast", ppart: "cast", fr: "jeter" },
-          { base: "catch", past: "caught", ppart: "caught", fr: "attraper" },
-          { base: "choose", past: "chose", ppart: "chosen", fr: "choisir" },
-          { base: "cling", past: "clung", ppart: "clung", fr: "s'accrocher" },
-          { base: "come", past: "came", ppart: "come", fr: "venir" },
-          { base: "cost", past: "cost", ppart: "cost", fr: "coûter" },
-          { base: "creep", past: "crept", ppart: "crept", fr: "ramper" },
-          { base: "cut", past: "cut", ppart: "cut", fr: "couper" },
-          { base: "deal", past: "dealt", ppart: "dealt", fr: "distribuer" },
-          { base: "dig", past: "dug", ppart: "dug", fr: "creuser" },
-          { base: "do", past: "did", ppart: "done", fr: "faire" },
-          { base: "draw", past: "drew", ppart: "drawn", fr: "dessiner/tirer" },
-          { base: "dream", past: "dreamt/dreamed", ppart: "dreamt/dreamed", fr: "rêver" },
-          { base: "drink", past: "drank", ppart: "drunk", fr: "boire" },
-          { base: "drive", past: "drove", ppart: "driven", fr: "conduire" },
-          { base: "dwell", past: "dwelt", ppart: "dwelt", fr: "habiter" },
-          { base: "eat", past: "ate", ppart: "eaten", fr: "manger" },
-          { base: "fall", past: "fell", ppart: "fallen", fr: "tomber" },
-          { base: "feed", past: "fed", ppart: "fed", fr: "nourrir" },
-          { base: "feel", past: "felt", ppart: "felt", fr: "sentir" },
-          { base: "fight", past: "fought", ppart: "fought", fr: "se battre" },
-          { base: "find", past: "found", ppart: "found", fr: "trouver" },
-          { base: "flee", past: "fled", ppart: "fled", fr: "fuir" },
-          { base: "fling", past: "flung", ppart: "flung", fr: "lancer violemment" },
-          { base: "fly", past: "flew", ppart: "flown", fr: "voler" },
-          { base: "forbid", past: "forbade", ppart: "forbidden", fr: "interdire" },
-          { base: "forget", past: "forgot", ppart: "forgotten", fr: "oublier" },
-          { base: "forgive", past: "forgave", ppart: "forgiven", fr: "pardonner" },
-          { base: "freeze", past: "froze", ppart: "frozen", fr: "geler" },
-          { base: "get", past: "got", ppart: "got/gotten", fr: "obtenir" },
-          { base: "give", past: "gave", ppart: "given", fr: "donner" },
-          { base: "go", past: "went", ppart: "gone", fr: "aller" },
-          { base: "grind", past: "ground", ppart: "ground", fr: "moudre" },
-          { base: "grow", past: "grew", ppart: "grown", fr: "grandir" },
-          { base: "hang", past: "hung", ppart: "hung", fr: "pendre" },
-          { base: "have", past: "had", ppart: "had", fr: "avoir" },
-          { base: "hear", past: "heard", ppart: "heard", fr: "entendre" },
-          { base: "hide", past: "hid", ppart: "hidden", fr: "cacher" },
-          { base: "hit", past: "hit", ppart: "hit", fr: "frapper" },
-          { base: "hold", past: "held", ppart: "held", fr: "tenir" },
-          { base: "hurt", past: "hurt", ppart: "hurt", fr: "blesser" },
-          { base: "keep", past: "kept", ppart: "kept", fr: "garder" },
-          { base: "kneel", past: "knelt", ppart: "knelt", fr: "s'agenouiller" },
-          { base: "knit", past: "knit", ppart: "knit", fr: "tricoter" },
-          { base: "know", past: "knew", ppart: "known", fr: "savoir/connaître" },
-          { base: "lay", past: "laid", ppart: "laid", fr: "poser" },
-          { base: "lead", past: "led", ppart: "led", fr: "mener" },
-          { base: "lean", past: "leant/leaned", ppart: "leant/leaned", fr: "se pencher" },
-          { base: "leap", past: "leapt/leaped", ppart: "leapt/leaped", fr: "sauter" },
-          { base: "learn", past: "learnt/learned", ppart: "learnt/learned", fr: "apprendre" },
-          { base: "leave", past: "left", ppart: "left", fr: "laisser/quitter" },
-          { base: "lend", past: "lent", ppart: "lent", fr: "prêter" },
-          { base: "let", past: "let", ppart: "let", fr: "permettre" },
-          { base: "lie", past: "lay", ppart: "lain", fr: "être allongé" },
-          { base: "light", past: "lit/lighted", ppart: "lit/lighted", fr: "allumer" },
-          { base: "lose", past: "lost", ppart: "lost", fr: "perdre" },
-          { base: "make", past: "made", ppart: "made", fr: "fabriquer" },
-          { base: "mean", past: "meant", ppart: "meant", fr: "signifier" },
-          { base: "meet", past: "met", ppart: "met", fr: "rencontrer" },
-          { base: "pay", past: "paid", ppart: "paid", fr: "payer" },
-          { base: "put", past: "put", ppart: "put", fr: "mettre" },
-          { base: "quit", past: "quit", ppart: "quit", fr: "abandonner" },
-          { base: "read", past: "read", ppart: "read", fr: "lire" },
-          { base: "ride", past: "rode", ppart: "ridden", fr: "chevaucher" },
-          { base: "ring", past: "rang", ppart: "rung", fr: "sonner" },
-          { base: "rise", past: "rose", ppart: "risen", fr: "s'élever" },
-          { base: "run", past: "ran", ppart: "run", fr: "courir" },
-          { base: "say", past: "said", ppart: "said", fr: "dire" },
-          { base: "see", past: "saw", ppart: "seen", fr: "voir" },
-          { base: "sell", past: "sold", ppart: "sold", fr: "vendre" },
-          { base: "send", past: "sent", ppart: "sent", fr: "envoyer" },
-          { base: "set", past: "set", ppart: "set", fr: "placer" },
-          { base: "sew", past: "sewed", ppart: "sewn/sewed", fr: "coudre" },
-          { base: "shake", past: "shook", ppart: "shaken", fr: "secouer" },
-          { base: "shine", past: "shone", ppart: "shone", fr: "briller" },
-          { base: "shoot", past: "shot", ppart: "shot", fr: "tirer" },
-          { base: "show", past: "showed", ppart: "shown", fr: "montrer" },
-          { base: "shrink", past: "shrank", ppart: "shrunk", fr: "rétrécir" },
-          { base: "shut", past: "shut", ppart: "shut", fr: "fermer" },
-          { base: "sing", past: "sang", ppart: "sung", fr: "chanter" },
-          { base: "sink", past: "sank", ppart: "sunk", fr: "couler" },
-          { base: "sit", past: "sat", ppart: "sat", fr: "s'asseoir" },
-          { base: "sleep", past: "slept", ppart: "slept", fr: "dormir" },
-          { base: "slide", past: "slid", ppart: "slid", fr: "glisser" },
-          { base: "sling", past: "slung", ppart: "slung", fr: "lancer (bras)" },
-          { base: "speak", past: "spoke", ppart: "spoken", fr: "parler" },
-          { base: "spend", past: "spent", ppart: "spent", fr: "dépenser/passer" },
-          { base: "spin", past: "spun", ppart: "spun", fr: "tourner" },
-          { base: "spread", past: "spread", ppart: "spread", fr: "étaler" },
-          { base: "spring", past: "sprang", ppart: "sprung", fr: "bondir" },
-          { base: "stand", past: "stood", ppart: "stood", fr: "se tenir debout" },
-          { base: "steal", past: "stole", ppart: "stolen", fr: "voler" },
-          { base: "stick", past: "stuck", ppart: "stuck", fr: "coller" },
-          { base: "sting", past: "stung", ppart: "stung", fr: "piquer" },
-          { base: "stink", past: "stank", ppart: "stunk", fr: "puer" },
-          { base: "strike", past: "struck", ppart: "struck/stricken", fr: "frapper" },
-          { base: "swear", past: "swore", ppart: "sworn", fr: "jurer" },
-          { base: "sweep", past: "swept", ppart: "swept", fr: "balayer" },
-          { base: "swim", past: "swam", ppart: "swum", fr: "nager" },
-          { base: "take", past: "took", ppart: "taken", fr: "prendre" },
-          { base: "teach", past: "taught", ppart: "taught", fr: "enseigner" },
-          { base: "tear", past: "tore", ppart: "torn", fr: "déchirer" },
-          { base: "tell", past: "told", ppart: "told", fr: "raconter/dire" },
-          { base: "think", past: "thought", ppart: "thought", fr: "penser" },
-          { base: "throw", past: "threw", ppart: "thrown", fr: "jeter" },
-          { base: "thrust", past: "thrust", ppart: "thrust", fr: "pousser violemment" },
-          { base: "understand", past: "understood", ppart: "understood", fr: "comprendre" },
-          { base: "uphold", past: "upheld", ppart: "upheld", fr: "maintenir" },
-          { base: "wake", past: "woke", ppart: "woken", fr: "réveiller" },
-          { base: "wear", past: "wore", ppart: "worn", fr: "porter (vêtement)" },
-          { base: "weep", past: "wept", ppart: "wept", fr: "pleurer" },
-          { base: "win", past: "won", ppart: "won", fr: "gagner" },
-          { base: "write", past: "wrote", ppart: "written", fr: "écrire" }
-        ];
-        const type5Questions = [
-            { en: "He has written a letter", correct: "Il a écrit une lettre", choices: ["Il a écrit une lettre", "Il écrivait une lettre", "Il écrira une lettre", "Il avait écrit une lettre", "Il écrit une lettre"] },
-            { en: "They have broken the window", correct: "Ils ont cassé la fenêtre", choices: ["Ils ont cassé la fenêtre", "Ils cassaient la fenêtre", "Ils vont casser la fenêtre", "Ils avaient cassé la fenêtre", "Ils cassent la fenêtre"] },
-            { en: "She has drunk too much coffee", correct: "Elle a bu trop de café", choices: ["Elle a bu trop de café", "Elle buvait trop de café", "Elle boira trop de café", "Elle avait bu trop de café", "Elle boit trop de café"] },
-            { en: "We have seen this movie before", correct: "Nous avons déjà vu ce film", choices: ["Nous avons déjà vu ce film", "Nous voyons déjà ce film", "Nous verrons ce film", "Nous avions déjà vu ce film", "Nous voyions ce film"] },
-            { en: "I have lost my keys", correct: "J'ai perdu mes clés", choices: ["J'ai perdu mes clés", "Je perds mes clés", "Je perdais mes clés", "J'avais perdu mes clés", "Je vais perdre mes clés"] },
-            { en: "He has spoken to the manager", correct: "Il a parlé au responsable", choices: ["Il a parlé au responsable", "Il parlait au responsable", "Il parle au responsable", "Il avait parlé au responsable", "Il va parler au responsable"] },
-            { en: "They have built a new house", correct: "Ils ont construit une nouvelle maison", choices: ["Ils ont construit une nouvelle maison", "Ils construisaient une nouvelle maison", "Ils avaient construit une nouvelle maison", "Ils construisent une nouvelle maison", "Ils vont construire une nouvelle maison"] },
-            { en: "She has chosen the red dress", correct: "Elle a choisi la robe rouge", choices: ["Elle a choisi la robe rouge", "Elle choisit la robe rouge", "Elle choisissait la robe rouge", "Elle avait choisi la robe rouge", "Elle va choisir la robe rouge"] },
-            { en: "We have met him before", correct: "Nous l'avons déjà rencontré", choices: ["Nous l'avons déjà rencontré", "Nous le rencontrons déjà", "Nous allons le rencontrer", "Nous l'avions déjà rencontré", "Nous le rencontrions"] },
-            { en: "I have slept very well", correct: "J'ai très bien dormi", choices: ["J'ai très bien dormi", "Je dors très bien", "Je dormais très bien", "J'avais très bien dormi", "Je vais très bien dormir"] },
-            { en: "He has sold his car", correct: "Il a vendu sa voiture", choices: ["Il a vendu sa voiture", "Il vend sa voiture", "Il vendait sa voiture", "Il avait vendu sa voiture", "Il va vendre sa voiture"] },
-            { en: "They have bought new shoes", correct: "Ils ont acheté de nouvelles chaussures", choices: ["Ils ont acheté de nouvelles chaussures", "Ils achètent de nouvelles chaussures", "Ils achetaient de nouvelles chaussures", "Ils avaient acheté de nouvelles chaussures", "Ils vont acheter de nouvelles chaussures"] },
-            { en: "She has driven all night", correct: "Elle a conduit toute la nuit", choices: ["Elle a conduit toute la nuit", "Elle conduit toute la nuit", "Elle conduisait toute la nuit", "Elle avait conduit toute la nuit", "Elle va conduire toute la nuit"] },
-            { en: "We have learned something new", correct: "Nous avons appris quelque chose de nouveau", choices: ["Nous avons appris quelque chose de nouveau", "Nous apprenons quelque chose de nouveau", "Nous apprenions quelque chose de nouveau", "Nous avions appris quelque chose de nouveau", "Nous allons apprendre quelque chose de nouveau"] },
-            { en: "I have felt very tired lately", correct: "Je me suis senti très fatigué dernièrement", choices: ["Je me suis senti très fatigué dernièrement", "Je me sens très fatigué dernièrement", "Je me sentais très fatigué dernièrement", "Je m'étais senti très fatigué dernièrement", "Je vais me sentir très fatigué"] },
-            { en: "He has kept his promise", correct: "Il a tenu sa promesse", choices: ["Il a tenu sa promesse", "Il tient sa promesse", "Il tenait sa promesse", "Il avait tenu sa promesse", "Il va tenir sa promesse"] },
-            { en: "They have won the game", correct: "Ils ont gagné le match", choices: ["Ils ont gagné le match", "Ils gagnent le match", "Ils gagnaient le match", "Ils avaient gagné le match", "Ils vont gagner le match"] },
-            { en: "She has rung the bell", correct: "Elle a sonné la cloche", choices: ["Elle a sonné la cloche", "Elle sonne la cloche", "Elle sonnait la cloche", "Elle avait sonné la cloche", "Elle va sonner la cloche"] },
-            { en: "We have flown over the mountains", correct: "Nous avons volé au-dessus des montagnes", choices: ["Nous avons volé au-dessus des montagnes", "Nous volons au-dessus des montagnes", "Nous volions au-dessus des montages", "Nous avions volé au-dessus des montagnes", "Nous allons voler au-dessus des montagnes"] },
-            { en: "I have spoken to her already", correct: "Je lui ai déjà parlé", choices: ["Je lui ai déjà parlé", "Je lui parle déjà", "Je lui parlais", "Je lui avais déjà parlé", "Je vais lui parler"] }
-        ];
-        const type2Questions = [
-            { q: "What is the past simple of 'eat'?", a: "ate" },
-            { q: "What is the past participle of 'eat'?", a: "eaten" },
-            { q: "What is the past simple of 'see'?", a: "saw" },
-            { q: "What is the past participle of 'see'?", a: "seen" },
-            { q: "What is the past simple of 'take'?", a: "took" },
-            { q: "What is the past participle of 'take'?", a: "taken" },
-            { q: "What is the past simple of 'break'?", a: "broke" },
-            { q: "What is the past participle of 'break'?", a: "broken" },
-            { q: "What is the past simple of 'write'?", a: "wrote" },
-            { q: "What is the past participle of 'write'?", a: "written" },
-            { q: "What is the past simple of 'give'?", a: "gave" },
-            { q: "What is the past participle of 'give'?", a: "given" },
-            { q: "What is the past simple of 'drink'?", a: "drank" },
-            { q: "What is the past participle of 'drink'?", a: "drunk" },
-            { q: "What is the past simple of 'drive'?", a: "drove" },
-            { q: "What is the past participle of 'drive'?", a: "driven" },
-            { q: "What is the past simple of 'speak'?", a: "spoke" },
-            { q: "What is the past participle of 'speak'?", a: "spoken" },
-            { q: "What is the past simple of 'choose'?", a: "chose" },
-            { q: "What is the past participle of 'choose'?", a: "chosen" }
-        ];
-        let score = 0, lives = 0, timeLeft = 0, qTime = 0;
-        let timerInterval = null, qTimerInterval = null, awaitingNext = false;
-        let currentQuestionData = null;
-        let gameCompleted = false;
+        // 🔑 CONFIGURATION
+        const THEME = 'anglais';
+        const LEVEL_ID = 2;
+        const SCORE_REQUIS_N3 = 10;
+        const SCORE_REQUIS_N100 = 20;
+        const SCORE_PARFAIT_N2 = 10; // Score parfait = 100%
+        const TOTAL_QUESTIONS = 10;
+        const POINTS_PER_QUESTION = 1;
+        // Fonction pour convertir un nombre en anglais (0-100)
+        function numberToWords(num) {
+            if (num === 0) return "zero";
+            if (num < 0 || num > 100) return "";
+            const ones = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+                         "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+            const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+            if (num < 20) {
+                return ones[num];
+            } else if (num < 100) {
+                const ten = Math.floor(num / 10);
+                const unit = num % 10;
+                if (unit === 0) {
+                    return tens[ten];
+                } else {
+                    return tens[ten] + "-" + ones[unit];
+                }
+            } else { // 100
+                return "one hundred";
+            }
+        }
+        // Générer les questions
+        const QUESTIONS = [];
+        for (let i = 0; i <= 100; i++) {
+            const word = numberToWords(i);
+            if (word) {
+                QUESTIONS.push({
+                    question: `Comment écrit-on <strong>${i}</strong> en anglais ?`,
+                    correct: word
+                });
+            }
+        }
+        // ⏱️ Config du niveau (unique ici)
+        const levelConfig = {
+            time: 60,
+            qTime: 10,
+            lives: 5
+        };
+        // ✅ DOM
         const quizSection = document.getElementById('quiz-section');
         const resultSection = document.getElementById('result-section');
-        const backBtn = document.getElementById('back-btn');
-        const mobileBackBtn = document.getElementById('mobile-back-btn');
-        const answerBtns = document.querySelectorAll('.answer-btn');
         const questionBox = document.getElementById('question');
+        const userInput = document.getElementById('user-input');
+        const validateBtn = document.getElementById('validate-btn');
+        const feedbackContainer = document.getElementById('feedback-container');
         const scoreDisplay = document.getElementById('score');
         const livesDisplay = document.getElementById('lives');
         const timerDisplay = document.getElementById('timer');
         const qTimerDisplay = document.getElementById('question-timer');
         const timerFill = document.getElementById('timer-fill');
         const qTimerFill = document.getElementById('question-timer-fill');
+        const mobileBackBtn = document.getElementById('mobile-back-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const homeBtn = document.getElementById('home-btn');
+        const levelUnlockMsg = document.getElementById('level-unlock-msg');
+        const perfectScoreMsg = document.getElementById('perfect-score-msg');
+        const currentScoreDisplayMobile = document.getElementById('current-score-display-mobile');
+        const wrongAnswersDisplayMobile = document.getElementById('wrong-answers-mobile');
+        const bestScoreDisplayMobile = document.getElementById('best-score-display-mobile');
+        // ✅ États du jeu
+        let score = 0, lives = 0, timeLeft = 0, qTime = 0;
+        let timerInterval = null, qTimerInterval = null, awaitingNext = false;
+        let gameCompleted = false;
+        let usedQuestions = [];
+        let currentCorrectAnswer = null;
+        let wrongAnswers = 0;
+        let currentUserBestScore = 0;
+        let currentQuestionIndex = 0;
+        let questions = [];
+        // 🔁 Fonctions utilitaires
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
         function updateQuizHeaderVisibility(isQuizActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('quiz-active', isQuizActive);
@@ -570,355 +753,476 @@
                 mobileBackBtn.classList.add('hidden');
             }
         }
-        async function saveCurrentScore() {
-            if (!window.currentUser || score <= 0 || gameCompleted) return;
-            try {
-                const userDocRef = doc(db, 'users', currentUser.uid);
-                const userDoc = await getDoc(userDocRef);
-                let userData = userDoc.data();
-                const defaultQuizScores = { anglais: 0 };
-                if (!userData) {
-                    userData = {
-                        pseudo: currentUser.email.split('@')[0],
-                        email: currentUser.email,
-                        quizScores: defaultQuizScores,
-                        createdAt: new Date().toISOString()
-                    };
-                    await setDoc(userDocRef, userData);
-                }
-                const quizScores = { ...(userData.quizScores || defaultQuizScores) };
-                const oldAnglais = quizScores.anglais || 0;
-                const newAnglais = oldAnglais + score;
-                quizScores.anglais = newAnglais;
-                const newGlobalScore = newAnglais; // Only anglais counts
-                await updateDoc(userDocRef, { quizScores });
-                localStorage.setItem('globalScore', newGlobalScore);
-                localStorage.setItem('anglaisScore', newAnglais);
-                document.getElementById('user-global-score').textContent = newGlobalScore;
-            } catch (error) {
-                console.error('Erreur sauvegarde partielle:', error);
+        function updateResultHeaderVisibility(isResultActive) {
+            if (window.innerWidth <= 899) {
+                document.body.classList.toggle('result-active', isResultActive);
             }
         }
-        backBtn.onclick = async function () {
-            await saveCurrentScore();
-            stopAllTimers();
-            quizSection.classList.add('hidden');
-            window.location.href = 'index.html';
-        };
-        mobileBackBtn.onclick = backBtn.onclick;
-        function generateRandomQuestion() {
-            const questionType = Math.floor(Math.random() * 4);
-            if (questionType === 0) {
-                const randomIndex = Math.floor(Math.random() * irregularVerbs.length);
-                const verb = irregularVerbs[randomIndex];
-                const questionTypes = ['past', 'ppart', 'base'];
-                const qType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
-                let question, correctAnswer, options;
-                if (qType === 'past') {
-                    question = `Quel est le prétérit de "${verb.base}" ?`;
-                    correctAnswer = verb.past;
-                } else if (qType === 'ppart') {
-                    question = `Quel est le participe passé de "${verb.base}" ?`;
-                    correctAnswer = verb.ppart;
-                } else {
-                    question = `Quel est l'infinitif de "${verb.past}" ?`;
-                    correctAnswer = verb.base;
-                }
-                options = [correctAnswer];
-                let availableVerbs = irregularVerbs.filter(v => v !== verb);
-                for (let i = 0; i < 4 && availableVerbs.length > 0; i++) {
-                    const randomIdx = Math.floor(Math.random() * availableVerbs.length);
-                    const randomVerb = availableVerbs[randomIdx];
-                    availableVerbs.splice(randomIdx, 1);
-                    if (qType === 'past') {
-                        options.push(randomVerb.past);
-                    } else if (qType === 'ppart') {
-                        options.push(randomVerb.ppart);
+        // Comparer les réponses
+        function compareAnswers(correct, user) {
+            if (!correct || !user) {
+                return { isCorrect: false, feedback: [] };
+            }
+            correct = correct.trim().toLowerCase();
+            user = user.trim().toLowerCase();
+            if (correct === user) {
+                return { isCorrect: true, feedback: '' };
+            }
+            // Analyser caractère par caractère
+            const correctChars = correct.split('');
+            const userChars = user.split('');
+            const result = [];
+            const maxLength = Math.max(correctChars.length, userChars.length);
+            for (let i = 0; i < maxLength; i++) {
+                if (i < correctChars.length && i < userChars.length) {
+                    if (correctChars[i] === userChars[i]) {
+                        result.push({ char: userChars[i], status: 'correct' });
                     } else {
-                        options.push(randomVerb.base);
+                        result.push({ char: userChars[i], status: 'incorrect' });
                     }
+                } else if (i >= correctChars.length) {
+                    // Caractères en trop
+                    result.push({ char: userChars[i], status: 'extra' });
+                } else {
+                    // Caractères manquants
+                    result.push({ char: correctChars[i], status: 'missing' });
                 }
-                options = options.sort(() => Math.random() - 0.5);
-                return { q: question, a: correctAnswer, opts: options };
-            } else if (questionType === 1) {
-                const randomIndex = Math.floor(Math.random() * irregularVerbs.length);
-                const verb = irregularVerbs[randomIndex];
-                const question = `Quelle est la traduction de "${verb.base}" ?`;
-                const correctAnswer = verb.fr;
-                const options = [correctAnswer];
-                let availableVerbs = irregularVerbs.filter(v => v !== verb);
-                for (let i = 0; i < 4 && availableVerbs.length > 0; i++) {
-                    const randomIdx = Math.floor(Math.random() * availableVerbs.length);
-                    const randomVerb = availableVerbs[randomIdx];
-                    availableVerbs.splice(randomIdx, 1);
-                    options.push(randomVerb.fr);
+            }
+            return { isCorrect: false, feedback: result };
+        }
+        // Générer les questions
+        function generateQuestions() {
+            const numbers = Array.from({length: 101}, (_, i) => i);
+            // Mélanger les nombres
+            for (let i = numbers.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+            }
+            // Prendre les 10 premiers
+            return numbers.slice(0, TOTAL_QUESTIONS).map(num => {
+                const word = numberToWords(num);
+                return {
+                    number: num,
+                    word: word,
+                    question: `Comment écrit-on <strong>${num}</strong> en anglais ?`
+                };
+            });
+        }
+        // 📥 Fetch best score from DB with local fallback
+        async function fetchBestScore() {
+            if (!window.currentUser) return 0;
+            try {
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    return userData.bestScores?.[THEME] || 0;
                 }
-                options = options.sort(() => Math.random() - 0.5);
-                return { q: question, a: correctAnswer, opts: options };
-            } else if (questionType === 2) {
-                const randomIndex = Math.floor(Math.random() * type2Questions.length);
-                const q = type2Questions[randomIndex];
-                const question = q.q;
-                const correctAnswer = q.a;
-                let options = [correctAnswer];
-                let otherForms = [];
-                irregularVerbs.forEach(v => {
-                    if (v.past !== correctAnswer && v.ppart !== correctAnswer && v.base !== correctAnswer) {
-                        otherForms.push(v.past, v.ppart);
+            } catch (error) {
+                console.error("Erreur lors de la récupération du meilleur score:", error);
+            }
+            return 0;
+        }
+        // 💾 Save best score to DB with local fallback
+        async function saveBestScore(newBest) {
+            if (!window.currentUser) return;
+            try {
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                await updateDoc(userRef, {
+                    [`bestScores.${THEME}`]: newBest
+                });
+            } catch (error) {
+                console.error("Erreur lors de la sauvegarde du meilleur score:", error);
+            }
+        }
+        // 📥 Sauvegarde via transaction
+        async function saveScores(incrementValue) {
+            if (incrementValue <= 0 || !window.currentUser) return;
+            try {
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                await runTransaction(db, async (transaction) => {
+                    const userDoc = await transaction.get(userRef);
+                    if (!userDoc.exists()) {
+                        throw new Error("User document does not exist!");
+                    }
+                    const data = userDoc.data();
+                    const currentGlobalScore = data.globalScore || 0;
+                    const currentQuizScores = data.quizScores || {};
+                    const currentBestScores = data.bestScores || {};
+                    // Mettre à jour le score global
+                    transaction.update(userRef, {
+                        globalScore: currentGlobalScore + incrementValue
+                    });
+                    // Mettre à jour le score du quiz
+                    const currentThemeScore = currentQuizScores[THEME] || 0;
+                    transaction.update(userRef, {
+                        [`quizScores.${THEME}`]: currentThemeScore + incrementValue
+                    });
+                    // Mettre à jour le meilleur score si nécessaire
+                    const currentBestForTheme = currentBestScores[THEME] || 0;
+                    if (score > currentBestForTheme) {
+                        transaction.update(userRef, {
+                            [`bestScores.${THEME}`]: score
+                        });
                     }
                 });
-                otherForms = [...new Set(otherForms)].sort(() => Math.random() - 0.5).slice(0, 4);
-                options = [...options, ...otherForms].slice(0, 5);
-                options = options.sort(() => Math.random() - 0.5);
-                return { q: question, a: correctAnswer, opts: options };
-            } else {
-                const randomIndex = Math.floor(Math.random() * type5Questions.length);
-                const q = type5Questions[randomIndex];
-                const question = `Traduisez : "${q.en}"`;
-                const correctAnswer = q.correct;
-                const options = [...q.choices].sort(() => Math.random() - 0.5);
-                return { q: question, a: correctAnswer, opts: options };
+            } catch (error) {
+                console.error("Erreur lors de la sauvegarde des scores:", error);
             }
         }
-        function startMode() {
+        // 📥 Fonction pour mettre à jour les niveaux
+        async function updateLevels(isPerfectScore) {
+            if (!window.currentUser) return;
+            try {
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                const updates = {};
+                // Si le score est supérieur ou égal à 10, mettre le niveau à 3
+                if (score >= SCORE_REQUIS_N3) {
+                    updates[`niveaux.${THEME}`] = 3;
+                }
+                // Si c'est un score parfait (10) ET que le niveau 100 est déjà à 1, mettre le niveau100 à 2
+                if (isPerfectScore) {
+                    // On suppose que le niveau 100 est déjà à 1 si on est dans ce niveau
+                    updates[`niveaux100.${THEME}`] = 2;
+                }
+                if (Object.keys(updates).length > 0) {
+                    await updateDoc(userRef, updates);
+                }
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour des niveaux:", error);
+            }
+        }
+        // 🎮 Logique de jeu
+        async function startGame() {
+            if (gameCompleted) return;
             stopAllTimers();
-            score = 0;
-            lives = mode.lives;
-            timeLeft = mode.time;
-            qTime = mode.qTime;
-            awaitingNext = false;
-            updateLives();
+            score = 0; lives = levelConfig.lives; timeLeft = levelConfig.time; qTime = levelConfig.qTime;
+            wrongAnswers = 0;
+            usedQuestions = [];
+            currentQuestionIndex = 0;
+            questions = generateQuestions();
             scoreDisplay.textContent = score;
-            resultSection.classList.add('hidden');
+            updateLives();
+            currentUserBestScore = await fetchBestScore();
+            updateStatsDisplayMobile();
             quizSection.classList.remove('hidden');
+            resultSection.classList.add('hidden');
             updateQuizHeaderVisibility(true);
-            loadLeaderboard();
+            updateResultHeaderVisibility(false);
             generateQuestion();
             startMainTimer();
+            window.scrollTo(0, 0);
+        }
+        function getRandomQuestion() {
+            if (currentQuestionIndex >= questions.length) return null;
+            const q = questions[currentQuestionIndex];
+            currentQuestionIndex++;
+            return q;
         }
         function generateQuestion() {
             if (awaitingNext) return;
-            const qData = generateRandomQuestion();
-            currentQuestionData = qData;
-            qTime = mode.qTime;
-            qTimerDisplay.textContent = qTime.toFixed(1);
-            qTimerFill.style.width = '100%';
-            questionBox.innerHTML = qData.q;
-            const opts = qData.opts.slice(0, 5);
-            answerBtns.forEach((btn, i) => {
-                if (i < 5) {
-                    btn.innerHTML = opts[i] || "–";
-                    btn.dataset.value = opts[i] || "";
-                    btn.disabled = false;
-                    btn.classList.remove("correct", "incorrect");
-                    btn.onclick = () => handleAnswer(opts[i]);
-                    btn.style.display = '';
-                } else {
-                    btn.style.display = 'none';
-                }
-            });
-            setTimeout(() => {
-                if (!awaitingNext) startQTimer();
-            }, 100);
-        }
-        function handleAnswer(selected) {
-            if (awaitingNext) return;
-            awaitingNext = true;
-            clearInterval(qTimerInterval);
-            answerBtns.forEach(btn => {
-                btn.disabled = true;
-                if (btn.dataset.value === currentQuestionData.a) {
-                    btn.classList.add("correct");
-                }
-                if (btn.dataset.value === selected && selected !== currentQuestionData.a) {
-                    btn.classList.add("incorrect");
-                }
-            });
-            if (selected === currentQuestionData.a) {
-                score++;
-            } else {
-                lives--;
+            const q = getRandomQuestion();
+            if (!q) {
+                // Fin des questions
+                saveScores(score);
+                endGame();
+                return;
             }
-            updateLives();
+            currentCorrectAnswer = q.word;
+            questionBox.innerHTML = q.question;
+            userInput.value = '';
+            userInput.disabled = false;
+            validateBtn.disabled = false;
+            feedbackContainer.innerHTML = '';
+            qTime = levelConfig.qTime;
+            qTimerFill.style.width = '100%'; // Réinitialiser la barre de progression à 100%
+            setTimeout(startQTimer, 100);
+        }
+        async function handleAnswer() {
+            if (awaitingNext) return;
+            clearInterval(qTimerInterval);
+            userInput.disabled = true;
+            validateBtn.disabled = true;
+            const userAnswer = userInput.value.trim();
+            const comparison = compareAnswers(currentCorrectAnswer, userAnswer);
+            if (comparison.isCorrect) {
+                // Réponse correcte
+                feedbackContainer.innerHTML = '<div class="correct">Correct!</div>';
+                score += POINTS_PER_QUESTION;
+            } else {
+                // Réponse incorrecte - afficher la comparaison détaillée
+                const feedbackHtml = document.createElement('div');
+                feedbackHtml.className = 'partially-correct';
+                if (Array.isArray(comparison.feedback)) {
+                    comparison.feedback.forEach(item => {
+                        const span = document.createElement('span');
+                        switch(item.status) {
+                            case 'correct':
+                                span.className = 'char-correct';
+                                break;
+                            case 'incorrect':
+                                span.className = 'char-incorrect';
+                                break;
+                            case 'missing':
+                                span.className = 'char-missing';
+                                break;
+                            case 'extra':
+                                span.className = 'char-extra';
+                                break;
+                        }
+                        span.textContent = item.char || '';
+                        feedbackHtml.appendChild(span);
+                    });
+                } else {
+                    feedbackHtml.innerHTML = '<div class="incorrect">Incorrect</div>';
+                }
+                feedbackContainer.innerHTML = '';
+                // Ajouter la bonne réponse en italique
+                const correctAnswerDiv = document.createElement('div');
+                correctAnswerDiv.style.marginTop = '10px';
+                correctAnswerDiv.style.fontStyle = 'italic';
+                correctAnswerDiv.style.color = '#9c28a7';
+                correctAnswerDiv.innerHTML = `<em>Bonne réponse : ${currentCorrectAnswer}</em>`;
+                feedbackContainer.appendChild(feedbackHtml);
+                feedbackContainer.appendChild(correctAnswerDiv);
+                lives = Math.max(0, lives - 1);
+                wrongAnswers++;
+            }
             scoreDisplay.textContent = score;
+            updateLives();
+            updateStatsDisplayMobile();
+            awaitingNext = true;
+            // Pause des timers pendant 2.5 secondes
+            clearInterval(timerInterval); // Arrêter le timer principal
+            clearInterval(qTimerInterval); // Arrêter le timer de question
             setTimeout(() => {
-                awaitingNext = false;
-                if (lives <= 0) endGame();
-                else generateQuestion();
-            }, 1000);
+                if (lives <= 0 || currentQuestionIndex >= TOTAL_QUESTIONS) {
+                    // Mort ou fin des questions -> sauvegarder les scores
+                    saveScores(score);
+                    endGame();
+                }
+                else { 
+                    awaitingNext = false; 
+                    startMainTimer(); // Redémarrer le timer principal
+                    qTime = levelConfig.qTime; // Réinitialiser le temps de la question à la valeur maximale
+                    qTimerFill.style.width = '100%'; // Réinitialiser la barre de progression à 100%
+                    startQTimer(); // Redémarrer le timer de question
+                    generateQuestion(); 
+                }
+            }, 2500);
         }
         function updateLives() {
-            const safeLives = Math.max(0, lives);
-            const maxLives = mode.lives;
-            livesDisplay.textContent = '❤'.repeat(safeLives) + '♡'.repeat(Math.max(0, maxLives - safeLives));
+            const total = levelConfig.lives;
+            const hearts = livesDisplay.querySelectorAll('.heart');
+            hearts.forEach((heart, i) => {
+                if (i < lives) {
+                    heart.textContent = '❤';
+                    heart.style.color = '#FF6B6B';
+                    heart.style.textShadow = '0 0 4px rgba(255, 107, 107, 0.6)';
+                } else {
+                    heart.textContent = '♡';
+                    heart.style.color = '#8888aa';
+                    heart.style.textShadow = '0 0 4px rgba(136, 136, 170, 0.4)';
+                }
+            });
+        }
+        function updateStatsDisplayMobile() {
+            currentScoreDisplayMobile.textContent = score;
+            wrongAnswersDisplayMobile.textContent = wrongAnswers;
+            bestScoreDisplayMobile.textContent = currentUserBestScore;
         }
         function startMainTimer() {
-            timerDisplay.textContent = timeLeft;
-            timerFill.style.width = '100%';
             clearInterval(timerInterval);
+            // Ne pas réinitialiser timeLeft ici, conserver la valeur actuelle
+            // timeLeft = levelConfig.time; // Ligne supprimée
+            timerDisplay.textContent = timeLeft;
+            timerFill.style.width = (timeLeft / levelConfig.time * 100) + '%';
             timerInterval = setInterval(() => {
                 timeLeft--;
                 timerDisplay.textContent = timeLeft;
-                timerFill.style.width = (timeLeft / mode.time * 100) + '%';
-                if (timeLeft <= 5) timerFill.style.background = '#dc3545';
-                else if (timeLeft <= 10) timerFill.style.background = '#ffa500';
-                else timerFill.style.background = '#9c28a7ff';
+                timerFill.style.width = (timeLeft / levelConfig.time * 100) + '%';
+                if (timeLeft <= 5) {
+                    timerFill.style.background = 'linear-gradient(90deg, #FF4757, #FF6B81)';
+                } else if (timeLeft <= 10) {
+                    timerFill.style.background = 'linear-gradient(90deg, #ffa502, #ff7b25)';
+                } else {
+                    timerFill.style.background = 'linear-gradient(90deg, #FFD700, #FFA500)';
+                }
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
+                    // Fin du temps -> sauvegarder les scores
+                    saveScores(score);
                     endGame();
                 }
             }, 1000);
         }
         function startQTimer() {
             clearInterval(qTimerInterval);
-            const qStartTime = mode.qTime;
-            qTime = qStartTime;
+            const start = levelConfig.qTime;
+            qTime = start;
             qTimerInterval = setInterval(() => {
                 qTime -= 0.1;
                 qTimerDisplay.textContent = qTime.toFixed(1);
-                const percent = Math.max(0, qTime / qStartTime) * 100;
-                qTimerFill.style.width = percent + '%';
+                const pct = Math.max(0, qTime / start) * 100;
+                qTimerFill.style.width = pct + '%';
                 if (qTime <= 0) {
                     clearInterval(qTimerInterval);
-                    handleAnswer('');
+                    userInput.disabled = true;
+                    validateBtn.disabled = true;
+                    feedbackContainer.innerHTML = `<div class="incorrect">Temps écoulé! La réponse était: ${currentCorrectAnswer}</div>`;
+                    lives = Math.max(0, lives - 1);
+                    wrongAnswers++;
+                    scoreDisplay.textContent = score;
+                    updateLives();
+                    updateStatsDisplayMobile();
+                    awaitingNext = true;
+                    clearInterval(timerInterval); // Arrêter le timer principal
+                    clearInterval(qTimerInterval); // Arrêter le timer de question
+                    setTimeout(() => {
+                        if (lives <= 0 || currentQuestionIndex >= TOTAL_QUESTIONS) {
+                            // Mort ou fin des questions -> sauvegarder les scores
+                            saveScores(score);
+                            endGame();
+                        }
+                        else { 
+                            awaitingNext = false; 
+                            startMainTimer(); // Redémarrer le timer principal
+                            qTime = levelConfig.qTime; // Réinitialiser le temps de la question à la valeur maximale
+                            qTimerFill.style.width = '100%'; // Réinitialiser la barre de progression à 100%
+                            startQTimer(); // Redémarrer le timer de question
+                            generateQuestion(); 
+                        }
+                    }, 2600);
                 }
-            }, 100);
+            }, 200);
         }
         async function endGame() {
             if (gameCompleted) return;
             gameCompleted = true;
+            // Scores déjà sauvegardés dans les autres cas
+            const newBest = Math.max(currentUserBestScore, score);
+            if (newBest > currentUserBestScore) {
+                currentUserBestScore = newBest;
+                await saveBestScore(newBest);
+            }
+            // Déterminer si c'est un score parfait
+            const isPerfectScore = score >= SCORE_PARFAIT_N2;
+            // Mettre à jour les niveaux
+            await updateLevels(isPerfectScore);
             quizSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
             updateQuizHeaderVisibility(false);
+            updateResultHeaderVisibility(true);
             document.getElementById('final-score').textContent = score;
-            stopAllTimers();
-            try {
-                if (!window.currentUser) throw new Error('Utilisateur non connecté');
-                const userDocRef = doc(db, 'users', currentUser.uid);
-                const userDoc = await getDoc(userDocRef);
-                let userData = userDoc.data();
-                const defaultQuizScores = { anglais: 0 };
-                if (!userData) {
-                    userData = {
-                        pseudo: currentUser.email.split('@')[0],
-                        email: currentUser.email,
-                        quizScores: defaultQuizScores,
-                        createdAt: new Date().toISOString()
-                    };
-                    await setDoc(userDocRef, userData);
+            document.getElementById('best-score').textContent = currentUserBestScore;
+            // Récupérer les scores mis à jour pour l'affichage
+            if (window.currentUser) {
+                try {
+                    const userRef = doc(db, 'users', window.currentUser.uid);
+                    const userDoc = await getDoc(userRef);
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        const themeScore = userData.quizScores?.[THEME] || 0;
+                        const globalScore = userData.globalScore || 0;
+                        document.getElementById('new-theme-score').textContent = themeScore;
+                        document.getElementById('new-global-score').textContent = globalScore;
+                    }
+                } catch (error) {
+                    console.error("Erreur lors de la récupération des scores:", error);
                 }
-                const quizScores = { ...(userData.quizScores || defaultQuizScores) };
-                const oldAnglais = quizScores.anglais || 0;
-                const newAnglais = oldAnglais + score;
-                quizScores.anglais = newAnglais;
-                const newGlobalScore = newAnglais;
-                await updateDoc(userDocRef, { quizScores });
-                localStorage.setItem('globalScore', newGlobalScore);
-                localStorage.setItem('anglaisScore', newAnglais);
-                document.getElementById('new-global-score').textContent = newGlobalScore;
-                document.getElementById('new-dept-score').textContent = newAnglais;
-                const oldLevel = Math.floor(oldAnglais / 50);
-                const newLevel = Math.floor(newAnglais / 50);
-                if (newLevel > oldLevel) {
-                    document.getElementById('level-up-msg').classList.remove('hidden');
-                } else {
-                    document.getElementById('level-up-msg').classList.add('hidden');
-                }
-            } catch (error) {
-                console.error('Erreur sauvegarde fin de partie:', error);
-                alert('Erreur lors de la sauvegarde.');
             }
+            const oldTheme = 0; // Impossible de connaître l'ancien score ici
+            if (Math.floor(score / 50) > Math.floor(oldTheme / 50)) {
+                document.getElementById('level-up-msg').classList.remove('hidden');
+            }
+            // ✅ Gestion du score parfait
+            let perfectAchieved = false;
+            if (score >= SCORE_PARFAIT_N2) {
+                perfectAchieved = true;
+            }
+            // Affichage message score parfait
+            if (perfectAchieved) {
+                perfectScoreMsg.classList.remove('hidden');
+            }
+            // Gestion déverrouillage niveau 3
+            let unlocked = false;
+            if (score >= SCORE_REQUIS_N3) {
+                unlocked = true;
+            }
+            if (unlocked) {
+                levelUnlockMsg.style.display = 'block';
+            }
+            window.scrollTo(0, 0);
+        }
+        async function handleBack() {
+            if (gameCompleted) {
+                window.location.href = 'index.html';
+                return;
+            }
+            // Sauvegarder le score actuel même si on quitte
+            await saveScores(score);
+            const newBest = Math.max(currentUserBestScore, score);
+            if (newBest > currentUserBestScore) {
+                await saveBestScore(newBest);
+            }
+            // Mettre à jour les niveaux même si on quitte
+            const isPerfectScore = score >= SCORE_PARFAIT_N2;
+            await updateLevels(isPerfectScore);
+            stopAllTimers();
+            window.location.href = 'index.html';
         }
         function stopAllTimers() {
             clearInterval(timerInterval);
             clearInterval(qTimerInterval);
         }
-        const restartBtn = document.getElementById('restart-btn');
-        const homeBtn = document.getElementById('home-btn');
-        restartBtn.onclick = () => {
+        // 🔄 Navigation
+        validateBtn.addEventListener('click', handleAnswer);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleAnswer();
+            }
+        });
+        mobileBackBtn.addEventListener('click', handleBack);
+        restartBtn.addEventListener('click', () => {
             gameCompleted = false;
-            startMode();
-        };
-        homeBtn.onclick = async function () {
-            await saveCurrentScore();
-            stopAllTimers();
-            resultSection.classList.add('hidden');
-            window.location.href = 'index.html';
-        };
-        window.logout = async function () {
-            await signOut(auth);
-            window.location.href = 'index.html';
-        };
-        async function loadLeaderboard() {
-            const mobileList = document.querySelector('#leaderboard-section.mobile .leaderboard-list');
-            const desktopList = document.querySelector('#leaderboard-section.desktop .leaderboard-list');
-            const placeholder = '<div style="text-align: center; opacity: 0.6;">Chargement...</div>';
-            if (mobileList) mobileList.innerHTML = placeholder;
-            if (desktopList) desktopList.innerHTML = placeholder;
+            startGame();
+        });
+        homeBtn.addEventListener('click', handleBack);
+        // Vérifier les conditions d'accès
+        async function checkAccess() {
+            if (!window.currentUser) {
+                window.location.href = 'index.html';
+                return false;
+            }
             try {
-                const q = query(collection(db, 'users'), orderBy('quizScores.anglais', 'desc'), limit(10));
-                const querySnapshot = await getDocs(q);
-                let rank = 1;
-                let html = '';
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data() || {};
-                    const pseudo = data.pseudo || 'Anonyme';
-                    const score = data.quizScores?.anglais || 0;
-                    let medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
-                    html += `<div class="leaderboard-item">
-                        <div class="leaderboard-rank">${medal || rank}</div>
-                        <div class="leaderboard-name">${pseudo}</div>
-                        <div class="leaderboard-score">${score}</div>
-                    </div>`;
-                    rank++;
-                });
-                const finalHtml = html || '<div style="text-align: center; opacity: 0.6;">Aucun joueur</div>';
-                if (mobileList) mobileList.innerHTML = finalHtml;
-                if (desktopList) desktopList.innerHTML = finalHtml;
+                const userDoc = await getDoc(doc(db, 'users', window.currentUser.uid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    const globalScore = data.globalScore || 0;
+                    const themeLevel = data.niveaux?.[THEME] || 0;
+                    if (globalScore < 50 || themeLevel < LEVEL_ID) {
+                        window.location.href = 'index.html';
+                        return false;
+                    }
+                    return true;
+                } else {
+                    window.location.href = 'index.html';
+                    return false;
+                }
             } catch (error) {
-                console.error('Erreur chargement leaderboard:', error);
-                const errorMsg = '<div style="text-align: center; opacity: 0.6;">Erreur</div>';
-                if (mobileList) mobileList.innerHTML = errorMsg;
-                if (desktopList) desktopList.innerHTML = errorMsg;
+                console.error("Erreur lors de la vérification des accès:", error);
+                window.location.href = 'index.html';
+                return false;
             }
         }
-        // 🔑 Vérifie que l'utilisateur a au moins 100 points de score global
-        // Lit globalScore depuis localStorage ou depuis Firebase sans forcer à quizScores.anglais
+        // 🔐 Auth simulation
         onAuthStateChanged(auth, async (user) => {
-            const navLoggedIn = document.getElementById('nav-logged-in');
             if (user) {
                 window.currentUser = user;
-                const userDocRef = doc(db, 'users', user.uid);
-                const userDoc = await getDoc(userDocRef);
-                const pseudoEl = document.getElementById('user-pseudo');
-                const scoreEl = document.getElementById('user-global-score');
-
-                // 1. Essayer localStorage d'abord
-                let globalScore = parseInt(localStorage.getItem('globalScore')) || 0;
-
-                // 2. Si pas en local, charger depuis Firebase
-                if (globalScore === 0 && userDoc.exists()) {
-                    const data = userDoc.data();
-                    const quizScores = data.quizScores || {};
-                    // On garde globalScore = quizScores.anglais uniquement pour init
-                    globalScore = quizScores.anglais || 0;
-                    localStorage.setItem('globalScore', globalScore);
+                const hasAccess = await checkAccess();
+                if (hasAccess) {
+                    startGame();
                 }
-
-                pseudoEl.textContent = userDoc.exists()
-                    ? (userDoc.data().pseudo || user.email.split('@')[0])
-                    : user.email.split('@')[0];
-
-                scoreEl.textContent = globalScore;
-                navLoggedIn.classList.remove('hidden');
-
-                if (globalScore < 100) {
-                    alert("💡 Vous devez avoir au moins 100 points de score global pour accéder à ce quiz.");
-                    window.location.href = 'index.html';
-                    return;
-                }
-
-                startMode();
             } else {
                 window.location.href = 'index.html';
             }
