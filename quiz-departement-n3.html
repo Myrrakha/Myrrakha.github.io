@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Quiz Master - Départements Niveau 2</title>
+    <title>Quiz Master - Départements Niveau 3</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         .hidden {
@@ -568,13 +568,13 @@
             <div class="result-stats">
                 <h3>Résumé</h3>
                 <p>Score de la partie : <strong id="final-score">0</strong></p>
-                <p>Meilleur score (N2) : <strong id="best-score">0</strong></p>
+                <p>Meilleur score (N3) : <strong id="best-score">0</strong></p>
                 <p>Score Départements : <strong id="new-theme-score">0</strong></p>
                 <p>Score Global : <strong id="new-global-score">0</strong></p>
                 <div id="level-up-msg" class="hidden" style="color: #2ecc71; margin-top: 15px; font-weight: bold;">
                     🎊 NIVEAU SUPÉRIEUR ATTEINT !
                 </div>
-                <div id="level-unlock-msg">🔓 Niveau 3 débloqué !</div>
+                <div id="level-unlock-msg">🔓 Niveau 4 débloqué !</div>
             </div>
             <button id="restart-btn" class="action-btn">Rejouer</button>
             <button id="home-btn" class="action-btn">Accueil</button>
@@ -591,40 +591,38 @@
             getFirestore, doc, updateDoc, increment, runTransaction, getDoc
         } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // 🔑 CONFIGURATION DU NIVEAU 2
+        // 🔑 CONFIGURATION DU NIVEAU 3
         const THEME = 'departements';
-        const QUIZ_TITLE = 'Départements Niveau 2';
-        const SCORE_REQUIS_N3 = 13; // 50% de 25 questions (13/25)
-        const SCORE_PARFAIT_N2 = 25;
+        const QUIZ_TITLE = 'Départements Niveau 3';
+        const SCORE_REQUIS_N4 = 15; // 50% de 35 questions (18/35)
+        const SCORE_PARFAIT_N3 = 25;
 
         const DEPARTEMENTS = [
-            { numero: "26", nom: "Drôme" },
-            { numero: "27", nom: "Eure" },
-            { numero: "28", nom: "Eure-et-Loir" },
-            { numero: "29", nom: "Finistère" },
-            { numero: "2A", nom: "Corse-du-Sud" },
-            { numero: "2B", nom: "Haute-Corse" },
-            { numero: "30", nom: "Gard" },
-            { numero: "31", nom: "Haute-Garonne" },
-            { numero: "32", nom: "Gers" },
-            { numero: "33", nom: "Gironde" },
-            { numero: "34", nom: "Hérault" },
-            { numero: "35", nom: "Ille-et-Vilaine" },
-            { numero: "36", nom: "Indre" },
-            { numero: "37", nom: "Indre-et-Loire" },
-            { numero: "38", nom: "Isère" },
-            { numero: "39", nom: "Jura" },
-            { numero: "40", nom: "Landes" },
-            { numero: "41", nom: "Loir-et-Cher" },
-            { numero: "42", nom: "Loire" },
-            { numero: "43", nom: "Haute-Loire" },
-            { numero: "44", nom: "Loire-Atlantique" },
-            { numero: "45", nom: "Loiret" },
-            { numero: "46", nom: "Lot" },
-            { numero: "47", nom: "Lot-et-Garonne" },
-            { numero: "48", nom: "Lozère" },
-            { numero: "49", nom: "Maine-et-Loire" },
-            { numero: "50", nom: "Manche" }
+            { numero: "51", nom: "Marne" },
+            { numero: "52", nom: "Haute-Marne" },
+            { numero: "53", nom: "Mayenne" },
+            { numero: "54", nom: "Meurthe-et-Moselle" },
+            { numero: "55", nom: "Meuse" },
+            { numero: "56", nom: "Morbihan" },
+            { numero: "57", nom: "Moselle" },
+            { numero: "58", nom: "Nièvre" },
+            { numero: "59", nom: "Nord" },
+            { numero: "60", nom: "Oise" },
+            { numero: "61", nom: "Orne" },
+            { numero: "62", nom: "Pas-de-Calais" },
+            { numero: "63", nom: "Puy-de-Dôme" },
+            { numero: "64", nom: "Pyrénées-Atlantiques" },
+            { numero: "65", nom: "Hautes-Pyrénées" },
+            { numero: "66", nom: "Pyrénées-Orientales" },
+            { numero: "67", nom: "Bas-Rhin" },
+            { numero: "68", nom: "Haut-Rhin" },
+            { numero: "69", nom: "Rhône" },
+            { numero: "70", nom: "Haute-Saône" },
+            { numero: "71", nom: "Saône-et-Loire" },
+            { numero: "72", nom: "Sarthe" },
+            { numero: "73", nom: "Savoie" },
+            { numero: "74", nom: "Haute-Savoie" },
+            { numero: "75", nom: "Paris" }
         ];
 
         // Générer les questions
@@ -647,8 +645,8 @@
         // ⏱️ Config du niveau (unique ici)
         const levelConfig = {
             time: 60,
-            qTime: 5,
-            lives: 5
+            qTime: 4,
+            lives: 3
         };
 
         // 🌐 Firebase init
@@ -748,7 +746,7 @@
             try {
                 const userRef = doc(db, 'users', window.currentUser.uid);
                 await updateDoc(userRef, {
-                    [`bestScores.${THEME}-n2`]: newBest
+                    [`bestScores.${THEME}-n3`]: newBest
                 });
                 localStorage.setItem(`best-score-${THEME}`, newBest.toString());
             } catch (error) {
@@ -964,15 +962,15 @@
             }
 
             let unlocked = false;
-            if (score >= SCORE_REQUIS_N3) {
+            if (score >= SCORE_REQUIS_N4) {
                 const userRef = doc(db, 'users', window.currentUser.uid);
                 const userDoc = await getDoc(userRef);
                 if (userDoc.exists()) {
                     const niveaux = userDoc.data().niveaux || {};
                     const niveauActuel = niveaux[THEME] || 0;
-                    if (niveauActuel === 1 || niveauActuel === 2) {
+                    if (niveauActuel === 1 || niveauActuel === 2 || niveauActuel === 3) {
                         await updateDoc(userRef, {
-                            [`niveaux.${THEME}`]: 3
+                            [`niveaux.${THEME}`]: 4
                         });
                         unlocked = true;
                     }
@@ -987,7 +985,7 @@
 
         async function handleBack() {
             if (gameCompleted) {
-                window.location.href = 'dossier-quiz-departement.html';
+                window.location.href = 'index.html';
                 return;
             }
 
