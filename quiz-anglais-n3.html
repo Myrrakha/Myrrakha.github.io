@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Quiz Master - Anglais - Nombres</title>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather  :wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <title>Quiz Master - Anglais - Nombres N3</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <style>
         .hidden {
             display: none !important;
@@ -520,6 +520,33 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        /* Bouton audio */
+        #play-audio-btn {
+            background: linear-gradient(145deg, #001240, #012169);
+            border: 2px solid rgba(255, 215, 0, 0.25);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin: 10px auto;
+            transition: 0.2s;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+        }
+        #play-audio-btn:hover {
+            background: linear-gradient(145deg, #0e2a7a, #1a3b9b);
+            box-shadow: 0 0 16px rgba(255, 215, 0, 0.3);
+            border-color: rgba(255, 215, 0, 0.4);
+        }
+        #play-audio-btn:active {
+            transform: scale(0.95);
+        }
+        #play-audio-btn img {
+            width: 30px;
+            height: 30px;
+        }
     </style>
 </head>
 <body>
@@ -528,7 +555,10 @@
             <div class="bigben-watermark"></div>
             <div class="quiz-container">
                 <div class="question-box">
-                    <div id="question"></div>
+                    <div id="question">Écoutez le nombre</div>
+                    <button id="play-audio-btn">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F5F5F5'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E" alt="Lire l'audio">
+                    </button>
                 </div>
                 <div class="answers-container">
                     <button class="answer-btn"></button>
@@ -582,7 +612,7 @@
             <div class="result-stats">
                 <h3>Résumé</h3>
                 <p>Score de la partie : <strong id="final-score">0</strong></p>
-                <p>Meilleur score (N1) : <strong id="best-score">0</strong></p>
+                <p>Meilleur score (N3) : <strong id="best-score">0</strong></p>
                 <p>Score Anglais : <strong id="new-theme-score">0</strong></p>
                 <p>Score Global : <strong id="new-global-score">0</strong></p>
                 <div id="level-up-msg" class="hidden" style="margin-top: 12px; font-weight: bold;">
@@ -591,7 +621,7 @@
                 <div id="perfect-score-msg" class="hidden" style="margin-top: 10px; font-weight: bold;">
                     🌟 SCORE PARFAIT !
                 </div>
-                <div id="level-unlock-msg">🔓 Niveau 2 débloqué !</div>
+                <div id="level-unlock-msg">🔓 Niveau 4 débloqué !</div>
                 <!-- Horloge Big Ben -->
                 <div class="clock">
                     <div class="hand hour"></div>
@@ -626,9 +656,9 @@
         window.currentUser = null;
         // 🔑 CONFIGURATION
         const THEME = 'anglais';
-        const QUIZ_TITLE = 'Nombres en Anglais';
-        const SCORE_REQUIS_N2 = 18;
-        const SCORE_PARFAIT_N1 = 25; // Score parfait = 100%
+        const QUIZ_TITLE = 'Nombres en Anglais N3';
+        const SCORE_REQUIS_N4 = 18;
+        const SCORE_PARFAIT_N3 = 35; // Score parfait = 100%
         // Fonction pour convertir un nombre en anglais (0-100)
         function numberToWords(num) {
             if (num === 0) return "zero";
@@ -655,18 +685,18 @@
         for (let i = 0; i <= 100; i++) {
             const word = numberToWords(i);
             if (word) {
-                // Poser la question : Comment écrit-on en anglais ?
+                // Poser la question : Quel est le nombre entendu ?
                 QUESTIONS.push({
-                    question: `Comment écrit-on <strong>${i}</strong> en anglais ?`,
-                    correct: word,
+                    question: `Quel est le nombre entendu ?`,
+                    correct: i,
+                    correctWord: word,
                     options: (() => {
                         const options = new Set();
                         // Ajouter des distracteurs
                         while (options.size < 4) {
                             const rand = Math.floor(Math.random() * 101);
-                            const randWord = numberToWords(rand);
-                            if (randWord !== word) {
-                                options.add(randWord);
+                            if (rand !== i) {
+                                options.add(rand);
                             }
                         }
                         return Array.from(options);
@@ -677,13 +707,14 @@
         // ⏱️ Config du niveau (unique ici)
         const levelConfig = {
             time: 60,
-            qTime: 5,
+            qTime: 8, // Temps plus long pour écouter l'audio
             lives: 5
         };
         // ✅ DOM
         const quizSection = document.getElementById('quiz-section');
         const resultSection = document.getElementById('result-section');
         const questionBox = document.getElementById('question');
+        const playAudioBtn = document.getElementById('play-audio-btn');
         const answerBtns = document.querySelectorAll('.answer-btn');
         const scoreDisplay = document.getElementById('score');
         const livesDisplay = document.getElementById('lives');
@@ -705,6 +736,7 @@
         let gameCompleted = false;
         let usedQuestions = [];
         let currentCorrectAnswer = null;
+        let currentCorrectWord = null;
         let wrongAnswers = 0;
         let currentUserBestScore = 0;
         // 🔁 Fonctions utilitaires
@@ -724,6 +756,22 @@
         function updateResultHeaderVisibility(isResultActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('result-active', isResultActive);
+            }
+        }
+        // 🔊 Fonction de synthèse vocale
+        function speakNumber(numberWord) {
+            if ('speechSynthesis' in window) {
+                // Annuler toute synthèse en cours
+                speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(numberWord);
+                utterance.lang = 'en-US'; // Langue anglaise
+                utterance.rate = 0.9; // Légèrement plus lent pour la clarté
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                speechSynthesis.speak(utterance);
+            } else {
+                alert("La synthèse vocale n'est pas prise en charge par votre navigateur.");
             }
         }
         // 📥 Fetch best score from DB with local fallback
@@ -794,17 +842,14 @@
             try {
                 const userRef = doc(db, 'users', window.currentUser.uid);
                 const updates = {};
-                
-                // Si le score est supérieur ou égal à 18, mettre le niveau à 2
-                if (score >= SCORE_REQUIS_N2) {
-                    updates[`niveaux.${THEME}`] = 2;
+                // Si le score est supérieur ou égal à 18, mettre le niveau à 4
+                if (score >= SCORE_REQUIS_N4) {
+                    updates[`niveaux.${THEME}`] = 4;
                 }
-                
                 // Si c'est un score parfait (25), mettre le niveau100 à 1
                 if (isPerfectScore) {
                     updates[`niveaux100.${THEME}`] = 1;
                 }
-                
                 if (Object.keys(updates).length > 0) {
                     await updateDoc(userRef, updates);
                 }
@@ -844,6 +889,7 @@
             if (awaitingNext) return;
             const q = getRandomQuestion();
             currentCorrectAnswer = q.correct;
+            currentCorrectWord = q.correctWord;
             questionBox.innerHTML = q.question;
             const shuffled = [...q.options, q.correct].sort(() => Math.random() - 0.5);
             answerBtns.forEach((btn, i) => {
@@ -854,6 +900,8 @@
             });
             qTime = levelConfig.qTime;
             setTimeout(startQTimer, 100);
+            // Jouer automatiquement l'audio
+            speakNumber(currentCorrectWord);
         }
         function handleAnswer(selected, correct) {
             if (awaitingNext) return;
@@ -861,8 +909,8 @@
             clearInterval(qTimerInterval);
             answerBtns.forEach(btn => {
                 btn.disabled = true;
-                if (btn.innerHTML === escapeHtml(correct)) btn.classList.add('correct');
-                if (btn.innerHTML === escapeHtml(selected) && selected !== correct) btn.classList.add('incorrect');
+                if (parseInt(btn.innerHTML) === correct) btn.classList.add('correct');
+                if (parseInt(btn.innerHTML) === selected && selected !== correct) btn.classList.add('incorrect');
             });
             if (selected === correct) {
                 score++;
@@ -941,7 +989,7 @@
                     clearInterval(qTimerInterval);
                     answerBtns.forEach(btn => {
                         btn.disabled = true;
-                        if (btn.innerHTML === escapeHtml(currentCorrectAnswer)) {
+                        if (parseInt(btn.innerHTML) === currentCorrectAnswer) {
                             btn.classList.add('correct');
                         }
                     });
@@ -973,12 +1021,10 @@
                 currentUserBestScore = newBest;
                 await saveBestScore(newBest);
             }
-            
             // Déterminer si c'est un score parfait
-            const isPerfectScore = score >= SCORE_PARFAIT_N1;
+            const isPerfectScore = score >= SCORE_PARFAIT_N3;
             // Mettre à jour les niveaux
             await updateLevels(isPerfectScore);
-            
             quizSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
             updateQuizHeaderVisibility(false);
@@ -1007,16 +1053,16 @@
             }
             // ✅ Gestion du score parfait
             let perfectAchieved = false;
-            if (score >= SCORE_PARFAIT_N1) {
+            if (score >= SCORE_PARFAIT_N3) {
                 perfectAchieved = true;
             }
             // Affichage message score parfait
             if (perfectAchieved) {
                 perfectScoreMsg.classList.remove('hidden');
             }
-            // Gestion déverrouillage niveau 2
+            // Gestion déverrouillage niveau 4
             let unlocked = false;
-            if (score >= SCORE_REQUIS_N2) {
+            if (score >= SCORE_REQUIS_N4) {
                 unlocked = true;
             }
             if (unlocked) {
@@ -1036,9 +1082,8 @@
                 await saveBestScore(newBest);
             }
             // Mettre à jour les niveaux même si on quitte
-            const isPerfectScore = score >= SCORE_PARFAIT_N1;
+            const isPerfectScore = score >= SCORE_PARFAIT_N3;
             await updateLevels(isPerfectScore);
-            
             stopAllTimers();
             window.location.href = 'index.html';
         }
@@ -1046,6 +1091,12 @@
             clearInterval(timerInterval);
             clearInterval(qTimerInterval);
         }
+        // 🔊 Événement pour le bouton audio
+        playAudioBtn.addEventListener('click', () => {
+            if (currentCorrectWord) {
+                speakNumber(currentCorrectWord);
+            }
+        });
         // 🔄 Navigation
         mobileBackBtn.addEventListener('click', handleBack);
         restartBtn.addEventListener('click', () => {
