@@ -666,9 +666,8 @@
         const THEME = 'anglais';
         const LEVEL_ID = 2;
         const SCORE_REQUIS_N3 = 10;
-        const SCORE_REQUIS_N100 = 20;
-        const SCORE_PARFAIT_N2 = 10; // Score parfait = 100%
-        const TOTAL_QUESTIONS = 10;
+        const SCORE_PARFAIT_N2 = 26; // Score parfait = 100%
+        const TOTAL_QUESTIONS = 40;
         const POINTS_PER_QUESTION = 1;
         // Fonction pour convertir un nombre en anglais (0-100)
         function numberToWords(num) {
@@ -875,16 +874,26 @@
             if (!window.currentUser) return;
             try {
                 const userRef = doc(db, 'users', window.currentUser.uid);
+                const userDoc = await getDoc(userRef);
+                if (!userDoc.exists()) {
+                    throw new Error("User document does not exist!");
+                }
+                
+                const userData = userDoc.data();
+                const currentNiveaux100Anglais = userData.niveaux100?.[THEME] || 0;
+                
                 const updates = {};
+                
                 // Si le score est supérieur ou égal à 10, mettre le niveau à 3
                 if (score >= SCORE_REQUIS_N3) {
                     updates[`niveaux.${THEME}`] = 3;
                 }
-                // Si c'est un score parfait (10) ET que le niveau 100 est déjà à 1, mettre le niveau100 à 2
-                if (isPerfectScore) {
-                    // On suppose que le niveau 100 est déjà à 1 si on est dans ce niveau
+                
+                // Condition spécifique : Si Niveaux100 anglais = 1 ET Score = 26, alors mettre Niveaux100 anglais à 2
+                if (currentNiveaux100Anglais === 1 && score === SCORE_PARFAIT_N2) {
                     updates[`niveaux100.${THEME}`] = 2;
                 }
+                
                 if (Object.keys(updates).length > 0) {
                     await updateDoc(userRef, updates);
                 }
