@@ -633,211 +633,138 @@
         let hidePinyinAfter30s = true;
         let hasSpoken = false; // Indicateur pour savoir si l'utilisateur a parlé
         let timeoutId = null; // Pour le timer de question
-        
-        // 🔧 NOUVELLE FONCTION : Détection appareil mobile
-        function isMobileDevice() {
-            return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        }
-        
-        // 🔧 NOUVELLE FONCTION : Vérification préalable des capacités
-        async function checkDeviceCapabilities() {
-            try {
-                // Vérifier si on est en contexte sécurisé
-                if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-                    alert('⚠️ Pour utiliser le microphone, ce site doit être consulté en HTTPS ou en local (localhost).');
-                    return false;
-                }
-                
-                // Vérifier la présence de l'API SpeechRecognition
-                if (!('webkitSpeechRecognition' in window)) {
-                    alert('⚠️ Votre appareil ne supporte pas la reconnaissance vocale. Essayez avec Chrome sur Android ou Safari sur iOS.');
-                    return false;
-                }
-                
-                return true;
-            } catch (error) {
-                console.error('Erreur vérification capacités:', error);
-                alert('⚠️ Problème technique avec votre appareil. Veuillez réessayer plus tard.');
-                return false;
-            }
-        }
-        
-        // 🔧 FONCTION CORRIGÉE : Initialisation SpeechRecognition
+        // Initialiser l'API Speech Recognition avec gestion correcte des permissions
         function initSpeechRecognition() {
-            if (!('webkitSpeechRecognition' in window)) {
-                console.warn('SpeechRecognition non supporté');
-                return;
-            }
-            
-            try {
-                const SpeechRecognition = window.webkitSpeechRecognition;
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 recognition = new SpeechRecognition();
                 recognition.continuous = false;
                 recognition.interimResults = false;
                 recognition.lang = 'zh-CN';
-                recognition.maxAlternatives = 1;
                 
                 recognition.onstart = function() {
-                    console.log('🔊 Reconnaissance vocale DÉMARRÉE');
                     isListening = true;
-                    hasSpoken = false;
                     micBtn.classList.add('listening');
-                    voiceInstruction.textContent = 'Écoute active...';
-                    micBtn.disabled = true; // Désactiver pendant l'écoute
-                    
-                    // Sur mobile, montrer un indicateur plus visible
-                    if (isMobileDevice()) {
-                        voiceInstruction.style.fontSize = '1.3em';
-                        voiceInstruction.style.fontWeight = 'bold';
-                    }
+                    voiceInstruction.textContent = 'En cours d\'écoute...';
+                    hasSpoken = false;
+                    console.log("Reconnaissance vocale démarrée");
                 };
                 
                 recognition.onresult = function(event) {
-                    console.log('🎤 Résultat reçu');
-                    if (awaitingNext || !currentQuestionData) {
-                        console.log('⚠️ Résultat ignoré: game state incorrect');
-                        return;
-                    }
+                    if (!currentQuestionData || awaitingNext) return;
                     
                     const transcript = event.results[0][0].transcript.trim().toLowerCase();
-                    console.log('📝 Texte reconnu:', transcript);
+                    console.log('Résultat reconnaissance:', transcript);
                     handleSpeechResult(transcript);
                 };
                 
                 recognition.onerror = function(event) {
-                    console.error('❌ Erreur reconnaissance vocale:', event.error);
-                    isListening = false;
-                    micBtn.disabled = false;
-                    
-                    // Gestion spécifique des erreurs courantes sur mobile
-                    if (event.error === 'audio-capture') {
-                        alert('Impossible d\'accéder au microphone. Veuillez vérifier les autorisations dans les paramètres de votre appareil.');
-                    } else if (event.error === 'not-allowed') {
-                        alert('Autorisation microphone refusée. Veuillez activer le microphone pour ce site dans les paramètres de votre navigateur.');
-                    } else if (event.error === 'network') {
-                        alert('Problème de connexion internet. Vérifiez votre connexion et réessayez.');
-                    }
-                    
+                    console.error('Erreur reconnaissance vocale:', event.error);
+                    // Ne pas pénaliser pour les erreurs techniques
                     resetListeningState();
                 };
                 
                 recognition.onend = function() {
-                    console.log('🔇 Reconnaissance vocale TERMINÉE');
+                    console.log("Reconnaissance vocale arrêtée");
                     resetListeningState();
                     
-                    // Si aucune parole détectée après 2.5s, considérer comme réponse incorrecte
+                    // Seulement si l'utilisateur n'a pas parlé ET que nous sommes toujours sur la même question
                     if (!hasSpoken && !awaitingNext && currentQuestionData) {
+                        // On ne pénalise pas immédiatement - laisser un délai raisonnable
                         setTimeout(() => {
-                            if (!hasSpoken && !awaitingNext && currentQuestionData) {
-                                console.log('🔇 Aucune parole détectée après 2.5s');
+                            if (!hasSpoken && !awaitingNext) {
+                                console.log("Aucune parole détectée après autorisation");
                                 handleIncorrectAnswer();
                             }
-                        }, 2500);
+                        }, 500);
                     }
                 };
-            } catch (e) {
-                console.error('💥 Erreur initialisation SpeechRecognition:', e);
-                alert('⚠️ Impossible d\'initialiser la reconnaissance vocale. Veuillez utiliser la dernière version de Chrome.');
-                micBtn.disabled = true;
+            } else {
+                alert('Votre navigateur ne supporte pas la reconnaissance vocale. Veuillez utiliser Chrome.');
+                micBtn.disabled = true; // Désactiver le bouton si non supporté
             }
         }
-        
-        // 🔧 NOUVELLE FONCTION : Réinitialisation propre de l'état
+        // Réinitialiser l'état d'écoute proprement
         function resetListeningState() {
             isListening = false;
             micBtn.classList.remove('listening');
-            micBtn.disabled = false; // Réactiver le bouton
             voiceInstruction.textContent = 'Appuyez sur le micro pour parler';
-            
-            // S'assurer que l'API est bien arrêtée
+        }
+        // Vérifier les permissions microphone AVANT de tenter d'écouter
+        async function checkMicrophonePermission() {
             try {
-                if (recognition) {
-                    recognition.stop();
+                // Vérifier si l'accès au microphone est déjà autorisé
+                if (navigator.permissions) {
+                    const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+                    console.log('Statut permission microphone:', permissionStatus.state);
+                    
+                    if (permissionStatus.state === 'denied') {
+                        alert('L\'accès au microphone est bloqué. Veuillez l\'autoriser dans les paramètres de votre navigateur.');
+                        return false;
+                    }
                 }
-            } catch (e) {
-                console.log('ℹ️ Arrêt de la reconnaissance sans erreur');
+                
+                // Tester l'accès au microphone sans démarrer l'écoute
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                console.log('Accès microphone autorisé');
+                stream.getTracks().forEach(track => track.stop());
+                return true;
+            } catch (err) {
+                console.error('Erreur permission microphone:', err);
+                alert('Veuillez autoriser l\'accès au microphone pour utiliser cette fonctionnalité.');
+                return false;
             }
         }
-        
-        // 🔧 FONCTION CORRIGÉE : Démarrer l'écoute
+        // Démarrer l'écoute vocale - CORRIGÉ
         async function startListening() {
-            if (awaitingNext || !recognition || isListening) {
-                console.log('🚫 Écoute impossible: awaitingNext=' + awaitingNext + ', isListening=' + isListening);
+            if (awaitingNext || !recognition) return;
+            
+            // Vérifier les permissions avant de démarrer
+            const permissionGranted = await checkMicrophonePermission();
+            if (!permissionGranted) {
                 return;
             }
             
-            console.log('🔍 Vérification permissions microphone...');
-            
             try {
-                // Sur mobile, on doit absolument avoir une interaction utilisateur directe
-                if (isMobileDevice()) {
-                    console.log('📱 Mode appareil mobile détecté');
-                    
-                    // Vérifier les permissions existantes
-                    if (navigator.permissions) {
-                        const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
-                        console.log('📱 Statut permission microphone:', permissionStatus.state);
-                        
-                        if (permissionStatus.state === 'denied') {
-                            alert('📱 Le microphone est bloqué pour ce site. Allez dans les paramètres de votre navigateur pour l\'autoriser.');
-                            return;
-                        }
-                    }
-                    
-                    // Tester l'accès au microphone avec une méthode mobile-friendly
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    console.log('✅ Accès microphone mobile autorisé');
-                    stream.getTracks().forEach(track => track.stop());
+                console.log("Tentative de démarrage de l'écoute...");
+                recognition.start();
+                // L'état "listening" sera géré dans onstart, pas ici
+            } catch (e) {
+                console.error('Erreur démarrage reconnaissance:', e);
+                resetListeningState();
+                
+                // Essayer de récupérer après une erreur courante
+                if (e.name === 'NotAllowedError' || e.name === 'NotAllowedError') {
+                    alert('Veuillez autoriser l\'accès au microphone dans les paramètres de votre navigateur.');
                 }
-                
-                console.log('🎤 Démarrage reconnaissance vocale...');
-                resetListeningState(); // S'assurer d'un état propre
-                
-                // Utiliser un délai minimal pour permettre au navigateur de traiter l'interaction utilisateur
-                setTimeout(() => {
-                    try {
-                        recognition.start();
-                        // L'état sera mis à jour dans onstart
-                    } catch (e) {
-                        console.error('💥 Erreur démarrage immédiat:', e);
-                        resetListeningState();
-                    }
-                }, 100);
-                
-            } catch (err) {
-                console.error('💥 Erreur permissions microphone:', err);
-                if (err.name === 'NotAllowedError') {
-                    alert('📱 Veuillez autoriser l\'accès au microphone quand le navigateur le demande.');
-                } else if (err.name === 'NotFoundError') {
-                    alert('📱 Aucun microphone trouvé sur votre appareil.');
-                } else {
-                    alert('📱 Erreur technique: ' + (err.message || 'Impossible d\'accéder au microphone'));
-                }
+            }
+        }
+        // Arrêter l'écoute vocale - CORRIGÉ
+        function stopListening() {
+            if (recognition && isListening) {
+                console.log("Arrêt forcé de l'écoute");
+                recognition.stop();
                 resetListeningState();
             }
         }
-        
-        // 🔧 FONCTION CORRIGÉE : Gestion résultat vocal
+        // Gérer le résultat de la reconnaissance - CORRIGÉ
         function handleSpeechResult(userInput) {
-            if (!currentQuestionData || awaitingNext) {
-                console.log('🚫 Résultat ignoré: état jeu incorrect');
-                return;
-            }
+            if (!currentQuestionData || awaitingNext) return;
             
-            stopListening();
             hasSpoken = true;
+            stopListening();
             
-            // Nettoyer les entrées
-            const correct = currentQuestionData.correct.toLowerCase().replace(/\s+/g, ' ').trim();
-            const user = userInput.toLowerCase().replace(/\s+/g, ' ').trim();
+            // Nettoyer les entrées pour comparaison
+            const correct = currentQuestionData.correct.toLowerCase().replace(/\s+/g, ' ');
+            const user = userInput.toLowerCase().replace(/\s+/g, ' ');
             
-            console.log('🔍 Comparaison:', { user: user, correct: correct });
+            console.log('Comparaison:', { user, correct }); // Log pour debug
             
-            // Calcul de similarité plus robuste pour mobile
+            // Vérifier si la réponse est correcte avec plus de tolérance
             const similarity = getSimilarity(correct, user);
-            const isCorrect = similarity > 0.65 || user.includes(correct) || correct.includes(user);
+            const isCorrect = similarity > 0.6 || user.includes(correct) || correct.includes(user);
             
-            console.log('📊 Similarité:', similarity.toFixed(2), 'Est correct:', isCorrect);
+            console.log('Similarité calculée:', similarity, 'Est correct:', isCorrect);
             
             if (isCorrect) {
                 handleCorrectAnswer();
@@ -845,7 +772,6 @@
                 handleIncorrectAnswer();
             }
         }
-        
         // Calculer la similarité entre deux chaînes
         function getSimilarity(s1, s2) {
             let longer = s1;
@@ -885,68 +811,6 @@
             }
             return costs[s2.length];
         }
-        
-        // 🔧 NOUVELLE FONCTION : Fallback textuel pour mobile
-        function setupMobileFallback() {
-            if (!isMobileDevice()) return;
-            
-            const inputContainer = document.createElement('div');
-            inputContainer.style.margin = '15px 0';
-            inputContainer.style.width = '100%';
-            inputContainer.style.maxWidth = '300px';
-            
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.placeholder = 'Tapez ici si le micro ne fonctionne pas...';
-            input.style.padding = '10px';
-            input.style.borderRadius = '8px';
-            input.style.border = '2px solid #ffb380';
-            input.style.width = '100%';
-            input.style.fontSize = '16px';
-            input.style.textAlign = 'center';
-            input.style.fontFamily = '"Noto Serif SC", serif';
-            
-            const submitBtn = document.createElement('button');
-            submitBtn.textContent = '✅ Valider';
-            submitBtn.style.marginTop = '8px';
-            submitBtn.style.padding = '8px 16px';
-            submitBtn.style.borderRadius = '6px';
-            submitBtn.style.background = 'linear-gradient(145deg, #ffecd9, #f2c19b)';
-            submitBtn.style.border = '2px solid rgba(180, 0, 0, 0.2)';
-            submitBtn.style.cursor = 'pointer';
-            submitBtn.style.fontFamily = '"Noto Serif SC", serif';
-            submitBtn.style.fontSize = '16px';
-            submitBtn.style.width = '100%';
-            
-            inputContainer.appendChild(input);
-            inputContainer.appendChild(submitBtn);
-            document.querySelector('.voice-container').appendChild(inputContainer);
-            
-            // Événement pour l'entrée textuelle
-            input.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && !awaitingNext && currentQuestionData) {
-                    handleSpeechResult(input.value);
-                    input.value = '';
-                }
-            });
-            
-            submitBtn.addEventListener('click', function() {
-                if (!awaitingNext && currentQuestionData && input.value.trim()) {
-                    handleSpeechResult(input.value);
-                    input.value = '';
-                }
-            });
-            
-            // Indication pour l'utilisateur mobile
-            const hint = document.createElement('div');
-            hint.textContent = '💡 Conseil: Si le micro ne fonctionne pas, utilisez le champ ci-dessus';
-            hint.style.fontSize = '0.9em';
-            hint.style.color = '#b40000';
-            hint.style.marginTop = '8px';
-            hint.style.fontStyle = 'italic';
-            inputContainer.appendChild(hint);
-        }
-        
         // 🔁 Fonctions utilitaires
         function escapeHtml(text) {
             const div = document.createElement('div');
@@ -1045,15 +909,6 @@
         // 🎮 Logique de jeu
         async function startGame() {
             if (gameCompleted) return;
-            
-            // Vérification préalable des capacités
-            const canProceed = await checkDeviceCapabilities();
-            if (!canProceed) {
-                // Bloquer le jeu si les capacités ne sont pas suffisantes
-                alert('⚠️ Ce quiz nécessite la reconnaissance vocale. Veuillez utiliser un appareil compatible.');
-                return;
-            }
-            
             stopAllTimers();
             score = 0; lives = levelConfig.lives; timeLeft = levelConfig.time; qTime = levelConfig.qTime;
             wrongAnswers = 0;
@@ -1069,11 +924,6 @@
             generateQuestion();
             startMainTimer();
             window.scrollTo(0, 0);
-            
-            // Ajouter le fallback mobile après le démarrage
-            if (isMobileDevice()) {
-                setupMobileFallback();
-            }
         }
         function getRandomQuestion() {
             if (usedQuestions.length >= QUESTIONS.length) usedQuestions = [];
@@ -1305,26 +1155,20 @@
             clearTimeout(timeoutId);
             stopListening();
         }
-        // Événement du bouton micro
-        micBtn.addEventListener('click', function(e) {
-            // Empêcher le comportement par défaut (important sur mobile)
-            e.preventDefault();
-            e.stopPropagation();
-            
+        // Événement du bouton micro - CORRIGÉ
+        micBtn.addEventListener('click', async () => {
             if (isListening) {
-                console.log('✋ Arrêt forcé de l\'écoute');
                 stopListening();
             } else {
-                console.log('👆 Clic utilisateur détecté - tentative d\'écoute');
-                startListening();
+                // Désactiver temporairement le bouton pour éviter les clics multiples
+                micBtn.disabled = true;
+                await startListening();
+                // Réactiver après un court délai
+                setTimeout(() => {
+                    micBtn.disabled = false;
+                }, 300);
             }
         });
-        
-        // Ajouter un gestionnaire pour les événements tactiles
-        micBtn.addEventListener('touchstart', function(e) {
-            e.preventDefault(); // Empêcher le scroll sur mobile
-        });
-        
         // 🔄 Navigation
         mobileBackBtn.addEventListener('click', handleBack);
         restartBtn.addEventListener('click', () => {
