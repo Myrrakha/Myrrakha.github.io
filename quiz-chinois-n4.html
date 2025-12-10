@@ -1,18 +1,14 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Quiz Master - Chinois N4</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         .hidden {
             display: none !important;
         }
-
         /* GLOBAL */
         body {
             margin: 0;
@@ -27,7 +23,6 @@
             overflow-x: hidden;
             opacity: 0.98;
         }
-
         .lanterne {
             width: 60px;
             height: 90px;
@@ -39,29 +34,24 @@
             filter: drop-shadow(0 0 6px rgba(255, 80, 0, 0.8));
             z-index: -1;
         }
-
         .lanterne:nth-child(1) {
             left: 15%;
             animation-delay: 0s;
         }
-
         .lanterne:nth-child(2) {
             right: 15%;
             animation-delay: 1.2s;
         }
-
         @keyframes flotter {
             0% {
                 transform: translateY(0) rotate(-2deg);
                 opacity: 0.95;
             }
-
             100% {
                 transform: translateY(12px) rotate(2deg);
                 opacity: 1;
             }
         }
-
         #hover-warning {
             position: absolute;
             padding: 8px 14px;
@@ -74,7 +64,6 @@
             transition: opacity 0.4s ease;
             z-index: 9999;
         }
-
         /* ✨ CENTRAGE PRINCIPAL */
         main {
             display: flex;
@@ -87,7 +76,6 @@
             box-sizing: border-box;
             position: relative;
         }
-
         /* QUIZ SECTION */
         #quiz-section {
             display: flex;
@@ -96,24 +84,20 @@
             width: 100%;
             max-width: 1200px;
         }
-
         .quiz-container {
             display: flex;
             gap: 12px;
             width: 100%;
             justify-content: center;
         }
-
         @media (min-width: 900px) {
             .question-box {
                 flex: 2;
             }
-
             .voice-container {
                 flex: 1;
             }
         }
-
         .question-box {
             background: rgba(255, 250, 240, 0.95);
             backdrop-filter: blur(8px);
@@ -134,17 +118,14 @@
             font-family: "Noto Serif SC", serif;
             flex-direction: column;
         }
-
         .number-display {
             font-size: 2.5em;
         }
-
         .pinyin-display {
             font-size: 1.2em;
             margin-top: 10px;
             color: #6a6a6a;
         }
-
         .voice-container {
             display: flex;
             flex-direction: column;
@@ -152,7 +133,6 @@
             justify-content: center;
             gap: 15px;
         }
-
         .mic-btn {
             width: 100px;
             height: 100px;
@@ -170,36 +150,23 @@
             z-index: 10;
             touch-action: manipulation;
         }
-
         .mic-btn:hover {
             transform: scale(1.05);
             background: linear-gradient(145deg, #fde3d0, #ffb380);
             box-shadow: 0 0 16px rgba(255, 100, 50, 0.4);
         }
-
         .mic-btn.listening {
             background: linear-gradient(145deg, #d3e87e, #9bc24f);
             animation: pulse 1.5s infinite;
         }
-
         .mic-btn.listening:hover {
             background: linear-gradient(145deg, #c3d86e, #8bb245);
         }
-
         @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(140, 200, 70, 0.7);
-            }
-
-            70% {
-                box-shadow: 0 0 0 12px rgba(140, 200, 70, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(140, 200, 70, 0);
-            }
+            0% { box-shadow: 0 0 0 0 rgba(140, 200, 70, 0.7); }
+            70% { box-shadow: 0 0 0 12px rgba(140, 200, 70, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(140, 200, 70, 0); }
         }
-
         .voice-instruction {
             font-size: 1.1em;
             text-align: center;
@@ -207,25 +174,6 @@
             font-weight: 600;
             margin-top: 10px;
         }
-
-        #transcript-box {
-            margin-top: 12px;
-            padding: 10px;
-            background: rgba(255, 250, 240, 0.9);
-            border-radius: 10px;
-            border: 1px solid rgba(180, 0, 0, 0.2);
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-            font-size: 1.1em;
-            color: #2a2a2a;
-            min-height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
-        }
-
         #timers-container {
             width: 100%;
             max-width: 1000px;
@@ -235,7 +183,6 @@
             align-items: center;
             gap: 8px;
         }
-
         #timer-bar-container,
         #question-timer-bar-container {
             width: 100%;
@@ -245,7 +192,6 @@
             color: #b40000;
             font-weight: 600;
         }
-
         #timer-bar,
         #question-timer-bar {
             width: 100%;
@@ -256,7 +202,6 @@
             overflow: hidden;
             border: 1px solid rgba(180, 0, 0, 0.2);
         }
-
         #timer-fill,
         #question-timer-fill {
             height: 100%;
@@ -264,15 +209,12 @@
             border-radius: 7px;
             transition: width 0.3s linear;
         }
-
         #timer-fill {
             background: linear-gradient(90deg, #b40000, #ff4d2e, #ff9b00);
         }
-
         #question-timer-fill {
             background: linear-gradient(90deg, #ff9b00, #ff4d2e, #b40000);
         }
-
         #score-lives {
             margin-top: 10px;
             display: flex;
@@ -283,26 +225,22 @@
             color: #b40000;
             font-weight: 600;
         }
-
         .score-container {
             margin-top: 7px;
             font-size: 19px;
             text-shadow: 0 0 5px rgba(255, 130, 100, 0.3);
         }
-
         .heart {
             font-size: 22px;
             margin: 0 3px;
             color: #d35949;
             text-shadow: 0 0 4px rgba(211, 89, 73, 0.6);
         }
-
         @media (max-width: 899px) {
             .quiz-container {
                 flex-direction: column;
                 gap: 10px;
             }
-
             .question-box {
                 font-size: 1.8em;
                 padding: 15px;
@@ -310,25 +248,20 @@
                 width: calc(100% - 30px);
                 color: #b40000;
             }
-
             .number-display {
                 font-size: 2.2em;
             }
-
             .pinyin-display {
                 font-size: 1em;
             }
-
             .voice-container {
                 gap: 10px;
             }
-
             .mic-btn {
                 width: 80px;
                 height: 80px;
                 font-size: 2.5em;
             }
-
             #score-lives {
                 flex-direction: column;
                 gap: 4px;
@@ -336,7 +269,6 @@
                 align-items: center;
                 color: #b40000;
             }
-
             #mobile-quiz-ui-row {
                 display: flex;
                 gap: 8px;
@@ -346,7 +278,6 @@
                 width: 100%;
                 max-width: 1200px;
             }
-
             #current-game-stats {
                 margin: 0;
                 flex: 1;
@@ -358,7 +289,6 @@
                 border: 2px solid rgba(180, 0, 0, 0.15);
                 height: 110px;
             }
-
             .stats-title {
                 font-size: 0.9em;
                 margin-bottom: 6px;
@@ -369,7 +299,6 @@
                 text-align: center;
                 font-family: "Noto Serif SC", serif;
             }
-
             .current-score {
                 font-size: 1.4em;
                 margin: 5px 0;
@@ -377,7 +306,6 @@
                 color: #9bc24f;
                 font-family: "Noto Serif SC", serif;
             }
-
             .stats-row {
                 padding: 3px 0;
                 font-size: 0.85em;
@@ -385,16 +313,13 @@
                 justify-content: space-between;
                 color: #2a2a2a;
             }
-
             .stats-label {
                 font-weight: 600;
             }
-
             .stats-value {
                 font-weight: bold;
                 color: #b40000;
             }
-
             #mobile-back-container {
                 background: rgba(255, 250, 240, 0.85);
                 padding: 12px 10px;
@@ -407,28 +332,18 @@
                 min-width: 44px;
                 height: fit-content;
             }
-
             .skip-btn {
                 margin-top: 8px;
                 width: 100%;
             }
-
-            #transcript-box {
-                max-width: none;
-                font-size: 1em;
-                padding: 8px;
-            }
         }
-
         @media (min-width: 900px) {
             #mobile-quiz-ui-row {
                 display: none !important;
             }
-
             #mobile-back-btn {
                 display: none !important;
             }
-
             #current-game-stats {
                 background: rgba(255, 250, 240, 0.85);
                 border-radius: 10px;
@@ -439,7 +354,6 @@
                 box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.2);
                 border: 2px solid rgba(180, 0, 0, 0.15);
             }
-
             .stats-title {
                 text-align: center;
                 margin-bottom: 10px;
@@ -450,7 +364,6 @@
                 text-shadow: 0 0 5px rgba(200, 0, 0, 0.3);
                 font-family: "Noto Serif SC", serif;
             }
-
             .current-score {
                 font-size: 1.8em;
                 font-weight: bold;
@@ -459,7 +372,6 @@
                 text-align: center;
                 font-family: "Noto Serif SC", serif;
             }
-
             .stats-row {
                 display: flex;
                 justify-content: space-between;
@@ -468,21 +380,17 @@
                 font-size: 0.9em;
                 color: #2a2a2a;
             }
-
             .stats-label {
                 font-weight: 600;
             }
-
             .stats-value {
                 font-weight: bold;
                 color: #b40000;
             }
-
             .skip-btn {
                 margin-top: 16px;
             }
         }
-
         /* RESULT SECTION */
         #result-section {
             text-align: center;
@@ -493,7 +401,6 @@
             align-items: center;
             max-width: 1200px;
         }
-
         .result-stats {
             background: rgba(255, 250, 240, 0.95);
             backdrop-filter: blur(8px);
@@ -505,7 +412,6 @@
             border: 2px solid rgba(180, 0, 0, 0.2);
             width: calc(100% - 30px);
         }
-
         .result-stats h3 {
             color: #b40000;
             margin-top: 0;
@@ -514,7 +420,6 @@
             text-shadow: 0 0 5px rgba(200, 0, 0, 0.4);
             font-family: "Noto Serif SC", serif;
         }
-
         .action-btn {
             margin: 8px;
             padding: 10px 20px;
@@ -528,20 +433,17 @@
             font-size: 15px;
             font-weight: 600;
         }
-
         .action-btn:hover {
             background: linear-gradient(145deg, #fde3d0, #ffb380);
             box-shadow: 0 0 8px rgba(255, 100, 80, 0.3);
             transform: translateY(-1px);
         }
-
         .action-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
-
         /* Unlock Message */
         #level-unlock-msg {
             color: #9bc24f;
@@ -551,14 +453,12 @@
             text-shadow: 0 0 5px rgba(155, 194, 79, 0.4);
             font-family: "Noto Serif SC", serif;
         }
-
         #level-up-msg,
         #perfect-score-msg {
             font-family: "Noto Serif SC", serif;
         }
     </style>
 </head>
-
 <body>
     <div class="lanterne"></div>
     <div class="lanterne"></div>
@@ -574,7 +474,6 @@
                     <div id="voice-instruction" class="voice-instruction">Maintenez le micro pour parler</div>
                 </div>
             </div>
-            <div id="transcript-box" class="hidden">🎤 Écoute en cours...</div>
             <div id="timers-container">
                 <div id="timer-bar-container">
                     <span>⏱️ Temps restant : <span id="timer">0</span>s</span>
@@ -644,13 +543,11 @@
         import {
             getFirestore, doc, updateDoc, increment, runTransaction, getDoc
         } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
         // 🔑 CONFIGURATION
         const THEME = 'chinois';
         const QUIZ_TITLE = 'Chinois N4';
         const SCORE_REQUIS_N5 = 18;
-        const SCORE_PARFAIT_N4 = 25;
-
+        const SCORE_PARFAIT_N4 = 25; // Score parfait = 100%
         const NOMBRES_CHINOIS = [
             { nombre: 0, caractere: "零", pinyin: "líng" },
             { nombre: 1, caractere: "一", pinyin: "yī" },
@@ -674,21 +571,19 @@
             { nombre: 19, caractere: "十九", pinyin: "shí jiǔ" },
             { nombre: 20, caractere: "二十", pinyin: "èr shí" }
         ];
-
-        // ✅ CORRIGÉ : utiliser le caractère comme réponse correcte
+        // Générer les questions pour N4 (prononciation)
         const QUESTIONS = NOMBRES_CHINOIS.map(num => ({
             question: `Prononcez ce nombre : ${num.caractere}`,
-            correct: num.caractere, // ← ICI : caractère, pas pinyin
+            correct: num.pinyin,
             caractere: num.caractere,
             pinyin: num.pinyin
         }));
-
+        // ⏱️ Config du niveau
         const levelConfig = {
             time: 60,
-            qTime: 8,
+            qTime: 8, // 8 secondes par question
             lives: 5
         };
-
         // 🌐 Firebase init
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
@@ -702,7 +597,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         window.currentUser = null;
-
         // ✅ DOM
         const quizSection = document.getElementById('quiz-section');
         const resultSection = document.getElementById('result-section');
@@ -725,7 +619,6 @@
         const currentScoreDisplayMobile = document.getElementById('current-score-display-mobile');
         const wrongAnswersDisplayMobile = document.getElementById('wrong-answers-mobile');
         const bestScoreDisplayMobile = document.getElementById('best-score-display-mobile');
-
         // ✅ États du jeu
         let score = 0, lives = 0, timeLeft = 0, qTime = 0;
         let timerInterval = null, qTimerInterval = null, awaitingNext = false;
@@ -736,114 +629,156 @@
         let currentUserBestScore = 0;
         let recognition = null;
         let isListening = false;
-        let hasSpoken = false;
-        let timeoutId = null;
-        let skipTimer = null;
-        let finalTranscript = null;
-
-        // ✅ Initialisation fiable de SpeechRecognition
+        let pinyinTimer = null;
+        let hidePinyinAfter30s = true;
+        let hasSpoken = false; // Indicateur pour savoir si l'utilisateur a parlé
+        let timeoutId = null; // Pour le timer de question
+        let skipTimer = null; // Pour le timer du bouton passer
+        let finalTranscript = null; // Pour stocker le dernier résultat final
+        
+        // ✅ Initialisation fiable de SpeechRecognition (uniquement webkit)
         function initSpeechRecognition() {
             if ('webkitSpeechRecognition' in window) {
                 const SpeechRecognition = window.webkitSpeechRecognition;
                 recognition = new SpeechRecognition();
-                recognition.continuous = true;
-                recognition.interimResults = true;
+                recognition.continuous = true; // Toujours actif pendant le maintien
+                recognition.interimResults = true; // Pour capturer les résultats intermédiaires
                 recognition.lang = 'zh-CN';
-
-                recognition.onstart = function () {
+                
+                recognition.onstart = function() {
                     isListening = true;
                     hasSpoken = false;
                     finalTranscript = null;
                     micBtn.classList.add('listening');
                     voiceInstruction.textContent = 'En cours d\'écoute...';
                 };
-
-                recognition.onresult = function (event) {
+                
+                recognition.onresult = function(event) {
                     if (!currentQuestionData || awaitingNext) return;
+                    // On stocke le dernier résultat final pour le traitement au relâchement
                     for (let i = event.resultIndex; i < event.results.length; i++) {
                         if (event.results[i].isFinal) {
-                            finalTranscript = event.results[i][0].transcript.trim(); // ⚠️ Pas de toLowerCase()
+                            finalTranscript = event.results[i][0].transcript.trim().toLowerCase();
                             hasSpoken = true;
                         }
                     }
                 };
-
-                recognition.onerror = function (event) {
+                
+                recognition.onerror = function(event) {
                     console.error('Erreur reconnaissance vocale:', event.error);
+                    // On ne fait rien ici, on laisse le processus se terminer normalement
                 };
-
-                recognition.onend = function () {
+                
+                recognition.onend = function() {
                     isListening = false;
                     micBtn.classList.remove('listening');
                     micBtn.disabled = false;
                     voiceInstruction.textContent = 'Maintenez le micro pour parler';
+                    
+                    // Traiter le dernier résultat final au moment où la reconnaissance s'arrête
                     if (finalTranscript && currentQuestionData && !awaitingNext) {
                         handleSpeechResult(finalTranscript);
                     } else if (!hasSpoken && !awaitingNext && currentQuestionData) {
-                        handleIncorrectAnswer();
+                        handleIncorrectAnswer(); // Aucune parole détectée
                     }
                 };
             } else {
-                alert('Veuillez utiliser Google Chrome pour ce quiz vocal.');
+                alert('Votre navigateur ne supporte pas la reconnaissance vocale. Veuillez utiliser Google Chrome.');
                 micBtn.disabled = true;
             }
         }
-
+        
         function stopListening() {
             if (recognition && isListening) {
-                try { recognition.stop(); } catch (e) { console.warn(e); }
+                try {
+                    recognition.stop();
+                } catch (e) {
+                    console.warn('Erreur lors de l\'arrêt de la reconnaissance:', e);
+                }
             }
         }
-
+        
         async function startListening() {
             if (awaitingNext || !recognition || isListening) return;
+            
+            // Vérifier l'accès au microphone
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 stream.getTracks().forEach(track => track.stop());
             } catch (err) {
-                alert('Veuillez autoriser le microphone.');
+                console.error('Erreur accès microphone:', err);
+                alert('Veuillez autoriser l\'accès au microphone dans les paramètres de votre navigateur.');
                 return;
             }
+            
             micBtn.disabled = true;
-            finalTranscript = null;
+            finalTranscript = null; // Réinitialiser le dernier résultat
+            
             setTimeout(() => {
-                try { recognition.start(); } catch (e) { stopListening(); }
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error('Erreur démarrage reconnaissance:', e);
+                    stopListening();
+                }
             }, 100);
         }
-
-        // ✅ CORRIGÉ : comparaison exacte en caractères
+        
         function handleSpeechResult(userInput) {
             if (!currentQuestionData || awaitingNext) return;
-
-            // 🔤 Afficher la transcription reconnue (même si c'est un caractère chinois)
-            voiceInstruction.textContent = `Vous avez dit : ${userInput}`;
-
-            // ✅ Filtrage strict : n'accepter que les caractères 0-10
-            const user = userInput.trim();
-            const correct = currentQuestionData.correct; // ← doit être le caractère chinois
-
-            if (!VALID_NUMBERS.has(user)) {
-                setTimeout(() => { voiceInstruction.textContent = 'Ce n’est pas un chiffre valide.'; }, 800);
-                handleIncorrectAnswer();
-                return;
-            }
-
-            if (user === correct) {
-                setTimeout(() => { voiceInstruction.textContent = '✅ Correct !'; }, 300);
+            
+            const correct = currentQuestionData.correct.toLowerCase().replace(/\s+/g, ' ').trim();
+            const user = userInput.toLowerCase().replace(/\s+/g, ' ').trim();
+            const similarity = getSimilarity(correct, user);
+            const isCorrect = similarity > 0.65 || user.includes(correct) || correct.includes(user);
+            
+            if (isCorrect) {
                 handleCorrectAnswer();
             } else {
-                setTimeout(() => { voiceInstruction.textContent = `❌ Ce n’est pas ${correct}.`; }, 800);
                 handleIncorrectAnswer();
             }
         }
-
+        
+        // Calcul de similarité
+        function getSimilarity(s1, s2) {
+            let longer = s1;
+            let shorter = s2;
+            if (s1.length < s2.length) {
+                longer = s2;
+                shorter = s1;
+            }
+            const longerLength = longer.length;
+            if (longerLength === 0) return 1.0;
+            return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+        }
+        function editDistance(s1, s2) {
+            s1 = s1.toLowerCase();
+            s2 = s2.toLowerCase();
+            const costs = new Array();
+            for (let i = 0; i <= s1.length; i++) {
+                let lastValue = i;
+                for (let j = 0; j <= s2.length; j++) {
+                    if (i === 0) costs[j] = j;
+                    else {
+                        if (j > 0) {
+                            let newValue = costs[j - 1];
+                            if (s1.charAt(i - 1) !== s2.charAt(j - 1))
+                                newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                            costs[j - 1] = lastValue;
+                            lastValue = newValue;
+                        }
+                    }
+                }
+                if (i > 0) costs[s2.length] = lastValue;
+            }
+            return costs[s2.length];
+        }
         // 🔁 Fonctions utilitaires
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
-
         function updateQuizHeaderVisibility(isQuizActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('quiz-active', isQuizActive);
@@ -852,13 +787,12 @@
                 mobileBackBtn.classList.add('hidden');
             }
         }
-
         function updateResultHeaderVisibility(isResultActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('result-active', isResultActive);
             }
         }
-
+        // 📥 Fetch best score from DB with local fallback
         async function fetchBestScore() {
             if (!window.currentUser?.uid) {
                 return parseInt(localStorage.getItem(`best-score-${THEME}-n4`) || '0');
@@ -872,11 +806,11 @@
                     return bestScore;
                 }
             } catch (error) {
-                console.warn('Erreur bestScore, fallback local:', error);
+                console.warn('Erreur chargement bestScore, fallback local:', error);
             }
             return parseInt(localStorage.getItem(`best-score-${THEME}-n4`) || '0');
         }
-
+        // 💾 Save best score to DB with local fallback
         async function saveBestScore(newBest) {
             if (!window.currentUser?.uid) {
                 localStorage.setItem(`best-score-${THEME}-n4`, newBest.toString());
@@ -884,14 +818,16 @@
             }
             try {
                 const userRef = doc(db, 'users', window.currentUser.uid);
-                await updateDoc(userRef, { [`bestScores.${THEME}`]: newBest });
+                await updateDoc(userRef, {
+                    [`bestScores.${THEME}`]: newBest
+                });
                 localStorage.setItem(`best-score-${THEME}-n4`, newBest.toString());
             } catch (error) {
-                console.warn('Erreur sauvegarde, fallback local:', error);
+                console.warn('Erreur sauvegarde bestScore, fallback local:', error);
                 localStorage.setItem(`best-score-${THEME}-n4`, newBest.toString());
             }
         }
-
+        // 📥 Sauvegarde via transaction
         async function saveScores(incrementValue) {
             if (!window.currentUser?.uid || incrementValue <= 0) return;
             const uid = window.currentUser.uid;
@@ -900,6 +836,8 @@
                     const userRef = doc(db, 'users', uid);
                     const userDoc = await transaction.get(userRef);
                     if (!userDoc.exists()) throw new Error("Utilisateur introuvable");
+                    const currentGlobal = userDoc.data().globalScore || 0;
+                    const currentTheme = userDoc.data().quizScores?.[THEME] || 0;
                     transaction.update(userRef, {
                         globalScore: increment(incrementValue),
                         [`quizScores.${THEME}`]: increment(incrementValue)
@@ -907,7 +845,7 @@
                     const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
                     quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
                     localStorage.setItem('quizScores', JSON.stringify(quizScores));
-                    localStorage.setItem('globalScore', (parseInt(localStorage.getItem('globalScore') || '0') + incrementValue).toString());
+                    localStorage.setItem('globalScore', (currentGlobal + incrementValue).toString());
                 });
             } catch (error) {
                 console.warn('Erreur sauvegarde, fallback local:', error);
@@ -918,19 +856,18 @@
                 localStorage.setItem('globalScore', global.toString());
             }
         }
-
+        // Fonction pour cacher le pinyin
         function hidePinyin() {
             pinyinDisplay.textContent = '';
         }
-
+        // Fonction pour montrer le pinyin
         function showPinyin(pinyin) {
-            if (timeLeft > 30) {
+            if (hidePinyinAfter30s) {
                 pinyinDisplay.textContent = `(${pinyin})`;
             } else {
                 pinyinDisplay.textContent = '🙈';
             }
         }
-
         // 🎮 Logique de jeu
         async function startGame() {
             if (gameCompleted) return;
@@ -951,7 +888,6 @@
             startSkipTimer();
             window.scrollTo(0, 0);
         }
-
         function startSkipTimer() {
             let remaining = 3;
             skipBtn.textContent = `Passer (${remaining}s)`;
@@ -959,7 +895,7 @@
             clearInterval(skipTimer);
             skipTimer = setInterval(() => {
                 remaining--;
-                if (remaining > 0) {
+                if(remaining > 0) {
                     skipBtn.textContent = `Passer (${remaining}s)`;
                 } else {
                     skipBtn.textContent = 'Passer';
@@ -968,7 +904,6 @@
                 }
             }, 1000);
         }
-
         function getRandomQuestion() {
             if (usedQuestions.length >= QUESTIONS.length) usedQuestions = [];
             let idx;
@@ -978,7 +913,6 @@
             usedQuestions.push(idx);
             return QUESTIONS[idx];
         }
-
         function generateQuestion() {
             if (awaitingNext) return;
             const q = getRandomQuestion();
@@ -986,9 +920,19 @@
             numberDisplay.textContent = q.caractere;
             if (timeLeft > 30) {
                 showPinyin(q.pinyin);
+                hidePinyinAfter30s = true;
             } else {
                 pinyinDisplay.textContent = '🙈';
+                hidePinyinAfter30s = false;
             }
+            clearInterval(pinyinTimer);
+            pinyinTimer = setInterval(() => {
+                if(timeLeft === 30) {
+                    hidePinyin();
+                    pinyinDisplay.textContent = '🙈';
+                    hidePinyinAfter30s = false;
+                }
+            }, 1000);
             qTime = levelConfig.qTime;
             qTimerDisplay.textContent = qTime.toFixed(1);
             qTimerFill.style.width = '100%';
@@ -996,7 +940,6 @@
             startQTimer();
             startSkipTimer();
         }
-
         function handleCorrectAnswer() {
             if (awaitingNext) return;
             awaitingNext = true;
@@ -1007,17 +950,21 @@
             updateLives();
             updateStatsDisplayMobile();
             numberDisplay.style.color = '#9bc24f';
-            setTimeout(() => numberDisplay.style.color = '#b40000', 1000);
+            setTimeout(() => {
+                numberDisplay.style.color = '#b40000';
+            }, 1000);
             setTimeout(() => {
                 if (lives <= 0 || timeLeft <= 0) {
                     endGame();
                 } else {
                     awaitingNext = false;
-                    setTimeout(() => generateQuestion(), 250);
+                    // Ajout du délai de 250ms avant de relancer le timer de question
+                    setTimeout(() => {
+                        generateQuestion();
+                    }, 250);
                 }
             }, 1900);
         }
-
         function handleIncorrectAnswer() {
             if (awaitingNext) return;
             awaitingNext = true;
@@ -1029,39 +976,47 @@
             updateLives();
             updateStatsDisplayMobile();
             numberDisplay.style.color = '#d35949';
-            setTimeout(() => numberDisplay.style.color = '#b40000', 1000);
+            setTimeout(() => {
+                numberDisplay.style.color = '#b40000';
+            }, 1000);
             setTimeout(() => {
                 if (lives <= 0 || timeLeft <= 0) {
                     endGame();
                 } else {
                     awaitingNext = false;
-                    setTimeout(() => generateQuestion(), 250);
+                    // Ajout du délai de 250ms avant de relancer le timer de question
+                    setTimeout(() => {
+                        generateQuestion();
+                    }, 250);
                 }
             }, 1900);
         }
-
         function handleSkip() {
             if (awaitingNext || skipBtn.disabled) return;
             awaitingNext = true;
             stopListening();
             clearTimeout(timeoutId);
             clearInterval(skipTimer);
-            score++; // Point pour passage
+            score++; // Ajoute un point pour le passage
             scoreDisplay.textContent = score;
             updateLives();
             updateStatsDisplayMobile();
-            numberDisplay.style.color = '#d3d3d3';
-            setTimeout(() => numberDisplay.style.color = '#b40000', 1000);
+            numberDisplay.style.color = '#d3d3d3'; // Gris pour indiquer le passage
+            setTimeout(() => {
+                numberDisplay.style.color = '#b40000';
+            }, 1000);
             setTimeout(() => {
                 if (lives <= 0 || timeLeft <= 0) {
                     endGame();
                 } else {
                     awaitingNext = false;
-                    setTimeout(() => generateQuestion(), 950);
+                    // Ajout du délai de 250ms avant de relancer le timer de question
+                    setTimeout(() => {
+                        generateQuestion();
+                    }, 950);
                 }
             }, 1900);
         }
-
         function updateLives() {
             const total = levelConfig.lives;
             const hearts = livesDisplay.querySelectorAll('.heart');
@@ -1077,13 +1032,11 @@
                 }
             });
         }
-
         function updateStatsDisplayMobile() {
             currentScoreDisplayMobile.textContent = score;
             wrongAnswersDisplayMobile.textContent = wrongAnswers;
             bestScoreDisplayMobile.textContent = currentUserBestScore;
         }
-
         function startMainTimer() {
             clearInterval(timerInterval);
             timerDisplay.textContent = timeLeft;
@@ -1106,25 +1059,26 @@
                 }
             }, 1000);
         }
-
         function startQTimer() {
             clearTimeout(timeoutId);
             let timeLeftQuestion = levelConfig.qTime;
             qTimerDisplay.textContent = timeLeftQuestion.toFixed(1);
-            qTimerFill.style.width = '100%';
+            qTimerFill.style.width = '110%'; // Remet la barre à 100%
             timeoutId = setInterval(() => {
                 timeLeftQuestion -= 0.1;
                 if (timeLeftQuestion <= 0) {
                     clearInterval(timeoutId);
-                    if (isListening) stopListening();
-                    else if (!hasSpoken && !awaitingNext && currentQuestionData) handleIncorrectAnswer();
+                    if (isListening) {
+                        stopListening(); // Arrêter la reconnaissance quand le timer expire
+                    } else if (!hasSpoken && !awaitingNext && currentQuestionData) {
+                        handleIncorrectAnswer(); // Pénaliser si l'utilisateur n'a pas parlé
+                    }
                     return;
                 }
                 qTimerDisplay.textContent = timeLeftQuestion.toFixed(1);
                 qTimerFill.style.width = (timeLeftQuestion / levelConfig.qTime * 100) + '%';
             }, 100);
         }
-
         async function endGame() {
             if (gameCompleted) return;
             gameCompleted = true;
@@ -1155,7 +1109,9 @@
                 const userRef = doc(db, 'users', window.currentUser.uid);
                 const userDoc = await getDoc(userRef);
                 if (userDoc.exists()) {
-                    await updateDoc(userRef, { [`niveaux100.${THEME}`]: 1 });
+                    await updateDoc(userRef, {
+                        [`niveaux100.${THEME}`]: 1
+                    });
                     perfectAchieved = true;
                 }
             }
@@ -1170,7 +1126,9 @@
                     const niveaux = userDoc.data().niveaux || {};
                     const niveauActuel = niveaux[THEME] || 0;
                     if (niveauActuel < 5) {
-                        await updateDoc(userRef, { [`niveaux.${THEME}`]: 5 });
+                        await updateDoc(userRef, {
+                            [`niveaux.${THEME}`]: 5
+                        });
                         unlocked = true;
                     }
                 }
@@ -1180,7 +1138,6 @@
             }
             window.scrollTo(0, 0);
         }
-
         async function handleBack() {
             if (gameCompleted) {
                 window.location.href = 'index.html';
@@ -1194,58 +1151,94 @@
             stopAllTimers();
             window.location.href = 'index.html';
         }
-
         function stopAllTimers() {
             clearInterval(timerInterval);
+            clearInterval(pinyinTimer);
             clearInterval(timeoutId);
             clearInterval(skipTimer);
             stopListening();
         }
-
-        // ✅ Événements micro (inchangés)
-        ['mousedown', 'mouseup', 'mouseleave'].forEach(event => {
-            micBtn.addEventListener(event, (e) => {
-                e.preventDefault();
-                if (event === 'mousedown' && !isListening) startListening();
-                else if ((event === 'mouseup' || event === 'mouseleave') && isListening) stopListening();
-            });
+        // ✅ Événements du bouton micro pour interaction "maintenir/appuyer"
+        micBtn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!isListening) {
+                startListening();
+            }
         });
-
-        ['touchstart', 'touchend'].forEach(event => {
-            micBtn.addEventListener(event, (e) => {
-                e.preventDefault();
-                if (event === 'touchstart' && !isListening) startListening();
-                else if (event === 'touchend' && isListening) stopListening();
-            });
+        
+        micBtn.addEventListener('mouseup', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (isListening) {
+                stopListening();
+            }
         });
-
+        
+        micBtn.addEventListener('mouseleave', (e) => {
+            // Si la souris quitte le bouton pendant qu'il est pressé, on arrête l'écoute
+            if (isListening) {
+                stopListening();
+            }
+        });
+        
+        // Pour la gestion tactile
+        micBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!isListening) {
+                startListening();
+            }
+        });
+        
+        micBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            if (isListening) {
+                stopListening();
+            }
+        });
+        
+        // ✅ Événement du bouton passer
         skipBtn.addEventListener('click', handleSkip);
+        // 🔄 Navigation
         mobileBackBtn.addEventListener('click', handleBack);
-        restartBtn.addEventListener('click', () => { gameCompleted = false; startGame(); });
+        restartBtn.addEventListener('click', () => {
+            gameCompleted = false;
+            startGame();
+        });
         homeBtn.addEventListener('click', handleBack);
-
         // 🔐 Auth
         onAuthStateChanged(auth, async (user) => {
-            if (!user) { window.location.href = 'index.html'; return; }
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
             window.currentUser = user;
             const pseudo = localStorage.getItem('userPseudo') || user.email.split('@')[0];
             try {
                 const userRef = doc(db, 'users', user.uid);
                 const userDoc = await getDoc(userRef);
-                if (!userDoc.exists()) { window.location.href = 'index.html'; return; }
+                if (!userDoc.exists()) {
+                    console.warn("Utilisateur non trouvé dans Firestore");
+                    window.location.href = 'index.html';
+                    return;
+                }
                 const userData = userDoc.data();
                 const globalScore = userData.globalScore ?? 0;
                 const niveauChinois = (userData.niveaux?.[THEME]) ?? 0;
-                if (globalScore < 0 || niveauChinois < 4) { window.location.href = 'index.html'; return; }
+                if (globalScore < 0 || niveauChinois < 4) {
+                    console.warn("Accès refusé : globalScore < 0 ou niveaux.chinois < 4");
+                    window.location.href = 'index.html';
+                    return;
+                }
                 localStorage.setItem('globalScore', globalScore.toString());
                 initSpeechRecognition();
                 startGame();
             } catch (error) {
-                console.error("Erreur auth:", error);
+                console.error("Erreur lors de la vérification des prérequis :", error);
                 window.location.href = 'index.html';
             }
         });
     </script>
 </body>
-
 </html>
+
