@@ -22,6 +22,26 @@
     <meta name="twitter:description"
         content="Mettez votre connaissance de la France à l'épreuve avec nos quiz niveaux 1 à 5.">
     <meta name="twitter:image" content="https://myrrakha.github.io/images/preview.jpg">
+    <!-- FAVICONS -->
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="/apple-touch-icon-167x167.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="1024x1024" href="/apple-touch-icon-1024x1024.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="/favicon-128x128.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="/favicon-256x256.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="msapplication-TileImage" content="/mstile-144x144.png">
     <style>
         /* ==========================
            Palette & variables (fusionnées en une seule déclaration)
@@ -546,7 +566,7 @@
                 display: none;
             }
             #desktop-leaderboard {
-                display: none;
+                display: none !important;
             }
         }
         @media (min-width: 900px) {
@@ -587,7 +607,6 @@
 <body>
     <!-- loading screen -->
     <div class="loading-auth" id="auth-check-screen">Vérification de la session…</div>
-
     <!-- visual layers -->
     <div class="cosmic" aria-hidden="true"></div>
     <header>
@@ -750,12 +769,10 @@
     </main>
     <div id="hover-warning"></div>
     <div id="toast">Débloqué à {{points}} points globaux</div>
-
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, doc, getDoc, updateDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
             authDomain: "quiz-master-io.firebaseapp.com",
@@ -764,39 +781,31 @@
             messagingSenderId: "773382469164",
             appId: "1:773382469164:web:5e24a9a62ce543f5190389"
         };
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         window.db = db;
-
         const THEMES = ['departements', 'chinois', 'anglais'];
         const UI_THEMES = {
             departements: 'dept',
             chinois: 'chinois',
             anglais: 'anglais'
         };
-
         const CACHE_DURATION_MS = 40 * 60 * 1000;
         let cachedPlayers = null;
         let lastFetchTime = 0;
         const LEADERBOARD_LOCAL_KEY = 'leaderboard_cache_v2';
-
         // ============ AUTH CHECK ============
         let authResolved = false;
-
         function showLoading() {
             document.getElementById('auth-check-screen').style.display = 'flex';
         }
-
         function hideLoading() {
             document.getElementById('auth-check-screen').style.display = 'none';
         }
-
         function redirectToLogin() {
             window.location.href = 'accueil.html';
         }
-
         // ============ UTILS ============
         function getQuizUrl(category, levelId) {
             if (category === 'departements') {
@@ -805,7 +814,6 @@
                 return `quiz-${category}-n${levelId}.html`;
             }
         }
-
         async function fetchGlobalScoresOnly() {
             const usersSnapshot = await getDocs(collection(db, 'users'));
             const players = {};
@@ -818,7 +826,6 @@
             });
             return players;
         }
-
         function saveToLocal(players) {
             try {
                 localStorage.setItem(LEADERBOARD_LOCAL_KEY, JSON.stringify({
@@ -827,7 +834,6 @@
                 }));
             } catch (e) { /* ignore */ }
         }
-
         function loadFromLocal() {
             try {
                 const raw = localStorage.getItem(LEADERBOARD_LOCAL_KEY);
@@ -842,7 +848,6 @@
                 return null;
             }
         }
-
         async function loadLeaderboardData() {
             if (cachedPlayers && (Date.now() - lastFetchTime) < CACHE_DURATION_MS) {
                 return cachedPlayers;
@@ -861,7 +866,6 @@
             }
             return players || {};
         }
-
         async function getRanking() {
             const players = await loadLeaderboardData();
             return Object.entries(players)
@@ -869,14 +873,11 @@
                 .sort((a, b) => b.score - a.score)
                 .slice(0, 10);
         }
-
         async function loadLeaderboard() {
             const leaderboardList = document.getElementById('leaderboard-list');
             const mobileGlobal = document.getElementById('mobile-leaderboard-global');
-
             leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;"><span class="loading-spinner"></span> Chargement…</div>';
             mobileGlobal.innerHTML = '<div style="text-align: center; opacity: 0.6;"><span class="loading-spinner"></span> Chargement…</div>';
-
             let top10 = null;
             try {
                 const globalTop = await getRanking();
@@ -884,7 +885,6 @@
             } catch (error) {
                 console.error('Erreur lors du chargement du leaderboard:', error);
             }
-
             if (!top10) {
                 const local = loadFromLocal();
                 if (local) {
@@ -895,7 +895,6 @@
                     top10 = fallback;
                 }
             }
-
             const renderLeaderboardItem = (item, index) => {
                 const rank = index + 1;
                 const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
@@ -910,7 +909,6 @@
                 li.innerHTML = `<div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${escapedName}</div><div class="leaderboard-score">${item.score}</div>`;
                 return li;
             };
-
             if (top10 && top10.length > 0) {
                 leaderboardList.innerHTML = '';
                 top10.forEach((item, i) => leaderboardList.appendChild(renderLeaderboardItem(item, i)));
@@ -920,25 +918,20 @@
                 leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
                 mobileGlobal.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur</div>';
             }
-
             if (window.matchMedia("(max-width: 899px)").matches) {
                 document.getElementById('mobile-leaderboard-carousel').classList.remove('hidden');
             }
-
             document.getElementById('mobile-leaderboard-season').innerHTML = '<div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>';
         }
-
         function navigateTo(url) {
             window.location.href = url;
         }
-
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2000);
         }
-
         function showHoverWarning(text, x, y) {
             const warn = document.getElementById("hover-warning");
             warn.textContent = text;
@@ -947,7 +940,6 @@
             warn.style.opacity = 1;
             setTimeout(() => { warn.style.opacity = 0; }, 1800);
         }
-
         function setupCardListeners() {
             THEMES.forEach(theme => {
                 const uiKey = UI_THEMES[theme];
@@ -968,7 +960,6 @@
                 }
             });
         }
-
         async function updateQuizCardUI(theme, globalScore, quizNiveaux = {}, quizNiveaux100 = {}) {
             const totalLevels = theme === 'departements' ? 6 : 5;
             const completedLevels = quizNiveaux100[theme] || 0;
@@ -992,7 +983,6 @@
             document.getElementById(`${uiTheme}-niveaux100`).textContent = completedLevels;
             document.getElementById(`${uiTheme}-niveaux100-ratio`).textContent = completedLevels;
         }
-
         async function loadUserData(user) {
             try {
                 const userDocRef = doc(db, 'users', user.uid);
@@ -1003,7 +993,6 @@
                     redirectToLogin();
                     return;
                 }
-
                 // Ensure required fields exist
                 if (!userData.niveaux) {
                     userData.niveaux = THEMES.reduce((acc, t) => ({ ...acc, [t]: 1 }), {});
@@ -1013,12 +1002,10 @@
                     userData.niveaux100 = THEMES.reduce((acc, t) => ({ ...acc, [t]: 0 }), {});
                     await updateDoc(userDocRef, { niveaux100: userData.niveaux100 });
                 }
-
                 const quizScores = userData.quizScores || {};
                 const globalScore = userData.globalScore || 0;
                 const quizNiveaux = userData.niveaux || {};
                 const quizNiveaux100 = userData.niveaux100 || {};
-
                 THEMES.forEach(theme => {
                     const containerId = `home-${UI_THEMES[theme]}-score-container`;
                     const container = document.getElementById(containerId);
@@ -1030,7 +1017,6 @@
                     container.innerHTML = '';
                     container.appendChild(span);
                 });
-
                 THEMES.forEach(theme => {
                     updateQuizCardUI(theme, globalScore, quizNiveaux, quizNiveaux100);
                 });
@@ -1039,7 +1025,6 @@
                 showToast('Erreur de chargement');
             }
         }
-
         function logoutUser() {
             signOut(auth)
                 .then(() => {
@@ -1050,7 +1035,6 @@
                     showToast('Erreur lors de la déconnexion');
                 });
         }
-
         // ============ PAGE INIT ============
         async function initPage(user) {
             hideLoading();
@@ -1059,7 +1043,6 @@
             setupCardListeners();
             document.getElementById('logout-btn').addEventListener('click', logoutUser);
         }
-
         // ============ AUTH HANDLER ============
         onAuthStateChanged(auth, (user) => {
             authResolved = true;
@@ -1069,14 +1052,12 @@
                 redirectToLogin();
             }
         });
-
         // Optional: hide loading if auth resolves instantly (unlikely but safe)
         setTimeout(() => {
             if (!authResolved) return;
             hideLoading();
         }, 500);
     </script>
-
     <style>
         #hover-warning {
             position: absolute;

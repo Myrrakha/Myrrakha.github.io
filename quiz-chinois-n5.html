@@ -1,18 +1,14 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Quiz Master - Chinois N4</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
+    <title>Quiz Master - Chinois N5</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         .hidden {
             display: none !important;
         }
-
         /* GLOBAL */
         body {
             margin: 0;
@@ -27,7 +23,6 @@
             overflow-x: hidden;
             opacity: 0.98;
         }
-
         .lanterne {
             width: 60px;
             height: 90px;
@@ -39,29 +34,24 @@
             filter: drop-shadow(0 0 6px rgba(255, 80, 0, 0.8));
             z-index: -1;
         }
-
         .lanterne:nth-child(1) {
             left: 15%;
             animation-delay: 0s;
         }
-
         .lanterne:nth-child(2) {
             right: 15%;
             animation-delay: 1.2s;
         }
-
         @keyframes flotter {
             0% {
                 transform: translateY(0) rotate(-2deg);
                 opacity: 0.95;
             }
-
             100% {
                 transform: translateY(12px) rotate(2deg);
                 opacity: 1;
             }
         }
-
         #hover-warning {
             position: absolute;
             padding: 8px 14px;
@@ -74,7 +64,6 @@
             transition: opacity 0.4s ease;
             z-index: 9999;
         }
-
         /* ✨ CENTRAGE PRINCIPAL */
         main {
             display: flex;
@@ -87,145 +76,100 @@
             box-sizing: border-box;
             position: relative;
         }
-
-        /* QUIZ SECTION */
-        #quiz-section {
+        /* GAME SECTION */
+        #game-section {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
             max-width: 1200px;
         }
-
-        .quiz-container {
-            display: flex;
-            gap: 12px;
+        #game-container {
             width: 100%;
-            justify-content: center;
+            max-width: 1000px;
+            margin: 0 auto;
         }
-
-        @media (min-width: 900px) {
-            .question-box {
-                flex: 2;
-            }
-
-            .voice-container {
-                flex: 1;
-            }
-        }
-
-        .question-box {
-            background: rgba(255, 250, 240, 0.95);
-            backdrop-filter: blur(8px);
-            padding: 18px;
+        #scene {
+            background-image: url('images/chinese-night-street.png');
+            background-size: cover;
+            background-position: center;
+            height: 600px;
+            position: relative;
             border-radius: 14px;
-            font-size: 2.5em;
-            font-weight: 700;
-            min-height: 180px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
             box-shadow: 0 0 16px rgba(255, 60, 60, 0.2);
             border: 2px solid rgba(180, 0, 0, 0.2);
-            color: #b40000;
-            letter-spacing: 0.8px;
-            text-shadow: 0 0 5px rgba(255, 150, 100, 0.4);
-            font-family: "Noto Serif SC", serif;
-            flex-direction: column;
+            overflow: hidden;
         }
-
-        .number-display {
-            font-size: 2.5em;
-        }
-
-        .pinyin-display {
-            font-size: 1.2em;
-            margin-top: 10px;
-            color: #6a6a6a;
-        }
-
-        .voice-container {
+        #sequence-line {
+            position: absolute;
+            top: 18%;
+            width: 100%;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
             gap: 15px;
+            z-index: 2;
         }
-
-        .mic-btn {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(145deg, #ffecd9, #f2c19b);
-            border: 3px solid rgba(180, 0, 0, 0.2);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3em;
-            transition: 0.3s ease;
-            box-shadow: 0 0 12px rgba(210, 60, 20, 0.2);
-            position: relative;
-            z-index: 10;
-            touch-action: manipulation;
+        #sequence-line::before {
+            content: "";
+            width: 90%;
+            height: 3px;
+            background: #5d3019;
+            position: absolute;
+            top: 45px;
         }
-
-        .mic-btn:hover {
-            transform: scale(1.05);
-            background: linear-gradient(145deg, #fde3d0, #ffb380);
-            box-shadow: 0 0 16px rgba(255, 100, 50, 0.4);
-        }
-
-        .mic-btn.listening {
-            background: linear-gradient(145deg, #d3e87e, #9bc24f);
-            animation: pulse 1.5s infinite;
-        }
-
-        .mic-btn.listening:hover {
-            background: linear-gradient(145deg, #c3d86e, #8bb245);
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(140, 200, 70, 0.7);
-            }
-
-            70% {
-                box-shadow: 0 0 0 12px rgba(140, 200, 70, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(140, 200, 70, 0);
-            }
-        }
-
-        .voice-instruction {
-            font-size: 1.1em;
-            text-align: center;
-            color: #b40000;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-
-        #transcript-box {
-            margin-top: 12px;
-            padding: 10px;
-            background: rgba(255, 250, 240, 0.9);
-            border-radius: 10px;
-            border: 1px solid rgba(180, 0, 0, 0.2);
+        #choices {
+            position: absolute;
+            bottom: 5%;
             width: 100%;
-            max-width: 500px;
-            text-align: center;
-            font-size: 1.1em;
-            color: #2a2a2a;
-            min-height: 24px;
             display: flex;
-            align-items: center;
+            flex-wrap: wrap;
             justify-content: center;
-            box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
+            gap: 12px;
         }
-
+        .lantern {
+            width: 70px;
+            height: 110px;
+            background-image: url('images/red-lantern.png');
+            background-size: cover;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Noto Serif SC", serif;
+            font-size: 2rem;
+            color: gold;
+            text-shadow: 0 0 4px black;
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.2s;
+        }
+        .lantern:hover {
+            transform: scale(1.05);
+        }
+        .slot {
+            width: 70px;
+            height: 110px;
+            border-bottom: 3px dashed rgba(255, 255, 255, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            filter: brightness(0.75);
+        }
+        .lantern.correct {
+            filter: brightness(1.3) drop-shadow(0 0 12px gold);
+            animation: glow 0.6s forwards;
+        }
+        @keyframes glow {
+            from { filter: brightness(0.9) drop-shadow(0 0 0px gold); }
+            to   { filter: brightness(1.3) drop-shadow(0 0 14px gold); }
+        }
+        @keyframes fly {
+            from { transform: translateY(0); }
+            to   { transform: translateY(-400px); opacity: 0; }
+        }
+        .lantern.fly-away {
+            animation: fly 2s forwards;
+        }
         #timers-container {
             width: 100%;
             max-width: 1000px;
@@ -235,7 +179,6 @@
             align-items: center;
             gap: 8px;
         }
-
         #timer-bar-container,
         #question-timer-bar-container {
             width: 100%;
@@ -245,7 +188,6 @@
             color: #b40000;
             font-weight: 600;
         }
-
         #timer-bar,
         #question-timer-bar {
             width: 100%;
@@ -256,7 +198,6 @@
             overflow: hidden;
             border: 1px solid rgba(180, 0, 0, 0.2);
         }
-
         #timer-fill,
         #question-timer-fill {
             height: 100%;
@@ -264,15 +205,12 @@
             border-radius: 7px;
             transition: width 0.3s linear;
         }
-
         #timer-fill {
             background: linear-gradient(90deg, #b40000, #ff4d2e, #ff9b00);
         }
-
         #question-timer-fill {
             background: linear-gradient(90deg, #ff9b00, #ff4d2e, #b40000);
         }
-
         #score-lives {
             margin-top: 10px;
             display: flex;
@@ -283,52 +221,30 @@
             color: #b40000;
             font-weight: 600;
         }
-
         .score-container {
             margin-top: 7px;
             font-size: 19px;
             text-shadow: 0 0 5px rgba(255, 130, 100, 0.3);
         }
-
         .heart {
             font-size: 22px;
             margin: 0 3px;
             color: #d35949;
             text-shadow: 0 0 4px rgba(211, 89, 73, 0.6);
         }
-
         @media (max-width: 899px) {
-            .quiz-container {
-                flex-direction: column;
-                gap: 10px;
+            #scene {
+                height: 500px;
             }
-
-            .question-box {
-                font-size: 1.8em;
-                padding: 15px;
-                min-height: 140px;
-                width: calc(100% - 30px);
-                color: #b40000;
+            .lantern {
+                width: 60px;
+                height: 90px;
+                font-size: 1.5rem;
             }
-
-            .number-display {
-                font-size: 2.2em;
+            .slot {
+                width: 60px;
+                height: 90px;
             }
-
-            .pinyin-display {
-                font-size: 1em;
-            }
-
-            .voice-container {
-                gap: 10px;
-            }
-
-            .mic-btn {
-                width: 80px;
-                height: 80px;
-                font-size: 2.5em;
-            }
-
             #score-lives {
                 flex-direction: column;
                 gap: 4px;
@@ -336,7 +252,6 @@
                 align-items: center;
                 color: #b40000;
             }
-
             #mobile-quiz-ui-row {
                 display: flex;
                 gap: 8px;
@@ -346,7 +261,6 @@
                 width: 100%;
                 max-width: 1200px;
             }
-
             #current-game-stats {
                 margin: 0;
                 flex: 1;
@@ -358,7 +272,6 @@
                 border: 2px solid rgba(180, 0, 0, 0.15);
                 height: 110px;
             }
-
             .stats-title {
                 font-size: 0.9em;
                 margin-bottom: 6px;
@@ -369,7 +282,6 @@
                 text-align: center;
                 font-family: "Noto Serif SC", serif;
             }
-
             .current-score {
                 font-size: 1.4em;
                 margin: 5px 0;
@@ -377,7 +289,6 @@
                 color: #9bc24f;
                 font-family: "Noto Serif SC", serif;
             }
-
             .stats-row {
                 padding: 3px 0;
                 font-size: 0.85em;
@@ -385,16 +296,13 @@
                 justify-content: space-between;
                 color: #2a2a2a;
             }
-
             .stats-label {
                 font-weight: 600;
             }
-
             .stats-value {
                 font-weight: bold;
                 color: #b40000;
             }
-
             #mobile-back-container {
                 background: rgba(255, 250, 240, 0.85);
                 padding: 12px 10px;
@@ -407,28 +315,32 @@
                 min-width: 44px;
                 height: fit-content;
             }
-
-            .skip-btn {
-                margin-top: 8px;
+            #mobile-back-container .action-btn {
+                padding: 5px 9px;
+                font-size: 1.1em;
+                display: block;
                 width: 100%;
+                text-align: center;
+                background: rgba(255, 240, 230, 0.9);
+                border-radius: 9px;
+                cursor: pointer;
+                transition: .2s;
+                border: 2px solid rgba(180, 0, 0, 0.2);
+                color: #b40000;
+                font-family: "Noto Serif SC", serif;
             }
-
-            #transcript-box {
-                max-width: none;
-                font-size: 1em;
-                padding: 8px;
+            #mobile-back-container .action-btn:hover {
+                background: rgba(255, 230, 220, 0.95);
+                box-shadow: 0 0 8px rgba(255, 100, 80, 0.3);
             }
         }
-
         @media (min-width: 900px) {
             #mobile-quiz-ui-row {
                 display: none !important;
             }
-
             #mobile-back-btn {
                 display: none !important;
             }
-
             #current-game-stats {
                 background: rgba(255, 250, 240, 0.85);
                 border-radius: 10px;
@@ -439,7 +351,6 @@
                 box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.2);
                 border: 2px solid rgba(180, 0, 0, 0.15);
             }
-
             .stats-title {
                 text-align: center;
                 margin-bottom: 10px;
@@ -450,7 +361,6 @@
                 text-shadow: 0 0 5px rgba(200, 0, 0, 0.3);
                 font-family: "Noto Serif SC", serif;
             }
-
             .current-score {
                 font-size: 1.8em;
                 font-weight: bold;
@@ -459,7 +369,6 @@
                 text-align: center;
                 font-family: "Noto Serif SC", serif;
             }
-
             .stats-row {
                 display: flex;
                 justify-content: space-between;
@@ -468,21 +377,14 @@
                 font-size: 0.9em;
                 color: #2a2a2a;
             }
-
             .stats-label {
                 font-weight: 600;
             }
-
             .stats-value {
                 font-weight: bold;
                 color: #b40000;
             }
-
-            .skip-btn {
-                margin-top: 16px;
-            }
         }
-
         /* RESULT SECTION */
         #result-section {
             text-align: center;
@@ -493,7 +395,6 @@
             align-items: center;
             max-width: 1200px;
         }
-
         .result-stats {
             background: rgba(255, 250, 240, 0.95);
             backdrop-filter: blur(8px);
@@ -505,7 +406,6 @@
             border: 2px solid rgba(180, 0, 0, 0.2);
             width: calc(100% - 30px);
         }
-
         .result-stats h3 {
             color: #b40000;
             margin-top: 0;
@@ -514,7 +414,6 @@
             text-shadow: 0 0 5px rgba(200, 0, 0, 0.4);
             font-family: "Noto Serif SC", serif;
         }
-
         .action-btn {
             margin: 8px;
             padding: 10px 20px;
@@ -528,20 +427,11 @@
             font-size: 15px;
             font-weight: 600;
         }
-
         .action-btn:hover {
             background: linear-gradient(145deg, #fde3d0, #ffb380);
             box-shadow: 0 0 8px rgba(255, 100, 80, 0.3);
             transform: translateY(-1px);
         }
-
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
         /* Unlock Message */
         #level-unlock-msg {
             color: #9bc24f;
@@ -551,30 +441,23 @@
             text-shadow: 0 0 5px rgba(155, 194, 79, 0.4);
             font-family: "Noto Serif SC", serif;
         }
-
         #level-up-msg,
         #perfect-score-msg {
             font-family: "Noto Serif SC", serif;
         }
     </style>
 </head>
-
 <body>
     <div class="lanterne"></div>
     <div class="lanterne"></div>
     <main>
-        <section id="quiz-section" class="hidden">
-            <div class="quiz-container">
-                <div class="question-box">
-                    <div id="number-display" class="number-display">一</div>
-                    <div id="pinyin-display" class="pinyin-display">(yī)</div>
-                </div>
-                <div class="voice-container">
-                    <button id="mic-btn" class="mic-btn">🎤</button>
-                    <div id="voice-instruction" class="voice-instruction">Maintenez le micro pour parler</div>
+        <section id="game-section" class="hidden">
+            <div id="game-container">
+                <div id="scene">
+                    <div id="sequence-line"></div>
+                    <div id="choices"></div>
                 </div>
             </div>
-            <div id="transcript-box" class="hidden">🎤 Écoute en cours...</div>
             <div id="timers-container">
                 <div id="timer-bar-container">
                     <span>⏱️ Temps restant : <span id="timer">0</span>s</span>
@@ -583,7 +466,7 @@
                     </div>
                 </div>
                 <div id="question-timer-bar-container">
-                    <span>⚡ Prononciation : <span id="question-timer">0</span>s</span>
+                    <span>⚡ Question : <span id="question-timer">0</span>s</span>
                     <div id="question-timer-bar">
                         <div id="question-timer-fill"></div>
                     </div>
@@ -611,7 +494,6 @@
                 </div>
                 <div id="mobile-back-container">
                     <button id="mobile-back-btn" class="action-btn">←</button>
-                    <button id="skip-btn" class="action-btn skip-btn" disabled>Passer (3s)</button>
                 </div>
             </div>
         </section>
@@ -620,7 +502,7 @@
             <div class="result-stats">
                 <h3>Résumé</h3>
                 <p>Score de la partie : <strong id="final-score">0</strong></p>
-                <p>Meilleur score (N4) : <strong id="best-score">0</strong></p>
+                <p>Meilleur score (N5) : <strong id="best-score">0</strong></p>
                 <p>Score Chinois : <strong id="new-theme-score">0</strong></p>
                 <p>Score Global : <strong id="new-global-score">0</strong></p>
                 <div id="level-up-msg" class="hidden" style="color: #9bc24f; margin-top: 12px; font-weight: bold;">
@@ -629,7 +511,7 @@
                 <div id="perfect-score-msg" class="hidden" style="color: #d4af37; margin-top: 10px; font-weight: bold;">
                     🌟 SCORE PARFAIT !
                 </div>
-                <div id="level-unlock-msg">🔓 Niveau 5 débloqué !</div>
+                <div id="level-unlock-msg">🔓 Niveau 6 débloqué !</div>
             </div>
             <button id="restart-btn" class="action-btn">Rejouer</button>
             <button id="home-btn" class="action-btn">Accueil</button>
@@ -644,50 +526,39 @@
         import {
             getFirestore, doc, updateDoc, increment, runTransaction, getDoc
         } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
         // 🔑 CONFIGURATION
         const THEME = 'chinois';
-        const QUIZ_TITLE = 'Chinois N4';
-        const SCORE_REQUIS_N5 = 18;
-        const SCORE_PARFAIT_N4 = 25;
+        const QUIZ_TITLE = 'Chinois N5';
+        const SCORE_REQUIS_N6 = 18;
+        const SCORE_PARFAIT_N5 = 25; // Score parfait = 100%
+        
+        // ------- PARAMETRES DU JEU -------
+        const start = 6;
+        const totalLanterns = 20;
+        // 1 = préplacée, 0 = vide à remplir
+        const fixedMap = [
+          1,1,1,1,1,
+          1,1,0,1,0,
+          1,0,0,1,1,
+          0,1,1,1
+        ]; // total 20, adapte si besoin
 
-        const NOMBRES_CHINOIS = [
-            { nombre: 0, caractere: "零", pinyin: "líng" },
-            { nombre: 1, caractere: "一", pinyin: "yī" },
-            { nombre: 2, caractere: "二", pinyin: "èr" },
-            { nombre: 3, caractere: "三", pinyin: "sān" },
-            { nombre: 4, caractere: "四", pinyin: "sì" },
-            { nombre: 5, caractere: "五", pinyin: "wǔ" },
-            { nombre: 6, caractere: "六", pinyin: "liù" },
-            { nombre: 7, caractere: "七", pinyin: "qī" },
-            { nombre: 8, caractere: "八", pinyin: "bā" },
-            { nombre: 9, caractere: "九", pinyin: "jiǔ" },
-            { nombre: 10, caractere: "十", pinyin: "shí" },
-            { nombre: 11, caractere: "十一", pinyin: "shí yī" },
-            { nombre: 12, caractere: "十二", pinyin: "shí èr" },
-            { nombre: 13, caractere: "十三", pinyin: "shí sān" },
-            { nombre: 14, caractere: "十四", pinyin: "shí sì" },
-            { nombre: 15, caractere: "十五", pinyin: "shí wǔ" },
-            { nombre: 16, caractere: "十六", pinyin: "shí liù" },
-            { nombre: 17, caractere: "十七", pinyin: "shí qī" },
-            { nombre: 18, caractere: "十八", pinyin: "shí bā" },
-            { nombre: 19, caractere: "十九", pinyin: "shí jiǔ" },
-            { nombre: 20, caractere: "二十", pinyin: "èr shí" }
-        ];
+        // ------- GENERATION SUITE NUMERIQUE -------
+        function generateSequence(start, count) {
+          const result = [];
+          for (let i = 0; i < count; i++) {
+            result.push((start + i) % 11); // cycle 0..10
+          }
+          return result;
+        }
 
-        // ✅ CORRIGÉ : utiliser le caractère comme réponse correcte
-        const QUESTIONS = NOMBRES_CHINOIS.map(num => ({
-            question: `Prononcez ce nombre : ${num.caractere}`,
-            correct: num.caractere, // ← ICI : caractère, pas pinyin
-            caractere: num.caractere,
-            pinyin: num.pinyin
-        }));
+        const sequence = generateSequence(start, totalLanterns);
 
-        const levelConfig = {
-            time: 60,
-            qTime: 8,
-            lives: 5
-        };
+        // ------- CONVERSION CHIFFRES → SINOTEXTES -------
+        const chineseNumbers = ["零","一","二","三","四","五","六","七","八","九","十","十一"];
+        function numberToChinese(n) {
+            return chineseNumbers[n] ?? n;
+        }
 
         // 🌐 Firebase init
         const firebaseConfig = {
@@ -702,14 +573,9 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         window.currentUser = null;
-
         // ✅ DOM
-        const quizSection = document.getElementById('quiz-section');
+        const gameSection = document.getElementById('game-section');
         const resultSection = document.getElementById('result-section');
-        const numberDisplay = document.getElementById('number-display');
-        const pinyinDisplay = document.getElementById('pinyin-display');
-        const micBtn = document.getElementById('mic-btn');
-        const voiceInstruction = document.getElementById('voice-instruction');
         const scoreDisplay = document.getElementById('score');
         const livesDisplay = document.getElementById('lives');
         const timerDisplay = document.getElementById('timer');
@@ -717,7 +583,6 @@
         const timerFill = document.getElementById('timer-fill');
         const qTimerFill = document.getElementById('question-timer-fill');
         const mobileBackBtn = document.getElementById('mobile-back-btn');
-        const skipBtn = document.getElementById('skip-btn');
         const restartBtn = document.getElementById('restart-btn');
         const homeBtn = document.getElementById('home-btn');
         const levelUnlockMsg = document.getElementById('level-unlock-msg');
@@ -725,112 +590,28 @@
         const currentScoreDisplayMobile = document.getElementById('current-score-display-mobile');
         const wrongAnswersDisplayMobile = document.getElementById('wrong-answers-mobile');
         const bestScoreDisplayMobile = document.getElementById('best-score-display-mobile');
-
+        const sequenceLine = document.getElementById("sequence-line");
+        const choicesContainer = document.getElementById("choices");
         // ✅ États du jeu
         let score = 0, lives = 0, timeLeft = 0, qTime = 0;
         let timerInterval = null, qTimerInterval = null, awaitingNext = false;
         let gameCompleted = false;
-        let usedQuestions = [];
-        let currentQuestionData = null;
         let wrongAnswers = 0;
         let currentUserBestScore = 0;
-        let recognition = null;
-        let isListening = false;
-        let hasSpoken = false;
-        let timeoutId = null;
-        let skipTimer = null;
-        let finalTranscript = null;
-
-        // ✅ Initialisation fiable de SpeechRecognition
-        function initSpeechRecognition() {
-            if ('webkitSpeechRecognition' in window) {
-                const SpeechRecognition = window.webkitSpeechRecognition;
-                recognition = new SpeechRecognition();
-                recognition.continuous = true;
-                recognition.interimResults = true;
-                recognition.lang = 'zh-CN';
-
-                recognition.onstart = function () {
-                    isListening = true;
-                    hasSpoken = false;
-                    finalTranscript = null;
-                    micBtn.classList.add('listening');
-                    voiceInstruction.textContent = 'En cours d\'écoute...';
-                };
-
-                recognition.onresult = function (event) {
-                    if (!currentQuestionData || awaitingNext) return;
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        if (event.results[i].isFinal) {
-                            finalTranscript = event.results[i][0].transcript.trim(); // ⚠️ Pas de toLowerCase()
-                            hasSpoken = true;
-                        }
-                    }
-                };
-
-                recognition.onerror = function (event) {
-                    console.error('Erreur reconnaissance vocale:', event.error);
-                };
-
-                recognition.onend = function () {
-                    isListening = false;
-                    micBtn.classList.remove('listening');
-                    micBtn.disabled = false;
-                    voiceInstruction.textContent = 'Maintenez le micro pour parler';
-                    if (finalTranscript && currentQuestionData && !awaitingNext) {
-                        handleSpeechResult(finalTranscript);
-                    } else if (!hasSpoken && !awaitingNext && currentQuestionData) {
-                        handleIncorrectAnswer();
-                    }
-                };
-            } else {
-                alert('Veuillez utiliser Google Chrome pour ce quiz vocal.');
-                micBtn.disabled = true;
-            }
-        }
-
-        function stopListening() {
-            if (recognition && isListening) {
-                try { recognition.stop(); } catch (e) { console.warn(e); }
-            }
-        }
-
-        async function startListening() {
-            if (awaitingNext || !recognition || isListening) return;
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                stream.getTracks().forEach(track => track.stop());
-            } catch (err) {
-                alert('Veuillez autoriser le microphone.');
-                return;
-            }
-            micBtn.disabled = true;
-            finalTranscript = null;
-            setTimeout(() => {
-                try { recognition.start(); } catch (e) { stopListening(); }
-            }, 100);
-        }
-
-        // ✅ CORRIGÉ : comparaison exacte en caractères
-        function handleSpeechResult(userInput) {
-            if (!currentQuestionData || awaitingNext) return;
-            const correct = currentQuestionData.correct; // Ex: "三"
-            const user = userInput.trim();              // Ex: "三" ou "散"
-            const isCorrect = user === correct;
-            if (isCorrect) {
-                handleCorrectAnswer();
-            } else {
-                handleIncorrectAnswer();
-            }
-        }
-
+        let lanternCount = 0; // Compteur pour attribuer des IDs uniques aux lanternes
+        let filledSlots = 0; // Nombre de slots remplis correctement
+        // ⏱️ Config du niveau
+        const levelConfig = {
+            time: 60,
+            qTime: 8, // 8 secondes par question
+            lives: 5
+        };
         // 🔁 Fonctions utilitaires
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
-
         function updateQuizHeaderVisibility(isQuizActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('quiz-active', isQuizActive);
@@ -839,46 +620,47 @@
                 mobileBackBtn.classList.add('hidden');
             }
         }
-
         function updateResultHeaderVisibility(isResultActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('result-active', isResultActive);
             }
         }
-
+        // 📥 Fetch best score from DB with local fallback
         async function fetchBestScore() {
             if (!window.currentUser?.uid) {
-                return parseInt(localStorage.getItem(`best-score-${THEME}-n4`) || '0');
+                return parseInt(localStorage.getItem(`best-score-${THEME}-n5`) || '0');
             }
             try {
                 const userRef = doc(db, 'users', window.currentUser.uid);
                 const userDoc = await getDoc(userRef);
                 if (userDoc.exists()) {
                     const bestScore = userDoc.data().bestScores?.[THEME] || 0;
-                    localStorage.setItem(`best-score-${THEME}-n4`, bestScore.toString());
+                    localStorage.setItem(`best-score-${THEME}-n5`, bestScore.toString());
                     return bestScore;
                 }
             } catch (error) {
-                console.warn('Erreur bestScore, fallback local:', error);
+                console.warn('Erreur chargement bestScore, fallback local:', error);
             }
-            return parseInt(localStorage.getItem(`best-score-${THEME}-n4`) || '0');
+            return parseInt(localStorage.getItem(`best-score-${THEME}-n5`) || '0');
         }
-
+        // 💾 Save best score to DB with local fallback
         async function saveBestScore(newBest) {
             if (!window.currentUser?.uid) {
-                localStorage.setItem(`best-score-${THEME}-n4`, newBest.toString());
+                localStorage.setItem(`best-score-${THEME}-n5`, newBest.toString());
                 return;
             }
             try {
                 const userRef = doc(db, 'users', window.currentUser.uid);
-                await updateDoc(userRef, { [`bestScores.${THEME}`]: newBest });
-                localStorage.setItem(`best-score-${THEME}-n4`, newBest.toString());
+                await updateDoc(userRef, {
+                    [`bestScores.${THEME}`]: newBest
+                });
+                localStorage.setItem(`best-score-${THEME}-n5`, newBest.toString());
             } catch (error) {
-                console.warn('Erreur sauvegarde, fallback local:', error);
-                localStorage.setItem(`best-score-${THEME}-n4`, newBest.toString());
+                console.warn('Erreur sauvegarde bestScore, fallback local:', error);
+                localStorage.setItem(`best-score-${THEME}-n5`, newBest.toString());
             }
         }
-
+        // 📥 Sauvegarde via transaction
         async function saveScores(incrementValue) {
             if (!window.currentUser?.uid || incrementValue <= 0) return;
             const uid = window.currentUser.uid;
@@ -887,6 +669,8 @@
                     const userRef = doc(db, 'users', uid);
                     const userDoc = await transaction.get(userRef);
                     if (!userDoc.exists()) throw new Error("Utilisateur introuvable");
+                    const currentGlobal = userDoc.data().globalScore || 0;
+                    const currentTheme = userDoc.data().quizScores?.[THEME] || 0;
                     transaction.update(userRef, {
                         globalScore: increment(incrementValue),
                         [`quizScores.${THEME}`]: increment(incrementValue)
@@ -894,7 +678,7 @@
                     const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
                     quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
                     localStorage.setItem('quizScores', JSON.stringify(quizScores));
-                    localStorage.setItem('globalScore', (parseInt(localStorage.getItem('globalScore') || '0') + incrementValue).toString());
+                    localStorage.setItem('globalScore', (currentGlobal + incrementValue).toString());
                 });
             } catch (error) {
                 console.warn('Erreur sauvegarde, fallback local:', error);
@@ -905,17 +689,105 @@
                 localStorage.setItem('globalScore', global.toString());
             }
         }
-
-        function hidePinyin() {
-            pinyinDisplay.textContent = '';
+        // Création d'une lanterne fixe
+        function createFixedLantern(value) {
+          const div = document.createElement("div");
+          div.classList.add("lantern");
+          div.textContent = numberToChinese(value);
+          div.dataset.value = value;
+          div.dataset.id = `fixed-${lanternCount++}`;
+          sequenceLine.appendChild(div);
         }
 
-        function showPinyin(pinyin) {
-            if (timeLeft > 30) {
-                pinyinDisplay.textContent = `(${pinyin})`;
-            } else {
-                pinyinDisplay.textContent = '🙈';
-            }
+        // Création d'un emplacement vide (drop slot)
+        function createDropSlot(expectedValue) {
+          const div = document.createElement("div");
+          div.classList.add("slot");
+          div.dataset.expected = expectedValue;
+          div.dataset.id = `slot-${lanternCount++}`;
+          div.addEventListener("dragover", e => e.preventDefault());
+          div.addEventListener("drop", handleDrop);
+          sequenceLine.appendChild(div);
+        }
+
+        // Création d'une lanterne de choix
+        function createChoiceLantern(value) {
+          const div = document.createElement("div");
+          div.classList.add("lantern");
+          div.textContent = numberToChinese(value);
+          div.dataset.value = value;
+          div.dataset.id = `choice-${lanternCount++}`;
+          div.draggable = true;
+
+          div.addEventListener("dragstart", e => {
+            e.dataTransfer.setData("text/plain", div.dataset.value);
+            e.dataTransfer.setData("id", div.dataset.id);
+          });
+
+          choicesContainer.appendChild(div);
+        }
+
+        // Gestion du drop
+        function handleDrop(e) {
+          e.preventDefault();
+          const value = e.dataTransfer.getData("text/plain");
+          const id = e.dataTransfer.getData("id");
+          const expected = this.dataset.expected;
+          
+          // Trouver la lanterne draggable
+          const lantern = document.querySelector(`.lantern[data-id="${id}"]`);
+          
+          if (!this.hasChildNodes() && value === expected) {
+            this.appendChild(lantern);
+            lantern.classList.add("correct");
+            this.classList.add("filled");
+            filledSlots++;
+            
+            // Incrémenter le score pour chaque bonne réponse
+            score++;
+            scoreDisplay.textContent = score;
+            updateStatsDisplayMobile();
+            
+            checkWin();
+          } else if (value !== expected) {
+              // Mauvaise réponse
+              lives = Math.max(0, lives - 1);
+              wrongAnswers++;
+              updateLives();
+              updateStatsDisplayMobile();
+              
+              // Replacer la lanterne dans le conteneur de choix
+              choicesContainer.appendChild(lantern);
+              
+              // Désactiver temporairement la lanterne incorrecte
+              lantern.style.opacity = '0.5';
+              setTimeout(() => {
+                  lantern.style.opacity = '1';
+              }, 1000);
+              
+              if (lives <= 0) {
+                  endGame();
+              }
+          }
+        }
+        
+        // Vérifier si la partie est gagnée
+        function checkWin() {
+          if (filledSlots === totalLanterns - fixedMap.filter(m => m === 1).length) {
+            // Tous les slots sont remplis correctement
+            setTimeout(playSuccessAnimation, 500);
+          }
+        }
+
+        // Animation de succès
+        function playSuccessAnimation() {
+          // Faire s'envoler toutes les lanternes
+          document.querySelectorAll('.lantern').forEach(l => {
+            l.classList.add("fly-away");
+          });
+          
+          // Attendre la fin de l'animation avant de terminer le jeu
+          setTimeout(endGame, 2000);
         }
 
         // 🎮 Logique de jeu
@@ -924,131 +796,41 @@
             stopAllTimers();
             score = 0; lives = levelConfig.lives; timeLeft = levelConfig.time; qTime = levelConfig.qTime;
             wrongAnswers = 0;
-            usedQuestions = [];
+            filledSlots = 0;
+            lanternCount = 0;
+            
+            // Réinitialiser les conteneurs
+            sequenceLine.innerHTML = '';
+            choicesContainer.innerHTML = '';
+            
             scoreDisplay.textContent = score;
             updateLives();
             currentUserBestScore = await fetchBestScore();
             updateStatsDisplayMobile();
-            quizSection.classList.remove('hidden');
+            
+            gameSection.classList.remove('hidden');
             resultSection.classList.add('hidden');
             updateQuizHeaderVisibility(true);
             updateResultHeaderVisibility(false);
-            generateQuestion();
+            
+            // ------- Construction de la scène -------
+            sequence.forEach((value, index) => {
+              if (fixedMap[index] === 1) {
+                createFixedLantern(value);
+              } else {
+                createDropSlot(value);
+              }
+            });
+
+            // ------- Génération zone choix (0 → 10) -------
+            for (let i = 0; i <= 10; i++) {
+              createChoiceLantern(i);
+            }
+            
             startMainTimer();
-            startSkipTimer();
             window.scrollTo(0, 0);
         }
-
-        function startSkipTimer() {
-            let remaining = 3;
-            skipBtn.textContent = `Passer (${remaining}s)`;
-            skipBtn.disabled = true;
-            clearInterval(skipTimer);
-            skipTimer = setInterval(() => {
-                remaining--;
-                if (remaining > 0) {
-                    skipBtn.textContent = `Passer (${remaining}s)`;
-                } else {
-                    skipBtn.textContent = 'Passer';
-                    skipBtn.disabled = false;
-                    clearInterval(skipTimer);
-                }
-            }, 1000);
-        }
-
-        function getRandomQuestion() {
-            if (usedQuestions.length >= QUESTIONS.length) usedQuestions = [];
-            let idx;
-            do {
-                idx = Math.floor(Math.random() * QUESTIONS.length);
-            } while (usedQuestions.includes(idx) && usedQuestions.length < QUESTIONS.length);
-            usedQuestions.push(idx);
-            return QUESTIONS[idx];
-        }
-
-        function generateQuestion() {
-            if (awaitingNext) return;
-            const q = getRandomQuestion();
-            currentQuestionData = q;
-            numberDisplay.textContent = q.caractere;
-            if (timeLeft > 30) {
-                showPinyin(q.pinyin);
-            } else {
-                pinyinDisplay.textContent = '🙈';
-            }
-            qTime = levelConfig.qTime;
-            qTimerDisplay.textContent = qTime.toFixed(1);
-            qTimerFill.style.width = '100%';
-            qTimerFill.style.background = 'linear-gradient(90deg, #ff9b00, #ff4d2e, #b40000)';
-            startQTimer();
-            startSkipTimer();
-        }
-
-        function handleCorrectAnswer() {
-            if (awaitingNext) return;
-            awaitingNext = true;
-            stopListening();
-            clearTimeout(timeoutId);
-            score++;
-            scoreDisplay.textContent = score;
-            updateLives();
-            updateStatsDisplayMobile();
-            numberDisplay.style.color = '#9bc24f';
-            setTimeout(() => numberDisplay.style.color = '#b40000', 1000);
-            setTimeout(() => {
-                if (lives <= 0 || timeLeft <= 0) {
-                    endGame();
-                } else {
-                    awaitingNext = false;
-                    setTimeout(() => generateQuestion(), 250);
-                }
-            }, 1900);
-        }
-
-        function handleIncorrectAnswer() {
-            if (awaitingNext) return;
-            awaitingNext = true;
-            stopListening();
-            clearTimeout(timeoutId);
-            lives = Math.max(0, lives - 1);
-            wrongAnswers++;
-            scoreDisplay.textContent = score;
-            updateLives();
-            updateStatsDisplayMobile();
-            numberDisplay.style.color = '#d35949';
-            setTimeout(() => numberDisplay.style.color = '#b40000', 1000);
-            setTimeout(() => {
-                if (lives <= 0 || timeLeft <= 0) {
-                    endGame();
-                } else {
-                    awaitingNext = false;
-                    setTimeout(() => generateQuestion(), 250);
-                }
-            }, 1900);
-        }
-
-        function handleSkip() {
-            if (awaitingNext || skipBtn.disabled) return;
-            awaitingNext = true;
-            stopListening();
-            clearTimeout(timeoutId);
-            clearInterval(skipTimer);
-            score++; // Point pour passage
-            scoreDisplay.textContent = score;
-            updateLives();
-            updateStatsDisplayMobile();
-            numberDisplay.style.color = '#d3d3d3';
-            setTimeout(() => numberDisplay.style.color = '#b40000', 1000);
-            setTimeout(() => {
-                if (lives <= 0 || timeLeft <= 0) {
-                    endGame();
-                } else {
-                    awaitingNext = false;
-                    setTimeout(() => generateQuestion(), 950);
-                }
-            }, 1900);
-        }
-
+        
         function updateLives() {
             const total = levelConfig.lives;
             const hearts = livesDisplay.querySelectorAll('.heart');
@@ -1064,18 +846,17 @@
                 }
             });
         }
-
         function updateStatsDisplayMobile() {
             currentScoreDisplayMobile.textContent = score;
             wrongAnswersDisplayMobile.textContent = wrongAnswers;
             bestScoreDisplayMobile.textContent = currentUserBestScore;
         }
-
         function startMainTimer() {
             clearInterval(timerInterval);
             timerDisplay.textContent = timeLeft;
             timerFill.style.width = (timeLeft / levelConfig.time * 100) + '%';
             timerInterval = setInterval(() => {
+                // Ne pas décrémenter si on est en attente d'action
                 if (awaitingNext) return;
                 timeLeft--;
                 timerDisplay.textContent = timeLeft;
@@ -1093,36 +874,19 @@
                 }
             }, 1000);
         }
-
-        function startQTimer() {
-            clearTimeout(timeoutId);
-            let timeLeftQuestion = levelConfig.qTime;
-            qTimerDisplay.textContent = timeLeftQuestion.toFixed(1);
-            qTimerFill.style.width = '100%';
-            timeoutId = setInterval(() => {
-                timeLeftQuestion -= 0.1;
-                if (timeLeftQuestion <= 0) {
-                    clearInterval(timeoutId);
-                    if (isListening) stopListening();
-                    else if (!hasSpoken && !awaitingNext && currentQuestionData) handleIncorrectAnswer();
-                    return;
-                }
-                qTimerDisplay.textContent = timeLeftQuestion.toFixed(1);
-                qTimerFill.style.width = (timeLeftQuestion / levelConfig.qTime * 100) + '%';
-            }, 100);
-        }
-
         async function endGame() {
             if (gameCompleted) return;
             gameCompleted = true;
-            stopAllTimers();
+            clearInterval(timerInterval);
+            clearInterval(qTimerInterval);
+            
             await saveScores(score);
             const newBest = Math.max(currentUserBestScore, score);
             if (newBest > currentUserBestScore) {
                 currentUserBestScore = newBest;
                 await saveBestScore(newBest);
             }
-            quizSection.classList.add('hidden');
+            gameSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
             updateQuizHeaderVisibility(false);
             updateResultHeaderVisibility(true);
@@ -1137,27 +901,34 @@
             if (Math.floor(themeScore / 50) > Math.floor(oldTheme / 50)) {
                 document.getElementById('level-up-msg').classList.remove('hidden');
             }
+            // ✅ Gestion du score parfait
             let perfectAchieved = false;
-            if (score >= SCORE_PARFAIT_N4 && window.currentUser?.uid) {
+            if (score >= SCORE_PARFAIT_N5 && window.currentUser?.uid) {
                 const userRef = doc(db, 'users', window.currentUser.uid);
                 const userDoc = await getDoc(userRef);
                 if (userDoc.exists()) {
-                    await updateDoc(userRef, { [`niveaux100.${THEME}`]: 1 });
+                    await updateDoc(userRef, {
+                        [`niveaux100.${THEME}`]: 1
+                    });
                     perfectAchieved = true;
                 }
             }
+            // Affichage message score parfait
             if (perfectAchieved) {
                 perfectScoreMsg.classList.remove('hidden');
             }
+            // Gestion déverrouillage niveau 6
             let unlocked = false;
-            if (score >= SCORE_REQUIS_N5 && window.currentUser?.uid) {
+            if (score >= SCORE_REQUIS_N6 && window.currentUser?.uid) {
                 const userRef = doc(db, 'users', window.currentUser.uid);
                 const userDoc = await getDoc(userRef);
                 if (userDoc.exists()) {
                     const niveaux = userDoc.data().niveaux || {};
                     const niveauActuel = niveaux[THEME] || 0;
-                    if (niveauActuel < 5) {
-                        await updateDoc(userRef, { [`niveaux.${THEME}`]: 5 });
+                    if (niveauActuel < 6) {
+                        await updateDoc(userRef, {
+                            [`niveaux.${THEME}`]: 6
+                        });
                         unlocked = true;
                     }
                 }
@@ -1167,7 +938,6 @@
             }
             window.scrollTo(0, 0);
         }
-
         async function handleBack() {
             if (gameCompleted) {
                 window.location.href = 'index.html';
@@ -1181,58 +951,54 @@
             stopAllTimers();
             window.location.href = 'index.html';
         }
-
         function stopAllTimers() {
             clearInterval(timerInterval);
-            clearInterval(timeoutId);
-            clearInterval(skipTimer);
-            stopListening();
+            clearInterval(qTimerInterval);
         }
-
-        // ✅ Événements micro (inchangés)
-        ['mousedown', 'mouseup', 'mouseleave'].forEach(event => {
-            micBtn.addEventListener(event, (e) => {
-                e.preventDefault();
-                if (event === 'mousedown' && !isListening) startListening();
-                else if ((event === 'mouseup' || event === 'mouseleave') && isListening) stopListening();
-            });
-        });
-
-        ['touchstart', 'touchend'].forEach(event => {
-            micBtn.addEventListener(event, (e) => {
-                e.preventDefault();
-                if (event === 'touchstart' && !isListening) startListening();
-                else if (event === 'touchend' && isListening) stopListening();
-            });
-        });
-
-        skipBtn.addEventListener('click', handleSkip);
+        // 🔄 Navigation
         mobileBackBtn.addEventListener('click', handleBack);
-        restartBtn.addEventListener('click', () => { gameCompleted = false; startGame(); });
+        restartBtn.addEventListener('click', () => {
+            gameCompleted = false;
+            startGame();
+        });
         homeBtn.addEventListener('click', handleBack);
-
         // 🔐 Auth
         onAuthStateChanged(auth, async (user) => {
-            if (!user) { window.location.href = 'index.html'; return; }
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
             window.currentUser = user;
             const pseudo = localStorage.getItem('userPseudo') || user.email.split('@')[0];
+            // Sauvegarde locale
             try {
                 const userRef = doc(db, 'users', user.uid);
                 const userDoc = await getDoc(userRef);
-                if (!userDoc.exists()) { window.location.href = 'index.html'; return; }
+                if (!userDoc.exists()) {
+                    console.warn("Utilisateur non trouvé dans Firestore");
+                    window.location.href = 'index.html';
+                    return;
+                }
                 const userData = userDoc.data();
                 const globalScore = userData.globalScore ?? 0;
                 const niveauChinois = (userData.niveaux?.[THEME]) ?? 0;
-                if (globalScore < 0 || niveauChinois < 4) { window.location.href = 'index.html'; return; }
+                // ✅ Vérifications obligatoires avant de lancer le quiz
+                if (globalScore < 0 || niveauChinois < 5) { // Niveau 5 requis
+                    console.warn("Accès refusé : globalScore < 0 ou niveaux.chinois < 5");
+                    window.location.href = 'index.html';
+                    return;
+                }
+                // Met à jour l'UI
+                // Sauvegarde locale
                 localStorage.setItem('globalScore', globalScore.toString());
-                initSpeechRecognition();
+                // ✅ Tout est OK → lancer le quiz
                 startGame();
             } catch (error) {
-                console.error("Erreur auth:", error);
+                console.error("Erreur lors de la vérification des prérequis :", error);
                 window.location.href = 'index.html';
             }
         });
     </script>
 </body>
-
 </html>
+
