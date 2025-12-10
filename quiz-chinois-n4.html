@@ -459,6 +459,65 @@
         #perfect-score-msg {
             font-family: "Noto Serif SC", serif;
         }
+        
+        /* iOS prompt styles */
+        #ios-prompt {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 250, 240, 0.95);
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            width: 90%;
+            max-width: 400px;
+            border: 2px solid rgba(180, 0, 0, 0.2);
+            display: none;
+        }
+        #ios-prompt input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid rgba(180, 0, 0, 0.2);
+            border-radius: 8px;
+            font-size: 1.2em;
+            text-align: center;
+            font-family: "Noto Serif SC", serif;
+        }
+        .ios-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .ios-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            font-family: "Noto Serif SC", serif;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .ios-btn.submit {
+            background: linear-gradient(145deg, #d3e87e, #9bc24f);
+            color: #2a2a2a;
+        }
+        .ios-btn.cancel {
+            background: linear-gradient(145deg, #ffecd9, #f2c19b);
+            color: #b40000;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -535,6 +594,19 @@
             <button id="home-btn" class="action-btn">Accueil</button>
         </section>
     </main>
+    
+    <!-- iOS Fallback UI -->
+    <div class="overlay" id="ios-overlay"></div>
+    <div id="ios-prompt">
+        <h3 id="ios-question">Prononcez ce nombre : 一</h3>
+        <div id="ios-pinyin">(yī)</div>
+        <input type="text" id="ios-input" placeholder="Tapez votre réponse..." autocomplete="off">
+        <div class="ios-buttons">
+            <button class="ios-btn submit" id="ios-submit">Valider</button>
+            <button class="ios-btn cancel" id="ios-cancel">Annuler</button>
+        </div>
+    </div>
+    
     <div id="hover-warning"></div>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -619,6 +691,20 @@
         const currentScoreDisplayMobile = document.getElementById('current-score-display-mobile');
         const wrongAnswersDisplayMobile = document.getElementById('wrong-answers-mobile');
         const bestScoreDisplayMobile = document.getElementById('best-score-display-mobile');
+        
+        // iOS DOM elements
+        const iosPrompt = document.getElementById('ios-prompt');
+        const iosOverlay = document.getElementById('ios-overlay');
+        const iosQuestion = document.getElementById('ios-question');
+        const iosPinyin = document.getElementById('ios-pinyin');
+        const iosInput = document.getElementById('ios-input');
+        const iosSubmit = document.getElementById('ios-submit');
+        const iosCancel = document.getElementById('ios-cancel');
+        
+        // Détection mobile et iOS
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        
         // ✅ États du jeu
         let score = 0, lives = 0, timeLeft = 0, qTime = 0;
         let timerInterval = null, qTimerInterval = null, awaitingNext = false;
@@ -633,8 +719,16 @@
         let hidePinyinAfter30s = true;
         let hasSpoken = false; // Indicateur pour savoir si l'utilisateur a parlé
         let timeoutId = null; // Pour le timer de question
-        // Initialiser l'API Speech Recognition avec gestion correcte des permissions
+        let isUsingIOSFallback = false;
+        
+        // Initialiser l'API Speech Recognition avec gestion mobile-friendly
         function initSpeechRecognition() {
+            if (isIOS) {
+                // iOS n'a pas de support fiable pour SpeechRecognition
+                handleIOSFallback();
+                return;
+            }
+            
             if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 recognition = new SpeechRecognition();
@@ -647,124 +741,191 @@
                     micBtn.classList.add('listening');
                     voiceInstruction.textContent = 'En cours d\'écoute...';
                     hasSpoken = false;
-                    console.log("Reconnaissance vocale démarrée");
                 };
                 
                 recognition.onresult = function(event) {
                     if (!currentQuestionData || awaitingNext) return;
-                    
                     const transcript = event.results[0][0].transcript.trim().toLowerCase();
-                    console.log('Résultat reconnaissance:', transcript);
                     handleSpeechResult(transcript);
                 };
                 
                 recognition.onerror = function(event) {
                     console.error('Erreur reconnaissance vocale:', event.error);
-                    // Ne pas pénaliser pour les erreurs techniques
                     resetListeningState();
+                    
+                    // Gestion des erreurs courantes sur mobile
+                    if (event.error === 'not-allowed' || event.error === 'permission-denied' || event.error === 'audio-capture') {
+                        handlePermissionError();
+                    } else if (event.error === 'no-speech' || event.error === 'aborted') {
+                        // Pas de parole détectée ou arrêté par l'utilisateur
+                        if (!hasSpoken && !awaitingNext && currentQuestionData) {
+                            setTimeout(() => {
+                                if (!hasSpoken && !awaitingNext) {
+                                    handleIncorrectAnswer();
+                                }
+                            }, 500);
+                        }
+                    }
                 };
                 
                 recognition.onend = function() {
-                    console.log("Reconnaissance vocale arrêtée");
                     resetListeningState();
                     
-                    // Seulement si l'utilisateur n'a pas parlé ET que nous sommes toujours sur la même question
+                    // Si l'utilisateur n'a pas parlé et que nous sommes toujours sur la même question
                     if (!hasSpoken && !awaitingNext && currentQuestionData) {
-                        // On ne pénalise pas immédiatement - laisser un délai raisonnable
                         setTimeout(() => {
                             if (!hasSpoken && !awaitingNext) {
-                                console.log("Aucune parole détectée après autorisation");
                                 handleIncorrectAnswer();
                             }
                         }, 500);
                     }
                 };
             } else {
-                alert('Votre navigateur ne supporte pas la reconnaissance vocale. Veuillez utiliser Chrome.');
-                micBtn.disabled = true; // Désactiver le bouton si non supporté
+                // Navigateur non supporté
+                handleNoSupport();
             }
         }
+        
+        // Gérer le fallback iOS
+        function handleIOSFallback() {
+            isUsingIOSFallback = true;
+            voiceInstruction.innerHTML = '📱 Appuyez sur le micro pour taper votre réponse';
+            micBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                showIOSPrompt();
+            });
+            micBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                showIOSPrompt();
+            });
+        }
+        
+        // Afficher le prompt iOS
+        function showIOSPrompt() {
+            if (awaitingNext || !currentQuestionData) return;
+            
+            iosQuestion.textContent = `Prononcez ce nombre : ${currentQuestionData.caractere}`;
+            iosPinyin.textContent = `(${currentQuestionData.pinyin})`;
+            iosInput.value = '';
+            iosInput.focus();
+            
+            iosOverlay.style.display = 'block';
+            iosPrompt.style.display = 'block';
+            
+            // Bloquer le défilement
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Masquer le prompt iOS
+        function hideIOSPrompt() {
+            iosOverlay.style.display = 'none';
+            iosPrompt.style.display = 'none';
+            
+            // Réactiver le défilement
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Gérer l'envoi de la réponse iOS
+        function handleIOSResponse() {
+            const userInput = iosInput.value.trim().toLowerCase();
+            hideIOSPrompt();
+            
+            if (userInput === '') {
+                handleIncorrectAnswer();
+                return;
+            }
+            
+            hasSpoken = true;
+            handleSpeechResult(userInput);
+        }
+        
+        // Gestion des erreurs de permission
+        function handlePermissionError() {
+            voiceInstruction.innerHTML = '🚫 Autorisez le microphone<br><small>(Paramètres → Site → Microphone)</small>';
+            
+            setTimeout(() => {
+                if (!isListening) {
+                    voiceInstruction.textContent = isIOS ? 
+                        '📱 Appuyez sur le micro pour taper votre réponse' : 
+                        'Appuyez sur le micro pour parler';
+                }
+            }, 5000);
+        }
+        
+        // Gestion des navigateurs non supportés
+        function handleNoSupport() {
+            if (isMobile) {
+                voiceInstruction.innerHTML = '📱 Utilisez Chrome sur Android<br>ou tapez votre réponse';
+                micBtn.addEventListener('click', showManualInputFallback);
+            } else {
+                voiceInstruction.innerHTML = '❌ Navigateur non supporté<br>Veuillez utiliser Chrome';
+            }
+            micBtn.disabled = false; // Garder le bouton actif pour le fallback
+        }
+        
+        // Fallback pour saisie manuelle (non-iOS mobile)
+        function showManualInputFallback() {
+            const userInput = prompt(`Prononcez ce nombre : ${currentQuestionData.caractere}\n(${currentQuestionData.pinyin})`, '');
+            if (userInput !== null && userInput.trim() !== '') {
+                hasSpoken = true;
+                handleSpeechResult(userInput.trim());
+            } else if (!awaitingNext) {
+                handleIncorrectAnswer();
+            }
+        }
+        
         // Réinitialiser l'état d'écoute proprement
         function resetListeningState() {
             isListening = false;
             micBtn.classList.remove('listening');
-            voiceInstruction.textContent = 'Appuyez sur le micro pour parler';
-        }
-        // Vérifier les permissions microphone AVANT de tenter d'écouter
-        async function checkMicrophonePermission() {
-            try {
-                // Vérifier si l'accès au microphone est déjà autorisé
-                if (navigator.permissions) {
-                    const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
-                    console.log('Statut permission microphone:', permissionStatus.state);
-                    
-                    if (permissionStatus.state === 'denied') {
-                        alert('L\'accès au microphone est bloqué. Veuillez l\'autoriser dans les paramètres de votre navigateur.');
-                        return false;
-                    }
-                }
-                
-                // Tester l'accès au microphone sans démarrer l'écoute
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                console.log('Accès microphone autorisé');
-                stream.getTracks().forEach(track => track.stop());
-                return true;
-            } catch (err) {
-                console.error('Erreur permission microphone:', err);
-                alert('Veuillez autoriser l\'accès au microphone pour utiliser cette fonctionnalité.');
-                return false;
+            
+            if (!isUsingIOSFallback) {
+                voiceInstruction.textContent = 'Appuyez sur le micro pour parler';
             }
         }
-        // Démarrer l'écoute vocale - CORRIGÉ
-        async function startListening() {
-            if (awaitingNext || !recognition) return;
-            
-            // Vérifier les permissions avant de démarrer
-            const permissionGranted = await checkMicrophonePermission();
-            if (!permissionGranted) {
-                return;
-            }
+        
+        // Démarrer l'écoute vocale - version mobile-friendly
+        function startListening() {
+            if (awaitingNext || isListening || !recognition) return;
             
             try {
-                console.log("Tentative de démarrage de l'écoute...");
                 recognition.start();
-                // L'état "listening" sera géré dans onstart, pas ici
             } catch (e) {
                 console.error('Erreur démarrage reconnaissance:', e);
                 resetListeningState();
                 
-                // Essayer de récupérer après une erreur courante
-                if (e.name === 'NotAllowedError' || e.name === 'NotAllowedError') {
-                    alert('Veuillez autoriser l\'accès au microphone dans les paramètres de votre navigateur.');
+                if (e.name === 'NotAllowedError' || e.name === 'SecurityError') {
+                    handlePermissionError();
+                } else if (e.name === 'NotSupportedError' || e.name === 'NotReadableError') {
+                    handleNoSupport();
                 }
             }
         }
-        // Arrêter l'écoute vocale - CORRIGÉ
+        
+        // Arrêter l'écoute vocale
         function stopListening() {
             if (recognition && isListening) {
-                console.log("Arrêt forcé de l'écoute");
-                recognition.stop();
+                try {
+                    recognition.stop();
+                } catch (e) {
+                    console.warn('Erreur arrêt reconnaissance:', e);
+                }
                 resetListeningState();
             }
         }
-        // Gérer le résultat de la reconnaissance - CORRIGÉ
+        
+        // Gérer le résultat de la reconnaissance
         function handleSpeechResult(userInput) {
             if (!currentQuestionData || awaitingNext) return;
-            
             hasSpoken = true;
-            stopListening();
             
             // Nettoyer les entrées pour comparaison
             const correct = currentQuestionData.correct.toLowerCase().replace(/\s+/g, ' ');
             const user = userInput.toLowerCase().replace(/\s+/g, ' ');
             
-            console.log('Comparaison:', { user, correct }); // Log pour debug
-            
             // Vérifier si la réponse est correcte avec plus de tolérance
             const similarity = getSimilarity(correct, user);
             const isCorrect = similarity > 0.6 || user.includes(correct) || correct.includes(user);
-            
-            console.log('Similarité calculée:', similarity, 'Est correct:', isCorrect);
             
             if (isCorrect) {
                 handleCorrectAnswer();
@@ -772,6 +933,7 @@
                 handleIncorrectAnswer();
             }
         }
+        
         // Calculer la similarité entre deux chaînes
         function getSimilarity(s1, s2) {
             let longer = s1;
@@ -786,6 +948,7 @@
             }
             return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
         }
+        
         function editDistance(s1, s2) {
             s1 = s1.toLowerCase();
             s2 = s2.toLowerCase();
@@ -811,12 +974,14 @@
             }
             return costs[s2.length];
         }
+        
         // 🔁 Fonctions utilitaires
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
+        
         function updateQuizHeaderVisibility(isQuizActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('quiz-active', isQuizActive);
@@ -825,11 +990,13 @@
                 mobileBackBtn.classList.add('hidden');
             }
         }
+        
         function updateResultHeaderVisibility(isResultActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('result-active', isResultActive);
             }
         }
+        
         // 📥 Fetch best score from DB with local fallback
         async function fetchBestScore() {
             if (!window.currentUser?.uid) {
@@ -848,6 +1015,7 @@
             }
             return parseInt(localStorage.getItem(`best-score-${THEME}-n4`) || '0');
         }
+        
         // 💾 Save best score to DB with local fallback
         async function saveBestScore(newBest) {
             if (!window.currentUser?.uid) {
@@ -865,6 +1033,7 @@
                 localStorage.setItem(`best-score-${THEME}-n4`, newBest.toString());
             }
         }
+        
         // 📥 Sauvegarde via transaction
         async function saveScores(incrementValue) {
             if (!window.currentUser?.uid || incrementValue <= 0) return;
@@ -894,10 +1063,12 @@
                 localStorage.setItem('globalScore', global.toString());
             }
         }
+        
         // Fonction pour cacher le pinyin
         function hidePinyin() {
             pinyinDisplay.textContent = '';
         }
+        
         // Fonction pour montrer le pinyin
         function showPinyin(pinyin) {
             if (hidePinyinAfter30s) {
@@ -906,6 +1077,7 @@
                 pinyinDisplay.textContent = '🙈';
             }
         }
+        
         // 🎮 Logique de jeu
         async function startGame() {
             if (gameCompleted) return;
@@ -925,6 +1097,7 @@
             startMainTimer();
             window.scrollTo(0, 0);
         }
+        
         function getRandomQuestion() {
             if (usedQuestions.length >= QUESTIONS.length) usedQuestions = [];
             let idx;
@@ -934,6 +1107,7 @@
             usedQuestions.push(idx);
             return QUESTIONS[idx];
         }
+        
         function generateQuestion() {
             if (awaitingNext) return;
             const q = getRandomQuestion();
@@ -963,20 +1137,24 @@
             qTimerFill.style.background = 'linear-gradient(90deg, #ff9b00, #ff4d2e, #b40000)';
             startQTimer();
         }
+        
         function handleCorrectAnswer() {
             if (awaitingNext) return;
             awaitingNext = true;
             stopListening();
             clearTimeout(timeoutId); // Arrêter le timer de question
+            
             score++;
             scoreDisplay.textContent = score;
             updateLives();
             updateStatsDisplayMobile();
+            
             // Afficher une indication visuelle de bonne réponse
             numberDisplay.style.color = '#9bc24f';
             setTimeout(() => {
                 numberDisplay.style.color = '#b40000';
             }, 1000);
+            
             // Pause de 1,9s avant la question suivante
             setTimeout(() => {
                 if (lives <= 0 || timeLeft <= 0) {
@@ -987,21 +1165,25 @@
                 }
             }, 1900);
         }
+        
         function handleIncorrectAnswer() {
             if (awaitingNext) return;
             awaitingNext = true;
             stopListening();
             clearTimeout(timeoutId); // Arrêter le timer de question
+            
             lives = Math.max(0, lives - 1);
             wrongAnswers++;
             scoreDisplay.textContent = score;
             updateLives();
             updateStatsDisplayMobile();
+            
             // Afficher une indication visuelle de mauvaise réponse
             numberDisplay.style.color = '#d35949';
             setTimeout(() => {
                 numberDisplay.style.color = '#b40000';
             }, 1000);
+            
             // Pause de 1,9s avant la question suivante
             setTimeout(() => {
                 if (lives <= 0 || timeLeft <= 0) {
@@ -1012,6 +1194,7 @@
                 }
             }, 1900);
         }
+        
         function updateLives() {
             const total = levelConfig.lives;
             const hearts = livesDisplay.querySelectorAll('.heart');
@@ -1027,11 +1210,13 @@
                 }
             });
         }
+        
         function updateStatsDisplayMobile() {
             currentScoreDisplayMobile.textContent = score;
             wrongAnswersDisplayMobile.textContent = wrongAnswers;
             bestScoreDisplayMobile.textContent = currentUserBestScore;
         }
+        
         function startMainTimer() {
             clearInterval(timerInterval);
             timerDisplay.textContent = timeLeft;
@@ -1055,6 +1240,7 @@
                 }
             }, 1000);
         }
+        
         function startQTimer() {
             clearTimeout(timeoutId); // Nettoyer l'ancien timer
             const start = levelConfig.qTime;
@@ -1062,18 +1248,15 @@
             qTimerDisplay.textContent = qTime.toFixed(1);
             qTimerFill.style.width = '100%';
             qTimerFill.style.background = 'linear-gradient(90deg, #ff9b00, #ff4d2e, #b40000)';
+            
             // Utilisation de setTimeout au lieu de setInterval pour le timer de question
             timeoutId = setTimeout(() => {
-                // Si l'utilisateur n'a pas parlé, c'est une erreur
-                if (!hasSpoken) {
+                if (!hasSpoken && !awaitingNext) {
                     handleIncorrectAnswer();
-                }
-                // Si l'utilisateur a parlé, on attend la fin de la réponse
-                else {
-                    // Ne rien faire, la réponse a été traitée
                 }
             }, qTime * 1000);
         }
+        
         async function endGame() {
             if (gameCompleted) return;
             gameCompleted = true;
@@ -1136,6 +1319,7 @@
             }
             window.scrollTo(0, 0);
         }
+        
         async function handleBack() {
             if (gameCompleted) {
                 window.location.href = 'index.html';
@@ -1149,26 +1333,51 @@
             stopAllTimers();
             window.location.href = 'index.html';
         }
+        
         function stopAllTimers() {
             clearInterval(timerInterval);
             clearInterval(pinyinTimer);
             clearTimeout(timeoutId);
             stopListening();
+            hideIOSPrompt();
         }
-        // Événement du bouton micro - CORRIGÉ
-        micBtn.addEventListener('click', async () => {
+        
+        // Événement du bouton micro - version mobile-friendly
+        micBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (isUsingIOSFallback) {
+                // iOS gère le clic différemment
+                return;
+            }
+            
             if (isListening) {
                 stopListening();
-            } else {
-                // Désactiver temporairement le bouton pour éviter les clics multiples
-                micBtn.disabled = true;
-                await startListening();
-                // Réactiver après un court délai
-                setTimeout(() => {
-                    micBtn.disabled = false;
-                }, 300);
+                return;
+            }
+            
+            if (!awaitingNext && currentQuestionData) {
+                startListening();
             }
         });
+        
+        // iOS button events
+        iosSubmit.addEventListener('click', handleIOSResponse);
+        iosCancel.addEventListener('click', () => {
+            hideIOSPrompt();
+            handleIncorrectAnswer();
+        });
+        iosInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleIOSResponse();
+            }
+        });
+        iosOverlay.addEventListener('click', () => {
+            hideIOSPrompt();
+            handleIncorrectAnswer();
+        });
+        
         // 🔄 Navigation
         mobileBackBtn.addEventListener('click', handleBack);
         restartBtn.addEventListener('click', () => {
@@ -1176,6 +1385,7 @@
             startGame();
         });
         homeBtn.addEventListener('click', handleBack);
+        
         // 🔐 Auth
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
