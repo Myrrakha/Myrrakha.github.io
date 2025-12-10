@@ -148,7 +148,7 @@
             box-shadow: 0 0 12px rgba(210, 60, 20, 0.2);
             position: relative;
             z-index: 10;
-            touch-action: manipulation; /* Permet la manipulation tactile sur mobile */
+            touch-action: manipulation;
         }
         .mic-btn:hover {
             transform: scale(1.05);
@@ -332,23 +332,9 @@
                 min-width: 44px;
                 height: fit-content;
             }
-            #mobile-back-container .action-btn {
-                padding: 5px 9px;
-                font-size: 1.1em;
-                display: block;
+            .skip-btn {
+                margin-top: 8px;
                 width: 100%;
-                text-align: center;
-                background: rgba(255, 240, 230, 0.9);
-                border-radius: 9px;
-                cursor: pointer;
-                transition: .2s;
-                border: 2px solid rgba(180, 0, 0, 0.2);
-                color: #b40000;
-                font-family: "Noto Serif SC", serif;
-            }
-            #mobile-back-container .action-btn:hover {
-                background: rgba(255, 230, 220, 0.95);
-                box-shadow: 0 0 8px rgba(255, 100, 80, 0.3);
             }
         }
         @media (min-width: 900px) {
@@ -401,6 +387,9 @@
                 font-weight: bold;
                 color: #b40000;
             }
+            .skip-btn {
+                margin-top: 16px;
+            }
         }
         /* RESULT SECTION */
         #result-section {
@@ -449,6 +438,12 @@
             box-shadow: 0 0 8px rgba(255, 100, 80, 0.3);
             transform: translateY(-1px);
         }
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
         /* Unlock Message */
         #level-unlock-msg {
             color: #9bc24f;
@@ -476,7 +471,7 @@
                 </div>
                 <div class="voice-container">
                     <button id="mic-btn" class="mic-btn">🎤</button>
-                    <div id="voice-instruction" class="voice-instruction">Appuyez sur le micro pour parler</div>
+                    <div id="voice-instruction" class="voice-instruction">Maintenez le micro pour parler</div>
                 </div>
             </div>
             <div id="timers-container">
@@ -515,6 +510,7 @@
                 </div>
                 <div id="mobile-back-container">
                     <button id="mobile-back-btn" class="action-btn">←</button>
+                    <button id="skip-btn" class="action-btn skip-btn" disabled>Passer (3s)</button>
                 </div>
             </div>
         </section>
@@ -615,6 +611,7 @@
         const timerFill = document.getElementById('timer-fill');
         const qTimerFill = document.getElementById('question-timer-fill');
         const mobileBackBtn = document.getElementById('mobile-back-btn');
+        const skipBtn = document.getElementById('skip-btn');
         const restartBtn = document.getElementById('restart-btn');
         const homeBtn = document.getElementById('home-btn');
         const levelUnlockMsg = document.getElementById('level-unlock-msg');
@@ -636,46 +633,53 @@
         let hidePinyinAfter30s = true;
         let hasSpoken = false; // Indicateur pour savoir si l'utilisateur a parlé
         let timeoutId = null; // Pour le timer de question
+        let skipTimer = null; // Pour le timer du bouton passer
+        let finalTranscript = null; // Pour stocker le dernier résultat final
+        
         // ✅ Initialisation fiable de SpeechRecognition (uniquement webkit)
         function initSpeechRecognition() {
             if ('webkitSpeechRecognition' in window) {
                 const SpeechRecognition = window.webkitSpeechRecognition;
                 recognition = new SpeechRecognition();
-                recognition.continuous = false;
-                recognition.interimResults = false;
+                recognition.continuous = true; // Toujours actif pendant le maintien
+                recognition.interimResults = true; // Pour capturer les résultats intermédiaires
                 recognition.lang = 'zh-CN';
+                
                 recognition.onstart = function() {
                     isListening = true;
                     hasSpoken = false;
+                    finalTranscript = null;
                     micBtn.classList.add('listening');
                     voiceInstruction.textContent = 'En cours d\'écoute...';
                 };
+                
                 recognition.onresult = function(event) {
                     if (!currentQuestionData || awaitingNext) return;
-                    const transcript = event.results[0][0].transcript.trim().toLowerCase();
-                    handleSpeechResult(transcript);
-                };
-                recognition.onerror = function(event) {
-                    console.error('Erreur reconnaissance vocale:', event.error);
-                    stopListening();
-                    // Ne pénalise pas si l'utilisateur n'a pas parlé (erreur technique)
-                    if (!hasSpoken && !awaitingNext && currentQuestionData) {
-                        setTimeout(() => {
-                            if (!hasSpoken && !awaitingNext && currentQuestionData) {
-                                handleIncorrectAnswer();
-                            }
-                        }, 500);
+                    // On stocke le dernier résultat final pour le traitement au relâchement
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        if (event.results[i].isFinal) {
+                            finalTranscript = event.results[i][0].transcript.trim().toLowerCase();
+                            hasSpoken = true;
+                        }
                     }
                 };
+                
+                recognition.onerror = function(event) {
+                    console.error('Erreur reconnaissance vocale:', event.error);
+                    // On ne fait rien ici, on laisse le processus se terminer normalement
+                };
+                
                 recognition.onend = function() {
-                    stopListening();
-                    // Si aucune parole détectée après l'arrêt, pénaliser après délai
-                    if (!hasSpoken && !awaitingNext && currentQuestionData) {
-                        setTimeout(() => {
-                            if (!hasSpoken && !awaitingNext && currentQuestionData) {
-                                handleIncorrectAnswer();
-                            }
-                        }, 1000);
+                    isListening = false;
+                    micBtn.classList.remove('listening');
+                    micBtn.disabled = false;
+                    voiceInstruction.textContent = 'Maintenez le micro pour parler';
+                    
+                    // Traiter le dernier résultat final au moment où la reconnaissance s'arrête
+                    if (finalTranscript && currentQuestionData && !awaitingNext) {
+                        handleSpeechResult(finalTranscript);
+                    } else if (!hasSpoken && !awaitingNext && currentQuestionData) {
+                        handleIncorrectAnswer(); // Aucune parole détectée
                     }
                 };
             } else {
@@ -683,6 +687,7 @@
                 micBtn.disabled = true;
             }
         }
+        
         function stopListening() {
             if (recognition && isListening) {
                 try {
@@ -691,13 +696,11 @@
                     console.warn('Erreur lors de l\'arrêt de la reconnaissance:', e);
                 }
             }
-            isListening = false;
-            micBtn.classList.remove('listening');
-            micBtn.disabled = false;
-            voiceInstruction.textContent = 'Appuyez sur le micro pour parler';
         }
+        
         async function startListening() {
             if (awaitingNext || !recognition || isListening) return;
+            
             // Vérifier l'accès au microphone
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -707,7 +710,10 @@
                 alert('Veuillez autoriser l\'accès au microphone dans les paramètres de votre navigateur.');
                 return;
             }
+            
             micBtn.disabled = true;
+            finalTranscript = null; // Réinitialiser le dernier résultat
+            
             setTimeout(() => {
                 try {
                     recognition.start();
@@ -717,20 +723,22 @@
                 }
             }, 100);
         }
+        
         function handleSpeechResult(userInput) {
             if (!currentQuestionData || awaitingNext) return;
-            hasSpoken = true;
-            stopListening();
+            
             const correct = currentQuestionData.correct.toLowerCase().replace(/\s+/g, ' ').trim();
             const user = userInput.toLowerCase().replace(/\s+/g, ' ').trim();
             const similarity = getSimilarity(correct, user);
             const isCorrect = similarity > 0.65 || user.includes(correct) || correct.includes(user);
+            
             if (isCorrect) {
                 handleCorrectAnswer();
             } else {
                 handleIncorrectAnswer();
             }
         }
+        
         // Calcul de similarité
         function getSimilarity(s1, s2) {
             let longer = s1;
@@ -877,7 +885,24 @@
             updateResultHeaderVisibility(false);
             generateQuestion();
             startMainTimer();
+            startSkipTimer();
             window.scrollTo(0, 0);
+        }
+        function startSkipTimer() {
+            let remaining = 3;
+            skipBtn.textContent = `Passer (${remaining}s)`;
+            skipBtn.disabled = true;
+            clearInterval(skipTimer);
+            skipTimer = setInterval(() => {
+                remaining--;
+                if(remaining > 0) {
+                    skipBtn.textContent = `Passer (${remaining}s)`;
+                } else {
+                    skipBtn.textContent = 'Passer';
+                    skipBtn.disabled = false;
+                    clearInterval(skipTimer);
+                }
+            }, 1000);
         }
         function getRandomQuestion() {
             if (usedQuestions.length >= QUESTIONS.length) usedQuestions = [];
@@ -913,6 +938,7 @@
             qTimerFill.style.width = '100%';
             qTimerFill.style.background = 'linear-gradient(90deg, #ff9b00, #ff4d2e, #b40000)';
             startQTimer();
+            startSkipTimer();
         }
         function handleCorrectAnswer() {
             if (awaitingNext) return;
@@ -932,7 +958,10 @@
                     endGame();
                 } else {
                     awaitingNext = false;
-                    generateQuestion();
+                    // Ajout du délai de 250ms avant de relancer le timer de question
+                    setTimeout(() => {
+                        generateQuestion();
+                    }, 250);
                 }
             }, 1900);
         }
@@ -955,7 +984,36 @@
                     endGame();
                 } else {
                     awaitingNext = false;
-                    generateQuestion();
+                    // Ajout du délai de 250ms avant de relancer le timer de question
+                    setTimeout(() => {
+                        generateQuestion();
+                    }, 250);
+                }
+            }, 1900);
+        }
+        function handleSkip() {
+            if (awaitingNext || skipBtn.disabled) return;
+            awaitingNext = true;
+            stopListening();
+            clearTimeout(timeoutId);
+            clearInterval(skipTimer);
+            score++; // Ajoute un point pour le passage
+            scoreDisplay.textContent = score;
+            updateLives();
+            updateStatsDisplayMobile();
+            numberDisplay.style.color = '#d3d3d3'; // Gris pour indiquer le passage
+            setTimeout(() => {
+                numberDisplay.style.color = '#b40000';
+            }, 1000);
+            setTimeout(() => {
+                if (lives <= 0 || timeLeft <= 0) {
+                    endGame();
+                } else {
+                    awaitingNext = false;
+                    // Ajout du délai de 250ms avant de relancer le timer de question
+                    setTimeout(() => {
+                        generateQuestion();
+                    }, 950);
                 }
             }, 1900);
         }
@@ -1005,13 +1063,15 @@
             clearTimeout(timeoutId);
             let timeLeftQuestion = levelConfig.qTime;
             qTimerDisplay.textContent = timeLeftQuestion.toFixed(1);
-            qTimerFill.style.width = '100%';
+            qTimerFill.style.width = '110%'; // Remet la barre à 100%
             timeoutId = setInterval(() => {
                 timeLeftQuestion -= 0.1;
                 if (timeLeftQuestion <= 0) {
                     clearInterval(timeoutId);
-                    if (!hasSpoken && !awaitingNext && currentQuestionData) {
-                        handleIncorrectAnswer();
+                    if (isListening) {
+                        stopListening(); // Arrêter la reconnaissance quand le timer expire
+                    } else if (!hasSpoken && !awaitingNext && currentQuestionData) {
+                        handleIncorrectAnswer(); // Pénaliser si l'utilisateur n'a pas parlé
                     }
                     return;
                 }
@@ -1095,26 +1155,50 @@
             clearInterval(timerInterval);
             clearInterval(pinyinTimer);
             clearInterval(timeoutId);
+            clearInterval(skipTimer);
             stopListening();
         }
-        // ✅ Événement du bouton micro avec prévention des clics fantômes
-        micBtn.addEventListener('click', (e) => {
+        // ✅ Événements du bouton micro pour interaction "maintenir/appuyer"
+        micBtn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!isListening) {
+                startListening();
+            }
+        });
+        
+        micBtn.addEventListener('mouseup', (e) => {
             e.preventDefault();
             e.stopPropagation();
             if (isListening) {
                 stopListening();
-            } else {
+            }
+        });
+        
+        micBtn.addEventListener('mouseleave', (e) => {
+            // Si la souris quitte le bouton pendant qu'il est pressé, on arrête l'écoute
+            if (isListening) {
+                stopListening();
+            }
+        });
+        
+        // Pour la gestion tactile
+        micBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!isListening) {
                 startListening();
             }
         });
-        micBtn.addEventListener('touchstart', (e) => {
+        
+        micBtn.addEventListener('touchend', (e) => {
             e.preventDefault();
             if (isListening) {
                 stopListening();
-            } else {
-                startListening();
             }
         });
+        
+        // ✅ Événement du bouton passer
+        skipBtn.addEventListener('click', handleSkip);
         // 🔄 Navigation
         mobileBackBtn.addEventListener('click', handleBack);
         restartBtn.addEventListener('click', () => {
