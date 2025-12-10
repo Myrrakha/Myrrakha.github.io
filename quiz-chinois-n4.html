@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Quiz Master - Chinois N4</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         .hidden {
             display: none !important;
         }
+
         /* GLOBAL */
         body {
             margin: 0;
@@ -23,6 +27,7 @@
             overflow-x: hidden;
             opacity: 0.98;
         }
+
         .lanterne {
             width: 60px;
             height: 90px;
@@ -34,24 +39,29 @@
             filter: drop-shadow(0 0 6px rgba(255, 80, 0, 0.8));
             z-index: -1;
         }
+
         .lanterne:nth-child(1) {
             left: 15%;
             animation-delay: 0s;
         }
+
         .lanterne:nth-child(2) {
             right: 15%;
             animation-delay: 1.2s;
         }
+
         @keyframes flotter {
             0% {
                 transform: translateY(0) rotate(-2deg);
                 opacity: 0.95;
             }
+
             100% {
                 transform: translateY(12px) rotate(2deg);
                 opacity: 1;
             }
         }
+
         #hover-warning {
             position: absolute;
             padding: 8px 14px;
@@ -64,6 +74,7 @@
             transition: opacity 0.4s ease;
             z-index: 9999;
         }
+
         /* ✨ CENTRAGE PRINCIPAL */
         main {
             display: flex;
@@ -76,6 +87,7 @@
             box-sizing: border-box;
             position: relative;
         }
+
         /* QUIZ SECTION */
         #quiz-section {
             display: flex;
@@ -84,20 +96,24 @@
             width: 100%;
             max-width: 1200px;
         }
+
         .quiz-container {
             display: flex;
             gap: 12px;
             width: 100%;
             justify-content: center;
         }
+
         @media (min-width: 900px) {
             .question-box {
                 flex: 2;
             }
+
             .voice-container {
                 flex: 1;
             }
         }
+
         .question-box {
             background: rgba(255, 250, 240, 0.95);
             backdrop-filter: blur(8px);
@@ -118,14 +134,17 @@
             font-family: "Noto Serif SC", serif;
             flex-direction: column;
         }
+
         .number-display {
             font-size: 2.5em;
         }
+
         .pinyin-display {
             font-size: 1.2em;
             margin-top: 10px;
             color: #6a6a6a;
         }
+
         .voice-container {
             display: flex;
             flex-direction: column;
@@ -133,6 +152,7 @@
             justify-content: center;
             gap: 15px;
         }
+
         .mic-btn {
             width: 100px;
             height: 100px;
@@ -150,23 +170,36 @@
             z-index: 10;
             touch-action: manipulation;
         }
+
         .mic-btn:hover {
             transform: scale(1.05);
             background: linear-gradient(145deg, #fde3d0, #ffb380);
             box-shadow: 0 0 16px rgba(255, 100, 50, 0.4);
         }
+
         .mic-btn.listening {
             background: linear-gradient(145deg, #d3e87e, #9bc24f);
             animation: pulse 1.5s infinite;
         }
+
         .mic-btn.listening:hover {
             background: linear-gradient(145deg, #c3d86e, #8bb245);
         }
+
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(140, 200, 70, 0.7); }
-            70% { box-shadow: 0 0 0 12px rgba(140, 200, 70, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(140, 200, 70, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(140, 200, 70, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 12px rgba(140, 200, 70, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(140, 200, 70, 0);
+            }
         }
+
         .voice-instruction {
             font-size: 1.1em;
             text-align: center;
@@ -174,6 +207,25 @@
             font-weight: 600;
             margin-top: 10px;
         }
+
+        #transcript-box {
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(255, 250, 240, 0.9);
+            border-radius: 10px;
+            border: 1px solid rgba(180, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            font-size: 1.1em;
+            color: #2a2a2a;
+            min-height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
+        }
+
         #timers-container {
             width: 100%;
             max-width: 1000px;
@@ -183,6 +235,7 @@
             align-items: center;
             gap: 8px;
         }
+
         #timer-bar-container,
         #question-timer-bar-container {
             width: 100%;
@@ -192,6 +245,7 @@
             color: #b40000;
             font-weight: 600;
         }
+
         #timer-bar,
         #question-timer-bar {
             width: 100%;
@@ -202,6 +256,7 @@
             overflow: hidden;
             border: 1px solid rgba(180, 0, 0, 0.2);
         }
+
         #timer-fill,
         #question-timer-fill {
             height: 100%;
@@ -209,12 +264,15 @@
             border-radius: 7px;
             transition: width 0.3s linear;
         }
+
         #timer-fill {
             background: linear-gradient(90deg, #b40000, #ff4d2e, #ff9b00);
         }
+
         #question-timer-fill {
             background: linear-gradient(90deg, #ff9b00, #ff4d2e, #b40000);
         }
+
         #score-lives {
             margin-top: 10px;
             display: flex;
@@ -225,22 +283,26 @@
             color: #b40000;
             font-weight: 600;
         }
+
         .score-container {
             margin-top: 7px;
             font-size: 19px;
             text-shadow: 0 0 5px rgba(255, 130, 100, 0.3);
         }
+
         .heart {
             font-size: 22px;
             margin: 0 3px;
             color: #d35949;
             text-shadow: 0 0 4px rgba(211, 89, 73, 0.6);
         }
+
         @media (max-width: 899px) {
             .quiz-container {
                 flex-direction: column;
                 gap: 10px;
             }
+
             .question-box {
                 font-size: 1.8em;
                 padding: 15px;
@@ -248,20 +310,25 @@
                 width: calc(100% - 30px);
                 color: #b40000;
             }
+
             .number-display {
                 font-size: 2.2em;
             }
+
             .pinyin-display {
                 font-size: 1em;
             }
+
             .voice-container {
                 gap: 10px;
             }
+
             .mic-btn {
                 width: 80px;
                 height: 80px;
                 font-size: 2.5em;
             }
+
             #score-lives {
                 flex-direction: column;
                 gap: 4px;
@@ -269,6 +336,7 @@
                 align-items: center;
                 color: #b40000;
             }
+
             #mobile-quiz-ui-row {
                 display: flex;
                 gap: 8px;
@@ -278,6 +346,7 @@
                 width: 100%;
                 max-width: 1200px;
             }
+
             #current-game-stats {
                 margin: 0;
                 flex: 1;
@@ -289,6 +358,7 @@
                 border: 2px solid rgba(180, 0, 0, 0.15);
                 height: 110px;
             }
+
             .stats-title {
                 font-size: 0.9em;
                 margin-bottom: 6px;
@@ -299,6 +369,7 @@
                 text-align: center;
                 font-family: "Noto Serif SC", serif;
             }
+
             .current-score {
                 font-size: 1.4em;
                 margin: 5px 0;
@@ -306,6 +377,7 @@
                 color: #9bc24f;
                 font-family: "Noto Serif SC", serif;
             }
+
             .stats-row {
                 padding: 3px 0;
                 font-size: 0.85em;
@@ -313,13 +385,16 @@
                 justify-content: space-between;
                 color: #2a2a2a;
             }
+
             .stats-label {
                 font-weight: 600;
             }
+
             .stats-value {
                 font-weight: bold;
                 color: #b40000;
             }
+
             #mobile-back-container {
                 background: rgba(255, 250, 240, 0.85);
                 padding: 12px 10px;
@@ -332,18 +407,28 @@
                 min-width: 44px;
                 height: fit-content;
             }
+
             .skip-btn {
                 margin-top: 8px;
                 width: 100%;
             }
+
+            #transcript-box {
+                max-width: none;
+                font-size: 1em;
+                padding: 8px;
+            }
         }
+
         @media (min-width: 900px) {
             #mobile-quiz-ui-row {
                 display: none !important;
             }
+
             #mobile-back-btn {
                 display: none !important;
             }
+
             #current-game-stats {
                 background: rgba(255, 250, 240, 0.85);
                 border-radius: 10px;
@@ -354,6 +439,7 @@
                 box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.2);
                 border: 2px solid rgba(180, 0, 0, 0.15);
             }
+
             .stats-title {
                 text-align: center;
                 margin-bottom: 10px;
@@ -364,6 +450,7 @@
                 text-shadow: 0 0 5px rgba(200, 0, 0, 0.3);
                 font-family: "Noto Serif SC", serif;
             }
+
             .current-score {
                 font-size: 1.8em;
                 font-weight: bold;
@@ -372,6 +459,7 @@
                 text-align: center;
                 font-family: "Noto Serif SC", serif;
             }
+
             .stats-row {
                 display: flex;
                 justify-content: space-between;
@@ -380,17 +468,21 @@
                 font-size: 0.9em;
                 color: #2a2a2a;
             }
+
             .stats-label {
                 font-weight: 600;
             }
+
             .stats-value {
                 font-weight: bold;
                 color: #b40000;
             }
+
             .skip-btn {
                 margin-top: 16px;
             }
         }
+
         /* RESULT SECTION */
         #result-section {
             text-align: center;
@@ -401,6 +493,7 @@
             align-items: center;
             max-width: 1200px;
         }
+
         .result-stats {
             background: rgba(255, 250, 240, 0.95);
             backdrop-filter: blur(8px);
@@ -412,6 +505,7 @@
             border: 2px solid rgba(180, 0, 0, 0.2);
             width: calc(100% - 30px);
         }
+
         .result-stats h3 {
             color: #b40000;
             margin-top: 0;
@@ -420,6 +514,7 @@
             text-shadow: 0 0 5px rgba(200, 0, 0, 0.4);
             font-family: "Noto Serif SC", serif;
         }
+
         .action-btn {
             margin: 8px;
             padding: 10px 20px;
@@ -433,17 +528,20 @@
             font-size: 15px;
             font-weight: 600;
         }
+
         .action-btn:hover {
             background: linear-gradient(145deg, #fde3d0, #ffb380);
             box-shadow: 0 0 8px rgba(255, 100, 80, 0.3);
             transform: translateY(-1px);
         }
+
         .action-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
+
         /* Unlock Message */
         #level-unlock-msg {
             color: #9bc24f;
@@ -453,12 +551,14 @@
             text-shadow: 0 0 5px rgba(155, 194, 79, 0.4);
             font-family: "Noto Serif SC", serif;
         }
+
         #level-up-msg,
         #perfect-score-msg {
             font-family: "Noto Serif SC", serif;
         }
     </style>
 </head>
+
 <body>
     <div class="lanterne"></div>
     <div class="lanterne"></div>
@@ -474,6 +574,7 @@
                     <div id="voice-instruction" class="voice-instruction">Maintenez le micro pour parler</div>
                 </div>
             </div>
+            <div id="transcript-box" class="hidden">🎤 Écoute en cours...</div>
             <div id="timers-container">
                 <div id="timer-bar-container">
                     <span>⏱️ Temps restant : <span id="timer">0</span>s</span>
@@ -538,7 +639,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import {
-            getAuth, onAuthStateChanged
+            getAuth, onAuthStateChanged, signOut
         } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import {
             getFirestore, doc, updateDoc, increment, runTransaction, getDoc
@@ -550,8 +651,7 @@
         const SCORE_REQUIS_N5 = 18;
         const SCORE_PARFAIT_N4 = 25;
 
-        // ✅ SEULEMENT 0 à 10, et on utilise le caractère comme référence
-        const NOMBRES_CHINOIS_0_10 = [
+        const NOMBRES_CHINOIS = [
             { nombre: 0, caractere: "零", pinyin: "líng" },
             { nombre: 1, caractere: "一", pinyin: "yī" },
             { nombre: 2, caractere: "二", pinyin: "èr" },
@@ -562,18 +662,26 @@
             { nombre: 7, caractere: "七", pinyin: "qī" },
             { nombre: 8, caractere: "八", pinyin: "bā" },
             { nombre: 9, caractere: "九", pinyin: "jiǔ" },
-            { nombre: 10, caractere: "十", pinyin: "shí" }
+            { nombre: 10, caractere: "十", pinyin: "shí" },
+            { nombre: 11, caractere: "十一", pinyin: "shí yī" },
+            { nombre: 12, caractere: "十二", pinyin: "shí èr" },
+            { nombre: 13, caractere: "十三", pinyin: "shí sān" },
+            { nombre: 14, caractere: "十四", pinyin: "shí sì" },
+            { nombre: 15, caractere: "十五", pinyin: "shí wǔ" },
+            { nombre: 16, caractere: "十六", pinyin: "shí liù" },
+            { nombre: 17, caractere: "十七", pinyin: "shí qī" },
+            { nombre: 18, caractere: "十八", pinyin: "shí bā" },
+            { nombre: 19, caractere: "十九", pinyin: "shí jiǔ" },
+            { nombre: 20, caractere: "二十", pinyin: "èr shí" }
         ];
 
-        const QUESTIONS = NOMBRES_CHINOIS_0_10.map(num => ({
+        // ✅ CORRIGÉ : utiliser le caractère comme réponse correcte
+        const QUESTIONS = NOMBRES_CHINOIS.map(num => ({
             question: `Prononcez ce nombre : ${num.caractere}`,
-            correct: num.caractere, // ← CARACTÈRE, pas pinyin
+            correct: num.caractere, // ← ICI : caractère, pas pinyin
             caractere: num.caractere,
             pinyin: num.pinyin
         }));
-
-        // Ensemble des réponses valides (filtrage strict)
-        const VALID_NUMBERS = new Set(QUESTIONS.map(q => q.correct));
 
         const levelConfig = {
             time: 60,
@@ -581,6 +689,7 @@
             lives: 5
         };
 
+        // 🌐 Firebase init
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
             authDomain: "quiz-master-io.firebaseapp.com",
@@ -594,7 +703,7 @@
         const db = getFirestore(app);
         window.currentUser = null;
 
-        // ✅ DOM (inchangé)
+        // ✅ DOM
         const quizSection = document.getElementById('quiz-section');
         const resultSection = document.getElementById('result-section');
         const numberDisplay = document.getElementById('number-display');
@@ -617,8 +726,9 @@
         const wrongAnswersDisplayMobile = document.getElementById('wrong-answers-mobile');
         const bestScoreDisplayMobile = document.getElementById('best-score-display-mobile');
 
+        // ✅ États du jeu
         let score = 0, lives = 0, timeLeft = 0, qTime = 0;
-        let timerInterval = null, awaitingNext = false;
+        let timerInterval = null, qTimerInterval = null, awaitingNext = false;
         let gameCompleted = false;
         let usedQuestions = [];
         let currentQuestionData = null;
@@ -631,7 +741,7 @@
         let skipTimer = null;
         let finalTranscript = null;
 
-        // ✅ Nouvelle fonction de reconnaissance (inchangée)
+        // ✅ Initialisation fiable de SpeechRecognition
         function initSpeechRecognition() {
             if ('webkitSpeechRecognition' in window) {
                 const SpeechRecognition = window.webkitSpeechRecognition;
@@ -639,26 +749,30 @@
                 recognition.continuous = true;
                 recognition.interimResults = true;
                 recognition.lang = 'zh-CN';
-                recognition.onstart = function() {
+
+                recognition.onstart = function () {
                     isListening = true;
                     hasSpoken = false;
                     finalTranscript = null;
                     micBtn.classList.add('listening');
                     voiceInstruction.textContent = 'En cours d\'écoute...';
                 };
-                recognition.onresult = function(event) {
+
+                recognition.onresult = function (event) {
                     if (!currentQuestionData || awaitingNext) return;
                     for (let i = event.resultIndex; i < event.results.length; i++) {
                         if (event.results[i].isFinal) {
-                            finalTranscript = event.results[i][0].transcript.trim(); // 🔥 PAS de .toLowerCase()
+                            finalTranscript = event.results[i][0].transcript.trim(); // ⚠️ Pas de toLowerCase()
                             hasSpoken = true;
                         }
                     }
                 };
-                recognition.onerror = function(event) {
+
+                recognition.onerror = function (event) {
                     console.error('Erreur reconnaissance vocale:', event.error);
                 };
-                recognition.onend = function() {
+
+                recognition.onend = function () {
                     isListening = false;
                     micBtn.classList.remove('listening');
                     micBtn.disabled = false;
@@ -697,28 +811,33 @@
             }, 100);
         }
 
-        // ✅ CORRIGÉ : comparaison exacte + filtrage strict
+        // ✅ CORRIGÉ : comparaison exacte en caractères
         function handleSpeechResult(userInput) {
             if (!currentQuestionData || awaitingNext) return;
 
-            const user = userInput.trim();
-            const correct = currentQuestionData.correct;
+            // 🔤 Afficher la transcription reconnue (même si c'est un caractère chinois)
+            voiceInstruction.textContent = `Vous avez dit : ${userInput}`;
 
-            // 🔍 Vérifier que c'est un chiffre valide (0-10)
+            // ✅ Filtrage strict : n'accepter que les caractères 0-10
+            const user = userInput.trim();
+            const correct = currentQuestionData.correct; // ← doit être le caractère chinois
+
             if (!VALID_NUMBERS.has(user)) {
+                setTimeout(() => { voiceInstruction.textContent = 'Ce n’est pas un chiffre valide.'; }, 800);
                 handleIncorrectAnswer();
                 return;
             }
 
-            // ✅ Comparaison exacte en caractères
             if (user === correct) {
+                setTimeout(() => { voiceInstruction.textContent = '✅ Correct !'; }, 300);
                 handleCorrectAnswer();
             } else {
+                setTimeout(() => { voiceInstruction.textContent = `❌ Ce n’est pas ${correct}.`; }, 800);
                 handleIncorrectAnswer();
             }
         }
 
-        // 🔁 Fonctions utilitaires (inchangées)
+        // 🔁 Fonctions utilitaires
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
@@ -812,6 +931,7 @@
             }
         }
 
+        // 🎮 Logique de jeu
         async function startGame() {
             if (gameCompleted) return;
             stopAllTimers();
@@ -839,7 +959,7 @@
             clearInterval(skipTimer);
             skipTimer = setInterval(() => {
                 remaining--;
-                if(remaining > 0) {
+                if (remaining > 0) {
                     skipBtn.textContent = `Passer (${remaining}s)`;
                 } else {
                     skipBtn.textContent = 'Passer';
@@ -926,7 +1046,7 @@
             stopListening();
             clearTimeout(timeoutId);
             clearInterval(skipTimer);
-            score++;
+            score++; // Point pour passage
             scoreDisplay.textContent = score;
             updateLives();
             updateStatsDisplayMobile();
@@ -943,6 +1063,7 @@
         }
 
         function updateLives() {
+            const total = levelConfig.lives;
             const hearts = livesDisplay.querySelectorAll('.heart');
             hearts.forEach((heart, i) => {
                 if (i < lives) {
@@ -1081,7 +1202,7 @@
             stopListening();
         }
 
-        // ✅ Événements micro
+        // ✅ Événements micro (inchangés)
         ['mousedown', 'mouseup', 'mouseleave'].forEach(event => {
             micBtn.addEventListener(event, (e) => {
                 e.preventDefault();
@@ -1103,9 +1224,11 @@
         restartBtn.addEventListener('click', () => { gameCompleted = false; startGame(); });
         homeBtn.addEventListener('click', handleBack);
 
+        // 🔐 Auth
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = 'index.html'; return; }
             window.currentUser = user;
+            const pseudo = localStorage.getItem('userPseudo') || user.email.split('@')[0];
             try {
                 const userRef = doc(db, 'users', user.uid);
                 const userDoc = await getDoc(userRef);
@@ -1124,5 +1247,5 @@
         });
     </script>
 </body>
-</html>
 
+</html>
