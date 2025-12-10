@@ -633,83 +633,145 @@
         let hidePinyinAfter30s = true;
         let hasSpoken = false; // Indicateur pour savoir si l'utilisateur a parlé
         let timeoutId = null; // Pour le timer de question
-        // Initialiser l'API Speech Recognition
+        // Initialiser l'API Speech Recognition avec gestion correcte des permissions
         function initSpeechRecognition() {
             if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 recognition = new SpeechRecognition();
                 recognition.continuous = false;
                 recognition.interimResults = false;
-                recognition.lang = 'zh-CN'; // Langue chinoise pour la reconnaissance
-
+                recognition.lang = 'zh-CN';
+                
+                recognition.onstart = function() {
+                    isListening = true;
+                    micBtn.classList.add('listening');
+                    voiceInstruction.textContent = 'En cours d\'écoute...';
+                    hasSpoken = false;
+                    console.log("Reconnaissance vocale démarrée");
+                };
+                
                 recognition.onresult = function(event) {
+                    if (!currentQuestionData || awaitingNext) return;
+                    
                     const transcript = event.results[0][0].transcript.trim().toLowerCase();
+                    console.log('Résultat reconnaissance:', transcript);
                     handleSpeechResult(transcript);
                 };
-
+                
                 recognition.onerror = function(event) {
                     console.error('Erreur reconnaissance vocale:', event.error);
-                    stopListening();
-                    // Si l'utilisateur n'a pas parlé, ne pas pénaliser
-                    if (!hasSpoken) {
-                        handleIncorrectAnswer();
-                    }
+                    // Ne pas pénaliser pour les erreurs techniques
+                    resetListeningState();
                 };
-
+                
                 recognition.onend = function() {
-                    if (isListening) {
-                        // Si on est toujours en mode écoute mais que l'API s'arrête, on réessaie
-                        recognition.start();
+                    console.log("Reconnaissance vocale arrêtée");
+                    resetListeningState();
+                    
+                    // Seulement si l'utilisateur n'a pas parlé ET que nous sommes toujours sur la même question
+                    if (!hasSpoken && !awaitingNext && currentQuestionData) {
+                        // On ne pénalise pas immédiatement - laisser un délai raisonnable
+                        setTimeout(() => {
+                            if (!hasSpoken && !awaitingNext) {
+                                console.log("Aucune parole détectée après autorisation");
+                                handleIncorrectAnswer();
+                            }
+                        }, 500);
                     }
                 };
             } else {
-                alert('Votre navigateur ne supporte pas la reconnaissance vocale. Veuillez utiliser Chrome ou un navigateur compatible.');
+                alert('Votre navigateur ne supporte pas la reconnaissance vocale. Veuillez utiliser Chrome.');
+                micBtn.disabled = true; // Désactiver le bouton si non supporté
             }
         }
-
-        // Démarrer l'écoute vocale
-        function startListening() {
-            if (!recognition || awaitingNext) return;
+        // Réinitialiser l'état d'écoute proprement
+        function resetListeningState() {
+            isListening = false;
+            micBtn.classList.remove('listening');
+            voiceInstruction.textContent = 'Appuyez sur le micro pour parler';
+        }
+        // Vérifier les permissions microphone AVANT de tenter d'écouter
+        async function checkMicrophonePermission() {
             try {
+                // Vérifier si l'accès au microphone est déjà autorisé
+                if (navigator.permissions) {
+                    const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+                    console.log('Statut permission microphone:', permissionStatus.state);
+                    
+                    if (permissionStatus.state === 'denied') {
+                        alert('L\'accès au microphone est bloqué. Veuillez l\'autoriser dans les paramètres de votre navigateur.');
+                        return false;
+                    }
+                }
+                
+                // Tester l'accès au microphone sans démarrer l'écoute
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                console.log('Accès microphone autorisé');
+                stream.getTracks().forEach(track => track.stop());
+                return true;
+            } catch (err) {
+                console.error('Erreur permission microphone:', err);
+                alert('Veuillez autoriser l\'accès au microphone pour utiliser cette fonctionnalité.');
+                return false;
+            }
+        }
+        // Démarrer l'écoute vocale - CORRIGÉ
+        async function startListening() {
+            if (awaitingNext || !recognition) return;
+            
+            // Vérifier les permissions avant de démarrer
+            const permissionGranted = await checkMicrophonePermission();
+            if (!permissionGranted) {
+                return;
+            }
+            
+            try {
+                console.log("Tentative de démarrage de l'écoute...");
                 recognition.start();
-                isListening = true;
-                micBtn.classList.add('listening');
-                voiceInstruction.textContent = 'En cours d\'écoute...';
-                hasSpoken = false; // Réinitialiser l'indicateur
+                // L'état "listening" sera géré dans onstart, pas ici
             } catch (e) {
                 console.error('Erreur démarrage reconnaissance:', e);
+                resetListeningState();
+                
+                // Essayer de récupérer après une erreur courante
+                if (e.name === 'NotAllowedError' || e.name === 'NotAllowedError') {
+                    alert('Veuillez autoriser l\'accès au microphone dans les paramètres de votre navigateur.');
+                }
             }
         }
-
-        // Arrêter l'écoute vocale
+        // Arrêter l'écoute vocale - CORRIGÉ
         function stopListening() {
             if (recognition && isListening) {
+                console.log("Arrêt forcé de l'écoute");
                 recognition.stop();
-                isListening = false;
-                micBtn.classList.remove('listening');
-                voiceInstruction.textContent = 'Appuyez sur le micro pour parler';
+                resetListeningState();
             }
         }
-
-        // Comparer la réponse vocale avec la bonne réponse
+        // Gérer le résultat de la reconnaissance - CORRIGÉ
         function handleSpeechResult(userInput) {
             if (!currentQuestionData || awaitingNext) return;
             
+            hasSpoken = true;
             stopListening();
-            hasSpoken = true; // Marquer que l'utilisateur a parlé
             
             // Nettoyer les entrées pour comparaison
             const correct = currentQuestionData.correct.toLowerCase().replace(/\s+/g, ' ');
             const user = userInput.toLowerCase().replace(/\s+/g, ' ');
             
-            // Vérifier si la réponse est correcte
-            if (user.includes(correct) || correct.includes(user) || Math.abs(correct.length - user.length) <= 2 && getSimilarity(correct, user) > 0.7) {
+            console.log('Comparaison:', { user, correct }); // Log pour debug
+            
+            // Vérifier si la réponse est correcte avec plus de tolérance
+            const similarity = getSimilarity(correct, user);
+            const isCorrect = similarity > 0.6 || user.includes(correct) || correct.includes(user);
+            
+            console.log('Similarité calculée:', similarity, 'Est correct:', isCorrect);
+            
+            if (isCorrect) {
                 handleCorrectAnswer();
             } else {
                 handleIncorrectAnswer();
             }
         }
-
         // Calculer la similarité entre deux chaînes
         function getSimilarity(s1, s2) {
             let longer = s1;
@@ -724,7 +786,6 @@
             }
             return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
         }
-
         function editDistance(s1, s2) {
             s1 = s1.toLowerCase();
             s2 = s2.toLowerCase();
@@ -750,7 +811,6 @@
             }
             return costs[s2.length];
         }
-
         // 🔁 Fonctions utilitaires
         function escapeHtml(text) {
             const div = document.createElement('div');
@@ -878,10 +938,8 @@
             if (awaitingNext) return;
             const q = getRandomQuestion();
             currentQuestionData = q;
-            
             // Afficher le caractère chinois
             numberDisplay.textContent = q.caractere;
-            
             // Afficher le pinyin pendant les 30 premières secondes
             if (timeLeft > 30) {
                 showPinyin(q.pinyin);
@@ -890,7 +948,6 @@
                 pinyinDisplay.textContent = '🙈';
                 hidePinyinAfter30s = false;
             }
-            
             // Mise à jour du timer pour gérer le changement pinyin/singe
             clearInterval(pinyinTimer);
             pinyinTimer = setInterval(() => {
@@ -900,31 +957,26 @@
                     hidePinyinAfter30s = false;
                 }
             }, 1000);
-            
             qTime = levelConfig.qTime;
             qTimerDisplay.textContent = qTime.toFixed(1);
             qTimerFill.style.width = '100%';
             qTimerFill.style.background = 'linear-gradient(90deg, #ff9b00, #ff4d2e, #b40000)';
             startQTimer();
         }
-        
         function handleCorrectAnswer() {
             if (awaitingNext) return;
             awaitingNext = true;
             stopListening();
             clearTimeout(timeoutId); // Arrêter le timer de question
-            
             score++;
             scoreDisplay.textContent = score;
             updateLives();
             updateStatsDisplayMobile();
-            
             // Afficher une indication visuelle de bonne réponse
             numberDisplay.style.color = '#9bc24f';
             setTimeout(() => {
                 numberDisplay.style.color = '#b40000';
             }, 1000);
-            
             // Pause de 1,9s avant la question suivante
             setTimeout(() => {
                 if (lives <= 0 || timeLeft <= 0) {
@@ -935,26 +987,21 @@
                 }
             }, 1900);
         }
-        
         function handleIncorrectAnswer() {
             if (awaitingNext) return;
             awaitingNext = true;
             stopListening();
             clearTimeout(timeoutId); // Arrêter le timer de question
-            
             lives = Math.max(0, lives - 1);
             wrongAnswers++;
-            
             scoreDisplay.textContent = score;
             updateLives();
             updateStatsDisplayMobile();
-            
             // Afficher une indication visuelle de mauvaise réponse
             numberDisplay.style.color = '#d35949';
             setTimeout(() => {
                 numberDisplay.style.color = '#b40000';
             }, 1000);
-            
             // Pause de 1,9s avant la question suivante
             setTimeout(() => {
                 if (lives <= 0 || timeLeft <= 0) {
@@ -965,7 +1012,6 @@
                 }
             }, 1900);
         }
-        
         function updateLives() {
             const total = levelConfig.lives;
             const hearts = livesDisplay.querySelectorAll('.heart');
@@ -1016,7 +1062,6 @@
             qTimerDisplay.textContent = qTime.toFixed(1);
             qTimerFill.style.width = '100%';
             qTimerFill.style.background = 'linear-gradient(90deg, #ff9b00, #ff4d2e, #b40000)';
-            
             // Utilisation de setTimeout au lieu de setInterval pour le timer de question
             timeoutId = setTimeout(() => {
                 // Si l'utilisateur n'a pas parlé, c'est une erreur
@@ -1110,12 +1155,18 @@
             clearTimeout(timeoutId);
             stopListening();
         }
-        // Événement du bouton micro
-        micBtn.addEventListener('click', () => {
+        // Événement du bouton micro - CORRIGÉ
+        micBtn.addEventListener('click', async () => {
             if (isListening) {
                 stopListening();
             } else {
-                startListening();
+                // Désactiver temporairement le bouton pour éviter les clics multiples
+                micBtn.disabled = true;
+                await startListening();
+                // Réactiver après un court délai
+                setTimeout(() => {
+                    micBtn.disabled = false;
+                }, 300);
             }
         });
         // 🔄 Navigation
