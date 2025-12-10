@@ -631,6 +631,8 @@
         let isListening = false;
         let pinyinTimer = null;
         let hidePinyinAfter30s = true;
+        let hasSpoken = false; // Indicateur pour savoir si l'utilisateur a parlé
+        let timeoutId = null; // Pour le timer de question
         // Initialiser l'API Speech Recognition
         function initSpeechRecognition() {
             if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -648,8 +650,10 @@
                 recognition.onerror = function(event) {
                     console.error('Erreur reconnaissance vocale:', event.error);
                     stopListening();
-                    // On considère comme une mauvaise réponse
-                    handleIncorrectAnswer();
+                    // Si l'utilisateur n'a pas parlé, ne pas pénaliser
+                    if (!hasSpoken) {
+                        handleIncorrectAnswer();
+                    }
                 };
 
                 recognition.onend = function() {
@@ -665,12 +669,13 @@
 
         // Démarrer l'écoute vocale
         function startListening() {
-            if (!recognition) return;
+            if (!recognition || awaitingNext) return;
             try {
                 recognition.start();
                 isListening = true;
                 micBtn.classList.add('listening');
                 voiceInstruction.textContent = 'En cours d\'écoute...';
+                hasSpoken = false; // Réinitialiser l'indicateur
             } catch (e) {
                 console.error('Erreur démarrage reconnaissance:', e);
             }
@@ -691,6 +696,7 @@
             if (!currentQuestionData || awaitingNext) return;
             
             stopListening();
+            hasSpoken = true; // Marquer que l'utilisateur a parlé
             
             // Nettoyer les entrées pour comparaison
             const correct = currentQuestionData.correct.toLowerCase().replace(/\s+/g, ' ');
@@ -906,8 +912,7 @@
             if (awaitingNext) return;
             awaitingNext = true;
             stopListening();
-            // Arrêter uniquement le timer de question
-            clearInterval(qTimerInterval);
+            clearTimeout(timeoutId); // Arrêter le timer de question
             
             score++;
             scoreDisplay.textContent = score;
@@ -935,8 +940,7 @@
             if (awaitingNext) return;
             awaitingNext = true;
             stopListening();
-            // Arrêter uniquement le timer de question
-            clearInterval(qTimerInterval);
+            clearTimeout(timeoutId); // Arrêter le timer de question
             
             lives = Math.max(0, lives - 1);
             wrongAnswers++;
@@ -1006,34 +1010,24 @@
             }, 1000);
         }
         function startQTimer() {
-            clearInterval(qTimerInterval);
+            clearTimeout(timeoutId); // Nettoyer l'ancien timer
             const start = levelConfig.qTime;
             qTime = start;
             qTimerDisplay.textContent = qTime.toFixed(1);
             qTimerFill.style.width = '100%';
             qTimerFill.style.background = 'linear-gradient(90deg, #ff9b00, #ff4d2e, #b40000)';
-            qTimerInterval = setInterval(() => {
-                qTime -= 0.1;
-                qTimerDisplay.textContent = qTime.toFixed(1);
-                const pct = Math.max(0, qTime / start) * 100;
-                qTimerFill.style.width = pct + '%';
-                if (qTime <= 0) {
-                    clearInterval(qTimerInterval);
-                    stopListening();
-                    lives = Math.max(0, lives - 1);
-                    wrongAnswers++;
-                    scoreDisplay.textContent = score;
-                    updateLives();
-                    updateStatsDisplayMobile();
-                    setTimeout(() => {
-                        if (lives <= 0 || timeLeft <= 0) endGame();
-                        else { 
-                            awaitingNext = false;
-                            generateQuestion(); 
-                        }
-                    }, 1900); // Pause de 1,9s entre les questions
+            
+            // Utilisation de setTimeout au lieu de setInterval pour le timer de question
+            timeoutId = setTimeout(() => {
+                // Si l'utilisateur n'a pas parlé, c'est une erreur
+                if (!hasSpoken) {
+                    handleIncorrectAnswer();
                 }
-            }, 100);
+                // Si l'utilisateur a parlé, on attend la fin de la réponse
+                else {
+                    // Ne rien faire, la réponse a été traitée
+                }
+            }, qTime * 1000);
         }
         async function endGame() {
             if (gameCompleted) return;
@@ -1112,8 +1106,8 @@
         }
         function stopAllTimers() {
             clearInterval(timerInterval);
-            clearInterval(qTimerInterval);
             clearInterval(pinyinTimer);
+            clearTimeout(timeoutId);
             stopListening();
         }
         // Événement du bouton micro
