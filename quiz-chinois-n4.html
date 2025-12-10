@@ -146,6 +146,9 @@
             font-size: 3em;
             transition: 0.3s ease;
             box-shadow: 0 0 12px rgba(210, 60, 20, 0.2);
+            position: relative;
+            z-index: 10;
+            touch-action: manipulation; /* Permet la manipulation tactile sur mobile */
         }
         .mic-btn:hover {
             transform: scale(1.05);
@@ -633,220 +636,102 @@
         let hidePinyinAfter30s = true;
         let hasSpoken = false; // Indicateur pour savoir si l'utilisateur a parlé
         let timeoutId = null; // Pour le timer de question
-        
-        // 🔧 NOUVELLE FONCTION : Détection appareil mobile
-        function isMobileDevice() {
-            return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        }
-        
-        // 🔧 NOUVELLE FONCTION : Vérification préalable des capacités
-        async function checkDeviceCapabilities() {
-            try {
-                // Vérifier si on est en contexte sécurisé
-                if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-                    alert('⚠️ Pour utiliser le microphone, ce site doit être consulté en HTTPS ou en local (localhost).');
-                    return false;
-                }
-                
-                // Vérifier la présence de l'API SpeechRecognition
-                if (!('webkitSpeechRecognition' in window)) {
-                    alert('⚠️ Votre appareil ne supporte pas la reconnaissance vocale. Essayez avec Chrome sur Android ou Safari sur iOS.');
-                    return false;
-                }
-                
-                return true;
-            } catch (error) {
-                console.error('Erreur vérification capacités:', error);
-                alert('⚠️ Problème technique avec votre appareil. Veuillez réessayer plus tard.');
-                return false;
-            }
-        }
-        
-        // 🔧 FONCTION CORRIGÉE : Initialisation SpeechRecognition
+        // ✅ Initialisation fiable de SpeechRecognition (uniquement webkit)
         function initSpeechRecognition() {
-            if (!('webkitSpeechRecognition' in window)) {
-                console.warn('SpeechRecognition non supporté');
-                return;
-            }
-            
-            try {
+            if ('webkitSpeechRecognition' in window) {
                 const SpeechRecognition = window.webkitSpeechRecognition;
                 recognition = new SpeechRecognition();
                 recognition.continuous = false;
                 recognition.interimResults = false;
                 recognition.lang = 'zh-CN';
-                recognition.maxAlternatives = 1;
-                
                 recognition.onstart = function() {
-                    console.log('🔊 Reconnaissance vocale DÉMARRÉE');
                     isListening = true;
                     hasSpoken = false;
                     micBtn.classList.add('listening');
-                    voiceInstruction.textContent = 'Écoute active...';
-                    micBtn.disabled = true; // Désactiver pendant l'écoute
-                    
-                    // Sur mobile, montrer un indicateur plus visible
-                    if (isMobileDevice()) {
-                        voiceInstruction.style.fontSize = '1.3em';
-                        voiceInstruction.style.fontWeight = 'bold';
-                    }
+                    voiceInstruction.textContent = 'En cours d\'écoute...';
                 };
-                
                 recognition.onresult = function(event) {
-                    console.log('🎤 Résultat reçu');
-                    if (awaitingNext || !currentQuestionData) {
-                        console.log('⚠️ Résultat ignoré: game state incorrect');
-                        return;
-                    }
-                    
+                    if (!currentQuestionData || awaitingNext) return;
                     const transcript = event.results[0][0].transcript.trim().toLowerCase();
-                    console.log('📝 Texte reconnu:', transcript);
                     handleSpeechResult(transcript);
                 };
-                
                 recognition.onerror = function(event) {
-                    console.error('❌ Erreur reconnaissance vocale:', event.error);
-                    isListening = false;
-                    micBtn.disabled = false;
-                    
-                    // Gestion spécifique des erreurs courantes sur mobile
-                    if (event.error === 'audio-capture') {
-                        alert('Impossible d\'accéder au microphone. Veuillez vérifier les autorisations dans les paramètres de votre appareil.');
-                    } else if (event.error === 'not-allowed') {
-                        alert('Autorisation microphone refusée. Veuillez activer le microphone pour ce site dans les paramètres de votre navigateur.');
-                    } else if (event.error === 'network') {
-                        alert('Problème de connexion internet. Vérifiez votre connexion et réessayez.');
-                    }
-                    
-                    resetListeningState();
-                };
-                
-                recognition.onend = function() {
-                    console.log('🔇 Reconnaissance vocale TERMINÉE');
-                    resetListeningState();
-                    
-                    // Si aucune parole détectée après 2.5s, considérer comme réponse incorrecte
+                    console.error('Erreur reconnaissance vocale:', event.error);
+                    stopListening();
+                    // Ne pénalise pas si l'utilisateur n'a pas parlé (erreur technique)
                     if (!hasSpoken && !awaitingNext && currentQuestionData) {
                         setTimeout(() => {
                             if (!hasSpoken && !awaitingNext && currentQuestionData) {
-                                console.log('🔇 Aucune parole détectée après 2.5s');
                                 handleIncorrectAnswer();
                             }
-                        }, 2500);
+                        }, 500);
                     }
                 };
-            } catch (e) {
-                console.error('💥 Erreur initialisation SpeechRecognition:', e);
-                alert('⚠️ Impossible d\'initialiser la reconnaissance vocale. Veuillez utiliser la dernière version de Chrome.');
+                recognition.onend = function() {
+                    stopListening();
+                    // Si aucune parole détectée après l'arrêt, pénaliser après délai
+                    if (!hasSpoken && !awaitingNext && currentQuestionData) {
+                        setTimeout(() => {
+                            if (!hasSpoken && !awaitingNext && currentQuestionData) {
+                                handleIncorrectAnswer();
+                            }
+                        }, 1000);
+                    }
+                };
+            } else {
+                alert('Votre navigateur ne supporte pas la reconnaissance vocale. Veuillez utiliser Google Chrome.');
                 micBtn.disabled = true;
             }
         }
-        
-        // 🔧 NOUVELLE FONCTION : Réinitialisation propre de l'état
-        function resetListeningState() {
+        function stopListening() {
+            if (recognition && isListening) {
+                try {
+                    recognition.stop();
+                } catch (e) {
+                    console.warn('Erreur lors de l\'arrêt de la reconnaissance:', e);
+                }
+            }
             isListening = false;
             micBtn.classList.remove('listening');
-            micBtn.disabled = false; // Réactiver le bouton
+            micBtn.disabled = false;
             voiceInstruction.textContent = 'Appuyez sur le micro pour parler';
-            
-            // S'assurer que l'API est bien arrêtée
-            try {
-                if (recognition) {
-                    recognition.stop();
-                }
-            } catch (e) {
-                console.log('ℹ️ Arrêt de la reconnaissance sans erreur');
-            }
         }
-        
-        // 🔧 FONCTION CORRIGÉE : Démarrer l'écoute
         async function startListening() {
-            if (awaitingNext || !recognition || isListening) {
-                console.log('🚫 Écoute impossible: awaitingNext=' + awaitingNext + ', isListening=' + isListening);
-                return;
-            }
-            
-            console.log('🔍 Vérification permissions microphone...');
-            
+            if (awaitingNext || !recognition || isListening) return;
+            // Vérifier l'accès au microphone
             try {
-                // Sur mobile, on doit absolument avoir une interaction utilisateur directe
-                if (isMobileDevice()) {
-                    console.log('📱 Mode appareil mobile détecté');
-                    
-                    // Vérifier les permissions existantes
-                    if (navigator.permissions) {
-                        const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
-                        console.log('📱 Statut permission microphone:', permissionStatus.state);
-                        
-                        if (permissionStatus.state === 'denied') {
-                            alert('📱 Le microphone est bloqué pour ce site. Allez dans les paramètres de votre navigateur pour l\'autoriser.');
-                            return;
-                        }
-                    }
-                    
-                    // Tester l'accès au microphone avec une méthode mobile-friendly
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    console.log('✅ Accès microphone mobile autorisé');
-                    stream.getTracks().forEach(track => track.stop());
-                }
-                
-                console.log('🎤 Démarrage reconnaissance vocale...');
-                resetListeningState(); // S'assurer d'un état propre
-                
-                // Utiliser un délai minimal pour permettre au navigateur de traiter l'interaction utilisateur
-                setTimeout(() => {
-                    try {
-                        recognition.start();
-                        // L'état sera mis à jour dans onstart
-                    } catch (e) {
-                        console.error('💥 Erreur démarrage immédiat:', e);
-                        resetListeningState();
-                    }
-                }, 100);
-                
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                stream.getTracks().forEach(track => track.stop());
             } catch (err) {
-                console.error('💥 Erreur permissions microphone:', err);
-                if (err.name === 'NotAllowedError') {
-                    alert('📱 Veuillez autoriser l\'accès au microphone quand le navigateur le demande.');
-                } else if (err.name === 'NotFoundError') {
-                    alert('📱 Aucun microphone trouvé sur votre appareil.');
-                } else {
-                    alert('📱 Erreur technique: ' + (err.message || 'Impossible d\'accéder au microphone'));
-                }
-                resetListeningState();
-            }
-        }
-        
-        // 🔧 FONCTION CORRIGÉE : Gestion résultat vocal
-        function handleSpeechResult(userInput) {
-            if (!currentQuestionData || awaitingNext) {
-                console.log('🚫 Résultat ignoré: état jeu incorrect');
+                console.error('Erreur accès microphone:', err);
+                alert('Veuillez autoriser l\'accès au microphone dans les paramètres de votre navigateur.');
                 return;
             }
-            
-            stopListening();
+            micBtn.disabled = true;
+            setTimeout(() => {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error('Erreur démarrage reconnaissance:', e);
+                    stopListening();
+                }
+            }, 100);
+        }
+        function handleSpeechResult(userInput) {
+            if (!currentQuestionData || awaitingNext) return;
             hasSpoken = true;
-            
-            // Nettoyer les entrées
+            stopListening();
             const correct = currentQuestionData.correct.toLowerCase().replace(/\s+/g, ' ').trim();
             const user = userInput.toLowerCase().replace(/\s+/g, ' ').trim();
-            
-            console.log('🔍 Comparaison:', { user: user, correct: correct });
-            
-            // Calcul de similarité plus robuste pour mobile
             const similarity = getSimilarity(correct, user);
             const isCorrect = similarity > 0.65 || user.includes(correct) || correct.includes(user);
-            
-            console.log('📊 Similarité:', similarity.toFixed(2), 'Est correct:', isCorrect);
-            
             if (isCorrect) {
                 handleCorrectAnswer();
             } else {
                 handleIncorrectAnswer();
             }
         }
-        
-        // Calculer la similarité entre deux chaînes
+        // Calcul de similarité
         function getSimilarity(s1, s2) {
             let longer = s1;
             let shorter = s2;
@@ -855,9 +740,7 @@
                 shorter = s1;
             }
             const longerLength = longer.length;
-            if (longerLength === 0) {
-                return 1.0;
-            }
+            if (longerLength === 0) return 1.0;
             return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
         }
         function editDistance(s1, s2) {
@@ -867,25 +750,21 @@
             for (let i = 0; i <= s1.length; i++) {
                 let lastValue = i;
                 for (let j = 0; j <= s2.length; j++) {
-                    if (i === 0)
-                        costs[j] = j;
+                    if (i === 0) costs[j] = j;
                     else {
                         if (j > 0) {
                             let newValue = costs[j - 1];
                             if (s1.charAt(i - 1) !== s2.charAt(j - 1))
-                                newValue = Math.min(Math.min(newValue, lastValue),
-                                    costs[j]) + 1;
+                                newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
                             costs[j - 1] = lastValue;
                             lastValue = newValue;
                         }
                     }
                 }
-                if (i > 0)
-                    costs[s2.length] = lastValue;
+                if (i > 0) costs[s2.length] = lastValue;
             }
             return costs[s2.length];
         }
-        
         // 🔁 Fonctions utilitaires
         function escapeHtml(text) {
             const div = document.createElement('div');
@@ -984,15 +863,6 @@
         // 🎮 Logique de jeu
         async function startGame() {
             if (gameCompleted) return;
-            
-            // Vérification préalable des capacités
-            const canProceed = await checkDeviceCapabilities();
-            if (!canProceed) {
-                // Bloquer le jeu si les capacités ne sont pas suffisantes
-                alert('⚠️ Ce quiz nécessite la reconnaissance vocale. Veuillez utiliser un appareil compatible.');
-                return;
-            }
-            
             stopAllTimers();
             score = 0; lives = levelConfig.lives; timeLeft = levelConfig.time; qTime = levelConfig.qTime;
             wrongAnswers = 0;
@@ -1022,9 +892,7 @@
             if (awaitingNext) return;
             const q = getRandomQuestion();
             currentQuestionData = q;
-            // Afficher le caractère chinois
             numberDisplay.textContent = q.caractere;
-            // Afficher le pinyin pendant les 30 premières secondes
             if (timeLeft > 30) {
                 showPinyin(q.pinyin);
                 hidePinyinAfter30s = true;
@@ -1032,7 +900,6 @@
                 pinyinDisplay.textContent = '🙈';
                 hidePinyinAfter30s = false;
             }
-            // Mise à jour du timer pour gérer le changement pinyin/singe
             clearInterval(pinyinTimer);
             pinyinTimer = setInterval(() => {
                 if(timeLeft === 30) {
@@ -1051,17 +918,15 @@
             if (awaitingNext) return;
             awaitingNext = true;
             stopListening();
-            clearTimeout(timeoutId); // Arrêter le timer de question
+            clearTimeout(timeoutId);
             score++;
             scoreDisplay.textContent = score;
             updateLives();
             updateStatsDisplayMobile();
-            // Afficher une indication visuelle de bonne réponse
             numberDisplay.style.color = '#9bc24f';
             setTimeout(() => {
                 numberDisplay.style.color = '#b40000';
             }, 1000);
-            // Pause de 1,9s avant la question suivante
             setTimeout(() => {
                 if (lives <= 0 || timeLeft <= 0) {
                     endGame();
@@ -1075,18 +940,16 @@
             if (awaitingNext) return;
             awaitingNext = true;
             stopListening();
-            clearTimeout(timeoutId); // Arrêter le timer de question
+            clearTimeout(timeoutId);
             lives = Math.max(0, lives - 1);
             wrongAnswers++;
             scoreDisplay.textContent = score;
             updateLives();
             updateStatsDisplayMobile();
-            // Afficher une indication visuelle de mauvaise réponse
             numberDisplay.style.color = '#d35949';
             setTimeout(() => {
                 numberDisplay.style.color = '#b40000';
             }, 1000);
-            // Pause de 1,9s avant la question suivante
             setTimeout(() => {
                 if (lives <= 0 || timeLeft <= 0) {
                     endGame();
@@ -1121,7 +984,6 @@
             timerDisplay.textContent = timeLeft;
             timerFill.style.width = (timeLeft / levelConfig.time * 100) + '%';
             timerInterval = setInterval(() => {
-                // Ne pas décrémenter si on est en pause entre les questions
                 if (awaitingNext) return;
                 timeLeft--;
                 timerDisplay.textContent = timeLeft;
@@ -1140,23 +1002,22 @@
             }, 1000);
         }
         function startQTimer() {
-            clearTimeout(timeoutId); // Nettoyer l'ancien timer
-            const start = levelConfig.qTime;
-            qTime = start;
-            qTimerDisplay.textContent = qTime.toFixed(1);
+            clearTimeout(timeoutId);
+            let timeLeftQuestion = levelConfig.qTime;
+            qTimerDisplay.textContent = timeLeftQuestion.toFixed(1);
             qTimerFill.style.width = '100%';
-            qTimerFill.style.background = 'linear-gradient(90deg, #ff9b00, #ff4d2e, #b40000)';
-            // Utilisation de setTimeout au lieu de setInterval pour le timer de question
-            timeoutId = setTimeout(() => {
-                // Si l'utilisateur n'a pas parlé, c'est une erreur
-                if (!hasSpoken) {
-                    handleIncorrectAnswer();
+            timeoutId = setInterval(() => {
+                timeLeftQuestion -= 0.1;
+                if (timeLeftQuestion <= 0) {
+                    clearInterval(timeoutId);
+                    if (!hasSpoken && !awaitingNext && currentQuestionData) {
+                        handleIncorrectAnswer();
+                    }
+                    return;
                 }
-                // Si l'utilisateur a parlé, on attend la fin de la réponse
-                else {
-                    // Ne rien faire, la réponse a été traitée
-                }
-            }, qTime * 1000);
+                qTimerDisplay.textContent = timeLeftQuestion.toFixed(1);
+                qTimerFill.style.width = (timeLeftQuestion / levelConfig.qTime * 100) + '%';
+            }, 100);
         }
         async function endGame() {
             if (gameCompleted) return;
@@ -1183,7 +1044,6 @@
             if (Math.floor(themeScore / 50) > Math.floor(oldTheme / 50)) {
                 document.getElementById('level-up-msg').classList.remove('hidden');
             }
-            // ✅ Gestion du score parfait
             let perfectAchieved = false;
             if (score >= SCORE_PARFAIT_N4 && window.currentUser?.uid) {
                 const userRef = doc(db, 'users', window.currentUser.uid);
@@ -1195,11 +1055,9 @@
                     perfectAchieved = true;
                 }
             }
-            // Affichage message score parfait
             if (perfectAchieved) {
                 perfectScoreMsg.classList.remove('hidden');
             }
-            // Gestion déverrouillage niveau 5
             let unlocked = false;
             if (score >= SCORE_REQUIS_N5 && window.currentUser?.uid) {
                 const userRef = doc(db, 'users', window.currentUser.uid);
@@ -1236,29 +1094,27 @@
         function stopAllTimers() {
             clearInterval(timerInterval);
             clearInterval(pinyinTimer);
-            clearTimeout(timeoutId);
-            resetListeningState();
+            clearInterval(timeoutId);
+            stopListening();
         }
-        // Événement du bouton micro
-        micBtn.addEventListener('click', function(e) {
-            // Empêcher le comportement par défaut (important sur mobile)
+        // ✅ Événement du bouton micro avec prévention des clics fantômes
+        micBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            
             if (isListening) {
-                console.log('✋ Arrêt forcé de l\'écoute');
-                resetListeningState();
+                stopListening();
             } else {
-                console.log('👆 Clic utilisateur détecté - tentative d\'écoute');
                 startListening();
             }
         });
-        
-        // Ajouter un gestionnaire pour les événements tactiles
-        micBtn.addEventListener('touchstart', function(e) {
-            e.preventDefault(); // Empêcher le scroll sur mobile
+        micBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (isListening) {
+                stopListening();
+            } else {
+                startListening();
+            }
         });
-        
         // 🔄 Navigation
         mobileBackBtn.addEventListener('click', handleBack);
         restartBtn.addEventListener('click', () => {
@@ -1274,7 +1130,6 @@
             }
             window.currentUser = user;
             const pseudo = localStorage.getItem('userPseudo') || user.email.split('@')[0];
-            // Sauvegarde locale
             try {
                 const userRef = doc(db, 'users', user.uid);
                 const userDoc = await getDoc(userRef);
@@ -1286,16 +1141,12 @@
                 const userData = userDoc.data();
                 const globalScore = userData.globalScore ?? 0;
                 const niveauChinois = (userData.niveaux?.[THEME]) ?? 0;
-                // ✅ Vérifications obligatoires avant de lancer le quiz
-                if (globalScore < 0 || niveauChinois < 4) { // Niveau 4 requis
+                if (globalScore < 0 || niveauChinois < 4) {
                     console.warn("Accès refusé : globalScore < 0 ou niveaux.chinois < 4");
                     window.location.href = 'index.html';
                     return;
                 }
-                // Met à jour l'UI
-                // Sauvegarde locale
                 localStorage.setItem('globalScore', globalScore.toString());
-                // ✅ Tout est OK → initialiser l'API vocale et lancer le quiz
                 initSpeechRecognition();
                 startGame();
             } catch (error) {
