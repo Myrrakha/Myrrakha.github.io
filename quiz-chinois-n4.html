@@ -457,6 +457,17 @@
         #perfect-score-msg {
             font-family: "Noto Serif SC", serif;
         }
+        .valid-numbers-hint {
+            font-size: 0.8em;
+            color: #b40000;
+            margin-top: 5px;
+            text-align: center;
+            padding: 5px 10px;
+            background: rgba(255, 240, 230, 0.7);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+        }
     </style>
 </head>
 <body>
@@ -473,6 +484,9 @@
                     <button id="mic-btn" class="mic-btn">🎤</button>
                     <div id="voice-instruction" class="voice-instruction">Maintenez le micro pour parler</div>
                 </div>
+            </div>
+            <div class="valid-numbers-hint">
+                <small>🔢 Nombres valides: 零(líng) 一(yī) 二(èr) 三(sān) 四(sì) 五(wǔ) 六(liù) 七(qī) 八(bā) 九(jiǔ) 十(shí)</small>
             </div>
             <div id="timers-container">
                 <div id="timer-bar-container">
@@ -560,21 +574,11 @@
             { nombre: 8, caractere: "八", pinyin: "bā" },
             { nombre: 9, caractere: "九", pinyin: "jiǔ" },
             { nombre: 10, caractere: "十", pinyin: "shí" },
-            { nombre: 11, caractere: "十一", pinyin: "shí yī" },
-            { nombre: 12, caractere: "十二", pinyin: "shí èr" },
-            { nombre: 13, caractere: "十三", pinyin: "shí sān" },
-            { nombre: 14, caractere: "十四", pinyin: "shí sì" },
-            { nombre: 15, caractere: "十五", pinyin: "shí wǔ" },
-            { nombre: 16, caractere: "十六", pinyin: "shí liù" },
-            { nombre: 17, caractere: "十七", pinyin: "shí qī" },
-            { nombre: 18, caractere: "十八", pinyin: "shí bā" },
-            { nombre: 19, caractere: "十九", pinyin: "shí jiǔ" },
-            { nombre: 20, caractere: "二十", pinyin: "èr shí" }
         ];
         // Générer les questions pour N4 (prononciation)
         const QUESTIONS = NOMBRES_CHINOIS.map(num => ({
             question: `Prononcez ce nombre : ${num.caractere}`,
-            correct: num.pinyin,
+            correct: num.caractere,
             caractere: num.caractere,
             pinyin: num.pinyin
         }));
@@ -635,7 +639,56 @@
         let timeoutId = null; // Pour le timer de question
         let skipTimer = null; // Pour le timer du bouton passer
         let finalTranscript = null; // Pour stocker le dernier résultat final
-        
+
+        // Fonction pour normaliser et filtrer les nombres chinois
+        function normalizeChineseNumber(input) {
+            // Tableau des variations possibles pour chaque nombre
+            const numberVariations = {
+                "零": ["ling", "lin", "linh", "linh1", "zero", "0", "ling2"],
+                "一": ["yi", "yī", "y1", "i", "1", "un", "une", "yee"],
+                "二": ["er", "èr", "erh", "er2", "2", "deux"],
+                "三": ["san", "sān", "san1", "3", "trois"],
+                "四": ["si", "sì", "s4", "4", "quatre"],
+                "五": ["wu", "wǔ", "u", "5", "cinq"],
+                "六": ["liu", "liù", "liou", "liu4", "6", "six", "lyou"],
+                "七": ["qi", "qī", "chi", "ki", "7", "sept", "chee", "chi1"],
+                "八": ["ba", "bā", "pa", "8", "huit", "ba1"],
+                "九": ["jiu", "jiǔ", "kiou", "kiu", "9", "neuf", "jyo", "jyo3"],
+                "十": ["shi", "shí", "ch1", "10", "dix", "shr", "sh2"]
+            };
+            
+            // Normaliser l'entrée : minuscules, suppression des espaces et caractères non alphabétiques
+            const normalizedInput = input.toLowerCase().replace(/[^a-z0-9]/g, '');
+            
+            // Rechercher la meilleure correspondance parmi les nombres valides
+            let bestMatch = null;
+            let highestScore = 0;
+            
+            // Parcourir tous les nombres chinois valides
+            Object.entries(numberVariations).forEach(([character, variations]) => {
+                // Vérifier si l'entrée correspond directement à l'un des caractères
+                if (normalizedInput.includes(character.toLowerCase())) {
+                    bestMatch = character;
+                    return;
+                }
+                
+                // Vérifier les variations
+                variations.forEach(variation => {
+                    const normalizedVariation = variation.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    // Score de correspondance simple
+                    const score = normalizedInput.includes(normalizedVariation) ? 
+                                 (normalizedVariation.length / normalizedInput.length) : 0;
+                    
+                    if (score > highestScore) {
+                        highestScore = score;
+                        bestMatch = character;
+                    }
+                });
+            });
+            
+            return bestMatch;
+        }
+
         // ✅ Initialisation fiable de SpeechRecognition (uniquement webkit)
         function initSpeechRecognition() {
             if ('webkitSpeechRecognition' in window) {
@@ -644,7 +697,6 @@
                 recognition.continuous = true; // Toujours actif pendant le maintien
                 recognition.interimResults = true; // Pour capturer les résultats intermédiaires
                 recognition.lang = 'zh-CN';
-                
                 recognition.onstart = function() {
                     isListening = true;
                     hasSpoken = false;
@@ -652,7 +704,6 @@
                     micBtn.classList.add('listening');
                     voiceInstruction.textContent = 'En cours d\'écoute...';
                 };
-                
                 recognition.onresult = function(event) {
                     if (!currentQuestionData || awaitingNext) return;
                     // On stocke le dernier résultat final pour le traitement au relâchement
@@ -663,18 +714,15 @@
                         }
                     }
                 };
-                
                 recognition.onerror = function(event) {
                     console.error('Erreur reconnaissance vocale:', event.error);
                     // On ne fait rien ici, on laisse le processus se terminer normalement
                 };
-                
                 recognition.onend = function() {
                     isListening = false;
                     micBtn.classList.remove('listening');
                     micBtn.disabled = false;
                     voiceInstruction.textContent = 'Maintenez le micro pour parler';
-                    
                     // Traiter le dernier résultat final au moment où la reconnaissance s'arrête
                     if (finalTranscript && currentQuestionData && !awaitingNext) {
                         handleSpeechResult(finalTranscript);
@@ -687,7 +735,6 @@
                 micBtn.disabled = true;
             }
         }
-        
         function stopListening() {
             if (recognition && isListening) {
                 try {
@@ -697,10 +744,8 @@
                 }
             }
         }
-        
         async function startListening() {
             if (awaitingNext || !recognition || isListening) return;
-            
             // Vérifier l'accès au microphone
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -710,10 +755,8 @@
                 alert('Veuillez autoriser l\'accès au microphone dans les paramètres de votre navigateur.');
                 return;
             }
-            
             micBtn.disabled = true;
             finalTranscript = null; // Réinitialiser le dernier résultat
-            
             setTimeout(() => {
                 try {
                     recognition.start();
@@ -723,55 +766,37 @@
                 }
             }, 100);
         }
-        
         function handleSpeechResult(userInput) {
             if (!currentQuestionData || awaitingNext) return;
             
-            const correct = currentQuestionData.correct.toLowerCase().replace(/\s+/g, ' ').trim();
-            const user = userInput.toLowerCase().replace(/\s+/g, ' ').trim();
-            const similarity = getSimilarity(correct, user);
-            const isCorrect = similarity > 0.65 || user.includes(correct) || correct.includes(user);
+            // Normaliser et filtrer l'entrée pour ne garder que les nombres valides
+            const recognizedNumber = normalizeChineseNumber(userInput);
+            
+            // Si aucun nombre valide n'est reconnu
+            if (!recognizedNumber) {
+                voiceInstruction.textContent = '⚠️ Je n\'ai pas reconnu un nombre valide';
+                setTimeout(() => {
+                    if (!awaitingNext) voiceInstruction.textContent = 'Maintenez le micro pour parler';
+                }, 2000);
+                handleIncorrectAnswer();
+                return;
+            }
+            
+            // Comparer avec la réponse attendue
+            const correctCharacter = currentQuestionData.caractere;
+            const isCorrect = recognizedNumber === correctCharacter;
+            
+            // Feedback visuel amélioré
+            voiceInstruction.textContent = `J'ai entendu : ${recognizedNumber}`;
+            setTimeout(() => {
+                if (!awaitingNext) voiceInstruction.textContent = 'Maintenez le micro pour parler';
+            }, 1500);
             
             if (isCorrect) {
                 handleCorrectAnswer();
             } else {
                 handleIncorrectAnswer();
             }
-        }
-        
-        // Calcul de similarité
-        function getSimilarity(s1, s2) {
-            let longer = s1;
-            let shorter = s2;
-            if (s1.length < s2.length) {
-                longer = s2;
-                shorter = s1;
-            }
-            const longerLength = longer.length;
-            if (longerLength === 0) return 1.0;
-            return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
-        }
-        function editDistance(s1, s2) {
-            s1 = s1.toLowerCase();
-            s2 = s2.toLowerCase();
-            const costs = new Array();
-            for (let i = 0; i <= s1.length; i++) {
-                let lastValue = i;
-                for (let j = 0; j <= s2.length; j++) {
-                    if (i === 0) costs[j] = j;
-                    else {
-                        if (j > 0) {
-                            let newValue = costs[j - 1];
-                            if (s1.charAt(i - 1) !== s2.charAt(j - 1))
-                                newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
-                            costs[j - 1] = lastValue;
-                            lastValue = newValue;
-                        }
-                    }
-                }
-                if (i > 0) costs[s2.length] = lastValue;
-            }
-            return costs[s2.length];
         }
         // 🔁 Fonctions utilitaires
         function escapeHtml(text) {
@@ -1166,7 +1191,6 @@
                 startListening();
             }
         });
-        
         micBtn.addEventListener('mouseup', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -1174,14 +1198,12 @@
                 stopListening();
             }
         });
-        
         micBtn.addEventListener('mouseleave', (e) => {
             // Si la souris quitte le bouton pendant qu'il est pressé, on arrête l'écoute
             if (isListening) {
                 stopListening();
             }
         });
-        
         // Pour la gestion tactile
         micBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
@@ -1189,14 +1211,12 @@
                 startListening();
             }
         });
-        
         micBtn.addEventListener('touchend', (e) => {
             e.preventDefault();
             if (isListening) {
                 stopListening();
             }
         });
-        
         // ✅ Événement du bouton passer
         skipBtn.addEventListener('click', handleSkip);
         // 🔄 Navigation
