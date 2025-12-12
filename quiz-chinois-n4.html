@@ -650,7 +650,7 @@
         let skipTimer = null; // Pour le timer du bouton passer
         let finalTranscript = null; // Pour stocker le dernier résultat final
 
-        // Fonction pour normaliser et filtrer les nombres chinois
+        // Fonction pour normaliser et filtrer les nombres chinois (RESTAURÉE)
         function normalizeChineseNumber(input) {
             // Tableau des variations possibles pour chaque nombre
             const numberVariations = {
@@ -855,6 +855,7 @@
             }, 100);
         }
         
+        // Fonction pour gérer le résultat de la reconnaissance vocale (CORRIGÉE)
         function handleSpeechResult(userInput) {
             if (!currentQuestionData || awaitingNext) return;
             
