@@ -650,140 +650,97 @@
         let skipTimer = null; // Pour le timer du bouton passer
         let finalTranscript = null; // Pour stocker le dernier résultat final
 
-        // Fonction pour normaliser et filtrer les nombres chinois (VERSION PLUS TOLÉRANTE)
+        // Fonction pour normaliser et filtrer les nombres chinois - VERSION OPTIMISÉE POUR RECONNAISSANCE CHINOISE
         function normalizeChineseNumber(input) {
-            // Tableau étendu des variations possibles pour chaque nombre - BEAUCOUP PLUS GÉNÉREUX
-            const numberVariations = {
-                "零": ["ling", "lin", "linh", "linh1", "zero", "0", "ling2", "ling1", "lin1", "零", "leng", "leng2", "len", "lyn", "leng1", "lengh", "len1", "lun", "lene", "leen", "leng3", "len3", "lin3", "ling3", "leng4", "ling4", "lingo", "lengo"],
-                "一": ["yi", "yī", "y1", "i", "1", "un", "une", "yee", "yeh", "yih", "一", "ee", "eh", "e", "i1", "yih1", "ye", "yay", "ya", "yeh1", "yih2", "yi2", "yee1", "y1e", "i1e", "ye1", "yai", "yei", "yii", "yee2", "ee1", "ee2", "yay1", "yee3"],
-                "二": ["er", "èr", "erh", "er2", "2", "deux", "air", "are", "ar", "arh", "二", "ehr", "urr", "urr2", "err", "er1", "ehr2", "ehr1", "er3", "erh1", "erh2", "err1", "erh3", "er4", "are1", "air1", "eur", "ear", "erre", "ur", "ehr3", "uhr", "are2", "err2"],
-                "三": ["san", "sān", "san1", "3", "trois", "sahn", "sarn", "same", "sam", "san2", "三", "sang", "sahn1", "sarn1", "san3", "sang1", "sang2", "sah", "sarn2", "sam1", "sahn2", "sane", "sahn3", "sang3", "seum", "sahn4", "saan", "sahn5", "sarn3", "san4", "sam2", "sum", "sam3", "sum1", "sum2", "sahn6"],
-                "四": ["si", "sì", "s4", "4", "quatre", "suh", "sir", "sure", "sih", "si2", "四", "see", "sir1", "syr", "sy", "sii", "sye", "sy1", "see1", "se", "sii1", "sie", "syr1", "syi", "se1", "si3", "syr2", "sir2", "see2", "sy2", "s1", "see3", "sir3", "se2"],
-                "五": ["wu", "wǔ", "u", "5", "cinq", "woo", "wuh", "ou", "wou", "wu2", "五", "ou5", "woo1", "wuu", "wwo", "wou1", "woo2", "ou1", "ou2", "wu3", "woo3", "ou3", "ow", "wuh1", "wuh2", "uh", "uh1", "wuu1", "wuu2", "woo4", "ou4", "wuu3", "wu4", "woo5", "wu5", "uh2", "wuh3"],
-                "六": ["liu", "liù", "liou", "liu4", "6", "six", "lyou", "lee-oh", "liao", "low", "liou2", "六", "lew", "leu", "lyo", "lou", "leo", "lyoo", "lio", "lyow", "liow", "liuo", "liu1", "liou1", "liu3", "liow1", "lew1", "leo1", "liu5", "liow2", "leow", "lew2", "lio1", "leeoh", "lee-oh1", "low1", "low2", "liu6", "liu7"],
-                "七": ["qi", "qī", "chi", "ki", "7", "sept", "chee", "chi1", "chih", "kih", "tsi", "七", "chi2", "ch", "ki1", "tsi1", "che", "chi3", "kee", "ki2", "khi", "tsih", "chi4", "ke", "che1", "che2", "che3", "ki3", "ki4", "chih1", "khee", "chee1", "chee2", "che4", "khi1", "khi2", "tsi2", "chi5", "tsee", "tsee1", "tsee2"],
-                "八": ["ba", "bā", "pa", "8", "huit", "ba1", "bah", "baw", "pah", "par", "ba2", "八", "bah1", "bah2", "paw", "bha", "ba3", "bha1", "pa1", "pa2", "bah3", "baw1", "baw2", "pa3", "bah4", "baw3", "ba4", "bha2", "bha3", "ba5", "ba6", "bah5", "paw1", "paw2", "paw3", "bah6", "baw4", "baw5"],
-                "九": ["jiu", "jiǔ", "kiou", "kiu", "9", "neuf", "jyo", "jyo3", "joe", "jeau", "gao", "九", "gou", "gyo", "jow", "jew", "jao", "jyo1", "jou", "jew1", "jew2", "jiow", "jiu1", "jiu2", "jiou", "jou1", "jow1", "jou2", "jiow1", "jiow2", "jow2", "gou1", "gou2", "gyow", "giou", "jyo2", "jyo4", "jou3", "jiu3", "jiu4", "jow3", "jow4", "jiu5", "jiu6", "jiou1"],
-                "十": ["shi", "shí", "ch1", "10", "dix", "shr", "sh2", "sure", "sir", "shih", "shr1", "十", "sh", "shee", "sh1", "shy", "shy1", "she", "shu", "shu1", "shih1", "shr2", "sir1", "shir", "shi1", "shi2", "shi3", "shih2", "shih3", "shy2", "shr3", "shr4", "she1", "she2", "shu2", "shu3", "shir1", "shi4", "shy3", "shy4", "sure1", "shr5", "sh2e", "sh21"]
+            // Tableau des caractères chinois valides et leurs homophones courants
+            const validCharacters = {
+                "零": ["零", "灵", "另", "凌", "齡", "鈴", "領", "聆", "菱"], // Homophones communs pour "ling"
+                "一": ["一", "衣", "依", "伊", "壹", "揖", "揖", "壹"], // Homophones communs pour "yi"
+                "二": ["二", "而", "兒", "尔", "貳", "耳", "餌", "珥"], // Homophones communs pour "er"
+                "三": ["三", "參", "叁", "散", "珊", "山", "杉", "刪"], // Homophones communs pour "san"
+                "四": ["四", "肆", "死", "思", "司", "私", "絲", "斯"], // Homophones communs pour "si"
+                "五": ["五", "伍", "武", "舞", "無", "物", "屋", "梧"], // Homophones communs pour "wu"
+                "六": ["六", "陸", "溜", "流", "柳", "硫", "留", "劉"], // Homophones communs pour "liu"
+                "七": ["七", "期", "柒", "妻", "漆", "戚", "欺", "起"], // Homophones communs pour "qi"
+                "八": ["八", "巴", "拔", "扒", "捌", "把", "爸", "霸"], // Homophones communs pour "ba"
+                "九": ["九", "久", "酒", "玖", "究", "救", "纠", "舊"], // Homophones communs pour "jiu"
+                "十": ["十", "石", "拾", "實", "時", "食", "史", "世"] // Homophones communs pour "shi"
             };
             
-            // Normaliser l'entrée : minuscules, suppression des espaces et caractères non alphabétiques
-            let normalizedInput = input.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, '');
+            // Nettoyer l'input - garder uniquement les caractères chinois et les chiffres
+            let cleanedInput = input.replace(/[^\u4e00-\u9fa50-9]/g, '');
             
-            // Cas particuliers pour aider la reconnaissance des nombres difficiles
-            const specialCases = {
-                "er": ["are", "air", "err", "ur", "ehr", "ear", "ure"],
-                "si": ["see", "sir", "syr", "sy", "se", "sii", "sie"],
-                "liu": ["lew", "leu", "lyo", "low", "leo", "lyou", "lio"],
-                "jiu": ["jow", "jew", "jou", "gyo", "gou", "jao", "jeau"],
-                "qi": ["chee", "chi", "kee", "khi", "tsi", "tsee", "che"]
+            // Si l'input est vide après nettoyage, essayer de garder les lettres latines
+            if (cleanedInput.length === 0) {
+                cleanedInput = input.toLowerCase().replace(/[^a-z0-9]/g, '');
+            }
+            
+            // Chercher directement le caractère exact dans l'input
+            for (const [character, homophones] of Object.entries(validCharacters)) {
+                if (input.includes(character)) {
+                    return character;
+                }
+            }
+            
+            // Chercher les homophones chinois
+            for (const [character, homophones] of Object.entries(validCharacters)) {
+                for (const homophone of homophones) {
+                    if (input.includes(homophone)) {
+                        return character;
+                    }
+                }
+            }
+            
+            // Dernier recours - chercher les premiers caractères chinois dans l'input
+            const chineseChars = input.match(/[\u4e00-\u9fa5]/g);
+            if (chineseChars && chineseChars.length > 0) {
+                const firstChar = chineseChars[0];
+                // Vérifier si ce caractère est un homophone connu
+                for (const [character, homophones] of Object.entries(validCharacters)) {
+                    if (homophones.includes(firstChar)) {
+                        return character;
+                    }
+                }
+                // Si pas trouvé, vérifier si c'est un caractère valide
+                if (Object.keys(validCharacters).includes(firstChar)) {
+                    return firstChar;
+                }
+            }
+            
+            // Si aucune correspondance en chinois, essayer une correspondance très tolérante en latin
+            const latinFallback = {
+                "ling": "零",
+                "yi": "一",
+                "er": "二",
+                "san": "三",
+                "si": "四",
+                "wu": "五",
+                "liu": "六",
+                "qi": "七",
+                "ba": "八",
+                "jiu": "九",
+                "shi": "十",
+                "0": "零",
+                "1": "一",
+                "2": "二",
+                "3": "三",
+                "4": "四",
+                "5": "五",
+                "6": "六",
+                "7": "七",
+                "8": "八",
+                "9": "九",
+                "10": "十"
             };
             
-            // Ajouter des variations spéciales pour les nombres problématiques
-            Object.entries(specialCases).forEach(([number, variations]) => {
-                if (normalizedInput.length > 1) {
-                    variations.forEach(variation => {
-                        if (normalizedInput.includes(variation)) {
-                            const originalNumber = Object.entries(numberVariations).find(([char, vars]) => 
-                                vars.some(v => v.toLowerCase().includes(number))
-                            )?.[0];
-                            if (originalNumber) return originalNumber;
-                        }
-                    });
-                }
-            });
-            
-            // Rechercher la meilleure correspondance parmi les nombres valides
-            let bestMatch = null;
-            let highestScore = 0;
-            
-            // Parcourir tous les nombres chinois valides
-            Object.entries(numberVariations).forEach(([character, variations]) => {
-                // Vérifier si l'entrée correspond directement à l'un des caractères chinois
-                if (normalizedInput.includes(character.toLowerCase()) || input.includes(character) || character.toLowerCase().includes(normalizedInput)) {
-                    bestMatch = character;
-                    return;
-                }
-                
-                // Vérifier les variations avec une tolérance accrue
-                variations.forEach(variation => {
-                    const normalizedVariation = variation.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, '');
-                    
-                    // Score de correspondance plus tolérant
-                    let score = 0;
-                    
-                    // Correspondance partielle - même si l'input est plus court
-                    if (normalizedVariation.includes(normalizedInput) || normalizedInput.includes(normalizedVariation)) {
-                        score = 0.7; // Score élevé pour correspondance partielle
-                    } else if (normalizedVariation.substring(0, 2) === normalizedInput.substring(0, 2)) {
-                        // Les deux premiers caractères correspondent
-                        score = 0.6;
-                    }
-                    
-                    // Correspondance floue - calcul de similarité
-                    const similarity = calculateSimilarity(normalizedInput, normalizedVariation);
-                    if (similarity > score) {
-                        score = similarity;
-                    }
-                    
-                    if (score > highestScore && score >= 0.45) { // Seuil de tolérance plus bas
-                        highestScore = score;
-                        bestMatch = character;
-                    }
-                });
-            });
-            
-            // Dernier recours - chercher le caractère chinois dans l'input original
-            if (!bestMatch) {
-                for (const char of ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"]) {
-                    if (input.includes(char)) {
-                        return char;
-                    }
+            for (const [latin, character] of Object.entries(latinFallback)) {
+                if (cleanedInput.includes(latin)) {
+                    return character;
                 }
             }
             
-            return bestMatch;
-        }
-        
-        // Fonction de calcul de similarité plus tolérante
-        function calculateSimilarity(s1, s2) {
-            if (!s1 || !s2) return 0;
-            
-            // Normaliser les chaînes
-            s1 = s1.toLowerCase().replace(/[^a-z0-9]/g, '');
-            s2 = s2.toLowerCase().replace(/[^a-z0-9]/g, '');
-            
-            // Si l'une des chaînes est vide
-            if (s1.length === 0 || s2.length === 0) return 0;
-            
-            // Distance de Levenshtein plus tolérante
-            const longer = s1.length > s2.length ? s1 : s2;
-            const shorter = s1.length > s2.length ? s2 : s1;
-            const longerLength = longer.length;
-            
-            // Calcul simplifié de similarité
-            let matchingChars = 0;
-            for (let i = 0; i < shorter.length; i++) {
-                if (longer.includes(shorter[i])) {
-                    matchingChars++;
-                }
-            }
-            
-            // Ratio de caractères correspondants
-            const charMatchRatio = matchingChars / shorter.length;
-            
-            // Similarité basée sur les premiers caractères
-            const prefixMatch = Math.min(3, Math.min(s1.length, s2.length));
-            let prefixScore = 0;
-            for (let i = 0; i < prefixMatch; i++) {
-                if (s1[i] === s2[i]) {
-                    prefixScore += 1;
-                }
-            }
-            const prefixRatio = prefixScore / prefixMatch;
-            
-            // Combinaison des scores avec plus de poids sur la correspondance des caractères
-            return (charMatchRatio * 0.7) + (prefixRatio * 0.3);
+            // Aucune correspondance trouvée
+            return null;
         }
 
         // ✅ Initialisation fiable de SpeechRecognition avec grammaire spécifique (uniquement webkit)
@@ -800,7 +757,7 @@
                     try {
                         // Créer une grammaire spécifique pour les nombres chinois
                         // Format JSGF (Java Speech Grammar Format)
-                        const grammar = '#JSGF V1.0; grammar numbers; public <number> = 零 | 一 | 二 | 三 | 四 | 五 | 六 | 七 | 八 | 九 | 十 | ling | yi | er | san | si | wu | liu | qi | ba | jiu | shi;';
+                        const grammar = '#JSGF V1.0; grammar numbers; public <number> = 零 | 一 | 二 | 三 | 四 | 五 | 六 | 七 | 八 | 九 | 十;';
                         
                         const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
                         const grammarList = new SpeechGrammarList();
@@ -929,7 +886,7 @@
             }, 100);
         }
         
-        // Fonction pour gérer le résultat de la reconnaissance vocale (VERSION PLUS TOLÉRANTE)
+        // Fonction pour gérer le résultat de la reconnaissance vocale
         function handleSpeechResult(userInput) {
             if (!currentQuestionData || awaitingNext) return;
             
