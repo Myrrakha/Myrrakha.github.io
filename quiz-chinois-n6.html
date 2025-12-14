@@ -754,6 +754,8 @@
         }
         function generateQuestion() {
             if (awaitingNext) return;
+            // Stop any existing question timer
+            clearInterval(qTimerInterval);
             const q = getRandomQuestion();
             currentCorrectAnswer = q.correct;
             questionBox.innerHTML = q.question;
@@ -765,13 +767,23 @@
                 btn.classList.remove('correct', 'incorrect');
                 btn.onclick = () => handleAnswer(shuffled[i], q.correct);
             });
+            // Reset question timer display and bar
             qTime = levelConfig.qTime;
-            setTimeout(start, 100);
+            qTimerDisplay.textContent = qTime.toFixed(1);
+            qTimerFill.style.width = '100%';
+            qTimerFill.style.background = 'linear-gradient(90deg, #ff9b00, #ff4d2e, #b40000)';
+            
+            // Start the question timer after a 250ms delay
+            setTimeout(() => {
+                if (!awaitingNext) {
+                    startQTimer();
+                }
+            }, 250);
         }
         function handleAnswer(selected, correct) {
             if (awaitingNext) return;
             awaitingNext = true;
-            clearInterval(Interval);
+            clearInterval(qTimerInterval);
             answerBtns.forEach(btn => {
                 btn.disabled = true;
                 if (btn.innerHTML === escapeHtml(correct)) btn.classList.add('correct');
@@ -838,13 +850,19 @@
         }
         function startQTimer() {
             clearInterval(qTimerInterval);
-            const start = levelConfig.qTime;
-            qTime = start;
+            const startValue = levelConfig.qTime;
             qTimerInterval = setInterval(() => {
                 qTime -= 0.1;
                 qTimerDisplay.textContent = qTime.toFixed(1);
-                const pct = Math.max(0, qTime / start) * 100;
+                const pct = Math.max(0, qTime / startValue) * 100;
                 qTimerFill.style.width = pct + '%';
+                if (qTime <= 1) {
+                    qTimerFill.style.background = 'linear-gradient(90deg, #ff4757, #ff6b81)';
+                } else if (qTime <= 3) {
+                    qTimerFill.style.background = 'linear-gradient(90deg, #ffa502, #ff7b25)';
+                } else {
+                    qTimerFill.style.background = 'linear-gradient(90deg, #ff9b00, #ff4d2e, #b40000)';
+                }
                 if (qTime <= 0) {
                     clearInterval(qTimerInterval);
                     answerBtns.forEach(btn => {
@@ -970,7 +988,6 @@
                 const userData = userDoc.data();
                 const globalScore = userData.globalScore ?? 0;
                 const niveauChinois = (userData.niveaux?.[THEME]) ?? 0;
-                // ✅ Vérifications obligatoires avant de lancer le quiz
                 if (globalScore < 0 || niveauChinois < 6) {
                     console.warn("Accès refusé : globalScore < 0 ou niveaux.chinois < 6");
                     window.location.href = 'index.html';
@@ -989,6 +1006,4 @@
     </script>
 </body>
 </html>
-
-
 
