@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quiz Master - Chinois N6</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .hidden {
+            display: none !important;
+        }
+        /* GLOBAL */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Noto Serif SC", serif;
+            background: linear-gradient(145deg, #fff7ef, #fde3d0);
+            background-image: url('images/cloud-pattern.png');
+            background-size: cover;
+            color: #2a2a2a;
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+            opacity: 0.98;
+        }
+        .lanterne {
+            width: 60px;
+            height: 90px;
+            background-image: url('images/red-lantern.png');
+            background-size: cover;
+            position: absolute;
+            top: -20px;
+            animation: flotter 3.5s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 6px rgba(255, 80, 0, 0.8));
+            z-index: -1;
+        }
+        .lanterne:nth-child(1) {
+            left: 15%;
+            animation-delay: 0s;
+        }
+        .lanterne:nth-child(2) {
+            right: 15%;
+            animation-delay: 1.2s;
+        }
+        @keyframes flotter {
+            0% {
+                transform: translateY(0) rotate(-2deg);
+                opacity: 0.95;
+            }
+            100% {
+                transform: translateY(12px) rotate(2deg);
+                opacity: 1;
+            }
+        }
+        #hover-warning {
+            position: absolute;
+            padding: 8px 14px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            font-size: 14px;
+            border-radius: 6px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 9999;
+        }
+        /* ✨ CENTRAGE PRINCIPAL */
+        main {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            width: 100%;
+            padding: 0 15px;
+            box-sizing: border-box;
+            position: relative;
+        }
+        /* QUIZ SECTION */
+        #quiz-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .quiz-container {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            justify-content: center;
+        }
+        @media (min-width: 900px) {
+            .question-box {
+                flex: 2;
+            }
+            .answers-container {
+                flex: 1;
+            }
+        }
+        .question-box {
+            background: rgba(255, 250, 240, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 18px;
+            border-radius: 14px;
+            font-size: 1.5em;
+            font-weight: 700;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 0 16px rgba(255, 60, 60, 0.2);
+            border: 2px solid rgba(180, 0, 0, 0.2);
+            color: #b40000;
+            letter-spacing: 0.8px;
+            text-shadow: 0 0 5px rgba(255, 150, 100, 0.4);
+            font-family: "Noto Serif SC", serif;
+        }
+        .answers-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+        .answer-btn {
+            width: 360px;
+            padding: 10px 4px;
+            margin-top: 10px;
+            border: 2px solid rgba(180, 0, 0, 0.2);
+            border-radius: 8px;
+            font-size: 17px;
+            cursor: pointer;
+            background: linear-gradient(145deg, #ffecd9, #f2c19b);
+            transition: 0.25s ease-in-out;
+            color: #2a2a2a;
+            box-shadow: 0 0 8px rgba(210, 60, 20, 0.15);
+            max-width: 100%;
+            font-family: "Noto Serif SC", serif;
+            font-weight: 600;
+        }
+        .answer-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(145deg, #fde3d0, #ffb380);
+            border-color: rgba(220, 50, 20, 0.4);
+            box-shadow: 0 0 12px rgba(255, 100, 50, 0.3);
+        }
+        .answer-btn:disabled {
+            cursor: not-allowed;
+        }
+        .correct {
+            background: linear-gradient(145deg, #d3e87e, #9bc24f) !important;
+            box-shadow: 0 0 10px rgba(140, 200, 70, 0.5) !important;
+            color: #2a2a2a !important;
+        }
+        .incorrect {
+            background: linear-gradient(145deg, #ff9b8a, #d35949) !important;
+            box-shadow: 0 0 10px rgba(200, 70, 70, 0.5) !important;
+            color: white !important;
+        }
+        #timers-container {
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        #timer-bar-container,
+        #question-timer-bar-container {
+            width: 100%;
+            max-width: 310px;
+            text-align: left;
+            font-size: 0.9em;
+            color: #b40000;
+            font-weight: 600;
+        }
+        #timer-bar,
+        #question-timer-bar {
+            width: 100%;
+            height: 10px;
+            background: #fde3d0;
+            border-radius: 7px;
+            margin-top: 5px;
+            overflow: hidden;
+            border: 1px solid rgba(180, 0, 0, 0.2);
+        }
+        #timer-fill,
+        #question-timer-fill {
+            height: 100%;
+            width: 100%;
+            border-radius: 7px;
+            transition: width 0.3s linear;
+        }
+        #timer-fill {
+            background: linear-gradient(90deg, #b40000, #ff4d2e, #ff9b00);
+        }
+        #question-timer-fill {
+            background: linear-gradient(90deg, #ff9b00, #ff4d2e, #b40000);
+        }
+        #score-lives {
+            margin-top: 10px;
+            display: flex;
+            gap: 50px;
+            justify-content: center;
+            font-size: 1.1em;
+            position: relative;
+            color: #b40000;
+            font-weight: 600;
+        }
+        .score-container {
+            margin-top: 7px;
+            font-size: 19px;
+            text-shadow: 0 0 5px rgba(255, 130, 100, 0.3);
+        }
+        .heart {
+            font-size: 22px;
+            margin: 0 3px;
+            color: #d35949;
+            text-shadow: 0 0 4px rgba(211, 89, 73, 0.6);
+        }
+        @media (max-width: 899px) {
+            .quiz-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .question-box {
+                font-size: 1.3em;
+                padding: 10px;
+                min-height: 70px;
+                width: calc(100% - 30px);
+                color: #b40000;
+            }
+            .answers-container {
+                gap: 5px;
+            }
+            .answer-btn {
+                width: calc(100% - 30px);
+                padding: 8px;
+                font-size: 1em;
+            }
+            #score-lives {
+                flex-direction: column;
+                gap: 4px;
+                margin-top: 10px;
+                align-items: center;
+                color: #b40000;
+            }
+            #mobile-quiz-ui-row {
+                display: flex;
+                gap: 8px;
+                justify-content: center;
+                margin-top: 8px;
+                padding: 0 15px;
+                width: 100%;
+                max-width: 1200px;
+            }
+            #current-game-stats {
+                margin: 0;
+                flex: 1;
+                max-width: 160px;
+                background: rgba(255, 250, 240, 0.85);
+                border-radius: 8px;
+                padding: 12px;
+                box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
+                border: 2px solid rgba(180, 0, 0, 0.15);
+                height: 110px;
+            }
+            .stats-title {
+                font-size: 0.9em;
+                margin-bottom: 6px;
+                font-weight: 700;
+                letter-spacing: 0.7px;
+                color: #b40000;
+                text-shadow: 0 0 5px rgba(200, 0, 0, 0.3);
+                text-align: center;
+                font-family: "Noto Serif SC", serif;
+            }
+            .current-score {
+                font-size: 1.4em;
+                margin: 5px 0;
+                text-align: center;
+                color: #9bc24f;
+                font-family: "Noto Serif SC", serif;
+            }
+            .stats-row {
+                padding: 3px 0;
+                font-size: 0.85em;
+                display: flex;
+                justify-content: space-between;
+                color: #2a2a2a;
+            }
+            .stats-label {
+                font-weight: 600;
+            }
+            .stats-value {
+                font-weight: bold;
+                color: #b40000;
+            }
+            #mobile-back-container {
+                background: rgba(255, 250, 240, 0.85);
+                padding: 12px 10px;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
+                border: 2px solid rgba(180, 0, 0, 0.15);
+                min-width: 44px;
+                height: fit-content;
+            }
+            #mobile-back-container .action-btn {
+                padding: 5px 9px;
+                font-size: 1.1em;
+                display: block;
+                width: 100%;
+                text-align: center;
+                background: rgba(255, 240, 230, 0.9);
+                border-radius: 9px;
+                cursor: pointer;
+                transition: .2s;
+                border: 2px solid rgba(180, 0, 0, 0.2);
+                color: #b40000;
+                font-family: "Noto Serif SC", serif;
+            }
+            #mobile-back-container .action-btn:hover {
+                background: rgba(255, 230, 220, 0.95);
+                box-shadow: 0 0 8px rgba(255, 100, 80, 0.3);
+            }
+        }
+        @media (min-width: 900px) {
+            #mobile-quiz-ui-row {
+                display: none !important;
+            }
+            #mobile-back-btn {
+                display: none !important;
+            }
+            #current-game-stats {
+                background: rgba(255, 250, 240, 0.85);
+                border-radius: 10px;
+                padding: 16px;
+                margin-top: 16px;
+                max-width: 250px;
+                width: 100%;
+                box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.2);
+                border: 2px solid rgba(180, 0, 0, 0.15);
+            }
+            .stats-title {
+                text-align: center;
+                margin-bottom: 10px;
+                color: #b40000;
+                font-size: 1.1em;
+                font-weight: 700;
+                letter-spacing: 0.8px;
+                text-shadow: 0 0 5px rgba(200, 0, 0, 0.3);
+                font-family: "Noto Serif SC", serif;
+            }
+            .current-score {
+                font-size: 1.8em;
+                font-weight: bold;
+                color: #9bc24f;
+                margin: 7px 0;
+                text-align: center;
+                font-family: "Noto Serif SC", serif;
+            }
+            .stats-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 6px 0;
+                border-bottom: 1px solid rgba(180, 0, 0, 0.2);
+                font-size: 0.9em;
+                color: #2a2a2a;
+            }
+            .stats-label {
+                font-weight: 600;
+            }
+            .stats-value {
+                font-weight: bold;
+                color: #b40000;
+            }
+        }
+        /* RESULT SECTION */
+        #result-section {
+            text-align: center;
+            padding: 16px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1200px;
+        }
+        .result-stats {
+            background: rgba(255, 250, 240, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 22px;
+            border-radius: 14px;
+            max-width: 480px;
+            margin: 22px auto;
+            box-shadow: 0 0 16px rgba(255, 60, 60, 0.2);
+            border: 2px solid rgba(180, 0, 0, 0.2);
+            width: calc(100% - 30px);
+        }
+        .result-stats h3 {
+            color: #b40000;
+            margin-top: 0;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-shadow: 0 0 5px rgba(200, 0, 0, 0.4);
+            font-family: "Noto Serif SC", serif;
+        }
+        .action-btn {
+            margin: 8px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #ffecd9, #f2c19b);
+            border: 2px solid rgba(180, 0, 0, 0.2);
+            cursor: pointer;
+            color: #b40000;
+            transition: 0.2s;
+            font-family: "Noto Serif SC", serif;
+            font-size: 15px;
+            font-weight: 600;
+        }
+        .action-btn:hover {
+            background: linear-gradient(145deg, #fde3d0, #ffb380);
+            box-shadow: 0 0 8px rgba(255, 100, 80, 0.3);
+            transform: translateY(-1px);
+        }
+        /* Unlock Message */
+        #level-unlock-msg {
+            color: #9bc24f;
+            margin-top: 12px;
+            font-weight: bold;
+            display: none;
+            text-shadow: 0 0 5px rgba(155, 194, 79, 0.4);
+            font-family: "Noto Serif SC", serif;
+        }
+        #level-up-msg,
+        #perfect-score-msg {
+            font-family: "Noto Serif SC", serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="lanterne"></div>
+    <div class="lanterne"></div>
+    <main>
+        <section id="quiz-section" class="hidden">
+            <div class="quiz-container">
+                <div class="question-box">
+                    <div id="question"></div>
+                </div>
+                <div class="answers-container">
+                    <button class="answer-btn"></button>
+                    <button class="answer-btn"></button>
+                    <button class="answer-btn"></button>
+                    <button class="answer-btn"></button>
+                    <button class="answer-btn"></button>
+                </div>
+            </div>
+            <div id="timers-container">
+                <div id="timer-bar-container">
+                    <span>⏱️ Temps restant : <span id="timer">0</span>s</span>
+                    <div id="timer-bar">
+                        <div id="timer-fill"></div>
+                    </div>
+                </div>
+                <div id="question-timer-bar-container">
+                    <span>⚡ Question : <span id="question-timer">0</span>s</span>
+                    <div id="question-timer-bar">
+                        <div id="question-timer-fill"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="score-lives">
+                <div class="score-container">Score : <span id="score">0</span></div>
+                <div id="lives">
+                    <span class="heart">❤</span><span class="heart">❤</span><span class="heart">❤</span><span
+                        class="heart">❤</span><span class="heart">❤</span>
+                </div>
+            </div>
+            <div id="mobile-quiz-ui-row">
+                <div id="current-game-stats">
+                    <div class="stats-title">📊 Stats</div>
+                    <div class="current-score" id="current-score-display-mobile">0</div>
+                    <div class="stats-row">
+                        <span class="stats-label">Fausses :</span>
+                        <span class="stats-value" id="wrong-answers-mobile">0</span>
+                    </div>
+                    <div class="stats-row">
+                        <span class="stats-label">Meilleur :</span>
+                        <span class="stats-value" id="best-score-display-mobile">0</span>
+                    </div>
+                </div>
+                <div id="mobile-back-container">
+                    <button id="mobile-back-btn" class="action-btn">←</button>
+                </div>
+            </div>
+        </section>
+        <section id="result-section" class="hidden">
+            <h2>Partie terminée ! 🎉</h2>
+            <div class="result-stats">
+                <h3>Résumé</h3>
+                <p>Score de la partie : <strong id="final-score">0</strong></p>
+                <p>Meilleur score (N6) : <strong id="best-score">0</strong></p>
+                <p>Score Chinois : <strong id="new-theme-score">0</strong></p>
+                <p>Score Global : <strong id="new-global-score">0</strong></p>
+                <div id="level-up-msg" class="hidden" style="color: #9bc24f; margin-top: 12px; font-weight: bold;">
+                    🎊 NIVEAU SUPÉRIEUR ATTEINT !
+                </div>
+                <div id="perfect-score-msg" class="hidden" style="color: #d4af37; margin-top: 10px; font-weight: bold;">
+                    🌟 SCORE PARFAIT !
+                </div>
+                <div id="level-unlock-msg">🔓 Niveau 7 débloqué !</div>
+            </div>
+            <button id="restart-btn" class="action-btn">Rejouer</button>
+            <button id="home-btn" class="action-btn">Accueil</button>
+        </section>
+    </main>
+    <div id="hover-warning"></div>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import {
+            getAuth, onAuthStateChanged, signOut
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import {
+            getFirestore, doc, updateDoc, increment, runTransaction, getDoc
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        // 🔑 CONFIGURATION
+        const THEME = 'chinois';
+        const QUIZ_TITLE = 'Chinois N6';
+        const SCORE_REQUIS_N7 = 12;
+        const SCORE_PARFAIT_N6 = 25; // Score parfait = 100%
+        const EXPRESSIONS_N6 = [
+            { francais: "Bonjour", caractere: "你好", pinyin: "nǐ hǎo" },
+            { francais: "Au revoir", caractere: "再见", pinyin: "zài jiàn" },
+            { francais: "Je ne sais pas", caractere: "我不知道", pinyin: "wǒ bù zhīdào" },
+            { francais: "Je ne comprends pas", caractere: "我不明白", pinyin: "wǒ bù míngbái" },
+            { francais: "Comment allez-vous ?", caractere: "你好吗？", pinyin: "nǐ hǎo ma ?" },
+            { francais: "Je suis français", caractere: "我是法国人", pinyin: "wǒ shì fǎguó rén" },
+            { francais: "Où se trouve la gare des trains ?", caractere: "火车站在哪里？", pinyin: "huǒchē zhàn zài nǎlǐ ?" },
+            { francais: "Pouvez-vous m’indiquer le chemin ?", caractere: "你可以给我指路吗？", pinyin: "nǐ kěyǐ gěi wǒ zhǐ lù ma ?" },
+            { francais: "Quel âge avez-vous ?", caractere: "你多大了？", pinyin: "nǐ duō dà le ?" },
+            { francais: "De rien", caractere: "不客气", pinyin: "bú kèqi" },
+            { francais: "Merci", caractere: "谢谢", pinyin: "xièxie" },
+            { francais: "Je m'appelle", caractere: "我叫", pinyin: "wǒ jiào" },
+            { francais: "Pardon / Désolé", caractere: "对不起", pinyin: "duìbuqǐ" },
+            { francais: "Ce n'est pas grave / Pas de problème", caractere: "没关系", pinyin: "méi guānxi" },
+            { francais: "S'il vous plaît", caractere: "请", pinyin: "qǐng" },
+            { francais: "D'accord", caractere: "好的", pinyin: "hǎo de" },
+            { francais: "Comment tu t'appelles ?", caractere: "你叫什么名字？", pinyin: "nǐ jiào shénme míngzi ?" },
+            { francais: "Où sont les toilettes ?", caractere: "厕所在哪里？", pinyin: "cèsuǒ zài nǎlǐ ?" },
+            { francais: "Qu'est-ce que c'est ?", caractere: "这是什么？", pinyin: "zhè shì shénme ?" },
+            { francais: "Enchanté de te connaître", caractere: "很高兴认识你", pinyin: "hěn gāoxìng rènshi nǐ" }
+        ];
+
+        const FAUSSES_REPONSES_POOL_N6 = [
+            "你好","再见","我不知道","我不明白","你好吗？","我是法国人","火车站在哪里？","你可以给我指路吗？","你多大了？","不客气","谢谢","我叫","对不起","没关系","请","好的","你叫什么名字？","厕所在哪里？","这是什么？","很高兴认识你",
+            "早上好","晚上好","欢迎","请进","慢走","一路顺风","祝你好运","谢谢你","非常感谢","不好意思",
+            "我明白了","我懂了","我不知道这个","我不太清楚","可以吗？","没问题","当然","可能吧","我觉得是这样","我不确定",
+            "你从哪里来？","你去哪儿？","你在做什么？","现在几点？","今天星期几？","你会说中文吗？","你喜欢什么？","你要去哪？",
+            "在这里","在那里","左边","右边","前面","后面","附近","很远","很近","一直走",
+            "这个","那个","什么","东西","地方","时间","人","朋友","名字","问题",
+            "我是一只猫","天气很好","我喜欢米饭","今天不行","明天再说","可能下雨","我饿了","我累了","没时间","太贵了",
+            "知道","明白","理解","喜欢","想要","需要","可以"
+        ];
+
+        // Générer les questions
+        const QUESTIONS = [];
+        EXPRESSIONS_N6.forEach(exp => {
+            // francais -> caractere+pinyin
+            QUESTIONS.push({
+                question: `Traduisez en chinois : <strong>${exp.francais}</strong>`,
+                correct: `${exp.caractere} (${exp.pinyin})`,
+                options: EXPRESSIONS_N6.filter(e => e.francais !== exp.francais).sort(() => 0.5 - Math.random()).slice(0, 4).map(e => `${e.caractere} (${e.pinyin})`)
+            });
+            
+            // caractere+pinyin -> francais
+            QUESTIONS.push({
+                question: `Traduisez en français : <strong>${exp.caractere} (${exp.pinyin})</strong>`,
+                correct: exp.francais,
+                options: EXPRESSIONS_N6.filter(e => e.caractere !== exp.caractere).sort(() => 0.5 - Math.random()).slice(0, 4).map(e => e.francais)
+            });
+        });
+
+        // Ajouter des options incorrectes depuis le pool
+        for (let i = 0; i < QUESTIONS.length; i++) {
+            const q = QUESTIONS[i];
+            while (q.options.length < 4) {
+                const randomOption = FAUSSES_REPONSES_POOL_N6[Math.floor(Math.random() * FAUSSES_REPONSES_POOL_N6.length)];
+                if (!q.options.includes(randomOption) && q.correct !== randomOption) {
+                    q.options.push(randomOption);
+                }
+            }
+        }
+
+        // ⏱️ Config du niveau (unique ici)
+        const levelConfig = {
+            time: 60,
+            qTime: 6,
+            lives: 5
+        };
+        // 🌐 Firebase init
+        const firebaseConfig = {
+            apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
+            authDomain: "quiz-master-io.firebaseapp.com",
+            projectId: "quiz-master-io",
+            storageBucket: "quiz-master-io.firebasestorage.app",
+            messagingSenderId: "773382469164",
+            appId: "1:773382469164:web:5e24a9a62ce543f5190389"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        window.currentUser = null;
+        // ✅ DOM
+        const quizSection = document.getElementById('quiz-section');
+        const resultSection = document.getElementById('result-section');
+        const questionBox = document.getElementById('question');
+        const answerBtns = document.querySelectorAll('.answer-btn');
+        const scoreDisplay = document.getElementById('score');
+        const livesDisplay = document.getElementById('lives');
+        const timerDisplay = document.getElementById('timer');
+        const qTimerDisplay = document.getElementById('question-timer');
+        const timerFill = document.getElementById('timer-fill');
+        const qTimerFill = document.getElementById('question-timer-fill');
+        const mobileBackBtn = document.getElementById('mobile-back-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const homeBtn = document.getElementById('home-btn');
+        const levelUnlockMsg = document.getElementById('level-unlock-msg');
+        const perfectScoreMsg = document.getElementById('perfect-score-msg');
+        const currentScoreDisplayMobile = document.getElementById('current-score-display-mobile');
+        const wrongAnswersDisplayMobile = document.getElementById('wrong-answers-mobile');
+        const bestScoreDisplayMobile = document.getElementById('best-score-display-mobile');
+        // ✅ États du jeu
+        let score = 0, lives = 0, timeLeft = 0, qTime = 0;
+        let timerInterval = null, qTimerInterval = null, awaitingNext = false;
+        let gameCompleted = false;
+        let usedQuestions = [];
+        let currentCorrectAnswer = null;
+        let wrongAnswers = 0;
+        let currentUserBestScore = 0;
+        // 🔁 Fonctions utilitaires
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        function updateQuizHeaderVisibility(isQuizActive) {
+            if (window.innerWidth <= 899) {
+                document.body.classList.toggle('quiz-active', isQuizActive);
+                mobileBackBtn.classList.toggle('hidden', !isQuizActive);
+            } else {
+                mobileBackBtn.classList.add('hidden');
+            }
+        }
+        function updateResultHeaderVisibility(isResultActive) {
+            if (window.innerWidth <= 899) {
+                document.body.classList.toggle('result-active', isResultActive);
+            }
+        }
+        // 📥 Fetch best score from DB with local fallback
+        async function fetchBestScore() {
+            if (!window.currentUser?.uid) {
+                return parseInt(localStorage.getItem(`best-score-${THEME}-n6`) || '0');
+            }
+            try {
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    const bestScore = userDoc.data().bestScores?.[THEME] || 0;
+                    localStorage.setItem(`best-score-${THEME}-n6`, bestScore.toString());
+                    return bestScore;
+                }
+            } catch (error) {
+                console.warn('Erreur chargement bestScore, fallback local:', error);
+            }
+            return parseInt(localStorage.getItem(`best-score-${THEME}-n6`) || '0');
+        }
+        // 💾 Save best score to DB with local fallback
+        async function saveBestScore(newBest) {
+            if (!window.currentUser?.uid) {
+                localStorage.setItem(`best-score-${THEME}-n6`, newBest.toString());
+                return;
+            }
+            try {
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                await updateDoc(userRef, {
+                    [`bestScores.${THEME}`]: newBest
+                });
+                localStorage.setItem(`best-score-${THEME}-n6`, newBest.toString());
+            } catch (error) {
+                console.warn('Erreur sauvegarde bestScore, fallback local:', error);
+                localStorage.setItem(`best-score-${THEME}-n6`, newBest.toString());
+            }
+        }
+        // 📥 Sauvegarde via transaction
+        async function saveScores(incrementValue) {
+            if (!window.currentUser?.uid || incrementValue <= 0) return;
+            const uid = window.currentUser.uid;
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const userRef = doc(db, 'users', uid);
+                    const userDoc = await transaction.get(userRef);
+                    if (!userDoc.exists()) throw new Error("Utilisateur introuvable");
+                    const currentGlobal = userDoc.data().globalScore || 0;
+                    const currentTheme = userDoc.data().quizScores?.[THEME] || 0;
+                    transaction.update(userRef, {
+                        globalScore: increment(incrementValue),
+                        [`quizScores.${THEME}`]: increment(incrementValue)
+                    });
+                    const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+                    quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
+                    localStorage.setItem('quizScores', JSON.stringify(quizScores));
+                    localStorage.setItem('globalScore', (currentGlobal + incrementValue).toString());
+                });
+            } catch (error) {
+                console.warn('Erreur sauvegarde, fallback local:', error);
+                const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+                quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
+                const global = (parseInt(localStorage.getItem('globalScore') || '0') + incrementValue);
+                localStorage.setItem('quizScores', JSON.stringify(quizScores));
+                localStorage.setItem('globalScore', global.toString());
+            }
+        }
+        // 🎮 Logique de jeu
+        async function startGame() {
+            if (gameCompleted) return;
+            stopAllTimers();
+            score = 0; lives = levelConfig.lives; timeLeft = levelConfig.time; qTime = levelConfig.qTime;
+            wrongAnswers = 0;
+            usedQuestions = [];
+            scoreDisplay.textContent = score;
+            updateLives();
+            currentUserBestScore = await fetchBestScore();
+            updateStatsDisplayMobile();
+            quizSection.classList.remove('hidden');
+            resultSection.classList.add('hidden');
+            updateQuizHeaderVisibility(true);
+            updateResultHeaderVisibility(false);
+            generateQuestion();
+            startMainTimer();
+            window.scrollTo(0, 0);
+        }
+        function getRandomQuestion() {
+            if (usedQuestions.length >= QUESTIONS.length) usedQuestions = [];
+            let idx;
+            do {
+                idx = Math.floor(Math.random() * QUESTIONS.length);
+            } while (usedQuestions.includes(idx) && usedQuestions.length < QUESTIONS.length);
+            usedQuestions.push(idx);
+            return QUESTIONS[idx];
+        }
+        function generateQuestion() {
+            if (awaitingNext) return;
+            const q = getRandomQuestion();
+            currentCorrectAnswer = q.correct;
+            questionBox.innerHTML = q.question;
+            const shuffled = [...q.options, q.correct].sort(() => Math.random() - 0.5);
+            answerBtns.forEach((btn, i) => {
+                btn.innerHTML = escapeHtml(shuffled[i]);
+                btn.disabled = false;
+                // ✅ Réinitialisation explicite des styles à chaque nouvelle question
+                btn.classList.remove('correct', 'incorrect');
+                btn.onclick = () => handleAnswer(shuffled[i], q.correct);
+            });
+            qTime = levelConfig.qTime;
+            setTimeout(startQTimer, 100);
+        }
+        function handleAnswer(selected, correct) {
+            if (awaitingNext) return;
+            awaitingNext = true;
+            clearInterval(qTimerInterval);
+            answerBtns.forEach(btn => {
+                btn.disabled = true;
+                if (btn.innerHTML === escapeHtml(correct)) btn.classList.add('correct');
+                if (btn.innerHTML === escapeHtml(selected) && selected !== correct) btn.classList.add('incorrect');
+            });
+            if (selected === correct) {
+                score++;
+            } else {
+                lives = Math.max(0, lives - 1);
+                wrongAnswers++;
+            }
+            scoreDisplay.textContent = score;
+            updateLives();
+            updateStatsDisplayMobile();
+            setTimeout(() => {
+                if (lives <= 0 || timeLeft <= 0) {
+                    endGame();
+                } else {
+                    awaitingNext = false;
+                    generateQuestion();
+                }
+            }, 1000);
+        }
+        function updateLives() {
+            const total = levelConfig.lives;
+            const hearts = livesDisplay.querySelectorAll('.heart');
+            hearts.forEach((heart, i) => {
+                if (i < lives) {
+                    heart.textContent = '❤';
+                    heart.style.color = '#d35949';
+                    heart.style.textShadow = '0 0 4px rgba(211, 89, 73, 0.6)';
+                } else {
+                    heart.textContent = '♡';
+                    heart.style.color = '#b40000';
+                    heart.style.textShadow = '0 0 4px rgba(180, 0, 0, 0.4)';
+                }
+            });
+        }
+        function updateStatsDisplayMobile() {
+            currentScoreDisplayMobile.textContent = score;
+            wrongAnswersDisplayMobile.textContent = wrongAnswers;
+            bestScoreDisplayMobile.textContent = currentUserBestScore;
+        }
+        function startMainTimer() {
+            clearInterval(timerInterval);
+            timerDisplay.textContent = timeLeft;
+            timerFill.style.width = '100%';
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                timerFill.style.width = (timeLeft / levelConfig.time * 100) + '%';
+                if (timeLeft <= 5) {
+                    timerFill.style.background = 'linear-gradient(90deg, #ff4757, #ff6b81)';
+                } else if (timeLeft <= 10) {
+                    timerFill.style.background = 'linear-gradient(90deg, #ffa502, #ff7b25)';
+                } else {
+                    timerFill.style.background = 'linear-gradient(90deg,#b40000,#ff4d2e,#ff9b00)';
+                }
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endGame();
+                }
+            }, 1000);
+        }
+        function startQTimer() {
+            clearInterval(qTimerInterval);
+            const start = levelConfig.qTime;
+            qTime = start;
+            qTimerInterval = setInterval(() => {
+                qTime -= 0.1;
+                qTimerDisplay.textContent = qTime.toFixed(1);
+                const pct = Math.max(0, qTime / start) * 100;
+                qTimerFill.style.width = pct + '%';
+                if (qTime <= 0) {
+                    clearInterval(qTimerInterval);
+                    answerBtns.forEach(btn => {
+                        btn.disabled = true;
+                        if (btn.innerHTML === escapeHtml(currentCorrectAnswer)) {
+                            btn.classList.add('correct');
+                        }
+                    });
+                    lives = Math.max(0, lives - 1);
+                    wrongAnswers++;
+                    scoreDisplay.textContent = score;
+                    updateLives();
+                    updateStatsDisplayMobile();
+                    setTimeout(() => {
+                        if (lives <= 0 || timeLeft <= 0) endGame();
+                        else { awaitingNext = false; generateQuestion(); }
+                    }, 1000);
+                }
+            }, 100);
+        }
+        async function endGame() {
+            if (gameCompleted) return;
+            gameCompleted = true;
+            await saveScores(score);
+            const newBest = Math.max(currentUserBestScore, score);
+            if (newBest > currentUserBestScore) {
+                currentUserBestScore = newBest;
+                await saveBestScore(newBest);
+            }
+            quizSection.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+            updateQuizHeaderVisibility(false);
+            updateResultHeaderVisibility(true);
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('best-score').textContent = currentUserBestScore;
+            const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+            const globalScore = parseInt(localStorage.getItem('globalScore') || '0');
+            const themeScore = quizScores[THEME] || 0;
+            document.getElementById('new-global-score').textContent = globalScore;
+            document.getElementById('new-theme-score').textContent = themeScore;
+            const oldTheme = themeScore - score;
+            if (Math.floor(themeScore / 50) > Math.floor(oldTheme / 50)) {
+                document.getElementById('level-up-msg').classList.remove('hidden');
+            }
+            // ✅ Gestion du score parfait
+            let perfectAchieved = false;
+            if (score >= SCORE_PARFAIT_N6 && window.currentUser?.uid) {
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    await updateDoc(userRef, {
+                        [`niveaux100.${THEME}`]: 6
+                    });
+                    perfectAchieved = true;
+                }
+            }
+            // Affichage message score parfait
+            if (perfectAchieved) {
+                perfectScoreMsg.classList.remove('hidden');
+            }
+            // Gestion déverrouillage niveau 7
+            let unlocked = false;
+            if (score >= SCORE_REQUIS_N7 && window.currentUser?.uid) {
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    const niveaux = userDoc.data().niveaux || {};
+                    const niveauActuel = niveaux[THEME] || 0;
+                    if (niveauActuel < 7) {
+                        await updateDoc(userRef, {
+                            [`niveaux.${THEME}`]: 7
+                        });
+                        unlocked = true;
+                    }
+                }
+            }
+            if (unlocked) {
+                levelUnlockMsg.style.display = 'block';
+            }
+            window.scrollTo(0, 0);
+        }
+        async function handleBack() {
+            if (gameCompleted) {
+                window.location.href = 'index.html';
+                return;
+            }
+            const newBest = Math.max(currentUserBestScore, score);
+            if (newBest > currentUserBestScore) {
+                await saveBestScore(newBest);
+            }
+            await saveScores(score);
+            stopAllTimers();
+            window.location.href = 'index.html';
+        }
+        function stopAllTimers() {
+            clearInterval(timerInterval);
+            clearInterval(qTimerInterval);
+        }
+        // 🔄 Navigation
+        mobileBackBtn.addEventListener('click', handleBack);
+        restartBtn.addEventListener('click', () => {
+            gameCompleted = false;
+            startGame();
+        });
+        homeBtn.addEventListener('click', handleBack);
+        // 🔐 Auth
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            window.currentUser = user;
+            const pseudo = localStorage.getItem('userPseudo') || user.email.split('@')[0];
+            // Sauvegarde locale
+            try {
+                const userRef = doc(db, 'users', user.uid);
+                const userDoc = await getDoc(userRef);
+                if (!userDoc.exists()) {
+                    console.warn("Utilisateur non trouvé dans Firestore");
+                    window.location.href = 'index.html';
+                    return;
+                }
+                const userData = userDoc.data();
+                const globalScore = userData.globalScore ?? 0;
+                const niveauChinois = (userData.niveaux?.[THEME]) ?? 0;
+                // ✅ Vérifications obligatoires avant de lancer le quiz
+                if (globalScore < 0 || niveauChinois < 6) {
+                    console.warn("Accès refusé : globalScore < 0 ou niveaux.chinois < 6");
+                    window.location.href = 'index.html';
+                    return;
+                }
+                // Met à jour l'UI
+                // Sauvegarde locale
+                localStorage.setItem('globalScore', globalScore.toString());
+                // ✅ Tout est OK → lancer le quiz
+                startGame();
+            } catch (error) {
+                console.error("Erreur lors de la vérification des prérequis :", error);
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>
+
