@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Quiz Master - Chinois N5</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -86,89 +86,65 @@
         }
         #game-container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 100%;
             margin: 0 auto;
         }
         #scene {
-            background-image: url('images/chinese-night-street.png');
-            background-size: cover;
+            background-image: url('images/chinese-night-street2.png');
+            background-size: contain;
             background-position: center;
-            height: 600px;
+            background-repeat: no-repeat;
+            width: 100%;
+            max-width: 1200px;
+            height: 650px;
             position: relative;
             border-radius: 14px;
             box-shadow: 0 0 16px rgba(255, 60, 60, 0.2);
             border: 2px solid rgba(180, 0, 0, 0.2);
             overflow: hidden;
+            margin: 10px auto;
         }
-        #sequence-line {
+        #lantern-container {
             position: absolute;
-            top: 18%;
+            top: 0;
+            left: 0;
             width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            z-index: 2;
+            height: 100%;
+            pointer-events: none;
         }
-        #sequence-line::before {
-            content: "";
-            width: 90%;
-            height: 3px;
-            background: #5d3019;
+        .lantern-hitbox {
             position: absolute;
-            top: 45px;
-        }
-        #choices {
-            position: absolute;
-            bottom: 5%;
-            width: 100%;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-        }
-        .lantern {
-            width: 70px;
-            height: 110px;
-            background-image: url('images/red-lantern.png');
-            background-size: cover;
-            position: relative;
+            cursor: pointer;
+            pointer-events: auto;
+            z-index: 10;
+            transform: translate(-50%, -50%);
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+        .debug-mode .lantern-hitbox {
+            border: 2px dashed rgba(255, 0, 0, 0.7);
+            background: rgba(0, 255, 255, 0.2);
+        }
+        .lantern-number {
+            position: absolute;
             font-family: "Noto Serif SC", serif;
-            font-size: 2rem;
-            color: gold;
-            text-shadow: 0 0 4px black;
-            cursor: grab;
-            user-select: none;
-            transition: transform 0.2s;
+            font-weight: 700;
+            font-size: 24px;
+            color: #f8f4e9;
+            text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+            z-index: 11;
+            opacity: 0.7;
+            transition: opacity 0.3s;
         }
-        .lantern:hover {
-            transform: scale(1.05);
+        .lantern-hitbox.glow .lantern-number,
+        .lantern-hitbox.lit .lantern-number {
+            opacity: 1;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.9);
         }
-        .slot {
-            width: 70px;
-            height: 110px;
-            border-bottom: 3px dashed rgba(255, 255, 255, 0.4);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            filter: brightness(0.75);
-        }
-        .lantern.correct {
-            filter: brightness(1.3) drop-shadow(0 0 12px gold);
-            animation: glow 0.6s forwards;
-        }
-        @keyframes glow {
-            from { filter: brightness(0.9) drop-shadow(0 0 0px gold); }
-            to   { filter: brightness(1.3) drop-shadow(0 0 14px gold); }
-        }
-        @keyframes fly {
-            from { transform: translateY(0); }
-            to   { transform: translateY(-400px); opacity: 0; }
-        }
-        .lantern.fly-away {
-            animation: fly 2s forwards;
+        .debug-mode .lantern-number {
+            color: red;
+            text-shadow: none;
         }
         #timers-container {
             width: 100%;
@@ -179,8 +155,7 @@
             align-items: center;
             gap: 8px;
         }
-        #timer-bar-container,
-        #question-timer-bar-container {
+        #timer-bar-container {
             width: 100%;
             max-width: 310px;
             text-align: left;
@@ -188,8 +163,7 @@
             color: #b40000;
             font-weight: 600;
         }
-        #timer-bar,
-        #question-timer-bar {
+        #timer-bar {
             width: 100%;
             height: 10px;
             background: #fde3d0;
@@ -198,59 +172,33 @@
             overflow: hidden;
             border: 1px solid rgba(180, 0, 0, 0.2);
         }
-        #timer-fill,
-        #question-timer-fill {
+        #timer-fill {
             height: 100%;
             width: 100%;
             border-radius: 7px;
             transition: width 0.3s linear;
-        }
-        #timer-fill {
             background: linear-gradient(90deg, #b40000, #ff4d2e, #ff9b00);
         }
-        #question-timer-fill {
-            background: linear-gradient(90deg, #ff9b00, #ff4d2e, #b40000);
-        }
-        #score-lives {
-            margin-top: 10px;
+        #lives-container {
+            margin-top: 12px;
             display: flex;
-            gap: 50px;
             justify-content: center;
-            font-size: 1.1em;
-            position: relative;
-            color: #b40000;
-            font-weight: 600;
-        }
-        .score-container {
-            margin-top: 7px;
-            font-size: 19px;
-            text-shadow: 0 0 5px rgba(255, 130, 100, 0.3);
+            gap: 8px;
         }
         .heart {
-            font-size: 22px;
+            font-size: 28px;
             margin: 0 3px;
             color: #d35949;
             text-shadow: 0 0 4px rgba(211, 89, 73, 0.6);
         }
+        .heart.empty {
+            color: #b40000;
+            text-shadow: 0 0 4px rgba(180, 0, 0, 0.4);
+        }
         @media (max-width: 899px) {
             #scene {
                 height: 500px;
-            }
-            .lantern {
-                width: 60px;
-                height: 90px;
-                font-size: 1.5rem;
-            }
-            .slot {
-                width: 60px;
-                height: 90px;
-            }
-            #score-lives {
-                flex-direction: column;
-                gap: 4px;
-                margin-top: 10px;
-                align-items: center;
-                color: #b40000;
+                max-width: 100%;
             }
             #mobile-quiz-ui-row {
                 display: flex;
@@ -260,48 +208,6 @@
                 padding: 0 15px;
                 width: 100%;
                 max-width: 1200px;
-            }
-            #current-game-stats {
-                margin: 0;
-                flex: 1;
-                max-width: 160px;
-                background: rgba(255, 250, 240, 0.85);
-                border-radius: 8px;
-                padding: 12px;
-                box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
-                border: 2px solid rgba(180, 0, 0, 0.15);
-                height: 110px;
-            }
-            .stats-title {
-                font-size: 0.9em;
-                margin-bottom: 6px;
-                font-weight: 700;
-                letter-spacing: 0.7px;
-                color: #b40000;
-                text-shadow: 0 0 5px rgba(200, 0, 0, 0.3);
-                text-align: center;
-                font-family: "Noto Serif SC", serif;
-            }
-            .current-score {
-                font-size: 1.4em;
-                margin: 5px 0;
-                text-align: center;
-                color: #9bc24f;
-                font-family: "Noto Serif SC", serif;
-            }
-            .stats-row {
-                padding: 3px 0;
-                font-size: 0.85em;
-                display: flex;
-                justify-content: space-between;
-                color: #2a2a2a;
-            }
-            .stats-label {
-                font-weight: 600;
-            }
-            .stats-value {
-                font-weight: bold;
-                color: #b40000;
             }
             #mobile-back-container {
                 background: rgba(255, 250, 240, 0.85);
@@ -340,49 +246,6 @@
             }
             #mobile-back-btn {
                 display: none !important;
-            }
-            #current-game-stats {
-                background: rgba(255, 250, 240, 0.85);
-                border-radius: 10px;
-                padding: 16px;
-                margin-top: 16px;
-                max-width: 250px;
-                width: 100%;
-                box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.2);
-                border: 2px solid rgba(180, 0, 0, 0.15);
-            }
-            .stats-title {
-                text-align: center;
-                margin-bottom: 10px;
-                color: #b40000;
-                font-size: 1.1em;
-                font-weight: 700;
-                letter-spacing: 0.8px;
-                text-shadow: 0 0 5px rgba(200, 0, 0, 0.3);
-                font-family: "Noto Serif SC", serif;
-            }
-            .current-score {
-                font-size: 1.8em;
-                font-weight: bold;
-                color: #9bc24f;
-                margin: 7px 0;
-                text-align: center;
-                font-family: "Noto Serif SC", serif;
-            }
-            .stats-row {
-                display: flex;
-                justify-content: space-between;
-                padding: 6px 0;
-                border-bottom: 1px solid rgba(180, 0, 0, 0.2);
-                font-size: 0.9em;
-                color: #2a2a2a;
-            }
-            .stats-label {
-                font-weight: 600;
-            }
-            .stats-value {
-                font-weight: bold;
-                color: #b40000;
             }
         }
         /* RESULT SECTION */
@@ -454,8 +317,7 @@
         <section id="game-section" class="hidden">
             <div id="game-container">
                 <div id="scene">
-                    <div id="sequence-line"></div>
-                    <div id="choices"></div>
+                    <div id="lantern-container"></div>
                 </div>
             </div>
             <div id="timers-container">
@@ -465,33 +327,15 @@
                         <div id="timer-fill"></div>
                     </div>
                 </div>
-                <div id="question-timer-bar-container">
-                    <span>⚡ Question : <span id="question-timer">0</span>s</span>
-                    <div id="question-timer-bar">
-                        <div id="question-timer-fill"></div>
-                    </div>
-                </div>
             </div>
-            <div id="score-lives">
-                <div class="score-container">Score : <span id="score">0</span></div>
-                <div id="lives">
-                    <span class="heart">❤</span><span class="heart">❤</span><span class="heart">❤</span><span
-                        class="heart">❤</span><span class="heart">❤</span>
-                </div>
+            <div id="lives-container">
+                <span class="heart">❤</span>
+                <span class="heart">❤</span>
+                <span class="heart">❤</span>
+                <span class="heart">❤</span>
+                <span class="heart">❤</span>
             </div>
             <div id="mobile-quiz-ui-row">
-                <div id="current-game-stats">
-                    <div class="stats-title">📊 Stats</div>
-                    <div class="current-score" id="current-score-display-mobile">0</div>
-                    <div class="stats-row">
-                        <span class="stats-label">Fausses :</span>
-                        <span class="stats-value" id="wrong-answers-mobile">0</span>
-                    </div>
-                    <div class="stats-row">
-                        <span class="stats-label">Meilleur :</span>
-                        <span class="stats-value" id="best-score-display-mobile">0</span>
-                    </div>
-                </div>
                 <div id="mobile-back-container">
                     <button id="mobile-back-btn" class="action-btn">←</button>
                 </div>
@@ -500,11 +344,9 @@
         <section id="result-section" class="hidden">
             <h2>Partie terminée ! 🎉</h2>
             <div class="result-stats">
-                <h3>Résumé</h3>
-                <p>Score de la partie : <strong id="final-score">0</strong></p>
-                <p>Meilleur score (N5) : <strong id="best-score">0</strong></p>
-                <p>Score Chinois : <strong id="new-theme-score">0</strong></p>
-                <p>Score Global : <strong id="new-global-score">0</strong></p>
+                <h3>Résultat</h3>
+                <p id="game-result-message"></p>
+                <p>Temps restant : <strong id="remaining-time">0</strong> secondes</p>
                 <div id="level-up-msg" class="hidden" style="color: #9bc24f; margin-top: 12px; font-weight: bold;">
                     🎊 NIVEAU SUPÉRIEUR ATTEINT !
                 </div>
@@ -529,37 +371,7 @@
         // 🔑 CONFIGURATION
         const THEME = 'chinois';
         const QUIZ_TITLE = 'Chinois N5';
-        const SCORE_REQUIS_N6 = 18;
-        const SCORE_PARFAIT_N5 = 25; // Score parfait = 100%
-        
-        // ------- PARAMETRES DU JEU -------
-        const start = 6;
-        const totalLanterns = 20;
-        // 1 = préplacée, 0 = vide à remplir
-        const fixedMap = [
-          1,1,1,1,1,
-          1,1,0,1,0,
-          1,0,0,1,1,
-          0,1,1,1
-        ]; // total 20, adapte si besoin
-
-        // ------- GENERATION SUITE NUMERIQUE -------
-        function generateSequence(start, count) {
-          const result = [];
-          for (let i = 0; i < count; i++) {
-            result.push((start + i) % 11); // cycle 0..10
-          }
-          return result;
-        }
-
-        const sequence = generateSequence(start, totalLanterns);
-
-        // ------- CONVERSION CHIFFRES → SINOTEXTES -------
-        const chineseNumbers = ["零","一","二","三","四","五","六","七","八","九","十","十一"];
-        function numberToChinese(n) {
-            return chineseNumbers[n] ?? n;
-        }
-
+        const DEBUG_MODE = false; // Mettre à false en production
         // 🌐 Firebase init
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
@@ -576,42 +388,60 @@
         // ✅ DOM
         const gameSection = document.getElementById('game-section');
         const resultSection = document.getElementById('result-section');
-        const scoreDisplay = document.getElementById('score');
-        const livesDisplay = document.getElementById('lives');
         const timerDisplay = document.getElementById('timer');
-        const qTimerDisplay = document.getElementById('question-timer');
         const timerFill = document.getElementById('timer-fill');
-        const qTimerFill = document.getElementById('question-timer-fill');
         const mobileBackBtn = document.getElementById('mobile-back-btn');
         const restartBtn = document.getElementById('restart-btn');
         const homeBtn = document.getElementById('home-btn');
         const levelUnlockMsg = document.getElementById('level-unlock-msg');
+        const levelUpMsg = document.getElementById('level-up-msg');
         const perfectScoreMsg = document.getElementById('perfect-score-msg');
-        const currentScoreDisplayMobile = document.getElementById('current-score-display-mobile');
-        const wrongAnswersDisplayMobile = document.getElementById('wrong-answers-mobile');
-        const bestScoreDisplayMobile = document.getElementById('best-score-display-mobile');
-        const sequenceLine = document.getElementById("sequence-line");
-        const choicesContainer = document.getElementById("choices");
+        const livesContainer = document.getElementById('lives-container');
+        const gameResultMessage = document.getElementById('game-result-message');
+        const remainingTimeDisplay = document.getElementById('remaining-time');
+        // 🔧 DEBUG MODE - Ajoute une classe pour visualiser les hitboxes
+        if (DEBUG_MODE) {
+            document.body.classList.add('debug-mode');
+        }
         // ✅ États du jeu
-        let score = 0, lives = 0, timeLeft = 0, qTime = 0;
-        let timerInterval = null, qTimerInterval = null, awaitingNext = false;
+        let timeLeft = 0;
+        let timerInterval = null;
         let gameCompleted = false;
+        let nextExpectedNumber = 0;
+        let lives = 5;
         let wrongAnswers = 0;
-        let currentUserBestScore = 0;
-        let lanternCount = 0; // Compteur pour attribuer des IDs uniques aux lanternes
-        let filledSlots = 0; // Nombre de slots remplis correctement
+        
+        // Chiffres chinois
+        const chineseNumbers = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
+        
         // ⏱️ Config du niveau
         const levelConfig = {
             time: 60,
-            qTime: 8, // 8 secondes par question
             lives: 5
         };
+        
+        // 🔧 Positions et tailles des hitboxes
+        const lanterns = [
+            { id: "ling", value: 0, top: "54%", left: "40%", width: "3%", height: "4%" }, // 零 (centre)    
+            { id: "yi", value: 1, top: "56.5%", left: "61.5%", width: "1.65%", height: "2.85%" },   // 一  ✅  
+            { id: "er", value: 2, top: "48%", left: "72.5%", width: "6%", height: "8%" },   // 二    ✅
+            { id: "san", value: 3, top: "44.1%", left: "14%", width: "8%", height: "9%" },  // 三   ✅
+            { id: "si", value: 4, top: "55%", left: "44.5%", width: "2%", height: "3%" },   // 四    
+            { id: "wu", value: 5, top: "47%", left: "26.1%", width: "6%", height: "6.5%" },  // 五    ✅
+            { id: "liu", value: 6, top: "53%", left: "67.5%", width: "3%", height: "5%" },  // 六     ✅
+            { id: "qi", value: 7, top: "57%", left: "58%", width: "1.5%", height: "2%" },   // 七   ✅ (modifié)
+            { id: "ba", value: 8, top: "43%", left: "89.5%", width: "8.5%", height: "12%" },  // 八    ✅
+            { id: "jiu", value: 9, top: "54%", left: "64.5%", width: "2.3%", height: "4%" },  // 九    ✅ (modifié)
+            { id: "shi", value: 10, top: "53%", left: "35%", width: "4%", height: "5%" } // 十    ✅
+        ];
+        
         // 🔁 Fonctions utilitaires
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
+        
         function updateQuizHeaderVisibility(isQuizActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('quiz-active', isQuizActive);
@@ -620,247 +450,205 @@
                 mobileBackBtn.classList.add('hidden');
             }
         }
+        
         function updateResultHeaderVisibility(isResultActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('result-active', isResultActive);
             }
         }
-        // 📥 Fetch best score from DB with local fallback
-        async function fetchBestScore() {
-            if (!window.currentUser?.uid) {
-                return parseInt(localStorage.getItem(`best-score-${THEME}-n5`) || '0');
-            }
-            try {
-                const userRef = doc(db, 'users', window.currentUser.uid);
-                const userDoc = await getDoc(userRef);
-                if (userDoc.exists()) {
-                    const bestScore = userDoc.data().bestScores?.[THEME] || 0;
-                    localStorage.setItem(`best-score-${THEME}-n5`, bestScore.toString());
-                    return bestScore;
+        
+        function updateLivesDisplay() {
+            const hearts = livesContainer.querySelectorAll('.heart');
+            hearts.forEach((heart, i) => {
+                if (i < lives) {
+                    heart.textContent = '❤';
+                    heart.classList.remove('empty');
+                } else {
+                    heart.textContent = '♡';
+                    heart.classList.add('empty');
                 }
-            } catch (error) {
-                console.warn('Erreur chargement bestScore, fallback local:', error);
-            }
-            return parseInt(localStorage.getItem(`best-score-${THEME}-n5`) || '0');
-        }
-        // 💾 Save best score to DB with local fallback
-        async function saveBestScore(newBest) {
-            if (!window.currentUser?.uid) {
-                localStorage.setItem(`best-score-${THEME}-n5`, newBest.toString());
-                return;
-            }
-            try {
-                const userRef = doc(db, 'users', window.currentUser.uid);
-                await updateDoc(userRef, {
-                    [`bestScores.${THEME}`]: newBest
-                });
-                localStorage.setItem(`best-score-${THEME}-n5`, newBest.toString());
-            } catch (error) {
-                console.warn('Erreur sauvegarde bestScore, fallback local:', error);
-                localStorage.setItem(`best-score-${THEME}-n5`, newBest.toString());
-            }
-        }
-        // 📥 Sauvegarde via transaction
-        async function saveScores(incrementValue) {
-            if (!window.currentUser?.uid || incrementValue <= 0) return;
-            const uid = window.currentUser.uid;
-            try {
-                await runTransaction(db, async (transaction) => {
-                    const userRef = doc(db, 'users', uid);
-                    const userDoc = await transaction.get(userRef);
-                    if (!userDoc.exists()) throw new Error("Utilisateur introuvable");
-                    const currentGlobal = userDoc.data().globalScore || 0;
-                    const currentTheme = userDoc.data().quizScores?.[THEME] || 0;
-                    transaction.update(userRef, {
-                        globalScore: increment(incrementValue),
-                        [`quizScores.${THEME}`]: increment(incrementValue)
-                    });
-                    const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
-                    quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
-                    localStorage.setItem('quizScores', JSON.stringify(quizScores));
-                    localStorage.setItem('globalScore', (currentGlobal + incrementValue).toString());
-                });
-            } catch (error) {
-                console.warn('Erreur sauvegarde, fallback local:', error);
-                const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
-                quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
-                const global = (parseInt(localStorage.getItem('globalScore') || '0') + incrementValue);
-                localStorage.setItem('quizScores', JSON.stringify(quizScores));
-                localStorage.setItem('globalScore', global.toString());
-            }
-        }
-        // Création d'une lanterne fixe
-        function createFixedLantern(value) {
-          const div = document.createElement("div");
-          div.classList.add("lantern");
-          div.textContent = numberToChinese(value);
-          div.dataset.value = value;
-          div.dataset.id = `fixed-${lanternCount++}`;
-          sequenceLine.appendChild(div);
-        }
-
-        // Création d'un emplacement vide (drop slot)
-        function createDropSlot(expectedValue) {
-          const div = document.createElement("div");
-          div.classList.add("slot");
-          div.dataset.expected = expectedValue;
-          div.dataset.id = `slot-${lanternCount++}`;
-          div.addEventListener("dragover", e => e.preventDefault());
-          div.addEventListener("drop", handleDrop);
-          sequenceLine.appendChild(div);
-        }
-
-        // Création d'une lanterne de choix
-        function createChoiceLantern(value) {
-          const div = document.createElement("div");
-          div.classList.add("lantern");
-          div.textContent = numberToChinese(value);
-          div.dataset.value = value;
-          div.dataset.id = `choice-${lanternCount++}`;
-          div.draggable = true;
-
-          div.addEventListener("dragstart", e => {
-            e.dataTransfer.setData("text/plain", div.dataset.value);
-            e.dataTransfer.setData("id", div.dataset.id);
-          });
-
-          choicesContainer.appendChild(div);
-        }
-
-        // Gestion du drop
-        function handleDrop(e) {
-          e.preventDefault();
-          const value = e.dataTransfer.getData("text/plain");
-          const id = e.dataTransfer.getData("id");
-          const expected = this.dataset.expected;
-          
-          // Trouver la lanterne draggable
-          const lantern = document.querySelector(`.lantern[data-id="${id}"]`);
-          
-          if (!this.hasChildNodes() && value === expected) {
-            this.appendChild(lantern);
-            lantern.classList.add("correct");
-            this.classList.add("filled");
-            filledSlots++;
-            
-            // Incrémenter le score pour chaque bonne réponse
-            score++;
-            scoreDisplay.textContent = score;
-            updateStatsDisplayMobile();
-            
-            checkWin();
-          } else if (value !== expected) {
-              // Mauvaise réponse
-              lives = Math.max(0, lives - 1);
-              wrongAnswers++;
-              updateLives();
-              updateStatsDisplayMobile();
-              
-              // Replacer la lanterne dans le conteneur de choix
-              choicesContainer.appendChild(lantern);
-              
-              // Désactiver temporairement la lanterne incorrecte
-              lantern.style.opacity = '0.5';
-              setTimeout(() => {
-                  lantern.style.opacity = '1';
-              }, 1000);
-              
-              if (lives <= 0) {
-                  endGame();
-              }
-          }
+            });
         }
         
-        // Vérifier si la partie est gagnée
-        function checkWin() {
-          if (filledSlots === totalLanterns - fixedMap.filter(m => m === 1).length) {
-            // Tous les slots sont remplis correctement
-            setTimeout(playSuccessAnimation, 500);
-          }
+        // 🔥 Lantern UI functions
+        function createLanterns() {
+            const container = document.getElementById('lantern-container');
+            container.innerHTML = '';
+            lanterns.forEach(lantern => {
+                const hitbox = document.createElement('div');
+                hitbox.className = 'lantern-hitbox';
+                hitbox.dataset.value = lantern.value;
+                hitbox.dataset.id = lantern.id;
+                hitbox.style.top = lantern.top;
+                hitbox.style.left = lantern.left;
+                hitbox.style.width = lantern.width;
+                hitbox.style.height = lantern.height;
+                const number = document.createElement('div');
+                number.className = 'lantern-number';
+                number.textContent = chineseNumbers[lantern.value];
+                hitbox.appendChild(number);
+                hitbox.addEventListener('click', () => handleLanternClick(lantern.value, hitbox));
+                container.appendChild(hitbox);
+            });
         }
-
-        // Animation de succès
-        function playSuccessAnimation() {
-          // Faire s'envoler toutes les lanternes
-          document.querySelectorAll('.lantern').forEach(l => {
-            l.classList.add("fly-away");
-          });
-          
-          // Attendre la fin de l'animation avant de terminer le jeu
-          setTimeout(endGame, 2000);
+        
+        function resetLanterns() {
+            const hitboxes = document.querySelectorAll('.lantern-hitbox');
+            hitboxes.forEach(box => {
+                box.classList.remove('lit');
+            });
+            nextExpectedNumber = 0;
         }
-
-        // 🎮 Logique de jeu
-        async function startGame() {
+        
+        function handleLanternClick(value, element) {
             if (gameCompleted) return;
-            stopAllTimers();
-            score = 0; lives = levelConfig.lives; timeLeft = levelConfig.time; qTime = levelConfig.qTime;
+            
+            // Vérifier si c'est le prochain chiffre attendu
+            if (value === nextExpectedNumber) {
+                // Clic correct
+                element.classList.add('lit');
+                nextExpectedNumber++;
+                
+                // Si on a cliqué sur toutes les lanternes (0 à 10)
+                if (nextExpectedNumber > 10) {
+                    finishGame(true);
+                }
+            } else {
+                // Clic incorrect - perdre une vie
+                if (lives > 0) {
+                    lives--;
+                    wrongAnswers++;
+                    updateLivesDisplay();
+                    
+                    if (lives <= 0) {
+                        finishGame(false);
+                    }
+                }
+            }
+        }
+        
+        function finishGame(success) {
+            gameCompleted = true;
+            clearInterval(timerInterval);
+            
+            if (success) {
+                gameResultMessage.textContent = "🎉 Félicitations ! Vous avez résolu l'énigme !";
+                gameResultMessage.style.color = "#9bc24f";
+                remainingTimeDisplay.textContent = timeLeft;
+                
+                // Gestion déverrouillage niveau 6 et score parfait
+                handleVictory();
+            } else {
+                gameResultMessage.textContent = "⏰ Vous avez perdu toutes vos vies ! Réessayez.";
+                gameResultMessage.style.color = "#d35949";
+                remainingTimeDisplay.textContent = "0";
+            }
+            
+            gameSection.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+            updateQuizHeaderVisibility(false);
+            updateResultHeaderVisibility(true);
+            window.scrollTo(0, 0);
+        }
+        
+        async function handleVictory() {
+            if (!window.currentUser?.uid) return;
+            
+            const userRef = doc(db, 'users', window.currentUser.uid);
+            const userDoc = await getDoc(userRef);
+            
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                const niveaux = data.niveaux || {};
+                const niveaux100 = data.niveaux100 || {};
+                const currentLevel = niveaux[THEME] || 0;
+                const currentPerfectLevel = niveaux100[THEME] || 0;
+                const updates = {};
+                
+                // Déverrouiller le niveau suivant si nécessaire
+                if (currentLevel === 5) {
+                    updates[`niveaux.${THEME}`] = 6;
+                    levelUnlockMsg.style.display = 'block';
+                }
+                
+                // Mettre à jour le niveau parfait si nécessaire
+                if (currentPerfectLevel === 4) {
+                    updates[`niveaux100.${THEME}`] = 5;
+                    perfectScoreMsg.classList.remove('hidden');
+                }
+                
+                // Si on a débloqué un nouveau niveau général
+                const themeScore = data.quizScores?.[THEME] || 0;
+                if (Math.floor((themeScore + 25) / 50) > Math.floor(themeScore / 50)) {
+                    levelUpMsg.classList.remove('hidden');
+                }
+                
+                // Enregistrer les scores et niveaux
+                if (Object.keys(updates).length > 0) {
+                    await updateDoc(userRef, updates);
+                }
+                
+                // Incrémenter le score global et thématique
+                try {
+                    await runTransaction(db, async (transaction) => {
+                        const currentUserDoc = await transaction.get(userRef);
+                        if (!currentUserDoc.exists()) {
+                            throw "Document utilisateur non trouvé!";
+                        }
+                        
+                        const currentGlobal = currentUserDoc.data().globalScore || 0;
+                        const currentTheme = currentUserDoc.data().quizScores?.[THEME] || 0;
+                        
+                        transaction.update(userRef, {
+                            globalScore: increment(25),
+                            [`quizScores.${THEME}`]: increment(25)
+                        });
+                        
+                        // Sauvegarde locale
+                        localStorage.setItem('globalScore', (currentGlobal + 25).toString());
+                        const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+                        quizScores[THEME] = (currentTheme + 25);
+                        localStorage.setItem('quizScores', JSON.stringify(quizScores));
+                    });
+                } catch (error) {
+                    console.error("Erreur transaction score:", error);
+                }
+            }
+        }
+        
+        // 🎮 Logique de jeu
+        function startGame() {
+            if (gameCompleted) return;
+            clearInterval(timerInterval);
+            
+            timeLeft = levelConfig.time;
+            lives = levelConfig.lives;
+            nextExpectedNumber = 0;
+            gameCompleted = false;
             wrongAnswers = 0;
-            filledSlots = 0;
-            lanternCount = 0;
-            
-            // Réinitialiser les conteneurs
-            sequenceLine.innerHTML = '';
-            choicesContainer.innerHTML = '';
-            
-            scoreDisplay.textContent = score;
-            updateLives();
-            currentUserBestScore = await fetchBestScore();
-            updateStatsDisplayMobile();
             
             gameSection.classList.remove('hidden');
             resultSection.classList.add('hidden');
             updateQuizHeaderVisibility(true);
             updateResultHeaderVisibility(false);
+            updateLivesDisplay();
             
-            // ------- Construction de la scène -------
-            sequence.forEach((value, index) => {
-              if (fixedMap[index] === 1) {
-                createFixedLantern(value);
-              } else {
-                createDropSlot(value);
-              }
-            });
-
-            // ------- Génération zone choix (0 → 10) -------
-            for (let i = 0; i <= 10; i++) {
-              createChoiceLantern(i);
-            }
-            
-            startMainTimer();
+            resetLanterns();
+            createLanterns();
+            startTimer();
             window.scrollTo(0, 0);
         }
         
-        function updateLives() {
-            const total = levelConfig.lives;
-            const hearts = livesDisplay.querySelectorAll('.heart');
-            hearts.forEach((heart, i) => {
-                if (i < lives) {
-                    heart.textContent = '❤';
-                    heart.style.color = '#d35949';
-                    heart.style.textShadow = '0 0 4px rgba(211, 89, 73, 0.6)';
-                } else {
-                    heart.textContent = '♡';
-                    heart.style.color = '#b40000';
-                    heart.style.textShadow = '0 0 4px rgba(180, 0, 0, 0.4)';
-                }
-            });
-        }
-        function updateStatsDisplayMobile() {
-            currentScoreDisplayMobile.textContent = score;
-            wrongAnswersDisplayMobile.textContent = wrongAnswers;
-            bestScoreDisplayMobile.textContent = currentUserBestScore;
-        }
-        function startMainTimer() {
-            clearInterval(timerInterval);
+        function startTimer() {
             timerDisplay.textContent = timeLeft;
             timerFill.style.width = (timeLeft / levelConfig.time * 100) + '%';
+            
             timerInterval = setInterval(() => {
-                // Ne pas décrémenter si on est en attente d'action
-                if (awaitingNext) return;
                 timeLeft--;
                 timerDisplay.textContent = timeLeft;
                 timerFill.style.width = (timeLeft / levelConfig.time * 100) + '%';
+                
+                // Changement de couleur selon le temps restant
                 if (timeLeft <= 5) {
                     timerFill.style.background = 'linear-gradient(90deg, #ff4757, #ff6b81)';
                 } else if (timeLeft <= 10) {
@@ -868,93 +656,23 @@
                 } else {
                     timerFill.style.background = 'linear-gradient(90deg,#b40000,#ff4d2e,#ff9b00)';
                 }
+                
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    endGame();
+                    finishGame(false);
                 }
             }, 1000);
         }
-        async function endGame() {
-            if (gameCompleted) return;
-            gameCompleted = true;
-            clearInterval(timerInterval);
-            clearInterval(qTimerInterval);
-            
-            await saveScores(score);
-            const newBest = Math.max(currentUserBestScore, score);
-            if (newBest > currentUserBestScore) {
-                currentUserBestScore = newBest;
-                await saveBestScore(newBest);
-            }
-            gameSection.classList.add('hidden');
-            resultSection.classList.remove('hidden');
-            updateQuizHeaderVisibility(false);
-            updateResultHeaderVisibility(true);
-            document.getElementById('final-score').textContent = score;
-            document.getElementById('best-score').textContent = currentUserBestScore;
-            const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
-            const globalScore = parseInt(localStorage.getItem('globalScore') || '0');
-            const themeScore = quizScores[THEME] || 0;
-            document.getElementById('new-global-score').textContent = globalScore;
-            document.getElementById('new-theme-score').textContent = themeScore;
-            const oldTheme = themeScore - score;
-            if (Math.floor(themeScore / 50) > Math.floor(oldTheme / 50)) {
-                document.getElementById('level-up-msg').classList.remove('hidden');
-            }
-            // ✅ Gestion du score parfait
-            let perfectAchieved = false;
-            if (score >= SCORE_PARFAIT_N5 && window.currentUser?.uid) {
-                const userRef = doc(db, 'users', window.currentUser.uid);
-                const userDoc = await getDoc(userRef);
-                if (userDoc.exists()) {
-                    await updateDoc(userRef, {
-                        [`niveaux100.${THEME}`]: 1
-                    });
-                    perfectAchieved = true;
-                }
-            }
-            // Affichage message score parfait
-            if (perfectAchieved) {
-                perfectScoreMsg.classList.remove('hidden');
-            }
-            // Gestion déverrouillage niveau 6
-            let unlocked = false;
-            if (score >= SCORE_REQUIS_N6 && window.currentUser?.uid) {
-                const userRef = doc(db, 'users', window.currentUser.uid);
-                const userDoc = await getDoc(userRef);
-                if (userDoc.exists()) {
-                    const niveaux = userDoc.data().niveaux || {};
-                    const niveauActuel = niveaux[THEME] || 0;
-                    if (niveauActuel < 6) {
-                        await updateDoc(userRef, {
-                            [`niveaux.${THEME}`]: 6
-                        });
-                        unlocked = true;
-                    }
-                }
-            }
-            if (unlocked) {
-                levelUnlockMsg.style.display = 'block';
-            }
-            window.scrollTo(0, 0);
-        }
+        
         async function handleBack() {
             if (gameCompleted) {
                 window.location.href = 'index.html';
                 return;
             }
-            const newBest = Math.max(currentUserBestScore, score);
-            if (newBest > currentUserBestScore) {
-                await saveBestScore(newBest);
-            }
-            await saveScores(score);
-            stopAllTimers();
+            clearInterval(timerInterval);
             window.location.href = 'index.html';
         }
-        function stopAllTimers() {
-            clearInterval(timerInterval);
-            clearInterval(qTimerInterval);
-        }
+        
         // 🔄 Navigation
         mobileBackBtn.addEventListener('click', handleBack);
         restartBtn.addEventListener('click', () => {
@@ -962,6 +680,7 @@
             startGame();
         });
         homeBtn.addEventListener('click', handleBack);
+        
         // 🔐 Auth
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
@@ -970,7 +689,7 @@
             }
             window.currentUser = user;
             const pseudo = localStorage.getItem('userPseudo') || user.email.split('@')[0];
-            // Sauvegarde locale
+            
             try {
                 const userRef = doc(db, 'users', user.uid);
                 const userDoc = await getDoc(userRef);
@@ -982,15 +701,14 @@
                 const userData = userDoc.data();
                 const globalScore = userData.globalScore ?? 0;
                 const niveauChinois = (userData.niveaux?.[THEME]) ?? 0;
+                
                 // ✅ Vérifications obligatoires avant de lancer le quiz
                 if (globalScore < 0 || niveauChinois < 5) { // Niveau 5 requis
                     console.warn("Accès refusé : globalScore < 0 ou niveaux.chinois < 5");
                     window.location.href = 'index.html';
                     return;
                 }
-                // Met à jour l'UI
-                // Sauvegarde locale
-                localStorage.setItem('globalScore', globalScore.toString());
+                
                 // ✅ Tout est OK → lancer le quiz
                 startGame();
             } catch (error) {
