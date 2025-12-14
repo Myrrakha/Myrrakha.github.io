@@ -766,12 +766,12 @@
                 btn.onclick = () => handleAnswer(shuffled[i], q.correct);
             });
             qTime = levelConfig.qTime;
-            setTimeout(startQTimer, 100);
+            setTimeout(start, 100);
         }
         function handleAnswer(selected, correct) {
             if (awaitingNext) return;
             awaitingNext = true;
-            clearInterval(qTimerInterval);
+            clearInterval(Interval);
             answerBtns.forEach(btn => {
                 btn.disabled = true;
                 if (btn.innerHTML === escapeHtml(correct)) btn.classList.add('correct');
@@ -793,7 +793,7 @@
                     awaitingNext = false;
                     generateQuestion();
                 }
-            }, 800);
+            }, 1000);
         }
         function updateLives() {
             const total = levelConfig.lives;
@@ -989,5 +989,6 @@
     </script>
 </body>
 </html>
+
 
 
