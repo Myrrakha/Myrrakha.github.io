@@ -126,6 +126,23 @@
             border: 2px dashed rgba(255, 0, 0, 0.7);
             background: rgba(0, 255, 255, 0.2);
         }
+        .glow-effect {
+            position: absolute;
+            width: 30%;
+            height: 30%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(255, 140, 0, 0) 70%);
+            border-radius: 50%;
+            opacity: 0.7;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .lantern-hitbox:hover .glow-effect {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+        .lantern-hitbox.lit .glow-effect {
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 215, 0, 0.6) 70%);
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+        }
         .lantern-number {
             position: absolute;
             font-family: "Noto Serif SC", serif;
@@ -136,15 +153,10 @@
             z-index: 11;
             opacity: 0.7;
             transition: opacity 0.3s;
-        }
-        .lantern-hitbox.glow .lantern-number,
-        .lantern-hitbox.lit .lantern-number {
-            opacity: 1;
-            text-shadow: 0 0 8px rgba(255, 215, 0, 0.9);
+            display: none; /* Caché par défaut en production */
         }
         .debug-mode .lantern-number {
-            color: red;
-            text-shadow: none;
+            display: block; /* Affiché uniquement en mode debug */
         }
         #timers-container {
             width: 100%;
@@ -371,7 +383,7 @@
         // 🔑 CONFIGURATION
         const THEME = 'chinois';
         const QUIZ_TITLE = 'Chinois N5';
-        const DEBUG_MODE = false; // Mettre à false en production
+        const DEBUG_MODE = false; // Mettre à false en production (caractères chinois cachés)
         // 🌐 Firebase init
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
@@ -483,10 +495,19 @@
                 hitbox.style.left = lantern.left;
                 hitbox.style.width = lantern.width;
                 hitbox.style.height = lantern.height;
-                const number = document.createElement('div');
-                number.className = 'lantern-number';
-                number.textContent = chineseNumbers[lantern.value];
-                hitbox.appendChild(number);
+                
+                // Ajouter l'effet glow même en production
+                const glowEffect = document.createElement('div');
+                glowEffect.className = 'glow-effect';
+                hitbox.appendChild(glowEffect);
+                
+                // Créer le numéro seulement si le mode debug est activé
+                if (DEBUG_MODE) {
+                    const number = document.createElement('div');
+                    number.className = 'lantern-number';
+                    number.textContent = chineseNumbers[lantern.value];
+                    hitbox.appendChild(number);
+                }
                 hitbox.addEventListener('click', () => handleLanternClick(lantern.value, hitbox));
                 container.appendChild(hitbox);
             });
