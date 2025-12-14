@@ -649,39 +649,77 @@
         let timeoutId = null; // Pour le timer de question
         let skipTimer = null; // Pour le timer du bouton passer
         let finalTranscript = null; // Pour stocker le dernier résultat final
-
         // Fonction pour normaliser et filtrer les nombres chinois - VERSION OPTIMISÉE POUR RECONNAISSANCE CHINOISE
         function normalizeChineseNumber(input) {
             // Tableau des caractères chinois valides et leurs homophones courants
             const validCharacters = {
-                "零": ["零", "灵", "另", "凌", "齡", "鈴", "領", "聆", "菱"], // Homophones communs pour "ling"
-                "一": ["一", "衣", "依", "伊", "壹", "揖", "揖", "壹"], // Homophones communs pour "yi"
-                "二": ["二", "而", "兒", "尔", "貳", "耳", "餌", "珥"], // Homophones communs pour "er"
-                "三": ["三", "參", "叁", "散", "珊", "山", "杉", "刪"], // Homophones communs pour "san"
-                "四": ["四", "肆", "死", "思", "司", "私", "絲", "斯"], // Homophones communs pour "si"
-                "五": ["五", "伍", "武", "舞", "無", "物", "屋", "梧"], // Homophones communs pour "wu"
-                "六": ["六", "陸", "溜", "流", "柳", "硫", "留", "劉"], // Homophones communs pour "liu"
-                "七": ["七", "期", "柒", "妻", "漆", "戚", "欺", "起"], // Homophones communs pour "qi"
-                "八": ["八", "巴", "拔", "扒", "捌", "把", "爸", "霸"], // Homophones communs pour "ba"
-                "九": ["九", "久", "酒", "玖", "究", "救", "纠", "舊"], // Homophones communs pour "jiu"
-                "十": ["十", "石", "拾", "實", "時", "食", "史", "世"] // Homophones communs pour "shi"
+                "零": [
+                    "零","靈","灵","鈴","铃","凌","陵","菱","領","领","齡","龄","玲","伶",
+                    "羚","聆","苓","泠","翎","瓴","棱","楞","崚","呤","囹","蛉","鯪","鲮",
+                    "綾","绫","霝","酃","舲","棂","柃","鲮","澪"
+                ],
+                "一": [
+                    "一","衣","依","伊","醫","医","壹","揖","噫","咿","猗","銥","铱","黟",
+                    "禕","繄","翳","欹","壱","弌","衤","洢","漪","椅","黝"
+                ],
+                "二": [
+                    "二","而","兒","儿","尔","耳","貳","贰","餌","饵","珥","佴","洱","鴯","鸸",
+                    "迩","弍","咡","輀","轜","陑","鮞","鲕"
+                ],
+                "三": [
+                    "三","參","参","叁","散","傘","伞","珊","山","杉","删","刪","衫",
+                    "煽","潸","姍","姗","舢","跚","膻","苫","閂","闩","扇","蟮","鱔","鳝"
+                ],
+                "四": [
+                    "四","肆","死","思","司","私","絲","丝","斯","寺","嗣","似","祀",
+                    "巳","泗","俟","嘶","飼","饲","厮","駟","驷","笥",
+                    "伺","姒","耜","澌","凘","汜","兕","肂"
+                ],
+                "五": [
+                    "五","伍","武","舞","無","无","午","侮","捂","污","烏","乌","屋",
+                    "誤","误","悟","吾","吳","吴","梧","蜈","鵡","鹉","兀",
+                    "戊","務","务","霧","雾","寤","晤","芴","婺","骛","焐"
+                ],
+                "六": [
+                    "六","陸","陆","溜","流","留","柳","硫","劉","刘","瘤","琉","榴",
+                    "馏","遛","浏","骝","鎏","旒","绺",
+                    "鹨","珋","锍","熘","瀏","镏","鷚","鹨"
+                ],
+                "七": [
+                    "七","期","柒","妻","漆","戚","欺","起","其","奇","齊","齐","旗",
+                    "乞","歧","祈","崎","棋","泣","契","棄","弃","亟","綺","绮","耆",
+                    "沏","萋","嘁","祁","騎","骑","臍","脐","祺","圻","杞","芑"
+                ],
+                "八": [
+                    "八","巴","拔","扒","叭","捌","把","爸","霸","罷","罢","芭","疤",
+                    "笆","跋","靶","粑","魃","壩","坝",
+                    "鈀","钯","灞","岜","鲅","菝","仈"
+                ],
+                "九": [
+                    "九","久","酒","玖","究","救","纠","糾","舊","旧","韭","咎","灸",
+                    "疚","臼","鸠","啾","阄","赳","柩",
+                    "揪","鳩","鸠","僦","鬮","阄","韮","廄","厩"
+                ],
+                "十": [
+                    "十","石","拾","實","实","時","时","食","史","世","市","室","識","识",
+                    "師","师","詩","诗","施","濕","湿","勢","势","試","试","釋","释",
+                    "飾","饰","屍","尸","失","蝕","蚀","獅","狮","嗜","噬","逝","誓",
+                    "侍","恃","矢","柿","豕","舐","軾","轼","鰣","鲥",
+                    "什","莳","埘","湜","弑","蓍","鲺","螫","铈","舂"
+                ]
             };
-            
             // Nettoyer l'input - garder uniquement les caractères chinois et les chiffres
             let cleanedInput = input.replace(/[^\u4e00-\u9fa50-9]/g, '');
-            
             // Si l'input est vide après nettoyage, essayer de garder les lettres latines
             if (cleanedInput.length === 0) {
                 cleanedInput = input.toLowerCase().replace(/[^a-z0-9]/g, '');
             }
-            
             // Chercher directement le caractère exact dans l'input
             for (const [character, homophones] of Object.entries(validCharacters)) {
                 if (input.includes(character)) {
                     return character;
                 }
             }
-            
             // Chercher les homophones chinois
             for (const [character, homophones] of Object.entries(validCharacters)) {
                 for (const homophone of homophones) {
@@ -690,7 +728,6 @@
                     }
                 }
             }
-            
             // Dernier recours - chercher les premiers caractères chinois dans l'input
             const chineseChars = input.match(/[\u4e00-\u9fa5]/g);
             if (chineseChars && chineseChars.length > 0) {
@@ -706,7 +743,6 @@
                     return firstChar;
                 }
             }
-            
             // Si aucune correspondance en chinois, essayer une correspondance très tolérante en latin
             const latinFallback = {
                 "ling": "零",
@@ -732,17 +768,14 @@
                 "9": "九",
                 "10": "十"
             };
-            
             for (const [latin, character] of Object.entries(latinFallback)) {
                 if (cleanedInput.includes(latin)) {
                     return character;
                 }
             }
-            
             // Aucune correspondance trouvée
             return null;
         }
-
         // ✅ Initialisation fiable de SpeechRecognition avec grammaire spécifique (uniquement webkit)
         function initSpeechRecognition() {
             if ('webkitSpeechRecognition' in window) {
@@ -751,19 +784,16 @@
                 recognition.continuous = true; // Toujours actif pendant le maintien
                 recognition.interimResults = true; // Pour capturer les résultats intermédiaires
                 recognition.lang = 'zh-CN'; // Langue chinoise pour la reconnaissance
-                
                 // Ajout de la grammaire spécifique si supportée
                 if ('grammars' in recognition) {
                     try {
                         // Créer une grammaire spécifique pour les nombres chinois
                         // Format JSGF (Java Speech Grammar Format)
                         const grammar = '#JSGF V1.0; grammar numbers; public <number> = 零 | 一 | 二 | 三 | 四 | 五 | 六 | 七 | 八 | 九 | 十;';
-                        
                         const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
                         const grammarList = new SpeechGrammarList();
                         grammarList.addFromString(grammar, 1);
                         recognition.grammars = grammarList;
-                        
                         console.log('Grammaire spécifique chargée pour les nombres chinois');
                     } catch (e) {
                         console.warn('Erreur lors de la configuration de la grammaire:', e);
@@ -771,7 +801,6 @@
                 } else {
                     console.log('Le navigateur ne supporte pas la configuration de grammaires pour SpeechRecognition');
                 }
-                
                 recognition.onstart = function() {
                     isListening = true;
                     hasSpoken = false;
@@ -779,10 +808,8 @@
                     micBtn.classList.add('listening');
                     voiceInstruction.textContent = 'En cours d\'écoute...';
                 };
-                
                 recognition.onresult = function(event) {
                     if (!currentQuestionData || awaitingNext) return;
-                    
                     // On stocke le dernier résultat final pour le traitement au relâchement
                     for (let i = event.resultIndex; i < event.results.length; i++) {
                         const transcript = event.results[i][0].transcript.trim();
@@ -797,7 +824,6 @@
                         }
                     }
                 };
-                
                 recognition.onerror = function(event) {
                     console.error('Erreur reconnaissance vocale:', event.error);
                     if (event.error === 'not-allowed') {
@@ -808,19 +834,16 @@
                     }
                     // On ne fait rien ici, on laisse le processus se terminer normalement
                 };
-                
                 recognition.onend = function() {
                     isListening = false;
                     micBtn.classList.remove('listening');
                     micBtn.disabled = false;
-                    
                     // Remettre l'instruction par défaut après un court délai
                     setTimeout(() => {
                         if (!awaitingNext) {
                             voiceInstruction.textContent = 'Maintenez le micro pour parler';
                         }
                     }, 800);
-                    
                     // Traiter le dernier résultat final au moment où la reconnaissance s'arrête
                     if (finalTranscript && currentQuestionData && !awaitingNext) {
                         handleSpeechResult(finalTranscript);
@@ -837,7 +860,6 @@
                 micBtn.disabled = true;
             }
         }
-        
         function stopListening() {
             if (recognition && isListening) {
                 try {
@@ -847,10 +869,8 @@
                 }
             }
         }
-        
         async function startListening() {
             if (awaitingNext || !recognition || isListening) return;
-            
             // Vérifier l'accès au microphone
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -867,10 +887,8 @@
                 }, 3000);
                 return;
             }
-            
             micBtn.disabled = true;
             finalTranscript = null; // Réinitialiser le dernier résultat
-            
             // Démarrer la reconnaissance avec un léger délai
             setTimeout(() => {
                 try {
@@ -885,14 +903,11 @@
                 }
             }, 100);
         }
-        
         // Fonction pour gérer le résultat de la reconnaissance vocale
         function handleSpeechResult(userInput) {
             if (!currentQuestionData || awaitingNext) return;
-            
             // Normaliser et filtrer l'entrée pour ne garder que les nombres valides
             const recognizedNumber = normalizeChineseNumber(userInput);
-            
             // Si aucun nombre valide n'est reconnu
             if (!recognizedNumber) {
                 voiceInstruction.textContent = '⚠️ Nombre non reconnu';
@@ -902,31 +917,26 @@
                 handleIncorrectAnswer();
                 return;
             }
-            
             // Comparer avec la réponse attendue
             const correctCharacter = currentQuestionData.caractere;
             const isCorrect = recognizedNumber === correctCharacter;
-            
             // Feedback visuel amélioré
             voiceInstruction.textContent = `J'ai entendu : ${recognizedNumber} (${isCorrect ? '✅' : '❌'})`;
             setTimeout(() => {
                 if (!awaitingNext) voiceInstruction.textContent = 'Maintenez le micro pour parler';
             }, 1500);
-            
             if (isCorrect) {
                 handleCorrectAnswer();
             } else {
                 handleIncorrectAnswer();
             }
         }
-        
         // 🔁 Fonctions utilitaires
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
-        
         function updateQuizHeaderVisibility(isQuizActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('quiz-active', isQuizActive);
@@ -935,13 +945,11 @@
                 mobileBackBtn.classList.add('hidden');
             }
         }
-        
         function updateResultHeaderVisibility(isResultActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('result-active', isResultActive);
             }
         }
-        
         // 📥 Fetch best score from DB with local fallback
         async function fetchBestScore() {
             if (!window.currentUser?.uid) {
@@ -960,7 +968,6 @@
             }
             return parseInt(localStorage.getItem(`best-score-${THEME}-n4`) || '0');
         }
-        
         // 💾 Save best score to DB with local fallback
         async function saveBestScore(newBest) {
             if (!window.currentUser?.uid) {
@@ -978,7 +985,6 @@
                 localStorage.setItem(`best-score-${THEME}-n4`, newBest.toString());
             }
         }
-        
         // 📥 Sauvegarde via transaction
         async function saveScores(incrementValue) {
             if (!window.currentUser?.uid || incrementValue <= 0) return;
@@ -1008,12 +1014,10 @@
                 localStorage.setItem('globalScore', global.toString());
             }
         }
-        
         // Fonction pour cacher le pinyin
         function hidePinyin() {
             pinyinDisplay.textContent = '';
         }
-        
         // Fonction pour montrer le pinyin
         function showPinyin(pinyin) {
             if (hidePinyinAfter30s) {
@@ -1022,7 +1026,6 @@
                 pinyinDisplay.textContent = '🙈';
             }
         }
-        
         // 🎮 Logique de jeu
         async function startGame() {
             if (gameCompleted) return;
@@ -1043,7 +1046,6 @@
             startSkipTimer();
             window.scrollTo(0, 0);
         }
-        
         function startSkipTimer() {
             let remaining = 3;
             skipBtn.textContent = `Passer (${remaining}s)`;
@@ -1060,7 +1062,6 @@
                 }
             }, 1000);
         }
-        
         function getRandomQuestion() {
             if (usedQuestions.length >= QUESTIONS.length) usedQuestions = [];
             let idx;
@@ -1070,7 +1071,6 @@
             usedQuestions.push(idx);
             return QUESTIONS[idx];
         }
-        
         function generateQuestion() {
             if (awaitingNext) return;
             const q = getRandomQuestion();
@@ -1098,7 +1098,6 @@
             startQTimer();
             startSkipTimer();
         }
-        
         function handleCorrectAnswer() {
             if (awaitingNext) return;
             awaitingNext = true;
@@ -1124,7 +1123,6 @@
                 }
             }, 1900);
         }
-        
         function handleIncorrectAnswer() {
             if (awaitingNext) return;
             awaitingNext = true;
@@ -1151,7 +1149,6 @@
                 }
             }, 1900);
         }
-        
         function handleSkip() {
             if (awaitingNext || skipBtn.disabled) return;
             awaitingNext = true;
@@ -1178,7 +1175,6 @@
                 }
             }, 1900);
         }
-        
         function updateLives() {
             const total = levelConfig.lives;
             const hearts = livesDisplay.querySelectorAll('.heart');
@@ -1194,13 +1190,11 @@
                 }
             });
         }
-        
         function updateStatsDisplayMobile() {
             currentScoreDisplayMobile.textContent = score;
             wrongAnswersDisplayMobile.textContent = wrongAnswers;
             bestScoreDisplayMobile.textContent = currentUserBestScore;
         }
-        
         function startMainTimer() {
             clearInterval(timerInterval);
             timerDisplay.textContent = timeLeft;
@@ -1223,7 +1217,6 @@
                 }
             }, 1000);
         }
-        
         function startQTimer() {
             clearTimeout(timeoutId);
             let timeLeftQuestion = levelConfig.qTime;
@@ -1244,7 +1237,6 @@
                 qTimerFill.style.width = (timeLeftQuestion / levelConfig.qTime * 100) + '%';
             }, 100);
         }
-        
         async function endGame() {
             if (gameCompleted) return;
             gameCompleted = true;
@@ -1304,7 +1296,6 @@
             }
             window.scrollTo(0, 0);
         }
-        
         async function handleBack() {
             if (gameCompleted) {
                 window.location.href = 'index.html';
@@ -1318,7 +1309,6 @@
             stopAllTimers();
             window.location.href = 'index.html';
         }
-        
         function stopAllTimers() {
             clearInterval(timerInterval);
             clearInterval(pinyinTimer);
@@ -1326,7 +1316,6 @@
             clearInterval(skipTimer);
             stopListening();
         }
-        
         // ✅ Événements du bouton micro pour interaction "maintenir/appuyer"
         micBtn.addEventListener('mousedown', (e) => {
             e.preventDefault();
@@ -1335,7 +1324,6 @@
                 startListening();
             }
         });
-        
         micBtn.addEventListener('mouseup', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -1343,14 +1331,12 @@
                 stopListening();
             }
         });
-        
         micBtn.addEventListener('mouseleave', (e) => {
             // Si la souris quitte le bouton pendant qu'il est pressé, on arrête l'écoute
             if (isListening) {
                 stopListening();
             }
         });
-        
         // Pour la gestion tactile
         micBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
@@ -1358,17 +1344,14 @@
                 startListening();
             }
         });
-        
         micBtn.addEventListener('touchend', (e) => {
             e.preventDefault();
             if (isListening) {
                 stopListening();
             }
         });
-        
         // ✅ Événement du bouton passer
         skipBtn.addEventListener('click', handleSkip);
-        
         // 🔄 Navigation
         mobileBackBtn.addEventListener('click', handleBack);
         restartBtn.addEventListener('click', () => {
@@ -1376,7 +1359,6 @@
             startGame();
         });
         homeBtn.addEventListener('click', handleBack);
-        
         // 🔐 Auth
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
