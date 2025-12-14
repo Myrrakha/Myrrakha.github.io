@@ -830,7 +830,7 @@
                         voiceInstruction.textContent = '⚠️ Micro non autorisé';
                         setTimeout(() => {
                             if (!awaitingNext) voiceInstruction.textContent = 'Maintenez le micro pour parler';
-                        }, 3000);
+                        }, 400);
                     }
                     // On ne fait rien ici, on laisse le processus se terminer normalement
                 };
@@ -843,7 +843,7 @@
                         if (!awaitingNext) {
                             voiceInstruction.textContent = 'Maintenez le micro pour parler';
                         }
-                    }, 800);
+                    }, 200);
                     // Traiter le dernier résultat final au moment où la reconnaissance s'arrête
                     if (finalTranscript && currentQuestionData && !awaitingNext) {
                         handleSpeechResult(finalTranscript);
@@ -851,7 +851,7 @@
                         voiceInstruction.textContent = '⚠️ Aucune parole détectée';
                         setTimeout(() => {
                             if (!awaitingNext) voiceInstruction.textContent = 'Maintenez le micro pour parler';
-                        }, 1500);
+                        }, 300);
                         handleIncorrectAnswer(); // Aucune parole détectée
                     }
                 };
@@ -884,7 +884,7 @@
                 }
                 setTimeout(() => {
                     if (!awaitingNext) voiceInstruction.textContent = 'Maintenez le micro pour parler';
-                }, 3000);
+                }, 400);
                 return;
             }
             micBtn.disabled = true;
@@ -898,7 +898,7 @@
                     voiceInstruction.textContent = '⚠️ Erreur démarrage microphone';
                     setTimeout(() => {
                         if (!awaitingNext) voiceInstruction.textContent = 'Maintenez le micro pour parler';
-                    }, 2000);
+                    }, 200);
                     stopListening();
                 }
             }, 100);
@@ -913,7 +913,7 @@
                 voiceInstruction.textContent = '⚠️ Nombre non reconnu';
                 setTimeout(() => {
                     if (!awaitingNext) voiceInstruction.textContent = 'Maintenez le micro pour parler';
-                }, 2000);
+                }, 200);
                 handleIncorrectAnswer();
                 return;
             }
@@ -924,7 +924,7 @@
             voiceInstruction.textContent = `J'ai entendu : ${recognizedNumber} (${isCorrect ? '✅' : '❌'})`;
             setTimeout(() => {
                 if (!awaitingNext) voiceInstruction.textContent = 'Maintenez le micro pour parler';
-            }, 1500);
+            }, 150);
             if (isCorrect) {
                 handleCorrectAnswer();
             } else {
@@ -1121,7 +1121,7 @@
                         generateQuestion();
                     }, 250);
                 }
-            }, 1900);
+            }, 1600);
         }
         function handleIncorrectAnswer() {
             if (awaitingNext) return;
@@ -1394,4 +1394,5 @@
     </script>
 </body>
 </html>
+
 
