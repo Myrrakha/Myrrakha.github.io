@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Quiz Master - Chinois N6</title>
-    <script src="https://unpkg.com/hanzi-writer@2.2.1/dist/hanzi-writer.min.js"></script>
+    <title>Quiz Master - Chinois N7</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         .hidden {
@@ -87,39 +86,98 @@
         }
         .quiz-container {
             display: flex;
-            flex-direction: column;
             gap: 12px;
             width: 100%;
             justify-content: center;
-            align-items: center;
         }
-        #drawing-area {
-            position: relative;
-            width: 342px;
-            height: 342px;
-            margin: 10px 0 2px 0;
-            background: white;
-            border: 2px solid #b40000;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        @media (min-width: 900px) {
+            .question-box {
+                flex: 2;
+            }
+            .answers-container {
+                flex: 1;
+            }
+        }
+        .question-box {
+            background: rgba(255, 250, 240, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 18px;
+            border-radius: 14px;
+            font-size: 4em; /* Très grand pour afficher le caractère */
+            font-weight: 700;
+            min-height: 200px;
             display: flex;
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
+            text-align: center;
+            box-shadow: 0 0 16px rgba(255, 60, 60, 0.2);
+            border: 2px solid rgba(180, 0, 0, 0.2);
+            color: #b40000;
+            letter-spacing: 0.8px;
+            text-shadow: 0 0 5px rgba(255, 150, 100, 0.4);
+            font-family: "Noto Serif SC", serif;
+        }
+        .character {
+            font-size: 4em;
+            line-height: 1.2;
+        }
+        .pinyin {
+            font-size: 1.5em;
+            margin-top: 10px;
+            color: #666;
+        }
+        .answers-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
             align-items: center;
         }
-        .canvas-container {
-            position: relative;
-            display: inline-block;
+        .answer-btn {
+            width: 360px;
+            padding: 10px 4px;
+            margin-top: 10px;
+            border: 2px solid rgba(180, 0, 0, 0.2);
+            border-radius: 8px;
+            font-size: 17px;
+            cursor: pointer;
+            background: linear-gradient(145deg, #ffecd9, #f2c19b);
+            transition: 0.25s ease-in-out;
+            color: #2a2a2a;
+            box-shadow: 0 0 8px rgba(210, 60, 20, 0.15);
+            max-width: 100%;
+            font-family: "Noto Serif SC", serif;
+            font-weight: 600;
+        }
+        .answer-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(145deg, #fde3d0, #ffb380);
+            border-color: rgba(220, 50, 20, 0.4);
+            box-shadow: 0 0 12px rgba(255, 100, 50, 0.3);
+        }
+        .answer-btn:disabled {
+            cursor: not-allowed;
+        }
+        .correct {
+            background: linear-gradient(145deg, #d3e87e, #9bc24f) !important;
+            box-shadow: 0 0 10px rgba(140, 200, 70, 0.5) !important;
+            color: #2a2a2a !important;
+        }
+        .incorrect {
+            background: linear-gradient(145deg, #ff9b8a, #d35949) !important;
+            box-shadow: 0 0 10px rgba(200, 70, 70, 0.5) !important;
+            color: white !important;
         }
         #timers-container {
             width: 100%;
             max-width: 1000px;
-            margin-top: 2px;
+            margin-top: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
-        .timer-bar-container {
+        #timer-bar-container {
             width: 100%;
             max-width: 310px;
             text-align: left;
@@ -127,68 +185,77 @@
             color: #b40000;
             font-weight: 600;
         }
-        .timer-bar {
+        #timer-bar {
             width: 100%;
             height: 10px;
             background: #fde3d0;
             border-radius: 7px;
-            margin-top: 4px;
+            margin-top: 5px;
             overflow: hidden;
             border: 1px solid rgba(180, 0, 0, 0.2);
         }
-        .timer-fill {
+        #timer-fill {
             height: 100%;
             width: 100%;
             border-radius: 7px;
             transition: width 0.3s linear;
         }
-        #quiz-timer-fill {
+        #timer-fill {
             background: linear-gradient(90deg, #b40000, #ff4d2e, #ff9b00);
         }
-        #score-display {
-            margin-top: 8px;
+        #question-timer-bar-container {
+            display: none; /* Caché car plus de timer par question */
+        }
+        #score-lives {
+            margin-top: 10px;
+            display: flex;
+            gap: 50px;
+            justify-content: center;
             font-size: 1.1em;
             position: relative;
             color: #b40000;
             font-weight: 600;
+        }
+        .score-container {
+            margin-top: 7px;
+            font-size: 19px;
             text-shadow: 0 0 5px rgba(255, 130, 100, 0.3);
-            font-family: "Noto Serif SC", serif;
         }
-        #feedback {
-            margin-top: 10px;
-            font-size: 1.2em;
-            min-height: 28px;
-            font-weight: bold;
-            font-family: "Noto Serif SC", serif;
-        }
-        /* Boutons réutilisables */
-        .action-btn {
-            padding: 12px 24px;
-            font-size: 1.1em;
-            background: rgba(255, 240, 230, 0.9);
-            border: 2px solid rgba(180, 0, 0, 0.2);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            color: #b40000;
-            font-family: "Noto Serif SC", serif;
-            font-weight: 600;
-            box-shadow: 0 2px 6px rgba(180, 0, 0, 0.15);
-            min-width: 140px;
-        }
-        .action-btn:hover {
-            background: rgba(255, 230, 220, 0.95);
-            box-shadow: 0 4px 10px rgba(255, 100, 80, 0.4);
-            transform: translateY(-2px);
-        }
-        .action-btn:active {
-            transform: translateY(0);
+        .heart {
+            display: none; /* Caché car plus de vies */
         }
         @media (max-width: 899px) {
-            #drawing-area {
-                width: 342px;
-                height: 342px;
-                margin: 8px 0 3px 0;
+            .quiz-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .question-box {
+                font-size: 3em;
+                padding: 10px;
+                min-height: 160px;
+                width: calc(100% - 30px);
+                color: #b40000;
+            }
+            .character {
+                font-size: 3em;
+            }
+            .pinyin {
+                font-size: 1.2em;
+            }
+            .answers-container {
+                gap: 5px;
+            }
+            .answer-btn {
+                width: calc(100% - 30px);
+                padding: 8px;
+                font-size: 1em;
+            }
+            #score-lives {
+                flex-direction: column;
+                gap: 4px;
+                margin-top: 10px;
+                align-items: center;
+                color: #b40000;
             }
             #mobile-quiz-ui-row {
                 display: flex;
@@ -322,29 +389,16 @@
                 font-weight: bold;
                 color: #b40000;
             }
-            /* Desktop back button container */
-            #desktop-back-container {
-                position: absolute;
-                top: 20px;
-                left: 20px;
-            }
-            #desktop-back-btn {
-                padding: 8px 16px;
-                font-size: 1em;
-                min-width: auto;
-            }
         }
-        /* RESULT SECTION - CORRECTED CENTERING */
+        /* RESULT SECTION */
         #result-section {
+            text-align: center;
+            padding: 16px;
             width: 100%;
-            min-height: 80vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-            text-align: center;
+            max-width: 1200px;
         }
         .result-stats {
             background: rgba(255, 250, 240, 0.95);
@@ -365,6 +419,25 @@
             text-shadow: 0 0 5px rgba(200, 0, 0, 0.4);
             font-family: "Noto Serif SC", serif;
         }
+        .action-btn {
+            margin: 8px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #ffecd9, #f2c19b);
+            border: 2px solid rgba(180, 0, 0, 0.2);
+            cursor: pointer;
+            color: #b40000;
+            transition: 0.2s;
+            font-family: "Noto Serif SC", serif;
+            font-size: 15px;
+            font-weight: 600;
+        }
+        .action-btn:hover {
+            background: linear-gradient(145deg, #fde3d0, #ffb380);
+            box-shadow: 0 0 8px rgba(255, 100, 80, 0.3);
+            transform: translateY(-1px);
+        }
+        /* Unlock Message */
         #level-unlock-msg {
             color: #9bc24f;
             margin-top: 12px;
@@ -373,28 +446,9 @@
             text-shadow: 0 0 5px rgba(155, 194, 79, 0.4);
             font-family: "Noto Serif SC", serif;
         }
+        #level-up-msg,
         #perfect-score-msg {
             font-family: "Noto Serif SC", serif;
-        }
-        .canvas-success {
-            border-color: #4caf50 !important;
-            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5) !important;
-        }
-        .canvas-error {
-            border-color: #f44336 !important;
-            box-shadow: 0 0 15px rgba(244, 67, 54, 0.5) !important;
-        }
-        /* Boutons de fin de quiz */
-        #result-section .buttons-container {
-            display: flex;
-            gap: 20px;
-            margin-top: 24px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        #result-section .action-btn {
-            padding: 14px 28px;
-            font-size: 1.15em;
         }
     </style>
 </head>
@@ -403,22 +457,40 @@
     <div class="lanterne"></div>
     <main>
         <section id="quiz-section" class="hidden">
-            <div id="desktop-back-container" class="hidden">
-                <button id="desktop-back-btn" class="action-btn">← Accueil</button>
-            </div>
             <div class="quiz-container">
-                <div id="drawing-area"></div>
-                <div id="feedback"></div>
+                <div class="question-box">
+                    <div id="character" class="character"></div>
+                    <div id="pinyin" class="pinyin"></div>
+                </div>
+                <div class="answers-container">
+                    <button class="answer-btn"></button>
+                    <button class="answer-btn"></button>
+                    <button class="answer-btn"></button>
+                    <button class="answer-btn"></button>
+                    <button class="answer-btn"></button>
+                </div>
             </div>
             <div id="timers-container">
-                <div class="timer-bar-container">
-                    <span>⏱️ Temps restant : <span id="quiz-timer">0</span>s</span>
-                    <div class="timer-bar">
-                        <div id="quiz-timer-fill" class="timer-fill"></div>
+                <div id="timer-bar-container">
+                    <span>⏱️ Temps restant : <span id="timer">0</span>s</span>
+                    <div id="timer-bar">
+                        <div id="timer-fill"></div>
+                    </div>
+                </div>
+                <div id="question-timer-bar-container">
+                    <span>⚡ Question : <span id="question-timer">0</span>s</span>
+                    <div id="question-timer-bar">
+                        <div id="question-timer-fill"></div>
                     </div>
                 </div>
             </div>
-            <div id="score-display">Score : <span id="score">0</span></div>
+            <div id="score-lives">
+                <div class="score-container">Score : <span id="score">0</span></div>
+                <div id="lives">
+                    <span class="heart">❤</span><span class="heart">❤</span><span class="heart">❤</span><span
+                        class="heart">❤</span><span class="heart">❤</span>
+                </div>
+            </div>
             <div id="mobile-quiz-ui-row">
                 <div id="current-game-stats">
                     <div class="stats-title">📊 Stats</div>
@@ -451,19 +523,19 @@
                 <div id="perfect-score-msg" class="hidden" style="color: #d4af37; margin-top: 10px; font-weight: bold;">
                     🌟 SCORE PARFAIT !
                 </div>
-                <div id="level-unlock-msg">🔓 Niveau 7 débloqué !</div>
+                <div id="level-unlock-msg">🔓 Niveau suivant débloqué !</div>
             </div>
-            <div class="buttons-container">
-                <button id="restart-btn" class="action-btn">Rejouer</button>
-                <button id="home-btn" class="action-btn">Accueil</button>
-            </div>
+            <button id="restart-btn" class="action-btn">Rejouer</button>
+            <button id="home-btn" class="action-btn">Accueil</button>
         </section>
     </main>
     <div id="hover-warning"></div>
+    <!-- Audio element pour la prononciation -->
+    <audio id="pronunciation-audio" preload="none"></audio>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import {
-            getAuth, onAuthStateChanged
+            getAuth, onAuthStateChanged, signOut
         } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import {
             getFirestore, doc, updateDoc, increment, runTransaction, getDoc
@@ -471,9 +543,9 @@
         // 🔑 CONFIGURATION
         const THEME = 'chinois';
         const QUIZ_TITLE = 'Chinois N6';
-        const SCORE_REQUIS_N7 = 10;
-        const SCORE_PARFAIT_N6 = 20;
-        const TOTAL_QUESTIONS = 25; 
+        const SCORE_NIVEAU_SUIVANT = 30; 
+        const SCORE_PARFAIT_N6 = 156; // 52 mots * 3 validations
+        
         // Mots pour le niveau N6
         const mots_N6 = [
             { caractere: "你", pinyin: "nǐ", sens: "tu / toi" },
@@ -529,16 +601,24 @@
             { caractere: "认", pinyin: "rèn", sens: "reconnaître" },
             { caractere: "识", pinyin: "shi", sens: "connaître" }
         ];
-        // Génération des questions basées sur les mots N6
-        const QUESTIONS = mots_N6.map(mot => ({
-            caractere: mot.caractere,
-            sens: mot.sens,
-            pinyin: mot.pinyin
-        }));
+
+        // Création des questions : Caractère -> Sens
+        const QUESTIONS = [];
+        mots_N6.forEach(mot => {
+            QUESTIONS.push({
+                caractere: mot.caractere,
+                pinyin: mot.pinyin,
+                correct: mot.sens,
+                options: mots_N6.filter(m => m !== mot).sort(() => 0.5 - Math.random()).slice(0, 4).map(m => m.sens)
+            });
+        });
+
+        // ⏱️ Config du niveau
         const levelConfig = {
-            quizTime: 300,
-            lives: 0
+            time: 300 // 5 minutes
         };
+        
+        // 🌐 Firebase init
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
             authDomain: "quiz-master-io.firebaseapp.com",
@@ -551,52 +631,80 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         window.currentUser = null;
+
+        // ✅ DOM
         const quizSection = document.getElementById('quiz-section');
         const resultSection = document.getElementById('result-section');
-        const drawingArea = document.getElementById('drawing-area');
-        const feedbackEl = document.getElementById('feedback');
+        const characterDisplay = document.getElementById('character');
+        const pinyinDisplay = document.getElementById('pinyin');
+        const answerBtns = document.querySelectorAll('.answer-btn');
         const scoreDisplay = document.getElementById('score');
-        const quizTimerDisplay = document.getElementById('quiz-timer');
-        const quizTimerFill = document.getElementById('quiz-timer-fill');
+        const timerDisplay = document.getElementById('timer');
+        const timerFill = document.getElementById('timer-fill');
+        const mobileBackBtn = document.getElementById('mobile-back-btn');
         const restartBtn = document.getElementById('restart-btn');
         const homeBtn = document.getElementById('home-btn');
         const levelUnlockMsg = document.getElementById('level-unlock-msg');
         const perfectScoreMsg = document.getElementById('perfect-score-msg');
-        const levelUpMsg = document.getElementById('level-up-msg');
-        const mobileBackBtn = document.getElementById('mobile-back-btn');
-        const desktopBackBtn = document.getElementById('desktop-back-btn');
-        const desktopBackContainer = document.getElementById('desktop-back-container');
         const currentScoreDisplayMobile = document.getElementById('current-score-display-mobile');
         const wrongAnswersDisplayMobile = document.getElementById('wrong-answers-mobile');
         const bestScoreDisplayMobile = document.getElementById('best-score-display-mobile');
-        let score = 0;
-        let quizTimeLeft = 0;
-        let quizTimerInterval = null;
+        const pronunciationAudio = document.getElementById('pronunciation-audio');
+
+        // ✅ États du jeu
+        let score = 0, timeLeft = 0;
+        let timerInterval = null, awaitingNext = false;
         let gameCompleted = false;
-        let usedQuestions = [];
-        let currentQuestion = null;
-        let currentWriter = null;
-        let currentUserBestScore = 0;
+        let currentCorrectAnswer = null;
         let wrongAnswers = 0;
-        let isQuizActive = false;
-        function updateStatsDisplayMobile() {
-            currentScoreDisplayMobile.textContent = score;
-            wrongAnswersDisplayMobile.textContent = wrongAnswers;
-            bestScoreDisplayMobile.textContent = currentUserBestScore;
+        let currentUserBestScore = 0;
+        
+        // Suivi des validations des mots (caractère -> nombre de fois correctement répondu)
+        let validationCount = {};
+        let availableQuestions = []; // Questions encore à valider (moins de 3 succès)
+
+        // Initialiser le compteur de validation
+        function initValidationCount() {
+            validationCount = {};
+            mots_N6.forEach(mot => {
+                validationCount[mot.caractere] = 0;
+            });
+            updateAvailableQuestions();
         }
+        
+        // Mettre à jour la liste des questions disponibles (celles avec < 3 validations)
+        function updateAvailableQuestions() {
+            availableQuestions = QUESTIONS.filter(q => validationCount[q.caractere] < 3);
+        }
+        
+        // Vérifier si le jeu est terminé (plus de questions ou temps écoulé)
+        function isGameFinished() {
+            return availableQuestions.length === 0 || timeLeft <= 0;
+        }
+
+        // 🔁 Fonctions utilitaires
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
         function updateQuizHeaderVisibility(isQuizActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('quiz-active', isQuizActive);
                 mobileBackBtn.classList.toggle('hidden', !isQuizActive);
             } else {
-                desktopBackContainer.classList.toggle('hidden', !isQuizActive);
+                mobileBackBtn.classList.add('hidden');
             }
         }
+        
         function updateResultHeaderVisibility(isResultActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('result-active', isResultActive);
             }
         }
+
+        // 📥 Fetch best score from DB with local fallback
         async function fetchBestScore() {
             if (!window.currentUser?.uid) {
                 return parseInt(localStorage.getItem(`best-score-${THEME}`) || '0');
@@ -614,6 +722,8 @@
             }
             return parseInt(localStorage.getItem(`best-score-${THEME}`) || '0');
         }
+
+        // 💾 Save best score to DB with local fallback
         async function saveBestScore(newBest) {
             if (!window.currentUser?.uid) {
                 localStorage.setItem(`best-score-${THEME}`, newBest.toString());
@@ -630,6 +740,8 @@
                 localStorage.setItem(`best-score-${THEME}`, newBest.toString());
             }
         }
+
+        // 📥 Sauvegarde via transaction
         async function saveScores(incrementValue) {
             if (!window.currentUser?.uid || incrementValue <= 0) return;
             const uid = window.currentUser.uid;
@@ -638,6 +750,8 @@
                     const userRef = doc(db, 'users', uid);
                     const userDoc = await transaction.get(userRef);
                     if (!userDoc.exists()) throw new Error("Utilisateur introuvable");
+                    const currentGlobal = userDoc.data().globalScore || 0;
+                    const currentTheme = userDoc.data().quizScores?.[THEME] || 0;
                     transaction.update(userRef, {
                         globalScore: increment(incrementValue),
                         [`quizScores.${THEME}`]: increment(incrementValue)
@@ -645,7 +759,7 @@
                     const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
                     quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
                     localStorage.setItem('quizScores', JSON.stringify(quizScores));
-                    localStorage.setItem('globalScore', (parseInt(localStorage.getItem('globalScore') || '0') + incrementValue).toString());
+                    localStorage.setItem('globalScore', (currentGlobal + incrementValue).toString());
                 });
             } catch (error) {
                 console.warn('Erreur sauvegarde, fallback local:', error);
@@ -656,138 +770,143 @@
                 localStorage.setItem('globalScore', global.toString());
             }
         }
-        function stopTimers() {
-            if (quizTimerInterval) clearInterval(quizTimerInterval);
-            quizTimerInterval = null;
+
+        // Fonction pour jouer l'audio de prononciation
+        function playPronunciation(pinyin) {
+            // Remplacer les accents du pinyin par des numéros (ex: nǐ -> ni3)
+            let cleanPinyin = pinyin.toLowerCase();
+            cleanPinyin = cleanPinyin.replace(/ā/g, 'a1').replace(/á/g, 'a2').replace(/ǎ/g, 'a3').replace(/à/g, 'a4');
+            cleanPinyin = cleanPinyin.replace(/ē/g, 'e1').replace(/é/g, 'e2').replace(/ě/g, 'e3').replace(/è/g, 'e4');
+            cleanPinyin = cleanPinyin.replace(/ī/g, 'i1').replace(/í/g, 'i2').replace(/ǐ/g, 'i3').replace(/ì/g, 'i4');
+            cleanPinyin = cleanPinyin.replace(/ō/g, 'o1').replace(/ó/g, 'o2').replace(/ǒ/g, 'o3').replace(/ò/g, 'o4');
+            cleanPinyin = cleanPinyin.replace(/ū/g, 'u1').replace(/ú/g, 'u2').replace(/ǔ/g, 'u3').replace(/ù/g, 'u4');
+            cleanPinyin = cleanPinyin.replace(/ü/g, 'v').replace(/ǘ/g, 'v2').replace(/ǚ/g, 'v3').replace(/ǜ/g, 'v4');
+            
+            // Générer l'URL du service de synthèse vocale (exemple avec Google Translate)
+            const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleanPinyin)}&tl=zh-CN&client=tw-ob`;
+            
+            pronunciationAudio.src = audioUrl;
+            pronunciationAudio.play().catch(e => console.log("Erreur de lecture audio:", e));
         }
-        function startQuizTimer() {
-            quizTimeLeft = levelConfig.quizTime;
-            quizTimerDisplay.textContent = quizTimeLeft;
-            quizTimerFill.style.width = '100%';
-            quizTimerInterval = setInterval(() => {
-                quizTimeLeft--;
-                quizTimerDisplay.textContent = quizTimeLeft;
-                quizTimerFill.style.width = (quizTimeLeft / levelConfig.quizTime * 100) + '%';
-                if (quizTimeLeft <= 5) {
-                    quizTimerFill.style.background = 'linear-gradient(90deg, #ff4757, #ff6b81)';
-                } else if (quizTimeLeft <= 10) {
-                    quizTimerFill.style.background = 'linear-gradient(90deg, #ffa502, #ff7b25)';
-                } else {
-                    quizTimerFill.style.background = 'linear-gradient(90deg,#b40000,#ff4d2e,#ff9b00)';
-                }
-                if (quizTimeLeft <= 0) {
-                    stopTimers();
-                    endGame();
-                }
-            }, 1000);
-        }
+
+        // 🎮 Logique de jeu
         async function startGame() {
             if (gameCompleted) return;
-            stopTimers();
-            score = 0; wrongAnswers = 0;
-            usedQuestions = [];
+            stopAllTimers();
+            score = 0; timeLeft = levelConfig.time;
+            wrongAnswers = 0;
+            initValidationCount();
             scoreDisplay.textContent = score;
-            currentUserBestScore = await fetchBestScore();
             updateStatsDisplayMobile();
             quizSection.classList.remove('hidden');
             resultSection.classList.add('hidden');
             updateQuizHeaderVisibility(true);
             updateResultHeaderVisibility(false);
-            startQuizTimer();
-            generateQuestion();
-            window.scrollTo(0, 0);
-        }
-        function getRandomQuestion() {
-            let idx;
-            if (usedQuestions.length === 0) {
-                idx = Math.floor(Math.random() * QUESTIONS.length);
+            if (availableQuestions.length > 0) {
+                generateQuestion();
             } else {
-                const lastIdx = usedQuestions[usedQuestions.length - 1];
-                do {
-                    idx = Math.floor(Math.random() * QUESTIONS.length);
-                } while (idx === lastIdx && QUESTIONS.length > 1);
-            }
-            usedQuestions.push(idx);
-            return QUESTIONS[idx];
-        }
-        function cleanupCurrentQuestion() {
-            if (currentWriter) {
-                drawingArea.innerHTML = '';
-                currentWriter = null;
-            }
-            feedbackEl.textContent = '';
-        }
-        function generateQuestion() {
-            cleanupCurrentQuestion();
-            if (usedQuestions.length >= TOTAL_QUESTIONS) {
                 endGame();
                 return;
             }
-            currentQuestion = getRandomQuestion();
-            drawingArea.innerHTML = '';
-            currentWriter = HanziWriter.create('drawing-area', currentQuestion.caractere, {
-                width: 342,
-                height: 342,
-                padding: 22,
-                showOutline: true,
-                showCharacter: false,
-                strokeAnimationSpeed: 1,
-                delayBetweenStrokes: 0,
-                strokeColor: '#b40000',
-                outlineColor: '#ddd',
-                renderer: 'canvas',
-                drawingWidth: 24,
-                highlightOnComplete: false,
-                showHintAfterMisses: 999,
-                // 👇 Paramètres rendant le tracé plus facile :
-                leniency: 1.1,         // Tolérance accrue (défaut = 1)
-                acceptBackwardsStrokes: true, // Permet de tracer dans le sens inverse
-                showCharacterOutline: true    // Affiche toujours la forme de référence
-            });
-            isQuizActive = true;
-            currentWriter.quiz({
-                onComplete: (success) => {
-                    if (!isQuizActive) return;
-                    if (success) {
-                        score++;
-                        scoreDisplay.textContent = score;
-                        feedbackEl.innerHTML = '✅ Correct !';
-                        updateStatsDisplayMobile();
-                        setTimeout(() => {
-                            if (usedQuestions.length < TOTAL_QUESTIONS) {
-                                generateQuestion();
-                            } else {
-                                endGame();
-                            }
-                        }, 1000);
-                    } else {
-                        wrongAnswers++;
-                        updateStatsDisplayMobile();
-                        feedbackEl.innerHTML = '❌ Presque !';
-                        setTimeout(() => {
-                            if (!isQuizActive) return;
-                            if (usedQuestions.length < TOTAL_QUESTIONS) {
-                                generateQuestion();
-                            } else {
-                                endGame();
-                            }
-                        }, 400);
-                    }
-                },
-                onMistake: () => {},
-                showHintAfterMisses: 999,
-                highlightOnComplete: false,
-                useCharacterOrder: false,
-                useStrokeOrder: false
-            });
-            feedbackEl.textContent = '';
+            startMainTimer();
+            window.scrollTo(0, 0);
         }
+
+        function getRandomQuestion() {
+            if (availableQuestions.length === 0) return null;
+            const idx = Math.floor(Math.random() * availableQuestions.length);
+            return availableQuestions[idx];
+        }
+
+        function generateQuestion() {
+            if (awaitingNext) return;
+            const q = getRandomQuestion();
+            if (!q) {
+                endGame();
+                return;
+            }
+            currentCorrectAnswer = q.correct;
+            characterDisplay.textContent = q.caractere;
+            pinyinDisplay.textContent = q.pinyin;
+            const shuffled = [...q.options, q.correct].sort(() => Math.random() - 0.5);
+            answerBtns.forEach((btn, i) => {
+                btn.innerHTML = escapeHtml(shuffled[i]);
+                btn.disabled = false;
+                // ✅ Réinitialisation explicite des styles à chaque nouvelle question
+                btn.classList.remove('correct', 'incorrect');
+                btn.onclick = () => handleAnswer(shuffled[i], q.correct, q.caractere);
+            });
+            
+            // Jouer l'audio de prononciation après 300ms
+            setTimeout(() => {
+                if (!awaitingNext) { // Vérifier que l'utilisateur n'a pas encore répondu
+                    playPronunciation(q.pinyin);
+                }
+            }, 300);
+        }
+
+        function handleAnswer(selected, correct, caractere) {
+            if (awaitingNext) return;
+            awaitingNext = true;
+            answerBtns.forEach(btn => {
+                btn.disabled = true;
+                if (btn.innerHTML === escapeHtml(correct)) btn.classList.add('correct');
+                if (btn.innerHTML === escapeHtml(selected) && selected !== correct) btn.classList.add('incorrect');
+            });
+            if (selected === correct) {
+                score++;
+                // Incrémenter le compteur de validation pour ce caractère
+                validationCount[caractere]++;
+                // Si atteint 3 validations, retirer de la liste des questions disponibles
+                if (validationCount[caractere] >= 3) {
+                    updateAvailableQuestions();
+                }
+            } else {
+                wrongAnswers++;
+            }
+            scoreDisplay.textContent = score;
+            updateStatsDisplayMobile();
+            setTimeout(() => {
+                if (isGameFinished()) {
+                    endGame();
+                } else {
+                    awaitingNext = false;
+                    generateQuestion();
+                }
+            }, 1000);
+        }
+
+        function updateStatsDisplayMobile() {
+            currentScoreDisplayMobile.textContent = score;
+            wrongAnswersDisplayMobile.textContent = wrongAnswers;
+            bestScoreDisplayMobile.textContent = currentUserBestScore;
+        }
+
+        function startMainTimer() {
+            clearInterval(timerInterval);
+            timerDisplay.textContent = timeLeft;
+            timerFill.style.width = '100%';
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                timerFill.style.width = (timeLeft / levelConfig.time * 100) + '%';
+                if (timeLeft <= 5) {
+                    timerFill.style.background = 'linear-gradient(90deg, #ff4757, #ff6b81)';
+                } else if (timeLeft <= 10) {
+                    timerFill.style.background = 'linear-gradient(90deg, #ffa502, #ff7b25)';
+                } else {
+                    timerFill.style.background = 'linear-gradient(90deg,#b40000,#ff4d2e,#ff9b00)';
+                }
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endGame();
+                }
+            }, 1000);
+        }
+
         async function endGame() {
             if (gameCompleted) return;
             gameCompleted = true;
-            isQuizActive = false;
-            stopTimers();
-            cleanupCurrentQuestion();
             await saveScores(score);
             const newBest = Math.max(currentUserBestScore, score);
             if (newBest > currentUserBestScore) {
@@ -805,15 +924,39 @@
             const themeScore = quizScores[THEME] || 0;
             document.getElementById('new-global-score').textContent = globalScore;
             document.getElementById('new-theme-score').textContent = themeScore;
-            let unlocked = false;
+            const oldTheme = themeScore - score;
+            if (Math.floor(themeScore / 50) > Math.floor(oldTheme / 50)) {
+                document.getElementById('level-up-msg').classList.remove('hidden');
+            }
+            // ✅ Gestion du score parfait
             let perfectAchieved = false;
-            if (score >= SCORE_REQUIS_N7 && window.currentUser?.uid) {
+            if (score >= SCORE_PARFAIT_N6 && window.currentUser?.uid) {
+                const userRef = doc(db, 'users', window.currentUser.uid);
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    const niveaux100 = userDoc.data().niveaux100 || {};
+                    const niveauActuel100 = niveaux100[THEME] || 0;
+                    if (niveauActuel100 < 7) {
+                        await updateDoc(userRef, {
+                            [`niveaux100.${THEME}`]: 7
+                        });
+                    }
+                    perfectAchieved = true;
+                }
+            }
+            // Affichage message score parfait
+            if (perfectAchieved) {
+                perfectScoreMsg.classList.remove('hidden');
+            }
+            // Gestion déverrouillage niveau suivant
+            let unlocked = false;
+            if (window.currentUser?.uid) {
                 const userRef = doc(db, 'users', window.currentUser.uid);
                 const userDoc = await getDoc(userRef);
                 if (userDoc.exists()) {
                     const niveaux = userDoc.data().niveaux || {};
                     const niveauActuel = niveaux[THEME] || 0;
-                    if (niveauActuel < 7) {
+                    if (niveauActuel === 7 && score >= SCORE_NIVEAU_SUIVANT) { // Si exactement 7 et score requis, passer à 8
                         await updateDoc(userRef, {
                             [`niveaux.${THEME}`]: 7
                         });
@@ -821,29 +964,12 @@
                     }
                 }
             }
-            if (score >= SCORE_PARFAIT_N6 && window.currentUser?.uid) {
-                const userRef = doc(db, 'users', window.currentUser.uid);
-                const userDoc = await getDoc(userRef);
-                if (userDoc.exists()) {
-                    const data = userDoc.data();
-                    const niveaux100 = data.niveaux100 || {};
-                    const currentPerfectLevel = niveaux100[THEME] || 0;
-                    if (currentPerfectLevel === 5) {
-                        await updateDoc(userRef, {
-                            [`niveaux100.${THEME}`]: 6
-                        });
-                        perfectAchieved = true;
-                    }
-                }
-            }
             if (unlocked) {
                 levelUnlockMsg.style.display = 'block';
             }
-            if (perfectAchieved) {
-                perfectScoreMsg.classList.remove('hidden');
-            }
             window.scrollTo(0, 0);
         }
+
         async function handleBack() {
             if (gameCompleted) {
                 window.location.href = 'index.html';
@@ -854,24 +980,31 @@
                 await saveBestScore(newBest);
             }
             await saveScores(score);
-            stopTimers();
-            cleanupCurrentQuestion();
+            stopAllTimers();
             window.location.href = 'index.html';
         }
+
+        function stopAllTimers() {
+            clearInterval(timerInterval);
+        }
+
+        // 🔄 Navigation
+        mobileBackBtn.addEventListener('click', handleBack);
         restartBtn.addEventListener('click', () => {
             gameCompleted = false;
-            isQuizActive = false;
             startGame();
         });
         homeBtn.addEventListener('click', handleBack);
-        mobileBackBtn.addEventListener('click', handleBack);
-        desktopBackBtn.addEventListener('click', handleBack);
+
+        // 🔐 Auth
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
                 return;
             }
             window.currentUser = user;
+            const pseudo = localStorage.getItem('userPseudo') || user.email.split('@')[0];
+            // Sauvegarde locale
             try {
                 const userRef = doc(db, 'users', user.uid);
                 const userDoc = await getDoc(userRef);
@@ -883,12 +1016,16 @@
                 const userData = userDoc.data();
                 const globalScore = userData.globalScore ?? 0;
                 const niveauChinois = (userData.niveaux?.[THEME]) ?? 0;
-                if (globalScore < 50 || niveauChinois < 6) {
-                    console.warn("Accès refusé : globalScore < 50 ou niveaux.chinois < 6");
+                // ✅ Vérifications obligatoires avant de lancer le quiz
+                if (globalScore < 0 || niveauChinois < 7) { // Niveau 7 requis
+                    console.warn("Accès refusé : globalScore < 0 ou niveaux.chinois < 6");
                     window.location.href = 'index.html';
                     return;
                 }
+                // Met à jour l'UI
+                // Sauvegarde locale
                 localStorage.setItem('globalScore', globalScore.toString());
+                // ✅ Tout est OK → lancer le quiz
                 startGame();
             } catch (error) {
                 console.error("Erreur lors de la vérification des prérequis :", error);
