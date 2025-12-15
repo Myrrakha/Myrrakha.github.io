@@ -637,7 +637,7 @@
                                 </div>
                                 <div class="level-completion-summary" id="dept-completion-summary">
                                     <span>Niveaux complétés à 100% : <span id="dept-niveaux100">0</span></span>
-                                    <span>Progression totale : <span id="dept-niveaux100-ratio">0</span>/6</span>
+                                    <span>Progression totale : <span id="dept-niveaux100-ratio">0</span>/10</span>
                                 </div>
                                 <div class="quiz-progress-bar">
                                     <div class="quiz-progress-fill" id="dept-progress-fill" style="width: 0%"></div>
@@ -668,7 +668,7 @@
                                 </div>
                                 <div class="level-completion-summary" id="chinois-completion-summary">
                                     <span>Niveaux complétés à 100% : <span id="chinois-niveaux100">0</span></span>
-                                    <span>Progression totale : <span id="chinois-niveaux100-ratio">0</span>/5</span>
+                                    <span>Progression totale : <span id="chinois-niveaux100-ratio">0</span>/10</span>
                                 </div>
                                 <div class="quiz-progress-bar">
                                     <div class="quiz-progress-fill" id="chinois-progress-fill" style="width: 0%"></div>
@@ -699,7 +699,7 @@
                                 </div>
                                 <div class="level-completion-summary" id="anglais-completion-summary">
                                     <span>Niveaux complétés à 100% : <span id="anglais-niveaux100">0</span></span>
-                                    <span>Progression totale : <span id="anglais-niveaux100-ratio">0</span>/5</span>
+                                    <span>Progression totale : <span id="anglais-niveaux100-ratio">0</span>/10</span>
                                 </div>
                                 <div class="quiz-progress-bar">
                                     <div class="quiz-progress-fill" id="anglais-progress-fill" style="width: 0%"></div>
@@ -961,7 +961,7 @@
             });
         }
         async function updateQuizCardUI(theme, globalScore, quizNiveaux = {}, quizNiveaux100 = {}) {
-            const totalLevels = theme === 'departements' ? 6 : 10;
+            const totalLevels = theme === 'departements' ? 10 : 10;
             const completedLevels = quizNiveaux100[theme] || 0;
             const progressPercent = Math.min(100, Math.round((completedLevels / totalLevels) * 100));
             const uiTheme = UI_THEMES[theme];
@@ -1074,6 +1074,7 @@
     </style>
 </body>
 </html>
+
 
 
 
