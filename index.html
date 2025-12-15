@@ -961,7 +961,7 @@
             });
         }
         async function updateQuizCardUI(theme, globalScore, quizNiveaux = {}, quizNiveaux100 = {}) {
-            const totalLevels = theme === 'departements' ? 6 : 5;
+            const totalLevels = theme === 'departements' ? 6 : 10;
             const completedLevels = quizNiveaux100[theme] || 0;
             const progressPercent = Math.min(100, Math.round((completedLevels / totalLevels) * 100));
             const uiTheme = UI_THEMES[theme];
@@ -1074,5 +1074,6 @@
     </style>
 </body>
 </html>
+
 
 
