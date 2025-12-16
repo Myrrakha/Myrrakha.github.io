@@ -110,6 +110,28 @@
             color: #9bc24f;
             box-shadow: 0 0 8px rgba(155, 194, 79, 0.5);
         }
+        #audio-toggle-btn.needs-init {
+            background: rgba(255, 220, 180, 0.9);
+            color: #ff9800;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(255, 152, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
+        }
+        .audio-indicator {
+            position: absolute;
+            top: 15px;
+            right: 70px;
+            color: #4caf50;
+            font-size: 1.2em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .audio-indicator.show {
+            opacity: 1;
+        }
         /* QUIZ SECTION */
         #quiz-section {
             display: flex;
@@ -441,6 +463,7 @@
             </div>
             <div id="audio-toggle-container">
                 <button id="audio-toggle-btn" class="action-btn">🔊</button>
+                <div id="audio-indicator" class="audio-indicator">🔊</div>
             </div>
             <div class="quiz-container">
                 <div id="drawing-area"></div>
@@ -606,6 +629,7 @@
         const wrongAnswersDisplayMobile = document.getElementById('wrong-answers-mobile');
         const bestScoreDisplayMobile = document.getElementById('best-score-display-mobile');
         const audioToggleBtn = document.getElementById('audio-toggle-btn');
+        const audioIndicator = document.getElementById('audio-indicator');
         let score = 0;
         let quizTimeLeft = 0;
         let quizTimerInterval = null;
@@ -617,44 +641,112 @@
         let wrongAnswers = 0;
         let isQuizActive = false;
         let audioEnabled = localStorage.getItem('audioEnabled') === 'true';
+        let audioInitialized = false;
         
         // Initialisation de l'état du bouton audio
-        if (audioEnabled) {
-            audioToggleBtn.classList.add('active');
-            audioToggleBtn.innerHTML = '🔊';
-        } else {
-            audioToggleBtn.innerHTML = '🔇';
-        }
+        updateAudioButtonState();
         
         // Toggle audio
         audioToggleBtn.addEventListener('click', () => {
+            if (!audioInitialized) {
+                initializeAudio();
+                return;
+            }
+            
             audioEnabled = !audioEnabled;
             localStorage.setItem('audioEnabled', audioEnabled.toString());
-            
-            if (audioEnabled) {
-                audioToggleBtn.classList.add('active');
-                audioToggleBtn.innerHTML = '🔊';
-            } else {
-                audioToggleBtn.classList.remove('active');
-                audioToggleBtn.innerHTML = '🔇';
-            }
+            updateAudioButtonState();
         });
+        
+        function updateAudioButtonState() {
+            if (!audioInitialized) {
+                audioToggleBtn.classList.add('needs-init');
+                audioToggleBtn.innerHTML = '🔊';
+                audioToggleBtn.title = "Cliquez pour activer l'audio";
+            } else if (audioEnabled) {
+                audioToggleBtn.classList.add('active');
+                audioToggleBtn.classList.remove('needs-init');
+                audioToggleBtn.innerHTML = '🔊';
+                audioToggleBtn.title = "Désactiver l'audio";
+            } else {
+                audioToggleBtn.classList.remove('active', 'needs-init');
+                audioToggleBtn.innerHTML = '🔇';
+                audioToggleBtn.title = "Activer l'audio";
+            }
+        }
+        
+        async function initializeAudio() {
+            try {
+                // Tenter de jouer un son très court pour initialiser l'audio
+                responsiveVoice.speak(" ", "Chinese Female", { 
+                    rate: 0.1,
+                    volume: 0.1,
+                    onend: function() {
+                        console.log("Audio initialisé avec succès");
+                        audioInitialized = true;
+                        // Activer l'audio par défaut après initialisation
+                        audioEnabled = true;
+                        localStorage.setItem('audioEnabled', 'true');
+                        updateAudioButtonState();
+                        
+                        // Si une question est active, rejouer son audio
+                        if (currentQuestion && isQuizActive) {
+                            setTimeout(() => {
+                                playCharacterAudio(currentQuestion.caractere);
+                            }, 300);
+                        }
+                    },
+                    onerror: function(err) {
+                        console.error("Erreur d'initialisation audio:", err);
+                        showAudioError();
+                    }
+                });
+            } catch (error) {
+                console.error("Erreur lors de l'initialisation audio:", error);
+                showAudioError();
+            }
+        }
+        
+        function showAudioError() {
+            audioToggleBtn.classList.remove('active', 'needs-init');
+            audioToggleBtn.innerHTML = '❌';
+            audioToggleBtn.title = "Erreur audio - Recharger la page";
+            setTimeout(() => {
+                updateAudioButtonState();
+            }, 3000);
+        }
         
         // Fonction pour jouer l'audio du caractère
         function playCharacterAudio(character) {
-            if (!audioEnabled || !responsiveVoice) return;
+            if (!audioEnabled || !audioInitialized || !responsiveVoice) return;
             
             // Petit délai avant de jouer l'audio
             setTimeout(() => {
-                // S'assurer que la voix est chargée
-                responsiveVoice.speak(character, "Chinese Female", { 
-                    rate: 0.8,
-                    pitch: 1,
-                    volume: 1,
-                    onend: function() {
-                        console.log("Audio terminé");
-                    }
-                });
+                try {
+                    responsiveVoice.cancel(); // Annuler tout audio en cours
+                    
+                    // Jouer le caractère avec une voix chinoise
+                    responsiveVoice.speak(character, "Chinese Female", { 
+                        rate: 0.8,
+                        pitch: 1,
+                        volume: 1,
+                        onend: function() {
+                            console.log(`Audio terminé pour: ${character}`);
+                        },
+                        onerror: function(err) {
+                            console.error("Erreur lors de la lecture audio:", err);
+                        }
+                    });
+                    
+                    // Afficher brièvement l'indicateur audio
+                    audioIndicator.classList.add('show');
+                    setTimeout(() => {
+                        audioIndicator.classList.remove('show');
+                    }, 800);
+                    
+                } catch (error) {
+                    console.error("Erreur lors de la lecture du caractère:", error);
+                }
             }, 200);
         }
         
@@ -869,7 +961,9 @@
             feedbackEl.textContent = '';
             
             // Jouer l'audio du caractère si activé
-            playCharacterAudio(currentQuestion.caractere);
+            if (audioInitialized && audioEnabled) {
+                playCharacterAudio(currentQuestion.caractere);
+            }
         }
         
         async function endGame() {
@@ -990,14 +1084,15 @@
             }
         });
         
-        // S'assurer que ResponsiveVoice est chargé avant de démarrer
+        // Vérifier si ResponsiveVoice est chargé
         window.addEventListener('load', () => {
             if (typeof responsiveVoice === 'undefined') {
-                console.warn('ResponsiveVoice non chargé, audio désactivé');
-                audioEnabled = false;
-                localStorage.setItem('audioEnabled', 'false');
-                audioToggleBtn.classList.remove('active');
-                audioToggleBtn.innerHTML = '🔇';
+                console.warn('ResponsiveVoice non chargé');
+                audioToggleBtn.classList.remove('active', 'needs-init');
+                audioToggleBtn.innerHTML = '❌';
+                audioToggleBtn.title = "Erreur: service audio indisponible";
+            } else {
+                console.log('ResponsiveVoice chargé avec les voix:', responsiveVoice.getVoices());
             }
         });
     </script>
