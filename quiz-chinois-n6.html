@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Quiz Master - Chinois N6</title>
     <script src="https://unpkg.com/hanzi-writer@2.2.1/dist/hanzi-writer.min.js"></script>
-    <script src="https://code.responsivevoice.org/responsivevoice.js?key=Zu0kYc9H"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         .hidden {
@@ -66,6 +65,98 @@
             transition: opacity 0.4s ease;
             z-index: 9999;
         }
+
+        /* INTRODUCTION SCREEN */
+        #intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #intro-content {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 250, 240, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(180, 0, 0, 0.3);
+        }
+        #intro-content h2 {
+            color: #b40000;
+            margin-top: 0;
+            font-family: "Poppins", sans-serif;
+        }
+        #intro-content p {
+            font-size: 1.1em;
+            margin: 15px 0;
+            line-height: 1.7;
+        }
+        .audio-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .audio-btn {
+            padding: 12px 24px;
+            font-size: 1.1em;
+            background: rgba(255, 240, 230, 0.9);
+            border: 2px solid rgba(180, 0, 0, 0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            color: #b40000;
+            font-family: "Noto Serif SC", serif;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(180, 0, 0, 0.15);
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        .audio-btn:hover {
+            background: rgba(255, 230, 220, 0.95);
+            box-shadow: 0 4px 10px rgba(255, 100, 80, 0.4);
+            transform: translateY(-2px);
+        }
+        #chars-list {
+            margin-top: 25px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid rgba(180, 0, 0, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 250, 240, 0.7);
+        }
+        .char-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(180, 0, 0, 0.1);
+        }
+        .char-char {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #b40000;
+        }
+        .char-pinyin {
+            font-style: italic;
+        }
+        .char-sens {
+            color: #555;
+        }
+
         /* ✨ CENTRAGE PRINCIPAL */
         main {
             display: flex;
@@ -78,59 +169,9 @@
             box-sizing: border-box;
             position: relative;
         }
-        /* AUDIO BUTTON */
+        /* AUDIO BUTTON - Masqué maintenant */
         #audio-toggle-container {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 100;
-        }
-        #audio-toggle-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(255, 240, 230, 0.9);
-            border: 2px solid rgba(180, 0, 0, 0.3);
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.4em;
-            color: #b40000;
-            box-shadow: 0 2px 6px rgba(180, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-        #audio-toggle-btn:hover {
-            background: rgba(255, 230, 220, 0.95);
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(255, 100, 80, 0.4);
-        }
-        #audio-toggle-btn.active {
-            background: rgba(255, 200, 200, 0.9);
-            color: #9bc24f;
-            box-shadow: 0 0 8px rgba(155, 194, 79, 0.5);
-        }
-        #audio-toggle-btn.needs-init {
-            background: rgba(255, 220, 180, 0.9);
-            color: #ff9800;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4); }
-            70% { box-shadow: 0 0 0 8px rgba(255, 152, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
-        }
-        .audio-indicator {
-            position: absolute;
-            top: 15px;
-            right: 70px;
-            color: #4caf50;
-            font-size: 1.2em;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .audio-indicator.show {
-            opacity: 1;
+            display: none;
         }
         /* QUIZ SECTION */
         #quiz-section {
@@ -164,6 +205,16 @@
         .canvas-container {
             position: relative;
             display: inline-block;
+        }
+        #character-info {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 1.2em;
+            color: #b40000;
+            font-weight: 600;
+            min-height: 40px;
+            line-height: 1.4;
+            font-family: "Noto Serif SC", serif;
         }
         #timers-container {
             width: 100%;
@@ -456,6 +507,32 @@
 <body>
     <div class="lanterne"></div>
     <div class="lanterne"></div>
+
+    <!-- Introduction Screen -->
+    <div id="intro-screen">
+        <div id="intro-content">
+            <h2>Bienvenue au Quiz Chinois N6</h2>
+            <p>Les 6 prochains niveaux vous permettront d’apprendre et d’utiliser 52 caractères chinois essentiels.</p>
+            <p>Lors des 3 premiers quiz, chaque question affichera :</p>
+            <ul style="text-align: left; margin: 10px 0 15px 30px;">
+                <li>La traduction française</li>
+                <li>Le pinyin</li>
+                <li>La prononciation audio (via synthèse vocale)</li>
+            </ul>
+            <p>Progressivement, ces aides disparaîtront. Les 3 quiz suivants testeront votre capacité à reconnaître et restituer ces caractères sans assistance. Prenez le temps de bien assimiler les caractères au début : ils seront la base de la suite.</p>
+            
+            <div class="audio-btn-group">
+                <button id="enable-audio-btn" class="audio-btn">🔊 Activer la prononciation</button>
+                <button id="disable-audio-btn" class="audio-btn">🔇 Ne pas activer la prononciation</button>
+            </div>
+            
+            <div id="chars-list">
+                <h3>Liste des 52 Caractères</h3>
+                <div id="chars-grid"></div>
+            </div>
+        </div>
+    </div>
+
     <main>
         <section id="quiz-section" class="hidden">
             <div id="desktop-back-container" class="hidden">
@@ -467,6 +544,7 @@
             </div>
             <div class="quiz-container">
                 <div id="drawing-area"></div>
+                <div id="character-info"></div>
                 <div id="feedback"></div>
             </div>
             <div id="timers-container">
@@ -483,11 +561,11 @@
                     <div class="stats-title">📊 Stats</div>
                     <div class="current-score" id="current-score-display-mobile">0</div>
                     <div class="stats-row">
-                        <span class="stats-label">Fausses :</span>
+                        <span class="stats-label">Score N7 :</span>
                         <span class="stats-value" id="wrong-answers-mobile">0</span>
                     </div>
                     <div class="stats-row">
-                        <span class="stats-label">Meilleur :</span>
+                        <span class="stats-label">Score parfait :</span>
                         <span class="stats-value" id="best-score-display-mobile">0</span>
                     </div>
                 </div>
@@ -527,12 +605,14 @@
         import {
             getFirestore, doc, updateDoc, increment, runTransaction, getDoc
         } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
         // 🔑 CONFIGURATION
         const THEME = 'chinois';
         const QUIZ_TITLE = 'Chinois N6';
         const SCORE_REQUIS_N7 = 10;
         const SCORE_PARFAIT_N6 = 20;
-        const TOTAL_QUESTIONS = 25; 
+        const TOTAL_QUESTIONS = 25; // Ancienne limite, maintenant infini
+        
         // Mots pour le niveau N6
         const mots_N6 = [
             { caractere: "你", pinyin: "nǐ", sens: "tu / toi" },
@@ -588,16 +668,19 @@
             { caractere: "认", pinyin: "rèn", sens: "reconnaître" },
             { caractere: "识", pinyin: "shi", sens: "connaître" }
         ];
+
         // Génération des questions basées sur les mots N6
         const QUESTIONS = mots_N6.map(mot => ({
             caractere: mot.caractere,
             sens: mot.sens,
             pinyin: mot.pinyin
         }));
+
         const levelConfig = {
             quizTime: 300,
             lives: 0
         };
+
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
             authDomain: "quiz-master-io.firebaseapp.com",
@@ -606,13 +689,18 @@
             messagingSenderId: "773382469164",
             appId: "1:773382469164:web:5e24a9a62ce543f5190389"
         };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         window.currentUser = null;
+
+        // DOM Elements
+        const introScreen = document.getElementById('intro-screen');
         const quizSection = document.getElementById('quiz-section');
         const resultSection = document.getElementById('result-section');
         const drawingArea = document.getElementById('drawing-area');
+        const characterInfo = document.getElementById('character-info');
         const feedbackEl = document.getElementById('feedback');
         const scoreDisplay = document.getElementById('score');
         const quizTimerDisplay = document.getElementById('quiz-timer');
@@ -630,6 +718,10 @@
         const bestScoreDisplayMobile = document.getElementById('best-score-display-mobile');
         const audioToggleBtn = document.getElementById('audio-toggle-btn');
         const audioIndicator = document.getElementById('audio-indicator');
+        const enableAudioBtn = document.getElementById('enable-audio-btn');
+        const disableAudioBtn = document.getElementById('disable-audio-btn');
+        const charsGrid = document.getElementById('chars-grid');
+
         let score = 0;
         let quizTimeLeft = 0;
         let quizTimerInterval = null;
@@ -640,122 +732,89 @@
         let currentUserBestScore = 0;
         let wrongAnswers = 0;
         let isQuizActive = false;
-        let audioEnabled = localStorage.getItem('audioEnabled') === 'true';
+        let audioEnabled = false;
         let audioInitialized = false;
-        
-        // Initialisation de l'état du bouton audio
-        updateAudioButtonState();
-        
-        // Toggle audio
-        audioToggleBtn.addEventListener('click', () => {
-            if (!audioInitialized) {
-                initializeAudio();
-                return;
+
+        // Initialize character grid
+        function initCharsList() {
+            charsGrid.innerHTML = '';
+            for (const charObj of mots_N6) {
+                const item = document.createElement('div');
+                item.className = 'char-item';
+                item.innerHTML = `
+                    <span class="char-char">${charObj.caractere}</span>
+                    <span class="char-pinyin">${charObj.pinyin}</span>
+                    <span class="char-sens">${charObj.sens}</span>
+                `;
+                charsGrid.appendChild(item);
             }
-            
-            audioEnabled = !audioEnabled;
-            localStorage.setItem('audioEnabled', audioEnabled.toString());
-            updateAudioButtonState();
+        }
+
+        // Function to speak Chinese using Web Speech API
+        function speakChinese(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = "zh-CN";
+                utterance.rate = 0.75;
+                utterance.pitch = 1;
+
+                speechSynthesis.cancel();
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Initialize audio via user gesture
+        function initializeAudio() {
+            audioEnabled = true;
+            audioInitialized = true;
+            localStorage.setItem('audioEnabled', 'true');
+            // Play a test sound to unlock audio
+            if (currentQuestion && isQuizActive) {
+                speakChinese(currentQuestion.caractere);
+            }
+        }
+
+        // Disable audio
+        function disableAudio() {
+            audioEnabled = false;
+            audioInitialized = true;
+            localStorage.setItem('audioEnabled', 'false');
+        }
+
+        // Enable audio from intro screen
+        enableAudioBtn.addEventListener('click', () => {
+            initializeAudio();
+            // Play the first character to confirm activation
+            if (currentQuestion) {
+                speakChinese(currentQuestion.caractere);
+            }
+            // Hide intro screen and start game
+            introScreen.classList.add('hidden');
+            startGame();
         });
-        
-        function updateAudioButtonState() {
-            if (!audioInitialized) {
-                audioToggleBtn.classList.add('needs-init');
-                audioToggleBtn.innerHTML = '🔊';
-                audioToggleBtn.title = "Cliquez pour activer l'audio";
-            } else if (audioEnabled) {
-                audioToggleBtn.classList.add('active');
-                audioToggleBtn.classList.remove('needs-init');
-                audioToggleBtn.innerHTML = '🔊';
-                audioToggleBtn.title = "Désactiver l'audio";
-            } else {
-                audioToggleBtn.classList.remove('active', 'needs-init');
-                audioToggleBtn.innerHTML = '🔇';
-                audioToggleBtn.title = "Activer l'audio";
+
+        // Disable audio from intro screen
+        disableAudioBtn.addEventListener('click', () => {
+            disableAudio();
+            // Hide intro screen and start game
+            introScreen.classList.add('hidden');
+            startGame();
+        });
+
+        // Clicking outside the content area also starts the game (only if audio is already initialized)
+        introScreen.addEventListener('click', (e) => {
+            if (e.target === introScreen && audioInitialized) {
+                introScreen.classList.add('hidden');
+                startGame();
             }
-        }
-        
-        async function initializeAudio() {
-            try {
-                // Tenter de jouer un son très court pour initialiser l'audio
-                responsiveVoice.speak(" ", "Chinese Female", { 
-                    rate: 0.1,
-                    volume: 0.1,
-                    onend: function() {
-                        console.log("Audio initialisé avec succès");
-                        audioInitialized = true;
-                        // Activer l'audio par défaut après initialisation
-                        audioEnabled = true;
-                        localStorage.setItem('audioEnabled', 'true');
-                        updateAudioButtonState();
-                        
-                        // Si une question est active, rejouer son audio
-                        if (currentQuestion && isQuizActive) {
-                            setTimeout(() => {
-                                playCharacterAudio(currentQuestion.caractere);
-                            }, 300);
-                        }
-                    },
-                    onerror: function(err) {
-                        console.error("Erreur d'initialisation audio:", err);
-                        showAudioError();
-                    }
-                });
-            } catch (error) {
-                console.error("Erreur lors de l'initialisation audio:", error);
-                showAudioError();
-            }
-        }
-        
-        function showAudioError() {
-            audioToggleBtn.classList.remove('active', 'needs-init');
-            audioToggleBtn.innerHTML = '❌';
-            audioToggleBtn.title = "Erreur audio - Recharger la page";
-            setTimeout(() => {
-                updateAudioButtonState();
-            }, 3000);
-        }
-        
-        // Fonction pour jouer l'audio du caractère
-        function playCharacterAudio(character) {
-            if (!audioEnabled || !audioInitialized || !responsiveVoice) return;
-            
-            // Petit délai avant de jouer l'audio
-            setTimeout(() => {
-                try {
-                    responsiveVoice.cancel(); // Annuler tout audio en cours
-                    
-                    // Jouer le caractère avec une voix chinoise
-                    responsiveVoice.speak(character, "Chinese Female", { 
-                        rate: 0.8,
-                        pitch: 1,
-                        volume: 1,
-                        onend: function() {
-                            console.log(`Audio terminé pour: ${character}`);
-                        },
-                        onerror: function(err) {
-                            console.error("Erreur lors de la lecture audio:", err);
-                        }
-                    });
-                    
-                    // Afficher brièvement l'indicateur audio
-                    audioIndicator.classList.add('show');
-                    setTimeout(() => {
-                        audioIndicator.classList.remove('show');
-                    }, 800);
-                    
-                } catch (error) {
-                    console.error("Erreur lors de la lecture du caractère:", error);
-                }
-            }, 200);
-        }
-        
+        });
+
         function updateStatsDisplayMobile() {
             currentScoreDisplayMobile.textContent = score;
-            wrongAnswersDisplayMobile.textContent = wrongAnswers;
-            bestScoreDisplayMobile.textContent = currentUserBestScore;
+            wrongAnswersDisplayMobile.textContent = score; // Score N7
+            bestScoreDisplayMobile.textContent = SCORE_PARFAIT_N6; // Score parfait
         }
-        
+
         function updateQuizHeaderVisibility(isQuizActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('quiz-active', isQuizActive);
@@ -764,13 +823,13 @@
                 desktopBackContainer.classList.toggle('hidden', !isQuizActive);
             }
         }
-        
+
         function updateResultHeaderVisibility(isResultActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('result-active', isResultActive);
             }
         }
-        
+
         async function fetchBestScore() {
             if (!window.currentUser?.uid) {
                 return parseInt(localStorage.getItem(`best-score-${THEME}`) || '0');
@@ -788,7 +847,7 @@
             }
             return parseInt(localStorage.getItem(`best-score-${THEME}`) || '0');
         }
-        
+
         async function saveBestScore(newBest) {
             if (!window.currentUser?.uid) {
                 localStorage.setItem(`best-score-${THEME}`, newBest.toString());
@@ -805,7 +864,7 @@
                 localStorage.setItem(`best-score-${THEME}`, newBest.toString());
             }
         }
-        
+
         async function saveScores(incrementValue) {
             if (!window.currentUser?.uid || incrementValue <= 0) return;
             const uid = window.currentUser.uid;
@@ -814,10 +873,12 @@
                     const userRef = doc(db, 'users', uid);
                     const userDoc = await transaction.get(userRef);
                     if (!userDoc.exists()) throw new Error("Utilisateur introuvable");
+                    
                     transaction.update(userRef, {
                         globalScore: increment(incrementValue),
                         [`quizScores.${THEME}`]: increment(incrementValue)
                     });
+                    
                     const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
                     quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
                     localStorage.setItem('quizScores', JSON.stringify(quizScores));
@@ -832,12 +893,12 @@
                 localStorage.setItem('globalScore', global.toString());
             }
         }
-        
+
         function stopTimers() {
             if (quizTimerInterval) clearInterval(quizTimerInterval);
             quizTimerInterval = null;
         }
-        
+
         function startQuizTimer() {
             quizTimeLeft = levelConfig.quizTime;
             quizTimerDisplay.textContent = quizTimeLeft;
@@ -859,7 +920,7 @@
                 }
             }, 1000);
         }
-        
+
         async function startGame() {
             if (gameCompleted) return;
             stopTimers();
@@ -876,21 +937,13 @@
             generateQuestion();
             window.scrollTo(0, 0);
         }
-        
+
         function getRandomQuestion() {
-            let idx;
-            if (usedQuestions.length === 0) {
-                idx = Math.floor(Math.random() * QUESTIONS.length);
-            } else {
-                const lastIdx = usedQuestions[usedQuestions.length - 1];
-                do {
-                    idx = Math.floor(Math.random() * QUESTIONS.length);
-                } while (idx === lastIdx && QUESTIONS.length > 1);
-            }
-            usedQuestions.push(idx);
+            // Générer une question aléatoire sans limite
+            const idx = Math.floor(Math.random() * QUESTIONS.length);
             return QUESTIONS[idx];
         }
-        
+
         function cleanupCurrentQuestion() {
             if (currentWriter) {
                 drawingArea.innerHTML = '';
@@ -898,13 +951,9 @@
             }
             feedbackEl.textContent = '';
         }
-        
+
         function generateQuestion() {
             cleanupCurrentQuestion();
-            if (usedQuestions.length >= TOTAL_QUESTIONS) {
-                endGame();
-                return;
-            }
             currentQuestion = getRandomQuestion();
             drawingArea.innerHTML = '';
             currentWriter = HanziWriter.create('drawing-area', currentQuestion.caractere, {
@@ -934,11 +983,7 @@
                         feedbackEl.innerHTML = '✅ Correct !';
                         updateStatsDisplayMobile();
                         setTimeout(() => {
-                            if (usedQuestions.length < TOTAL_QUESTIONS) {
-                                generateQuestion();
-                            } else {
-                                endGame();
-                            }
+                            generateQuestion();
                         }, 1000);
                     } else {
                         wrongAnswers++;
@@ -946,11 +991,7 @@
                         feedbackEl.innerHTML = '❌ Presque !';
                         setTimeout(() => {
                             if (!isQuizActive) return;
-                            if (usedQuestions.length < TOTAL_QUESTIONS) {
-                                generateQuestion();
-                            } else {
-                                endGame();
-                            }
+                            generateQuestion();
                         }, 400);
                     }
                 },
@@ -959,13 +1000,14 @@
                 highlightOnComplete: false
             });
             feedbackEl.textContent = '';
-            
+            // Afficher le caractère, le pinyin et la traduction FR sur une seule ligne
+            characterInfo.innerHTML = `<strong>${currentQuestion.caractere}</strong> <em>${currentQuestion.pinyin}</em> ${currentQuestion.sens}`;
             // Jouer l'audio du caractère si activé
             if (audioInitialized && audioEnabled) {
-                playCharacterAudio(currentQuestion.caractere);
+                speakChinese(currentQuestion.caractere);
             }
         }
-        
+
         async function endGame() {
             if (gameCompleted) return;
             gameCompleted = true;
@@ -1028,7 +1070,7 @@
             }
             window.scrollTo(0, 0);
         }
-        
+
         async function handleBack() {
             if (gameCompleted) {
                 window.location.href = 'index.html';
@@ -1043,17 +1085,18 @@
             cleanupCurrentQuestion();
             window.location.href = 'index.html';
         }
-        
+
         restartBtn.addEventListener('click', () => {
             gameCompleted = false;
             isQuizActive = false;
+            stopTimers();
             startGame();
         });
-        
+
         homeBtn.addEventListener('click', handleBack);
         mobileBackBtn.addEventListener('click', handleBack);
         desktopBackBtn.addEventListener('click', handleBack);
-        
+
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -1077,22 +1120,13 @@
                     return;
                 }
                 localStorage.setItem('globalScore', globalScore.toString());
-                startGame();
+                
+                // Initialize character list and show intro screen
+                initCharsList();
+                introScreen.classList.remove('hidden');
             } catch (error) {
                 console.error("Erreur lors de la vérification des prérequis :", error);
                 window.location.href = 'index.html';
-            }
-        });
-        
-        // Vérifier si ResponsiveVoice est chargé
-        window.addEventListener('load', () => {
-            if (typeof responsiveVoice === 'undefined') {
-                console.warn('ResponsiveVoice non chargé');
-                audioToggleBtn.classList.remove('active', 'needs-init');
-                audioToggleBtn.innerHTML = '❌';
-                audioToggleBtn.title = "Erreur: service audio indisponible";
-            } else {
-                console.log('ResponsiveVoice chargé avec les voix:', responsiveVoice.getVoices());
             }
         });
     </script>
