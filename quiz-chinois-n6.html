@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Quiz Master - Chinois N6</title>
     <script src="https://unpkg.com/hanzi-writer@2.2.1/dist/hanzi-writer.min.js"></script>
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=Zu0kYc9H"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         .hidden {
@@ -76,6 +77,38 @@
             padding: 0 15px;
             box-sizing: border-box;
             position: relative;
+        }
+        /* AUDIO BUTTON */
+        #audio-toggle-container {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 100;
+        }
+        #audio-toggle-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 240, 230, 0.9);
+            border: 2px solid rgba(180, 0, 0, 0.3);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.4em;
+            color: #b40000;
+            box-shadow: 0 2px 6px rgba(180, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        #audio-toggle-btn:hover {
+            background: rgba(255, 230, 220, 0.95);
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(255, 100, 80, 0.4);
+        }
+        #audio-toggle-btn.active {
+            background: rgba(255, 200, 200, 0.9);
+            color: #9bc24f;
+            box-shadow: 0 0 8px rgba(155, 194, 79, 0.5);
         }
         /* QUIZ SECTION */
         #quiz-section {
@@ -406,6 +439,9 @@
             <div id="desktop-back-container" class="hidden">
                 <button id="desktop-back-btn" class="action-btn">← Accueil</button>
             </div>
+            <div id="audio-toggle-container">
+                <button id="audio-toggle-btn" class="action-btn">🔊</button>
+            </div>
             <div class="quiz-container">
                 <div id="drawing-area"></div>
                 <div id="feedback"></div>
@@ -508,13 +544,13 @@
             { caractere: "客", pinyin: "kè", sens: "invité" },
             { caractere: "气", pinyin: "qi", sens: "air / politesse" },
             { caractere: "谢", pinyin: "xiè", sens: "remercier" },
-            { caractere: "叫", pinyin: "jiào", sens: "s’appeler" },
+            { caractere: "叫", pinyin: "jiào", sens: "s'appeler" },
             { caractere: "对", pinyin: "duì", sens: "correct / envers" },
             { caractere: "起", pinyin: "qǐ", sens: "se lever / commencer" },
             { caractere: "没", pinyin: "méi", sens: "ne pas avoir" },
             { caractere: "关", pinyin: "guān", sens: "relation" },
             { caractere: "系", pinyin: "xi", sens: "lien / système" },
-            { caractere: "请", pinyin: "qǐng", sens: "s’il vous plaît / inviter" },
+            { caractere: "请", pinyin: "qǐng", sens: "s'il vous plaît / inviter" },
             { caractere: "的", pinyin: "de", sens: "particule possessive" },
             { caractere: "名", pinyin: "míng", sens: "nom" },
             { caractere: "字", pinyin: "zì", sens: "caractère / mot" },
@@ -569,6 +605,7 @@
         const currentScoreDisplayMobile = document.getElementById('current-score-display-mobile');
         const wrongAnswersDisplayMobile = document.getElementById('wrong-answers-mobile');
         const bestScoreDisplayMobile = document.getElementById('best-score-display-mobile');
+        const audioToggleBtn = document.getElementById('audio-toggle-btn');
         let score = 0;
         let quizTimeLeft = 0;
         let quizTimerInterval = null;
@@ -579,11 +616,54 @@
         let currentUserBestScore = 0;
         let wrongAnswers = 0;
         let isQuizActive = false;
+        let audioEnabled = localStorage.getItem('audioEnabled') === 'true';
+        
+        // Initialisation de l'état du bouton audio
+        if (audioEnabled) {
+            audioToggleBtn.classList.add('active');
+            audioToggleBtn.innerHTML = '🔊';
+        } else {
+            audioToggleBtn.innerHTML = '🔇';
+        }
+        
+        // Toggle audio
+        audioToggleBtn.addEventListener('click', () => {
+            audioEnabled = !audioEnabled;
+            localStorage.setItem('audioEnabled', audioEnabled.toString());
+            
+            if (audioEnabled) {
+                audioToggleBtn.classList.add('active');
+                audioToggleBtn.innerHTML = '🔊';
+            } else {
+                audioToggleBtn.classList.remove('active');
+                audioToggleBtn.innerHTML = '🔇';
+            }
+        });
+        
+        // Fonction pour jouer l'audio du caractère
+        function playCharacterAudio(character) {
+            if (!audioEnabled || !responsiveVoice) return;
+            
+            // Petit délai avant de jouer l'audio
+            setTimeout(() => {
+                // S'assurer que la voix est chargée
+                responsiveVoice.speak(character, "Chinese Female", { 
+                    rate: 0.8,
+                    pitch: 1,
+                    volume: 1,
+                    onend: function() {
+                        console.log("Audio terminé");
+                    }
+                });
+            }, 200);
+        }
+        
         function updateStatsDisplayMobile() {
             currentScoreDisplayMobile.textContent = score;
             wrongAnswersDisplayMobile.textContent = wrongAnswers;
             bestScoreDisplayMobile.textContent = currentUserBestScore;
         }
+        
         function updateQuizHeaderVisibility(isQuizActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('quiz-active', isQuizActive);
@@ -592,11 +672,13 @@
                 desktopBackContainer.classList.toggle('hidden', !isQuizActive);
             }
         }
+        
         function updateResultHeaderVisibility(isResultActive) {
             if (window.innerWidth <= 899) {
                 document.body.classList.toggle('result-active', isResultActive);
             }
         }
+        
         async function fetchBestScore() {
             if (!window.currentUser?.uid) {
                 return parseInt(localStorage.getItem(`best-score-${THEME}`) || '0');
@@ -614,6 +696,7 @@
             }
             return parseInt(localStorage.getItem(`best-score-${THEME}`) || '0');
         }
+        
         async function saveBestScore(newBest) {
             if (!window.currentUser?.uid) {
                 localStorage.setItem(`best-score-${THEME}`, newBest.toString());
@@ -630,6 +713,7 @@
                 localStorage.setItem(`best-score-${THEME}`, newBest.toString());
             }
         }
+        
         async function saveScores(incrementValue) {
             if (!window.currentUser?.uid || incrementValue <= 0) return;
             const uid = window.currentUser.uid;
@@ -656,10 +740,12 @@
                 localStorage.setItem('globalScore', global.toString());
             }
         }
+        
         function stopTimers() {
             if (quizTimerInterval) clearInterval(quizTimerInterval);
             quizTimerInterval = null;
         }
+        
         function startQuizTimer() {
             quizTimeLeft = levelConfig.quizTime;
             quizTimerDisplay.textContent = quizTimeLeft;
@@ -681,6 +767,7 @@
                 }
             }, 1000);
         }
+        
         async function startGame() {
             if (gameCompleted) return;
             stopTimers();
@@ -697,6 +784,7 @@
             generateQuestion();
             window.scrollTo(0, 0);
         }
+        
         function getRandomQuestion() {
             let idx;
             if (usedQuestions.length === 0) {
@@ -710,6 +798,7 @@
             usedQuestions.push(idx);
             return QUESTIONS[idx];
         }
+        
         function cleanupCurrentQuestion() {
             if (currentWriter) {
                 drawingArea.innerHTML = '';
@@ -717,6 +806,7 @@
             }
             feedbackEl.textContent = '';
         }
+        
         function generateQuestion() {
             cleanupCurrentQuestion();
             if (usedQuestions.length >= TOTAL_QUESTIONS) {
@@ -739,10 +829,8 @@
                 drawingWidth: 24,
                 highlightOnComplete: false,
                 showHintAfterMisses: 999,
-                // 👇 Paramètres rendant le tracé plus facile :
                 leniency: 1.1,         // Tolérance accrue (défaut = 1)
-                acceptBackwardsStrokes: true, // Permet de tracer dans le sens inverse
-                showCharacterOutline: true    // Affiche toujours la forme de référence
+                acceptBackwardsStrokes: true // Permet de tracer dans le sens inverse
             });
             isQuizActive = true;
             currentWriter.quiz({
@@ -776,12 +864,14 @@
                 },
                 onMistake: () => {},
                 showHintAfterMisses: 999,
-                highlightOnComplete: false,
-                useCharacterOrder: false,
-                useStrokeOrder: false
+                highlightOnComplete: false
             });
             feedbackEl.textContent = '';
+            
+            // Jouer l'audio du caractère si activé
+            playCharacterAudio(currentQuestion.caractere);
         }
+        
         async function endGame() {
             if (gameCompleted) return;
             gameCompleted = true;
@@ -844,6 +934,7 @@
             }
             window.scrollTo(0, 0);
         }
+        
         async function handleBack() {
             if (gameCompleted) {
                 window.location.href = 'index.html';
@@ -858,14 +949,17 @@
             cleanupCurrentQuestion();
             window.location.href = 'index.html';
         }
+        
         restartBtn.addEventListener('click', () => {
             gameCompleted = false;
             isQuizActive = false;
             startGame();
         });
+        
         homeBtn.addEventListener('click', handleBack);
         mobileBackBtn.addEventListener('click', handleBack);
         desktopBackBtn.addEventListener('click', handleBack);
+        
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -893,6 +987,17 @@
             } catch (error) {
                 console.error("Erreur lors de la vérification des prérequis :", error);
                 window.location.href = 'index.html';
+            }
+        });
+        
+        // S'assurer que ResponsiveVoice est chargé avant de démarrer
+        window.addEventListener('load', () => {
+            if (typeof responsiveVoice === 'undefined') {
+                console.warn('ResponsiveVoice non chargé, audio désactivé');
+                audioEnabled = false;
+                localStorage.setItem('audioEnabled', 'false');
+                audioToggleBtn.classList.remove('active');
+                audioToggleBtn.innerHTML = '🔇';
             }
         });
     </script>
