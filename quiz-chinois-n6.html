@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Quiz Master - Chinois N6</title>
+    <title>Quiz Master - Chinois Niveau 6</title>
     <script src="https://unpkg.com/hanzi-writer@2.2.1/dist/hanzi-writer.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -65,7 +65,6 @@
             transition: opacity 0.4s ease;
             z-index: 9999;
         }
-
         /* INTRODUCTION SCREEN */
         #intro-screen {
             position: fixed;
@@ -156,7 +155,6 @@
         .char-sens {
             color: #555;
         }
-
         /* ✨ CENTRAGE PRINCIPAL */
         main {
             display: flex;
@@ -168,10 +166,6 @@
             padding: 0 15px;
             box-sizing: border-box;
             position: relative;
-        }
-        /* AUDIO BUTTON - Masqué maintenant */
-        #audio-toggle-container {
-            display: none;
         }
         /* QUIZ SECTION */
         #quiz-section {
@@ -215,6 +209,58 @@
             min-height: 40px;
             line-height: 1.4;
             font-family: "Noto Serif SC", serif;
+        }
+        #repeat-audio-btn {
+            margin-top: 10px;
+            min-width: 180px;
+        }
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+            padding: 6px 10px;
+            background: rgba(255, 250, 240, 0.8);
+            border-radius: 8px;
+            border: 1px solid rgba(180, 0, 0, 0.2);
+            width: fit-content;
+        }
+        .volume-control label {
+            font-size: 0.9em;
+            color: #b40000;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100px;
+            height: 6px;
+            border-radius: 3px;
+            background: #fde3d0;
+            outline: none;
+            -webkit-transition: 0.2s;
+            transition: opacity 0.2s;
+            position: relative;
+        }
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #b40000;
+            cursor: pointer;
+            box-shadow: 0 0 4px rgba(180, 0, 0, 0.5);
+        }
+        .volume-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #b40000;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 4px rgba(180, 0, 0, 0.5);
         }
         #timers-container {
             width: 100%;
@@ -507,44 +553,40 @@
 <body>
     <div class="lanterne"></div>
     <div class="lanterne"></div>
-
     <!-- Introduction Screen -->
     <div id="intro-screen">
         <div id="intro-content">
-            <h2>Bienvenue au Quiz Chinois N6</h2>
-            <p>Les 6 prochains niveaux vous permettront d’apprendre et d’utiliser 52 caractères chinois essentiels.</p>
+            <h2>Bienvenue au Quiz Chinois Niveau 6</h2>
+            <p>Les 6 prochains niveaux vous permettront d'apprendre et d'utiliser 52 caractères chinois essentiels.</p>
             <p>Lors des 3 premiers quiz, chaque question affichera :</p>
             <ul style="text-align: left; margin: 10px 0 15px 30px;">
                 <li>La traduction française</li>
                 <li>Le pinyin</li>
                 <li>La prononciation audio (via synthèse vocale)</li>
             </ul>
-            <p>Progressivement, ces aides disparaîtront. Les 3 quiz suivants testeront votre capacité à reconnaître et restituer ces caractères sans assistance. Prenez le temps de bien assimiler les caractères au début : ils seront la base de la suite.</p>
-            
+            <p>Les 6 quiz suivants testeront votre capacité à reconnaître et restituer 52 caractères.</p>
             <div class="audio-btn-group">
-                <button id="enable-audio-btn" class="audio-btn">🔊 Activer la prononciation</button>
-                <button id="disable-audio-btn" class="audio-btn">🔇 Ne pas activer la prononciation</button>
+                <button id="start-quiz-btn" class="audio-btn">Commencer le quiz</button>
             </div>
-            
             <div id="chars-list">
                 <h3>Liste des 52 Caractères</h3>
                 <div id="chars-grid"></div>
             </div>
         </div>
     </div>
-
     <main>
         <section id="quiz-section" class="hidden">
             <div id="desktop-back-container" class="hidden">
                 <button id="desktop-back-btn" class="action-btn">← Accueil</button>
             </div>
-            <div id="audio-toggle-container">
-                <button id="audio-toggle-btn" class="action-btn">🔊</button>
-                <div id="audio-indicator" class="audio-indicator">🔊</div>
-            </div>
             <div class="quiz-container">
                 <div id="drawing-area"></div>
                 <div id="character-info"></div>
+                <button id="repeat-audio-btn" class="action-btn">🔊 Répéter</button>
+                <div class="volume-control">
+                    <label for="volume-slider">🔊 Volume :</label>
+                    <input type="range" id="volume-slider" class="volume-slider" min="0" max="1" step="0.01" value="1">
+                </div>
                 <div id="feedback"></div>
             </div>
             <div id="timers-container">
@@ -558,15 +600,15 @@
             <div id="score-display">Score : <span id="score">0</span></div>
             <div id="mobile-quiz-ui-row">
                 <div id="current-game-stats">
-                    <div class="stats-title">📊 Stats</div>
+                    <div class="stats-title">📊 Objectifs</div>
                     <div class="current-score" id="current-score-display-mobile">0</div>
                     <div class="stats-row">
-                        <span class="stats-label">Score N7 :</span>
-                        <span class="stats-value" id="wrong-answers-mobile">0</span>
+                        <span class="stats-label">Score niveau 7 :</span>
+                        <span class="stats-value" id="level7-status-mobile">0 / 10</span>
                     </div>
-                    <div class="stats-row">
+                    <div class="stats-row" id="perfect-row-mobile" style="display: none;">
                         <span class="stats-label">Score parfait :</span>
-                        <span class="stats-value" id="best-score-display-mobile">0</span>
+                        <span class="stats-value" id="perfect-status-mobile">0 / 50</span>
                     </div>
                 </div>
                 <div id="mobile-back-container">
@@ -605,14 +647,11 @@
         import {
             getFirestore, doc, updateDoc, increment, runTransaction, getDoc
         } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-        
         // 🔑 CONFIGURATION
         const THEME = 'chinois';
-        const QUIZ_TITLE = 'Chinois N6';
+        const QUIZ_TITLE = 'Chinois Niveau 6';
         const SCORE_REQUIS_N7 = 10;
-        const SCORE_PARFAIT_N6 = 20;
-        const TOTAL_QUESTIONS = 25; // Ancienne limite, maintenant infini
-        
+        const SCORE_PARFAIT_N6 = 50;
         // Mots pour le niveau N6
         const mots_N6 = [
             { caractere: "你", pinyin: "nǐ", sens: "tu / toi" },
@@ -668,19 +707,16 @@
             { caractere: "认", pinyin: "rèn", sens: "reconnaître" },
             { caractere: "识", pinyin: "shi", sens: "connaître" }
         ];
-
         // Génération des questions basées sur les mots N6
         const QUESTIONS = mots_N6.map(mot => ({
             caractere: mot.caractere,
             sens: mot.sens,
             pinyin: mot.pinyin
         }));
-
         const levelConfig = {
             quizTime: 300,
             lives: 0
         };
-
         const firebaseConfig = {
             apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
             authDomain: "quiz-master-io.firebaseapp.com",
@@ -689,11 +725,13 @@
             messagingSenderId: "773382469164",
             appId: "1:773382469164:web:5e24a9a62ce543f5190389"
         };
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         window.currentUser = null;
+
+        // Audio volume state
+        let currentVolume = 1.0;
 
         // DOM Elements
         const introScreen = document.getElementById('intro-screen');
@@ -714,13 +752,13 @@
         const desktopBackBtn = document.getElementById('desktop-back-btn');
         const desktopBackContainer = document.getElementById('desktop-back-container');
         const currentScoreDisplayMobile = document.getElementById('current-score-display-mobile');
-        const wrongAnswersDisplayMobile = document.getElementById('wrong-answers-mobile');
-        const bestScoreDisplayMobile = document.getElementById('best-score-display-mobile');
-        const audioToggleBtn = document.getElementById('audio-toggle-btn');
-        const audioIndicator = document.getElementById('audio-indicator');
-        const enableAudioBtn = document.getElementById('enable-audio-btn');
-        const disableAudioBtn = document.getElementById('disable-audio-btn');
+        const level7StatusMobile = document.getElementById('level7-status-mobile');
+        const perfectRowMobile = document.getElementById('perfect-row-mobile');
+        const perfectStatusMobile = document.getElementById('perfect-status-mobile');
+        const repeatAudioBtn = document.getElementById('repeat-audio-btn');
+        const startQuizBtn = document.getElementById('start-quiz-btn');
         const charsGrid = document.getElementById('chars-grid');
+        const volumeSlider = document.getElementById('volume-slider');
 
         let score = 0;
         let quizTimeLeft = 0;
@@ -732,8 +770,12 @@
         let currentUserBestScore = 0;
         let wrongAnswers = 0;
         let isQuizActive = false;
-        let audioEnabled = false;
-        let audioInitialized = false;
+        let audioCache = {};
+
+        // Initialize volume control
+        volumeSlider.addEventListener('input', () => {
+            currentVolume = parseFloat(volumeSlider.value);
+        });
 
         // Initialize character grid
         function initCharsList() {
@@ -750,69 +792,64 @@
             }
         }
 
-        // Function to speak Chinese using Web Speech API
-        function speakChinese(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = "zh-CN";
-                utterance.rate = 0.75;
-                utterance.pitch = 1;
-
-                speechSynthesis.cancel();
-                speechSynthesis.speak(utterance);
+        // Fonction pour jouer un son depuis les fichiers MP3
+        function playCharacterAudio(caractere) {
+            let audio;
+            if (audioCache[caractere]) {
+                // Cloner l'audio pré-chargé
+                audio = audioCache[caractere].cloneNode();
+            } else {
+                // Fallback si non pré-chargé
+                const audioUrl = `audio/chinois/Niveau 6/${caractere}.mp3`;
+                audio = new Audio(audioUrl);
             }
+            audio.volume = currentVolume;
+            audio.play().catch(e => {
+                console.error(`Erreur lecture audio pour "${caractere}":`, e);
+                feedbackEl.innerHTML = '🔇 Audio bloqué';
+                setTimeout(() => {
+                    if (isQuizActive) feedbackEl.textContent = '';
+                }, 2000);
+            });
+            return audio;
         }
 
-        // Initialize audio via user gesture
-        function initializeAudio() {
-            audioEnabled = true;
-            audioInitialized = true;
-            localStorage.setItem('audioEnabled', 'true');
-            // Play a test sound to unlock audio
-            if (currentQuestion && isQuizActive) {
-                speakChinese(currentQuestion.caractere);
-            }
+        // Pré-charger tous les fichiers audio
+        function preloadAudioFiles() {
+            const audioCache = {};
+            QUESTIONS.forEach(q => {
+                const audioUrl = `audio/chinois/Niveau 6/${q.caractere}.mp3`;
+                audioCache[q.caractere] = new Audio(audioUrl);
+                audioCache[q.caractere].volume = currentVolume;
+                audioCache[q.caractere].load(); // Charger sans jouer
+            });
+            return audioCache;
         }
 
-        // Disable audio
-        function disableAudio() {
-            audioEnabled = false;
-            audioInitialized = true;
-            localStorage.setItem('audioEnabled', 'false');
-        }
-
-        // Enable audio from intro screen
-        enableAudioBtn.addEventListener('click', () => {
-            initializeAudio();
-            // Play the first character to confirm activation
-            if (currentQuestion) {
-                speakChinese(currentQuestion.caractere);
-            }
-            // Hide intro screen and start game
-            introScreen.classList.add('hidden');
-            startGame();
-        });
-
-        // Disable audio from intro screen
-        disableAudioBtn.addEventListener('click', () => {
-            disableAudio();
-            // Hide intro screen and start game
-            introScreen.classList.add('hidden');
-            startGame();
-        });
-
-        // Clicking outside the content area also starts the game (only if audio is already initialized)
-        introScreen.addEventListener('click', (e) => {
-            if (e.target === introScreen && audioInitialized) {
-                introScreen.classList.add('hidden');
-                startGame();
-            }
-        });
+        // Initialiser le contexte audio pour iOS
+        document.addEventListener('touchstart', function initAudioContext() {
+            const silentAudio = new Audio();
+            silentAudio.volume = 0;
+            silentAudio.play().then(() => {
+                silentAudio.pause();
+                console.log("Contexte audio iOS initialisé");
+            }).catch(e => console.log("Initialisation audio:", e));
+            document.removeEventListener('touchstart', initAudioContext);
+        }, { once: true });
 
         function updateStatsDisplayMobile() {
             currentScoreDisplayMobile.textContent = score;
-            wrongAnswersDisplayMobile.textContent = score; // Score N7
-            bestScoreDisplayMobile.textContent = SCORE_PARFAIT_N6; // Score parfait
+            // Gérer l'affichage du score niveau 7
+            if (score >= SCORE_REQUIS_N7) {
+                level7StatusMobile.textContent = 'débloqué';
+                // Afficher la ligne du score parfait
+                perfectRowMobile.style.display = 'flex';
+                perfectStatusMobile.textContent = `${score} / ${SCORE_PARFAIT_N6}`;
+            } else {
+                level7StatusMobile.textContent = `${score} / ${SCORE_REQUIS_N7}`;
+                // Cacher la ligne du score parfait
+                perfectRowMobile.style.display = 'none';
+            }
         }
 
         function updateQuizHeaderVisibility(isQuizActive) {
@@ -873,12 +910,10 @@
                     const userRef = doc(db, 'users', uid);
                     const userDoc = await transaction.get(userRef);
                     if (!userDoc.exists()) throw new Error("Utilisateur introuvable");
-                    
                     transaction.update(userRef, {
                         globalScore: increment(incrementValue),
                         [`quizScores.${THEME}`]: increment(incrementValue)
                     });
-                    
                     const quizScores = JSON.parse(localStorage.getItem('quizScores') || '{}');
                     quizScores[THEME] = (quizScores[THEME] || 0) + incrementValue;
                     localStorage.setItem('quizScores', JSON.stringify(quizScores));
@@ -934,7 +969,11 @@
             updateQuizHeaderVisibility(true);
             updateResultHeaderVisibility(false);
             startQuizTimer();
-            generateQuestion();
+            // Jouer un audio silencieux pour initialiser le contexte audio
+            const silentAudio = new Audio();
+            silentAudio.volume = 0;
+            silentAudio.play().catch(e => console.log("Silent audio init failed:", e));
+            setTimeout(generateQuestion, 500);
             window.scrollTo(0, 0);
         }
 
@@ -1002,10 +1041,12 @@
             feedbackEl.textContent = '';
             // Afficher le caractère, le pinyin et la traduction FR sur une seule ligne
             characterInfo.innerHTML = `<strong>${currentQuestion.caractere}</strong> <em>${currentQuestion.pinyin}</em> ${currentQuestion.sens}`;
-            // Jouer l'audio du caractère si activé
-            if (audioInitialized && audioEnabled) {
-                speakChinese(currentQuestion.caractere);
-            }
+            // Jouer l'audio du caractère
+            setTimeout(() => {
+                if (isQuizActive) {
+                    playCharacterAudio(currentQuestion.caractere);
+                }
+            }, 300);
         }
 
         async function endGame() {
@@ -1086,17 +1127,27 @@
             window.location.href = 'index.html';
         }
 
+        // Event listeners
         restartBtn.addEventListener('click', () => {
             gameCompleted = false;
             isQuizActive = false;
             stopTimers();
             startGame();
         });
-
         homeBtn.addEventListener('click', handleBack);
         mobileBackBtn.addEventListener('click', handleBack);
         desktopBackBtn.addEventListener('click', handleBack);
-
+        startQuizBtn.addEventListener('click', () => {
+            introScreen.classList.add('hidden');
+            // Pré-charger les audios avant de démarrer
+            audioCache = preloadAudioFiles();
+            setTimeout(startGame, 300);
+        });
+        repeatAudioBtn.addEventListener('click', () => {
+            if (currentQuestion && isQuizActive) {
+                playCharacterAudio(currentQuestion.caractere);
+            }
+        });
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -1120,7 +1171,6 @@
                     return;
                 }
                 localStorage.setItem('globalScore', globalScore.toString());
-                
                 // Initialize character list and show intro screen
                 initCharsList();
                 introScreen.classList.remove('hidden');
