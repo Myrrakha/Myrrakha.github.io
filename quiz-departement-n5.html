@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Carte Interactive - Départements Français</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 20px;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        svg {
+            width: 100%;
+            height: auto;
+            max-width: 95%;
+            max-height: 85vh;
+            cursor: grab;
+            transition: transform 0.1s ease;
+        }
+
+        svg:active {
+            cursor: grabbing;
+        }
+
+        .land {
+            fill: #2a2a4a;
+            stroke: #1a1a2e;
+            stroke-width: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .land:hover {
+            fill: #3a3a6a;
+            stroke: #a075ff;
+            stroke-width: 1.2;
+            filter: drop-shadow(0 0 3px rgba(170, 150, 255, 0.8));
+        }
+
+        .prefecture {
+            fill: #ff6b6b;
+            stroke: #ffffff;
+            stroke-width: 1;
+            transition: all 0.3s ease;
+        }
+
+        .prefecture:hover {
+            fill: #ff9e9e;
+            r: 6;
+            filter: drop-shadow(0 0 5px rgba(255, 107, 107, 0.8));
+        }
+
+        .bottom-bar {
+            position: absolute;
+            bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 90%;
+            max-width: 400px;
+            padding: 12px 15px;
+            background: rgba(30, 15, 65, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(170, 150, 255, 0.25);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 12px;
+            background: rgba(100, 100, 100, 0.3);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #00c9ff, #92fe9d);
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .stat-value {
+            font-weight: 600;
+        }
+
+        .instructions {
+            position: absolute;
+            top: 20px;
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            background: rgba(98, 58, 162, 0.25);
+            backdrop-filter: blur(12px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 100;
+            max-width: 80%;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .prefecture-tooltip {
+            position: absolute;
+            background: rgba(30, 15, 65, 0.9);
+            border: 1px solid rgba(170, 150, 255, 0.4);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 200;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .bottom-bar {
+                width: 95%;
+                padding: 10px;
+            }
+            
+            .instructions {
+                font-size: 1rem;
+                padding: 8px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="instructions" id="quiz-question">Cliquez et faites glisser pour naviguer • Utilisez la molette pour zoomer</div>
+        
+        <div class="map-container">
+            <svg id="france-map" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="2" result="blur"/>
+                        <feFlood flood-color="#a075ff" result="glowColor"/>
+                        <feComposite in="glowColor" in2="blur" operator="in" result="softGlow"/>
+                        <feMerge>
+                            <feMergeNode in="softGlow"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <g id="departments"></g>
+                <g id="prefectures"></g>
+            </svg>
+        </div>
+        
+        <div class="bottom-bar">
+            <div class="progress-container">
+                <div class="progress-bar" id="timer-bar"></div>
+            </div>
+            <div class="stats-row">
+                <span class="stat-label">Score:</span>
+                <span class="stat-value" id="score">0</span>
+            </div>
+            <div class="stats-row">
+                <span class="stat-label">Vies:</span>
+                <span class="stat-value" id="lives">5</span>
+            </div>
+            <div class="stats-row">
+                <span class="stat-label">Score requis Niveau 6:</span>
+                <span class="stat-value">10</span>
+            </div>
+            <div class="stats-row">
+                <span class="stat-label">Score parfait:</span>
+                <span class="stat-value">30</span>
+            </div>
+        </div>
+        
+        <div class="prefecture-tooltip" id="tooltip"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const svg = document.getElementById('france-map');
+            const departmentsGroup = document.getElementById('departments');
+            const prefecturesGroup = document.getElementById('prefectures');
+            const tooltip = document.getElementById('tooltip');
+            const timerBar = document.getElementById('timer-bar');
+            const scoreElement = document.getElementById('score');
+            const livesElement = document.getElementById('lives');
+            const quizQuestionElement = document.getElementById('quiz-question');
+            
+            // Initial viewBox parameters
+            const initialViewBox = { x: 0, y: 0, width: 1000, height: 1000 };
+            let viewBox = { ...initialViewBox };
+            let scale = 1;
+            let isPanning = false;
+            let startX, startY, startViewBoxX, startViewBoxY;
+            
+            // Game state
+            let score = 0;
+            let lives = 5;
+            let timeLeft = 120; // 2 minutes in seconds
+            let timerInterval;
+            let currentDepartmentCode = '';
+            let currentDepartmentName = '';
+            
+            // Prefectures data
+            const prefectures = {
+                "01": { name: "Bourg-en-Bresse", lat: 46.205, lon: 5.225 },
+                "02": { name: "Laon", lat: 49.564, lon: 3.624 },
+                "03": { name: "Moulins", lat: 46.565, lon: 3.334 },
+                "04": { name: "Digne-les-Bains", lat: 44.092, lon: 6.232 },
+                "05": { name: "Gap", lat: 44.559, lon: 6.079 },
+                "06": { name: "Nice", lat: 43.710, lon: 7.262 },
+                "07": { name: "Privas", lat: 44.735, lon: 4.599 },
+                "08": { name: "Charleville-Mézières", lat: 49.768, lon: 4.724 },
+                "09": { name: "Foix", lat: 42.963, lon: 1.607 },
+                "10": { name: "Troyes", lat: 48.297, lon: 4.074 },
+                "11": { name: "Carcassonne", lat: 43.213, lon: 2.351 },
+                "12": { name: "Rodez", lat: 44.351, lon: 2.573 },
+                "13": { name: "Marseille", lat: 43.296, lon: 5.369 },
+                "14": { name: "Caen", lat: 49.183, lon: -0.370 },
+                "15": { name: "Aurillac", lat: 44.928, lon: 2.444 },
+                "16": { name: "Angoulême", lat: 45.648, lon: 0.156 },
+                "17": { name: "La Rochelle", lat: 46.160, lon: -1.151 },
+                "18": { name: "Bourges", lat: 47.082, lon: 2.399 },
+                "19": { name: "Tulle", lat: 45.266, lon: 1.772 },
+                "2A": { name: "Ajaccio", lat: 41.919, lon: 8.738 },
+                "2B": { name: "Bastia", lat: 42.702, lon: 9.450 },
+                "21": { name: "Dijon", lat: 47.322, lon: 5.041 },
+                "22": { name: "Saint-Brieuc", lat: 48.514, lon: -2.765 },
+                "23": { name: "Guéret", lat: 46.170, lon: 1.872 },
+                "24": { name: "Périgueux", lat: 45.184, lon: 0.721 },
+                "25": { name: "Besançon", lat: 47.237, lon: 6.025 },
+                "26": { name: "Valence", lat: 44.933, lon: 4.892 },
+                "27": { name: "Évreux", lat: 49.024, lon: 1.150 },
+                "28": { name: "Chartres", lat: 48.447, lon: 1.489 },
+                "29": { name: "Quimper", lat: 47.996, lon: -4.102 },
+                "30": { name: "Nîmes", lat: 43.837, lon: 4.361 },
+                "31": { name: "Toulouse", lat: 43.604, lon: 1.444 },
+                "32": { name: "Auch", lat: 43.646, lon: 0.586 },
+                "33": { name: "Bordeaux", lat: 44.837, lon: -0.579 },
+                "34": { name: "Montpellier", lat: 43.611, lon: 3.877 },
+                "35": { name: "Rennes", lat: 48.117, lon: -1.677 },
+                "36": { name: "Châteauroux", lat: 46.812, lon: 1.694 },
+                "37": { name: "Tours", lat: 47.394, lon: 0.684 },
+                "38": { name: "Grenoble", lat: 45.188, lon: 5.724 },
+                "39": { name: "Lons-le-Saunier", lat: 46.675, lon: 5.555 },
+                "40": { name: "Mont-de-Marsan", lat: 43.891, lon: -0.499 },
+                "41": { name: "Blois", lat: 47.586, lon: 1.335 },
+                "42": { name: "Saint-Étienne", lat: 45.439, lon: 4.387 },
+                "43": { name: "Le Puy-en-Velay", lat: 45.042, lon: 3.885 },
+                "44": { name: "Nantes", lat: 47.218, lon: -1.553 },
+                "45": { name: "Orléans", lat: 47.903, lon: 1.909 },
+                "46": { name: "Cahors", lat: 44.449, lon: 1.441 },
+                "47": { name: "Agen", lat: 44.204, lon: 0.620 },
+                "48": { name: "Mende", lat: 44.518, lon: 3.501 },
+                "49": { name: "Angers", lat: 47.478, lon: -0.563 },
+                "50": { name: "Saint-Lô", lat: 49.115, lon: -1.091 },
+                "51": { name: "Châlons-en-Champagne", lat: 48.957, lon: 4.367 },
+                "52": { name: "Chaumont", lat: 48.111, lon: 5.141 },
+                "53": { name: "Laval", lat: 48.072, lon: -0.773 },
+                "54": { name: "Nancy", lat: 48.693, lon: 6.184 },
+                "55": { name: "Bar-le-Duc", lat: 48.773, lon: 5.161 },
+                "56": { name: "Vannes", lat: 47.658, lon: -2.759 },
+                "57": { name: "Metz", lat: 49.119, lon: 6.176 },
+                "58": { name: "Nevers", lat: 46.990, lon: 3.159 },
+                "59": { name: "Lille", lat: 50.629, lon: 3.057 },
+                "60": { name: "Beauvais", lat: 49.430, lon: 2.095 },
+                "61": { name: "Alençon", lat: 48.431, lon: 0.092 },
+                "62": { name: "Arras", lat: 50.291, lon: 2.778 },
+                "63": { name: "Clermont-Ferrand", lat: 45.777, lon: 3.087 },
+                "64": { name: "Pau", lat: 43.295, lon: -0.370 },
+                "65": { name: "Tarbes", lat: 43.233, lon: 0.072 },
+                "66": { name: "Perpignan", lat: 42.688, lon: 2.894 },
+                "67": { name: "Strasbourg", lat: 48.573, lon: 7.752 },
+                "68": { name: "Colmar", lat: 48.079, lon: 7.358 },
+                "69": { name: "Lyon", lat: 45.764, lon: 4.835 },
+                "70": { name: "Vesoul", lat: 47.623, lon: 6.155 },
+                "71": { name: "Mâcon", lat: 46.306, lon: 4.828 },
+                "72": { name: "Le Mans", lat: 48.007, lon: 0.199 },
+                "73": { name: "Chambéry", lat: 45.566, lon: 5.920 },
+                "74": { name: "Annecy", lat: 45.899, lon: 6.129 },
+                "75": { name: "Paris", lat: 48.8566, lon: 2.3522 },
+                "76": { name: "Rouen", lat: 49.443, lon: 1.099 },
+                "77": { name: "Melun", lat: 48.540, lon: 2.660 },
+                "78": { name: "Versailles", lat: 48.804, lon: 2.135 },
+                "79": { name: "Niort", lat: 46.323, lon: -0.461 },
+                "80": { name: "Amiens", lat: 49.895, lon: 2.302 },
+                "81": { name: "Albi", lat: 43.929, lon: 2.148 },
+                "82": { name: "Montauban", lat: 44.018, lon: 1.355 },
+                "83": { name: "Toulon", lat: 43.124, lon: 5.928 },
+                "84": { name: "Avignon", lat: 43.949, lon: 4.805 },
+                "85": { name: "La Roche-sur-Yon", lat: 46.670, lon: -1.427 },
+                "86": { name: "Poitiers", lat: 46.580, lon: 0.340 },
+                "87": { name: "Limoges", lat: 45.833, lon: 1.261 },
+                "88": { name: "Épinal", lat: 48.174, lon: 6.450 },
+                "89": { name: "Auxerre", lat: 47.798, lon: 3.573 },
+                "90": { name: "Belfort", lat: 47.639, lon: 6.863 },
+                "91": { name: "Évry", lat: 48.624, lon: 2.429 },
+                "92": { name: "Nanterre", lat: 48.892, lon: 2.206 },
+                "93": { name: "Bobigny", lat: 48.910, lon: 2.439 },
+                "94": { name: "Créteil", lat: 48.790, lon: 2.455 },
+                "95": { name: "Cergy", lat: 49.036, lon: 2.060 },
+                "971": { name: "Basse-Terre", lat: 15.998, lon: -61.726 },
+                "972": { name: "Fort-de-France", lat: 14.616, lon: -61.058 },
+                "973": { name: "Cayenne", lat: 4.937, lon: -52.325 },
+                "974": { name: "Saint-Denis", lat: -20.878, lon: 55.448 },
+                "976": { name: "Mamoudzou", lat: -12.787, lon: 45.227 }
+            };
+
+            // Function to project geographic coordinates to SVG coordinates
+            function project(lon, lat) {
+                // Simple equirectangular projection scaled to our viewBox
+                // Longitude range approximately from -5.5 to 9.5
+                // Latitude range approximately from 41 to 51.5
+                const minLon = -6;
+                const maxLon = 10;
+                const minLat = 41;
+                const maxLat = 52;
+                
+                const x = ((lon - minLon) / (maxLon - minLon)) * 1000;
+                const y = 1000 - ((lat - minLat) / (maxLat - minLat)) * 1000;
+                
+                return { x, y };
+            }
+
+            // Function to update the viewBox
+            function updateViewBox() {
+                svg.setAttribute("viewBox", `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+                scale = initialViewBox.width / viewBox.width;
+            }
+
+            // Initialize the map
+            async function initMap() {
+                try {
+                    // Load GeoJSON data
+                    const response = await fetch('departements-1000m.geojson');
+                    const geojsonData = await response.json();
+                    
+                    // Draw departments
+                    drawDepartments(geojsonData);
+                    
+                    // Add prefectures
+                    addPrefectures();
+                    
+                    // Set initial view
+                    svg.setAttribute("viewBox", `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+                    
+                    // Start the timer
+                    startTimer();
+                    
+                    // Start the quiz
+                    nextQuestion();
+                } catch (error) {
+                    console.error('Error loading GeoJSON:', error);
+                    quizQuestionElement.textContent = 'Erreur : impossible de charger la carte.';
+                }
+            }
+
+            // Function to draw departments from GeoJSON
+            function drawDepartments(geojsonData) {
+                // Clear existing departments
+                while (departmentsGroup.firstChild) {
+                    departmentsGroup.removeChild(departmentsGroup.firstChild);
+                }
+                
+                // Iterate through features
+                geojsonData.features.forEach(feature => {
+                    const geometry = feature.geometry;
+                    const properties = feature.properties;
+                    const code = properties.code;
+                    
+                    if (geometry.type === 'Polygon') {
+                        drawPolygon(geometry.coordinates[0], code);
+                    } else if (geometry.type === 'MultiPolygon') {
+                        geometry.coordinates.forEach(polygon => {
+                            drawPolygon(polygon[0], code);
+                        });
+                    }
+                });
+            }
+
+            // Helper function to draw a polygon
+            function drawPolygon(coordinates, code) {
+                const pathData = [];
+                
+                for (let i = 0; i < coordinates.length; i++) {
+                    const coord = coordinates[i];
+                    const projected = project(coord[0], coord[1]);
+                    
+                    if (i === 0) {
+                        pathData.push(`M ${projected.x} ${projected.y}`);
+                    } else {
+                        pathData.push(`L ${projected.x} ${projected.y}`);
+                    }
+                }
+                
+                pathData.push('Z'); // Close the path
+                
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', pathData.join(' '));
+                path.setAttribute('class', `land departement departement${code}`);
+                path.setAttribute('data-code', code);
+                path.setAttribute('data-name', prefectures[code]?.name || `Département ${code}`);
+                
+                // Add click event for quiz
+                path.addEventListener('click', () => {
+                    handleDepartmentClick(code);
+                });
+                
+                departmentsGroup.appendChild(path);
+            }
+
+            // Add prefectures to the map
+            function addPrefectures() {
+                // Clear existing prefectures
+                while (prefecturesGroup.firstChild) {
+                    prefecturesGroup.removeChild(prefecturesGroup.firstChild);
+                }
+                
+                // Get all department paths
+                const departments = Array.from(departmentsGroup.querySelectorAll('path'));
+                
+                departments.forEach(dep => {
+                    // Extract department code from data attribute
+                    const code = dep.getAttribute('data-code');
+                    
+                    // Check if we have prefecture data for this department
+                    if (prefectures[code]) {
+                        // Project the geographic coordinates to SVG coordinates
+                        const proj = project(prefectures[code].lon, prefectures[code].lat);
+                        
+                        // Create circle element
+                        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        circle.setAttribute('cx', proj.x);
+                        circle.setAttribute('cy', proj.y);
+                        circle.setAttribute('r', 4);
+                        circle.setAttribute('class', 'prefecture');
+                        circle.setAttribute('data-name', prefectures[code].name);
+                        circle.setAttribute('data-code', code);
+                        
+                        // Create tooltip title
+                        const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+                        title.textContent = prefectures[code].name;
+                        circle.appendChild(title);
+                        
+                        prefecturesGroup.appendChild(circle);
+                    }
+                });
+                
+                // Add event listeners to prefectures
+                document.querySelectorAll('.prefecture').forEach(circle => {
+                    circle.addEventListener('mouseenter', (e) => {
+                        const name = circle.getAttribute('data-name');
+                        tooltip.textContent = name;
+                        tooltip.style.opacity = '1';
+                        tooltip.style.left = (e.clientX + 10) + 'px';
+                        tooltip.style.top = (e.clientY + 10) + 'px';
+                    });
+                    
+                    circle.addEventListener('mouseleave', () => {
+                        tooltip.style.opacity = '0';
+                    });
+                    
+                    circle.addEventListener('mousemove', (e) => {
+                        tooltip.style.left = (e.clientX + 10) + 'px';
+                        tooltip.style.top = (e.clientY + 10) + 'px';
+                    });
+                });
+            }
+
+            // Start the timer
+            function startTimer() {
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateTimerBar();
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        endGame();
+                    }
+                }, 1000);
+            }
+
+            // Update the timer bar
+            function updateTimerBar() {
+                const percentage = (timeLeft / 120) * 100;
+                timerBar.style.width = `${percentage}%`;
+                
+                // Change color based on remaining time
+                if (percentage < 25) {
+                    timerBar.style.background = 'linear-gradient(90deg, #ff416c, #ff4b2b)';
+                } else if (percentage < 50) {
+                    timerBar.style.background = 'linear-gradient(90deg, #ffb347, #ffcc33)';
+                } else {
+                    timerBar.style.background = 'linear-gradient(90deg, #00c9ff, #92fe9d)';
+                }
+            }
+
+            // End the game
+            function endGame() {
+                alert(`Jeu terminé ! Score final: ${score}`);
+            }
+
+            // Mouse down event for panning
+            svg.addEventListener('mousedown', (e) => {
+                if (e.button === 0) { // Left mouse button
+                    isPanning = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    startViewBoxX = viewBox.x;
+                    startViewBoxY = viewBox.y;
+                    svg.style.cursor = 'grabbing';
+                    e.preventDefault();
+                }
+            });
+
+            // Mouse move event for panning
+            document.addEventListener('mousemove', (e) => {
+                if (isPanning) {
+                    const dx = (e.clientX - startX) * (viewBox.width / svg.clientWidth);
+                    const dy = (e.clientY - startY) * (viewBox.height / svg.clientHeight);
+                    
+                    viewBox.x = startViewBoxX - dx;
+                    viewBox.y = startViewBoxY - dy;
+                    updateViewBox();
+                }
+            });
+
+            // Mouse up event to stop panning
+            document.addEventListener('mouseup', () => {
+                isPanning = false;
+                svg.style.cursor = 'grab';
+            });
+
+            // Mouse wheel event for zooming
+            svg.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                
+                // Get mouse position relative to SVG
+                const rect = svg.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                // Convert to viewBox coordinates
+                const x = viewBox.x + (mouseX / rect.width) * viewBox.width;
+                const y = viewBox.y + (mouseY / rect.height) * viewBox.height;
+                
+                // Determine zoom direction
+                const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                
+                // Calculate new dimensions
+                const newWidth = viewBox.width * delta;
+                const newHeight = viewBox.height * delta;
+                
+                // Prevent extreme zoom levels
+                if (newWidth > 2000 || newHeight > 2000 || newWidth < 100 || newHeight < 100) return;
+                
+                // Calculate new position to keep mouse point fixed
+                viewBox.x = x - (mouseX / rect.width) * newWidth;
+                viewBox.y = y - (mouseY / rect.height) * newHeight;
+                viewBox.width = newWidth;
+                viewBox.height = newHeight;
+                
+                updateViewBox();
+            });
+
+            // Touch events for mobile zooming
+            let touchStartDistance = 0;
+            let touchStartViewBoxWidth = 0;
+            let touchStartViewBoxHeight = 0;
+            let touchStartCenterX = 0;
+            let touchStartCenterY = 0;
+
+            svg.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    
+                    touchStartDistance = Math.sqrt(
+                        Math.pow(touch2.clientX - touch1.clientX, 2) +
+                        Math.pow(touch2.clientY - touch1.clientY, 2)
+                    );
+                    
+                    touchStartViewBoxWidth = viewBox.width;
+                    touchStartViewBoxHeight = viewBox.height;
+                    
+                    touchStartCenterX = (touch1.clientX + touch2.clientX) / 2;
+                    touchStartCenterY = (touch1.clientY + touch2.clientY) / 2;
+                    
+                    e.preventDefault();
+                }
+            });
+
+            svg.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2) {
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    
+                    const currentDistance = Math.sqrt(
+                        Math.pow(touch2.clientX - touch1.clientX, 2) +
+                        Math.pow(touch2.clientY - touch1.clientY, 2)
+                    );
+                    
+                    const scale = currentDistance / touchStartDistance;
+                    
+                    // Calculate new dimensions
+                    const newWidth = touchStartViewBoxWidth / scale;
+                    const newHeight = touchStartViewBoxHeight / scale;
+                    
+                    // Prevent extreme zoom levels
+                    if (newWidth > 2000 || newHeight > 2000 || newWidth < 100 || newHeight < 100) return;
+                    
+                    // Get center position relative to SVG
+                    const rect = svg.getBoundingClientRect();
+                    const centerX = touchStartCenterX - rect.left;
+                    const centerY = touchStartCenterY - rect.top;
+                    
+                    // Convert to viewBox coordinates
+                    const x = viewBox.x + (centerX / rect.width) * viewBox.width;
+                    const y = viewBox.y + (centerY / rect.height) * viewBox.height;
+                    
+                    // Calculate new position to keep center point fixed
+                    viewBox.x = x - (centerX / rect.width) * newWidth;
+                    viewBox.y = y - (centerY / rect.height) * newHeight;
+                    viewBox.width = newWidth;
+                    viewBox.height = newHeight;
+                    
+                    updateViewBox();
+                    
+                    e.preventDefault();
+                }
+            });
+
+            // Reset view button
+            function resetView() {
+                viewBox = { ...initialViewBox };
+                updateViewBox();
+            }
+
+            // Generate a random department for the quiz
+            function getRandomDepartment() {
+                const codes = Object.keys(prefectures);
+                const randomCode = codes[Math.floor(Math.random() * codes.length)];
+                return {
+                    code: randomCode,
+                    name: prefectures[randomCode].name
+                };
+            }
+
+            // Display the next quiz question
+            function nextQuestion() {
+                const dept = getRandomDepartment();
+                currentDepartmentCode = dept.code;
+                currentDepartmentName = dept.name;
+                quizQuestionElement.textContent = `Cliquez sur le département de : ${currentDepartmentName}`;
+            }
+
+            // Handle department click
+            function handleDepartmentClick(clickedCode) {
+                if (clickedCode === currentDepartmentCode) {
+                    // Correct answer
+                    score++;
+                    scoreElement.textContent = score;
+                    
+                    // Highlight correct department
+                    const correctPath = document.querySelector(`.departement${currentDepartmentCode}`);
+                    if (correctPath) {
+                        correctPath.style.fill = '#4CAF50';
+                        setTimeout(() => {
+                            correctPath.style.fill = '#3a3a6a';
+                            setTimeout(() => {
+                                correctPath.style.fill = '#2a2a4a';
+                            }, 300);
+                        }, 500);
+                    }
+                    
+                    // Next question
+                    setTimeout(nextQuestion, 800);
+                } else {
+                    // Wrong answer
+                    lives--;
+                    livesElement.textContent = lives;
+                    
+                    // Highlight wrong department
+                    const wrongPath = document.querySelector(`.departement${clickedCode}`);
+                    if (wrongPath) {
+                        wrongPath.style.fill = '#f44336';
+                        setTimeout(() => {
+                            wrongPath.style.fill = '#2a2a4a';
+                        }, 500);
+                    }
+                    
+                    if (lives <= 0) {
+                        clearInterval(timerInterval);
+                        endGame();
+                    }
+                }
+            }
+
+            // Initialize the map
+            initMap();
+        });
+    </script>
+</body>
+</html>
+
