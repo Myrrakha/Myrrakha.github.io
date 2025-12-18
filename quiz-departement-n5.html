@@ -53,6 +53,7 @@
             max-height: 85vh;
             cursor: grab;
             transition: transform 0.1s ease;
+            touch-action: none;
         }
 
         svg:active {
@@ -71,6 +72,15 @@
             stroke: #a075ff;
             stroke-width: 1.2;
             filter: drop-shadow(0 0 3px rgba(170, 150, 255, 0.8));
+        }
+
+        @media (hover: none) {
+            .land:hover {
+                fill: #2a2a4a !important;
+                stroke: #1a1a2e !important;
+                stroke-width: 0.8 !important;
+                filter: none !important;
+            }
         }
 
         .bottom-bar {
@@ -140,6 +150,39 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(30, 15, 65, 0.7);
+            border: 1px solid rgba(170, 150, 255, 0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            z-index: 101;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(45, 25, 85, 0.9);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-button svg {
+            width: 16px;
+            height: 16px;
         }
 
         .game-over-screen {
@@ -240,6 +283,16 @@
                 padding: 8px 15px;
             }
             
+            .back-button {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .back-button svg {
+                width: 14px;
+                height: 14px;
+            }
+            
             .game-over-content {
                 padding: 25px 20px;
                 width: 90%;
@@ -306,6 +359,13 @@
                 <span class="stat-value">30</span>
             </div>
         </div>
+        
+        <button class="back-button" id="backButton">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Retour
+        </button>
     </div>
 
     <div class="game-over-screen" id="gameOverScreen">
@@ -332,6 +392,12 @@
             const finalScoreElement = document.getElementById('finalScore');
             const replayButton = document.getElementById('replayButton');
             const homeButton = document.getElementById('homeButton');
+            const backButton = document.getElementById('backButton');
+            
+            // Prevent context menu on long press
+            svg.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+            });
             
             // Initial viewBox parameters
             const initialViewBox = { x: 0, y: 0, width: 1000, height: 1000 };
@@ -348,6 +414,20 @@
             let currentDepartmentCode = '';
             let currentDepartmentName = '';
             let gameActive = true;
+            
+            // Touch interaction state machine
+            const TAP_MAX_DISTANCE = 8;   // pixels
+            const TAP_MAX_DURATION = 250; // ms
+            let touchMode = "idle"; // idle | tap | pan | pinch
+            let touchStartX, touchStartY, touchStartTime;
+            let panStartX, panStartY, viewBoxStart;
+            
+            // Pinch zoom state
+            let touchStartDistance = 0;
+            let touchStartViewBoxWidth = 0;
+            let touchStartViewBoxHeight = 0;
+            let touchStartCenterX = 0;
+            let touchStartCenterY = 0;
             
             // Departments data
             const departments = {
@@ -684,21 +764,18 @@
                 updateViewBox();
             });
 
-            // Touch events for mobile zooming
-            let touchStartDistance = 0;
-            let touchStartViewBoxWidth = 0;
-            let touchStartViewBoxHeight = 0;
-            let touchStartCenterX = 0;
-            let touchStartCenterY = 0;
-
+            // Touch events for mobile
             svg.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 2) {
+                if (e.touches.length >= 2) {
+                    // Pinch gesture started
+                    touchMode = "pinch";
+                    
                     const touch1 = e.touches[0];
                     const touch2 = e.touches[1];
                     
-                    touchStartDistance = Math.sqrt(
-                        Math.pow(touch2.clientX - touch1.clientX, 2) +
-                        Math.pow(touch2.clientY - touch1.clientY, 2)
+                    touchStartDistance = Math.hypot(
+                        touch2.clientX - touch1.clientX,
+                        touch2.clientY - touch1.clientY
                     );
                     
                     touchStartViewBoxWidth = viewBox.width;
@@ -708,17 +785,56 @@
                     touchStartCenterY = (touch1.clientY + touch2.clientY) / 2;
                     
                     e.preventDefault();
+                } else if (e.touches.length === 1) {
+                    // Single touch - potential tap or pan
+                    touchMode = "tap";
+                    const t = e.touches[0];
+                    touchStartX = t.clientX;
+                    touchStartY = t.clientY;
+                    touchStartTime = performance.now();
                 }
-            });
+            }, { passive: false });
 
             svg.addEventListener('touchmove', (e) => {
-                if (e.touches.length === 2) {
+                if (touchMode === "tap" && e.touches.length === 1) {
+                    // Check if this is becoming a pan gesture
+                    const t = e.touches[0];
+                    const dx = t.clientX - touchStartX;
+                    const dy = t.clientY - touchStartY;
+                    const distance = Math.hypot(dx, dy);
+                    
+                    if (distance > TAP_MAX_DISTANCE) {
+                        touchMode = "pan";
+                        panStartX = t.clientX;
+                        panStartY = t.clientY;
+                        viewBoxStart = { ...viewBox };
+                        e.preventDefault();
+                    }
+                }
+                
+                if (touchMode === "pan" && e.touches.length === 1) {
+                    // Continue panning
+                    const t = e.touches[0];
+                    const currentX = t.clientX;
+                    const currentY = t.clientY;
+                    
+                    const dx = (currentX - panStartX) * (viewBox.width / svg.clientWidth);
+                    const dy = (currentY - panStartY) * (viewBox.height / svg.clientHeight);
+                    
+                    viewBox.x = viewBoxStart.x - dx;
+                    viewBox.y = viewBoxStart.y - dy;
+                    updateViewBox();
+                    e.preventDefault();
+                }
+                
+                if (touchMode === "pinch" && e.touches.length === 2) {
+                    // Handle pinch zoom
                     const touch1 = e.touches[0];
                     const touch2 = e.touches[1];
                     
-                    const currentDistance = Math.sqrt(
-                        Math.pow(touch2.clientX - touch1.clientX, 2) +
-                        Math.pow(touch2.clientY - touch1.clientY, 2)
+                    const currentDistance = Math.hypot(
+                        touch2.clientX - touch1.clientX,
+                        touch2.clientY - touch1.clientY
                     );
                     
                     const scale = currentDistance / touchStartDistance;
@@ -746,9 +862,40 @@
                     viewBox.height = newHeight;
                     
                     updateViewBox();
-                    
                     e.preventDefault();
                 }
+            }, { passive: false });
+
+            svg.addEventListener('touchend', (e) => {
+                if (touchMode === "tap") {
+                    const duration = performance.now() - touchStartTime;
+                    
+                    if (duration < TAP_MAX_DURATION) {
+                        // This was a tap - find the element under the touch point
+                        const touch = e.changedTouches[0];
+                        const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                        
+                        // Find the closest department path
+                        let targetPath = element;
+                        while (targetPath && !targetPath.classList.contains('land')) {
+                            targetPath = targetPath.parentElement;
+                        }
+                        
+                        if (targetPath) {
+                            const code = targetPath.getAttribute('data-code');
+                            if (code) {
+                                handleDepartmentClick(code);
+                            }
+                        }
+                    }
+                }
+                
+                // Reset touch state
+                touchMode = "idle";
+            });
+
+            svg.addEventListener('touchcancel', () => {
+                touchMode = "idle";
             });
 
             // DOM-TOM codes to exclude from quiz questions
@@ -771,7 +918,7 @@
                 const dept = getRandomDepartment();
                 currentDepartmentCode = dept.code;
                 currentDepartmentName = dept.name;
-                quizQuestionElement.textContent = `Cliquez sur le département : ${currentDepartmentName}`;
+                quizQuestionElement.textContent = `${currentDepartmentName}🔍`;
             }
 
             // Handle department click
@@ -812,6 +959,12 @@
             // Event listeners for game over buttons
             replayButton.addEventListener('click', resetGame);
             homeButton.addEventListener('click', () => {
+                // Redirect to index.html
+                window.location.href = 'index.html';
+            });
+            
+            // Event listener for back button
+            backButton.addEventListener('click', () => {
                 // Redirect to index.html
                 window.location.href = 'index.html';
             });
