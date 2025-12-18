@@ -73,19 +73,6 @@
             filter: drop-shadow(0 0 3px rgba(170, 150, 255, 0.8));
         }
 
-        .prefecture {
-            fill: #ff6b6b;
-            stroke: #ffffff;
-            stroke-width: 1;
-            transition: all 0.3s ease;
-        }
-
-        .prefecture:hover {
-            fill: #ff9e9e;
-            r: 6;
-            filter: drop-shadow(0 0 5px rgba(255, 107, 107, 0.8));
-        }
-
         .bottom-bar {
             position: absolute;
             bottom: 20px;
@@ -155,20 +142,91 @@
             justify-content: center;
         }
 
-        .prefecture-tooltip {
+        .game-over-screen {
             position: absolute;
-            background: rgba(30, 15, 65, 0.9);
-            border: 1px solid rgba(170, 150, 255, 0.4);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            pointer-events: none;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 5, 30, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 200;
-            white-space: nowrap;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .game-over-screen.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .game-over-content {
+            background: rgba(30, 15, 65, 0.8);
+            border: 1px solid rgba(170, 150, 255, 0.4);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        .game-over-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #a075ff;
+            text-shadow: 0 0 10px rgba(160, 117, 255, 0.5);
+        }
+
+        .final-score {
+            font-size: 2rem;
+            margin: 15px 0;
+            color: #00c9ff;
+        }
+
+        .game-over-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .game-over-button {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .replay-button {
+            background: linear-gradient(45deg, #00c9ff, #92fe9d);
+            box-shadow: 0 4px 15px rgba(0, 201, 255, 0.4);
+        }
+
+        .replay-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 201, 255, 0.6);
+        }
+
+        .home-button {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
+        }
+
+        .home-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 65, 108, 0.6);
         }
 
         @media (max-width: 768px) {
@@ -180,6 +238,28 @@
             .instructions {
                 font-size: 1rem;
                 padding: 8px 15px;
+            }
+            
+            .game-over-content {
+                padding: 25px 20px;
+                width: 90%;
+            }
+            
+            .game-over-title {
+                font-size: 2rem;
+            }
+            
+            .final-score {
+                font-size: 1.6rem;
+            }
+            
+            .game-over-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .game-over-button {
+                width: 100%;
             }
         }
     </style>
@@ -202,7 +282,6 @@
                     </filter>
                 </defs>
                 <g id="departments"></g>
-                <g id="prefectures"></g>
             </svg>
         </div>
         
@@ -227,20 +306,32 @@
                 <span class="stat-value">30</span>
             </div>
         </div>
-        
-        <div class="prefecture-tooltip" id="tooltip"></div>
+    </div>
+
+    <div class="game-over-screen" id="gameOverScreen">
+        <div class="game-over-content">
+            <h2 class="game-over-title">Quiz Terminé</h2>
+            <p>Votre score final :</p>
+            <div class="final-score" id="finalScore">0</div>
+            <div class="game-over-buttons">
+                <button class="game-over-button replay-button" id="replayButton">Rejouer</button>
+                <button class="game-over-button home-button" id="homeButton">Accueil</button>
+            </div>
+        </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const svg = document.getElementById('france-map');
             const departmentsGroup = document.getElementById('departments');
-            const prefecturesGroup = document.getElementById('prefectures');
-            const tooltip = document.getElementById('tooltip');
             const timerBar = document.getElementById('timer-bar');
             const scoreElement = document.getElementById('score');
             const livesElement = document.getElementById('lives');
             const quizQuestionElement = document.getElementById('quiz-question');
+            const gameOverScreen = document.getElementById('gameOverScreen');
+            const finalScoreElement = document.getElementById('finalScore');
+            const replayButton = document.getElementById('replayButton');
+            const homeButton = document.getElementById('homeButton');
             
             // Initial viewBox parameters
             const initialViewBox = { x: 0, y: 0, width: 1000, height: 1000 };
@@ -256,110 +347,111 @@
             let timerInterval;
             let currentDepartmentCode = '';
             let currentDepartmentName = '';
+            let gameActive = true;
             
-            // Prefectures data
-            const prefectures = {
-                "01": { name: "Bourg-en-Bresse", lat: 46.205, lon: 5.225 },
-                "02": { name: "Laon", lat: 49.564, lon: 3.624 },
-                "03": { name: "Moulins", lat: 46.565, lon: 3.334 },
-                "04": { name: "Digne-les-Bains", lat: 44.092, lon: 6.232 },
-                "05": { name: "Gap", lat: 44.559, lon: 6.079 },
-                "06": { name: "Nice", lat: 43.710, lon: 7.262 },
-                "07": { name: "Privas", lat: 44.735, lon: 4.599 },
-                "08": { name: "Charleville-Mézières", lat: 49.768, lon: 4.724 },
-                "09": { name: "Foix", lat: 42.963, lon: 1.607 },
-                "10": { name: "Troyes", lat: 48.297, lon: 4.074 },
-                "11": { name: "Carcassonne", lat: 43.213, lon: 2.351 },
-                "12": { name: "Rodez", lat: 44.351, lon: 2.573 },
-                "13": { name: "Marseille", lat: 43.296, lon: 5.369 },
-                "14": { name: "Caen", lat: 49.183, lon: -0.370 },
-                "15": { name: "Aurillac", lat: 44.928, lon: 2.444 },
-                "16": { name: "Angoulême", lat: 45.648, lon: 0.156 },
-                "17": { name: "La Rochelle", lat: 46.160, lon: -1.151 },
-                "18": { name: "Bourges", lat: 47.082, lon: 2.399 },
-                "19": { name: "Tulle", lat: 45.266, lon: 1.772 },
-                "2A": { name: "Ajaccio", lat: 41.919, lon: 8.738 },
-                "2B": { name: "Bastia", lat: 42.702, lon: 9.450 },
-                "21": { name: "Dijon", lat: 47.322, lon: 5.041 },
-                "22": { name: "Saint-Brieuc", lat: 48.514, lon: -2.765 },
-                "23": { name: "Guéret", lat: 46.170, lon: 1.872 },
-                "24": { name: "Périgueux", lat: 45.184, lon: 0.721 },
-                "25": { name: "Besançon", lat: 47.237, lon: 6.025 },
-                "26": { name: "Valence", lat: 44.933, lon: 4.892 },
-                "27": { name: "Évreux", lat: 49.024, lon: 1.150 },
-                "28": { name: "Chartres", lat: 48.447, lon: 1.489 },
-                "29": { name: "Quimper", lat: 47.996, lon: -4.102 },
-                "30": { name: "Nîmes", lat: 43.837, lon: 4.361 },
-                "31": { name: "Toulouse", lat: 43.604, lon: 1.444 },
-                "32": { name: "Auch", lat: 43.646, lon: 0.586 },
-                "33": { name: "Bordeaux", lat: 44.837, lon: -0.579 },
-                "34": { name: "Montpellier", lat: 43.611, lon: 3.877 },
-                "35": { name: "Rennes", lat: 48.117, lon: -1.677 },
-                "36": { name: "Châteauroux", lat: 46.812, lon: 1.694 },
-                "37": { name: "Tours", lat: 47.394, lon: 0.684 },
-                "38": { name: "Grenoble", lat: 45.188, lon: 5.724 },
-                "39": { name: "Lons-le-Saunier", lat: 46.675, lon: 5.555 },
-                "40": { name: "Mont-de-Marsan", lat: 43.891, lon: -0.499 },
-                "41": { name: "Blois", lat: 47.586, lon: 1.335 },
-                "42": { name: "Saint-Étienne", lat: 45.439, lon: 4.387 },
-                "43": { name: "Le Puy-en-Velay", lat: 45.042, lon: 3.885 },
-                "44": { name: "Nantes", lat: 47.218, lon: -1.553 },
-                "45": { name: "Orléans", lat: 47.903, lon: 1.909 },
-                "46": { name: "Cahors", lat: 44.449, lon: 1.441 },
-                "47": { name: "Agen", lat: 44.204, lon: 0.620 },
-                "48": { name: "Mende", lat: 44.518, lon: 3.501 },
-                "49": { name: "Angers", lat: 47.478, lon: -0.563 },
-                "50": { name: "Saint-Lô", lat: 49.115, lon: -1.091 },
-                "51": { name: "Châlons-en-Champagne", lat: 48.957, lon: 4.367 },
-                "52": { name: "Chaumont", lat: 48.111, lon: 5.141 },
-                "53": { name: "Laval", lat: 48.072, lon: -0.773 },
-                "54": { name: "Nancy", lat: 48.693, lon: 6.184 },
-                "55": { name: "Bar-le-Duc", lat: 48.773, lon: 5.161 },
-                "56": { name: "Vannes", lat: 47.658, lon: -2.759 },
-                "57": { name: "Metz", lat: 49.119, lon: 6.176 },
-                "58": { name: "Nevers", lat: 46.990, lon: 3.159 },
-                "59": { name: "Lille", lat: 50.629, lon: 3.057 },
-                "60": { name: "Beauvais", lat: 49.430, lon: 2.095 },
-                "61": { name: "Alençon", lat: 48.431, lon: 0.092 },
-                "62": { name: "Arras", lat: 50.291, lon: 2.778 },
-                "63": { name: "Clermont-Ferrand", lat: 45.777, lon: 3.087 },
-                "64": { name: "Pau", lat: 43.295, lon: -0.370 },
-                "65": { name: "Tarbes", lat: 43.233, lon: 0.072 },
-                "66": { name: "Perpignan", lat: 42.688, lon: 2.894 },
-                "67": { name: "Strasbourg", lat: 48.573, lon: 7.752 },
-                "68": { name: "Colmar", lat: 48.079, lon: 7.358 },
-                "69": { name: "Lyon", lat: 45.764, lon: 4.835 },
-                "70": { name: "Vesoul", lat: 47.623, lon: 6.155 },
-                "71": { name: "Mâcon", lat: 46.306, lon: 4.828 },
-                "72": { name: "Le Mans", lat: 48.007, lon: 0.199 },
-                "73": { name: "Chambéry", lat: 45.566, lon: 5.920 },
-                "74": { name: "Annecy", lat: 45.899, lon: 6.129 },
-                "75": { name: "Paris", lat: 48.8566, lon: 2.3522 },
-                "76": { name: "Rouen", lat: 49.443, lon: 1.099 },
-                "77": { name: "Melun", lat: 48.540, lon: 2.660 },
-                "78": { name: "Versailles", lat: 48.804, lon: 2.135 },
-                "79": { name: "Niort", lat: 46.323, lon: -0.461 },
-                "80": { name: "Amiens", lat: 49.895, lon: 2.302 },
-                "81": { name: "Albi", lat: 43.929, lon: 2.148 },
-                "82": { name: "Montauban", lat: 44.018, lon: 1.355 },
-                "83": { name: "Toulon", lat: 43.124, lon: 5.928 },
-                "84": { name: "Avignon", lat: 43.949, lon: 4.805 },
-                "85": { name: "La Roche-sur-Yon", lat: 46.670, lon: -1.427 },
-                "86": { name: "Poitiers", lat: 46.580, lon: 0.340 },
-                "87": { name: "Limoges", lat: 45.833, lon: 1.261 },
-                "88": { name: "Épinal", lat: 48.174, lon: 6.450 },
-                "89": { name: "Auxerre", lat: 47.798, lon: 3.573 },
-                "90": { name: "Belfort", lat: 47.639, lon: 6.863 },
-                "91": { name: "Évry", lat: 48.624, lon: 2.429 },
-                "92": { name: "Nanterre", lat: 48.892, lon: 2.206 },
-                "93": { name: "Bobigny", lat: 48.910, lon: 2.439 },
-                "94": { name: "Créteil", lat: 48.790, lon: 2.455 },
-                "95": { name: "Cergy", lat: 49.036, lon: 2.060 },
-                "971": { name: "Basse-Terre", lat: 15.998, lon: -61.726 },
-                "972": { name: "Fort-de-France", lat: 14.616, lon: -61.058 },
-                "973": { name: "Cayenne", lat: 4.937, lon: -52.325 },
-                "974": { name: "Saint-Denis", lat: -20.878, lon: 55.448 },
-                "976": { name: "Mamoudzou", lat: -12.787, lon: 45.227 }
+            // Departments data
+            const departments = {
+                "01": "Ain",
+                "02": "Aisne",
+                "03": "Allier",
+                "04": "Alpes-de-Haute-Provence",
+                "05": "Hautes-Alpes",
+                "06": "Alpes-Maritimes",
+                "07": "Ardèche",
+                "08": "Ardennes",
+                "09": "Ariège",
+                "10": "Aube",
+                "11": "Aude",
+                "12": "Aveyron",
+                "13": "Bouches-du-Rhône",
+                "14": "Calvados",
+                "15": "Cantal",
+                "16": "Charente",
+                "17": "Charente-Maritime",
+                "18": "Cher",
+                "19": "Corrèze",
+                "2A": "Corse-du-Sud",
+                "2B": "Haute-Corse",
+                "21": "Côte-d'Or",
+                "22": "Côtes-d'Armor",
+                "23": "Creuse",
+                "24": "Dordogne",
+                "25": "Doubs",
+                "26": "Drôme",
+                "27": "Eure",
+                "28": "Eure-et-Loir",
+                "29": "Finistère",
+                "30": "Gard",
+                "31": "Haute-Garonne",
+                "32": "Gers",
+                "33": "Gironde",
+                "34": "Hérault",
+                "35": "Ille-et-Vilaine",
+                "36": "Indre",
+                "37": "Indre-et-Loire",
+                "38": "Isère",
+                "39": "Jura",
+                "40": "Landes",
+                "41": "Loir-et-Cher",
+                "42": "Loire",
+                "43": "Haute-Loire",
+                "44": "Loire-Atlantique",
+                "45": "Loiret",
+                "46": "Lot",
+                "47": "Lot-et-Garonne",
+                "48": "Lozère",
+                "49": "Maine-et-Loire",
+                "50": "Manche",
+                "51": "Marne",
+                "52": "Haute-Marne",
+                "53": "Mayenne",
+                "54": "Meurthe-et-Moselle",
+                "55": "Meuse",
+                "56": "Morbihan",
+                "57": "Moselle",
+                "58": "Nièvre",
+                "59": "Nord",
+                "60": "Oise",
+                "61": "Orne",
+                "62": "Pas-de-Calais",
+                "63": "Puy-de-Dôme",
+                "64": "Pyrénées-Atlantiques",
+                "65": "Hautes-Pyrénées",
+                "66": "Pyrénées-Orientales",
+                "67": "Bas-Rhin",
+                "68": "Haut-Rhin",
+                "69": "Rhône",
+                "70": "Haute-Saône",
+                "71": "Saône-et-Loire",
+                "72": "Sarthe",
+                "73": "Savoie",
+                "74": "Haute-Savoie",
+                "75": "Paris",
+                "76": "Seine-Maritime",
+                "77": "Seine-et-Marne",
+                "78": "Yvelines",
+                "79": "Deux-Sèvres",
+                "80": "Somme",
+                "81": "Tarn",
+                "82": "Tarn-et-Garonne",
+                "83": "Var",
+                "84": "Vaucluse",
+                "85": "Vendée",
+                "86": "Vienne",
+                "87": "Haute-Vienne",
+                "88": "Vosges",
+                "89": "Yonne",
+                "90": "Territoire de Belfort",
+                "91": "Essonne",
+                "92": "Hauts-de-Seine",
+                "93": "Seine-Saint-Denis",
+                "94": "Val-de-Marne",
+                "95": "Val-d'Oise",
+                "971": "Guadeloupe",
+                "972": "Martinique",
+                "973": "Guyane",
+                "974": "La Réunion",
+                "976": "Mayotte"
             };
 
             // Function to project geographic coordinates to SVG coordinates
@@ -388,14 +480,11 @@
             async function initMap() {
                 try {
                     // Load GeoJSON data
-                    const response = await fetch('departements-1000m.geojson');
+                    const response = await fetch('https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/departements.geojson');
                     const geojsonData = await response.json();
                     
                     // Draw departments
                     drawDepartments(geojsonData);
-                    
-                    // Add prefectures
-                    addPrefectures();
                     
                     // Set initial view
                     svg.setAttribute("viewBox", `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
@@ -455,77 +544,26 @@
                 path.setAttribute('d', pathData.join(' '));
                 path.setAttribute('class', `land departement departement${code}`);
                 path.setAttribute('data-code', code);
-                path.setAttribute('data-name', prefectures[code]?.name || `Département ${code}`);
+                path.setAttribute('data-name', departments[code] || `Département ${code}`);
                 
                 // Add click event for quiz
                 path.addEventListener('click', () => {
                     handleDepartmentClick(code);
                 });
                 
+                // Add title for tooltip
+                const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+                title.textContent = departments[code] || `Département ${code}`;
+                path.appendChild(title);
+                
                 departmentsGroup.appendChild(path);
-            }
-
-            // Add prefectures to the map
-            function addPrefectures() {
-                // Clear existing prefectures
-                while (prefecturesGroup.firstChild) {
-                    prefecturesGroup.removeChild(prefecturesGroup.firstChild);
-                }
-                
-                // Get all department paths
-                const departments = Array.from(departmentsGroup.querySelectorAll('path'));
-                
-                departments.forEach(dep => {
-                    // Extract department code from data attribute
-                    const code = dep.getAttribute('data-code');
-                    
-                    // Check if we have prefecture data for this department
-                    if (prefectures[code]) {
-                        // Project the geographic coordinates to SVG coordinates
-                        const proj = project(prefectures[code].lon, prefectures[code].lat);
-                        
-                        // Create circle element
-                        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                        circle.setAttribute('cx', proj.x);
-                        circle.setAttribute('cy', proj.y);
-                        circle.setAttribute('r', 4);
-                        circle.setAttribute('class', 'prefecture');
-                        circle.setAttribute('data-name', prefectures[code].name);
-                        circle.setAttribute('data-code', code);
-                        
-                        // Create tooltip title
-                        const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-                        title.textContent = prefectures[code].name;
-                        circle.appendChild(title);
-                        
-                        prefecturesGroup.appendChild(circle);
-                    }
-                });
-                
-                // Add event listeners to prefectures
-                document.querySelectorAll('.prefecture').forEach(circle => {
-                    circle.addEventListener('mouseenter', (e) => {
-                        const name = circle.getAttribute('data-name');
-                        tooltip.textContent = name;
-                        tooltip.style.opacity = '1';
-                        tooltip.style.left = (e.clientX + 10) + 'px';
-                        tooltip.style.top = (e.clientY + 10) + 'px';
-                    });
-                    
-                    circle.addEventListener('mouseleave', () => {
-                        tooltip.style.opacity = '0';
-                    });
-                    
-                    circle.addEventListener('mousemove', (e) => {
-                        tooltip.style.left = (e.clientX + 10) + 'px';
-                        tooltip.style.top = (e.clientY + 10) + 'px';
-                    });
-                });
             }
 
             // Start the timer
             function startTimer() {
                 timerInterval = setInterval(() => {
+                    if (!gameActive) return;
+                    
                     timeLeft--;
                     updateTimerBar();
                     
@@ -553,7 +591,32 @@
 
             // End the game
             function endGame() {
-                alert(`Jeu terminé ! Score final: ${score}`);
+                gameActive = false;
+                finalScoreElement.textContent = score;
+                gameOverScreen.classList.add('active');
+            }
+
+            // Reset the game
+            function resetGame() {
+                // Reset game state
+                score = 0;
+                lives = 5;
+                timeLeft = 120;
+                gameActive = true;
+                
+                // Update UI
+                scoreElement.textContent = score;
+                livesElement.textContent = lives;
+                
+                // Hide game over screen
+                gameOverScreen.classList.remove('active');
+                
+                // Restart timer
+                clearInterval(timerInterval);
+                startTimer();
+                
+                // Start new quiz
+                nextQuestion();
             }
 
             // Mouse down event for panning
@@ -589,6 +652,8 @@
 
             // Mouse wheel event for zooming
             svg.addEventListener('wheel', (e) => {
+                if (!gameActive) return;
+                
                 e.preventDefault();
                 
                 // Get mouse position relative to SVG
@@ -686,71 +751,70 @@
                 }
             });
 
-            // Reset view button
-            function resetView() {
-                viewBox = { ...initialViewBox };
-                updateViewBox();
-            }
+            // DOM-TOM codes to exclude from quiz questions
+            const domTomCodes = ["971", "972", "973", "974", "976"];
 
-            // Generate a random department for the quiz
+            // Generate a random department for the quiz (excluding DOM-TOM)
             function getRandomDepartment() {
-                const codes = Object.keys(prefectures);
+                const codes = Object.keys(departments).filter(code => !domTomCodes.includes(code));
                 const randomCode = codes[Math.floor(Math.random() * codes.length)];
                 return {
                     code: randomCode,
-                    name: prefectures[randomCode].name
+                    name: departments[randomCode]
                 };
             }
 
             // Display the next quiz question
             function nextQuestion() {
+                if (!gameActive) return;
+                
                 const dept = getRandomDepartment();
                 currentDepartmentCode = dept.code;
                 currentDepartmentName = dept.name;
-                quizQuestionElement.textContent = `Cliquez sur le département de : ${currentDepartmentName}`;
+                quizQuestionElement.textContent = `Cliquez sur le département : ${currentDepartmentName}`;
             }
 
             // Handle department click
             function handleDepartmentClick(clickedCode) {
-                if (clickedCode === currentDepartmentCode) {
-                    // Correct answer
-                    score++;
-                    scoreElement.textContent = score;
-                    
-                    // Highlight correct department
-                    const correctPath = document.querySelector(`.departement${currentDepartmentCode}`);
-                    if (correctPath) {
-                        correctPath.style.fill = '#4CAF50';
-                        setTimeout(() => {
-                            correctPath.style.fill = '#3a3a6a';
-                            setTimeout(() => {
-                                correctPath.style.fill = '#2a2a4a';
-                            }, 300);
-                        }, 500);
+                if (!gameActive) return;
+                
+                // Highlight clicked department
+                const clickedPath = document.querySelector(`.departement${clickedCode}`);
+                if (clickedPath) {
+                    if (clickedCode === currentDepartmentCode) {
+                        // Correct answer
+                        score++;
+                        scoreElement.textContent = score;
+                        clickedPath.style.fill = '#4CAF50';
+                    } else {
+                        // Wrong answer
+                        lives--;
+                        livesElement.textContent = lives;
+                        clickedPath.style.fill = '#f44336';
                     }
                     
-                    // Next question
-                    setTimeout(nextQuestion, 800);
-                } else {
-                    // Wrong answer
-                    lives--;
-                    livesElement.textContent = lives;
-                    
-                    // Highlight wrong department
-                    const wrongPath = document.querySelector(`.departement${clickedCode}`);
-                    if (wrongPath) {
-                        wrongPath.style.fill = '#f44336';
-                        setTimeout(() => {
-                            wrongPath.style.fill = '#2a2a4a';
-                        }, 500);
-                    }
-                    
-                    if (lives <= 0) {
-                        clearInterval(timerInterval);
-                        endGame();
-                    }
+                    // Pass to next question after showing feedback
+                    setTimeout(() => {
+                        // Reset highlight
+                        clickedPath.style.fill = '#2a2a4a';
+                        
+                        // Check if game over
+                        if (lives <= 0) {
+                            clearInterval(timerInterval);
+                            endGame();
+                        } else {
+                            nextQuestion();
+                        }
+                    }, 500);
                 }
             }
+
+            // Event listeners for game over buttons
+            replayButton.addEventListener('click', resetGame);
+            homeButton.addEventListener('click', () => {
+                // Redirect to index.html
+                window.location.href = 'index.html';
+            });
 
             // Initialize the map
             initMap();
