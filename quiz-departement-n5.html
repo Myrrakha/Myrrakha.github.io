@@ -65,6 +65,7 @@
             stroke: #1a1a2e;
             stroke-width: 0.8;
             transition: all 0.3s ease;
+            pointer-events: auto;
         }
 
         .land:hover {
@@ -72,6 +73,22 @@
             stroke: #a075ff;
             stroke-width: 1.2;
             filter: drop-shadow(0 0 3px rgba(170, 150, 255, 0.8));
+        }
+
+        path.correct {
+            fill: #4CAF50 !important;
+            stroke: #2e7d32 !important;
+            stroke-width: 1.5 !important;
+            filter: drop-shadow(0 0 5px rgba(76, 175, 80, 0.8)) !important;
+            z-index: 100 !important;
+        }
+
+        path.incorrect {
+            fill: #f44336 !important;
+            stroke: #c62828 !important;
+            stroke-width: 1.5 !important;
+            filter: drop-shadow(0 0 5px rgba(244, 67, 54, 0.8)) !important;
+            z-index: 100 !important;
         }
 
         @media (hover: none) {
@@ -394,6 +411,9 @@
             const homeButton = document.getElementById('homeButton');
             const backButton = document.getElementById('backButton');
             
+            // Device detection
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
             // Prevent context menu on long press
             svg.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
@@ -414,6 +434,8 @@
             let currentDepartmentCode = '';
             let currentDepartmentName = '';
             let gameActive = true;
+            let lastClickedTime = 0;
+            const CLICK_COOLDOWN = 300; // ms
             
             // Touch interaction state machine
             const TAP_MAX_DISTANCE = 8;   // pixels
@@ -596,15 +618,15 @@
                     if (geometry.type === 'Polygon') {
                         drawPolygon(geometry.coordinates[0], code);
                     } else if (geometry.type === 'MultiPolygon') {
-                        geometry.coordinates.forEach(polygon => {
-                            drawPolygon(polygon[0], code);
+                        geometry.coordinates.forEach((polygon, index) => {
+                            drawPolygon(polygon[0], code, index);
                         });
                     }
                 });
             }
 
             // Helper function to draw a polygon
-            function drawPolygon(coordinates, code) {
+            function drawPolygon(coordinates, code, index = 0) {
                 const pathData = [];
                 
                 for (let i = 0; i < coordinates.length; i++) {
@@ -625,11 +647,6 @@
                 path.setAttribute('class', `land departement departement${code}`);
                 path.setAttribute('data-code', code);
                 path.setAttribute('data-name', departments[code] || `Département ${code}`);
-                
-                // Add click event for quiz
-                path.addEventListener('click', () => {
-                    handleDepartmentClick(code);
-                });
                 
                 // Add title for tooltip
                 const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
@@ -701,7 +718,7 @@
 
             // Mouse down event for panning
             svg.addEventListener('mousedown', (e) => {
-                if (e.button === 0) { // Left mouse button
+                if (e.button === 0 && gameActive) { // Left mouse button
                     isPanning = true;
                     startX = e.clientX;
                     startY = e.clientY;
@@ -714,7 +731,7 @@
 
             // Mouse move event for panning
             document.addEventListener('mousemove', (e) => {
-                if (isPanning) {
+                if (isPanning && gameActive) {
                     const dx = (e.clientX - startX) * (viewBox.width / svg.clientWidth);
                     const dy = (e.clientY - startY) * (viewBox.height / svg.clientHeight);
                     
@@ -763,6 +780,49 @@
                 
                 updateViewBox();
             });
+
+            // Unified click handler with cooldown
+            function handleDepartmentClick(clickedCode, event = null) {
+                const now = Date.now();
+                if (now - lastClickedTime < CLICK_COOLDOWN) {
+                    return; // Prevent rapid double clicks
+                }
+                lastClickedTime = now;
+                
+                if (!gameActive) return;
+                
+                // Find all paths for this department code
+                const clickedPaths = document.querySelectorAll(`path[data-code="${clickedCode}"]`);
+                if (clickedPaths.length === 0) return;
+                
+                if (clickedCode === currentDepartmentCode) {
+                    // Correct answer
+                    score++;
+                    scoreElement.textContent = score;
+                    clickedPaths.forEach(path => path.classList.add('correct'));
+                } else {
+                    // Wrong answer
+                    lives--;
+                    livesElement.textContent = lives;
+                    clickedPaths.forEach(path => path.classList.add('incorrect'));
+                }
+                
+                // Pass to next question after showing feedback
+                setTimeout(() => {
+                    // Reset highlight
+                    clickedPaths.forEach(path => {
+                        path.classList.remove('correct', 'incorrect');
+                    });
+                    
+                    // Check if game over
+                    if (lives <= 0) {
+                        clearInterval(timerInterval);
+                        endGame();
+                    } else {
+                        nextQuestion();
+                    }
+                }, 500);
+            }
 
             // Touch events for mobile
             svg.addEventListener('touchstart', (e) => {
@@ -875,17 +935,15 @@
                         const touch = e.changedTouches[0];
                         const element = document.elementFromPoint(touch.clientX, touch.clientY);
                         
-                        // Find the closest department path
                         let targetPath = element;
-                        while (targetPath && !targetPath.classList.contains('land')) {
+                        while (targetPath && targetPath.tagName !== 'path') {
                             targetPath = targetPath.parentElement;
                         }
                         
-                        if (targetPath) {
+                        if (targetPath && targetPath.hasAttribute('data-code')) {
+                            e.preventDefault(); // Prevent the browser from simulating a click event
                             const code = targetPath.getAttribute('data-code');
-                            if (code) {
-                                handleDepartmentClick(code);
-                            }
+                            handleDepartmentClick(code);
                         }
                     }
                 }
@@ -896,6 +954,21 @@
 
             svg.addEventListener('touchcancel', () => {
                 touchMode = "idle";
+            });
+
+            // Mouse click handler for desktop
+            svg.addEventListener('click', (e) => {
+                if (!isMobile && gameActive) {
+                    let targetPath = e.target;
+                    while (targetPath && targetPath.tagName !== 'path') {
+                        targetPath = targetPath.parentElement;
+                    }
+                    
+                    if (targetPath && targetPath.hasAttribute('data-code')) {
+                        const code = targetPath.getAttribute('data-code');
+                        handleDepartmentClick(code, e);
+                    }
+                }
             });
 
             // DOM-TOM codes to exclude from quiz questions
@@ -919,41 +992,6 @@
                 currentDepartmentCode = dept.code;
                 currentDepartmentName = dept.name;
                 quizQuestionElement.textContent = `${currentDepartmentName}🔍`;
-            }
-
-            // Handle department click
-            function handleDepartmentClick(clickedCode) {
-                if (!gameActive) return;
-                
-                // Highlight clicked department
-                const clickedPath = document.querySelector(`.departement${clickedCode}`);
-                if (clickedPath) {
-                    if (clickedCode === currentDepartmentCode) {
-                        // Correct answer
-                        score++;
-                        scoreElement.textContent = score;
-                        clickedPath.style.fill = '#4CAF50';
-                    } else {
-                        // Wrong answer
-                        lives--;
-                        livesElement.textContent = lives;
-                        clickedPath.style.fill = '#f44336';
-                    }
-                    
-                    // Pass to next question after showing feedback
-                    setTimeout(() => {
-                        // Reset highlight
-                        clickedPath.style.fill = '#2a2a4a';
-                        
-                        // Check if game over
-                        if (lives <= 0) {
-                            clearInterval(timerInterval);
-                            endGame();
-                        } else {
-                            nextQuestion();
-                        }
-                    }, 500);
-                }
             }
 
             // Event listeners for game over buttons
