@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- SEO de la page d'accueil -->
     <title>Quiz Master - Accueil</title>
     <meta name="description"
@@ -43,1038 +44,342 @@
     <link rel="manifest" href="/site.webmanifest">
     <meta name="msapplication-TileImage" content="/mstile-144x144.png">
     <style>
-        /* ==========================
-           Palette & variables (fusionnées en une seule déclaration)
-           ========================== */
         :root {
-          /* Couleurs */
-          --bg-dark: #0b0f14;
-          --panel-dark: rgba(12,16,22,0.6);
-          --glass-bg: rgba(255,255,255,0.03);
-          --glass-border: rgba(255,255,255,0.06);
-          --muted-teal: #6ea8a3;
-          --warm-peach: #d69a7a;
-          --soft-amber: #e6c89a;
-          --violet-main: #7f63cc;
-          --violet-dark: #5b3bbd;
-          --violet-accent: #9b71ff;
-          /* Dimensions & espacements */
-          --radius: 14px;
-          --gap: 1rem;
-          --spacing-unit: 0.8em;
-          /* Typographie */
-          --text-scale: 0.9;
-          /* Boutons */
-          --btn-h: 36px;
-          --header-btn-height: 40px;
-          --next-btn-height: 56px;
-          --next-btn-font-size: 1.3em;
+            --bg-dark: #0b0f14;
+            --panel-dark: rgba(12,16,22,0.6);
+            --glass-bg: rgba(255,255,255,0.03);
+            --glass-border: rgba(255,255,255,0.06);
+            --violet-main: #7f63cc;
+            --violet-dark: #5b3bbd;
+            --radius: 14px;
+            --spacing-unit: 0.8em;
         }
-        /* Respect reduced motion */
-        @media (prefers-reduced-motion: reduce) {
-          :root { --reduced: 1; }
-        }
-        * { box-sizing: border-box; font-size: calc(16px * var(--text-scale)); }
+        
+        * { box-sizing: border-box; }
+        
         body {
-          margin: 0;
-          padding: var(--spacing-unit);
-          background: radial-gradient(1200px 600px at 10% 10%, rgba(110,168,163,0.06), transparent),
-                      radial-gradient(700px 400px at 90% 90%, rgba(214,154,122,0.04), transparent),
-                      var(--bg-dark);
-          font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-          color: #d7e6f2;
-          line-height: 1.5;
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-          overflow-x: hidden;
-          overflow-y: auto;
+            margin: 0;
+            padding: var(--spacing-unit);
+            background: var(--bg-dark);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            color: #d7e6f2;
+            line-height: 1.5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        /* cosmic layer - replaces original background effects */
-        .cosmic {
-          position: fixed; inset: 0; z-index: -3; pointer-events: none; mix-blend-mode: screen;
-          background:
-            conic-gradient(from 140deg at 50% 50%, rgba(127,99,204,0.06), rgba(110,168,163,0.04), rgba(214,154,122,0.03), rgba(127,99,204,0.06));
-          filter: blur(14px) saturate(110%);
-        }
-        header {
-            width: calc(100% - 2 * var(--spacing-unit));
+        
+        .container {
             background: var(--glass-bg);
             backdrop-filter: blur(12px) saturate(180%);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius);
-            padding: calc(var(--spacing-unit) * 0.5);
-            margin: var(--spacing-unit) auto;
-            position: sticky;
-            top: var(--spacing-unit);
-            z-index: 1000;
-            box-shadow: 0 6px 30px rgba(2,6,12,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
-        }
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .nav-title {
-            font-size: 1.2em;
-            font-weight: 600;
-            color: var(--violet-main);
-            letter-spacing: 1px;
-        }
-        /* Refined button style */
-        .glass-btn {
-            height: var(--header-btn-height);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            color: #e9f4ff;
-            cursor: pointer;
-            transition: transform 160ms cubic-bezier(.2,.9,.3,1), box-shadow 200ms;
-            backdrop-filter: blur(4px);
-            font-size: calc(14px * var(--text-scale));
-            font-weight: 700;
-            letter-spacing: 0.3px;
-            padding: 0 12px;
-            text-decoration: none;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 6px 18px rgba(2,8,20,0.6), 0 0 18px rgba(127,99,204,0.03) inset;
-        }
-        /* subtle shine */
-        .glass-btn::after{
-            content:""; 
-            position:absolute; 
-            inset:0; 
-            background: linear-gradient(120deg, rgba(255,255,255,0.06), transparent 30%); 
-            mix-blend-mode:overlay; 
-            pointer-events:none;
-        }
-        .glass-btn:hover {
-            transform: translateY(-2px) scale(1.01);
-            box-shadow: 0 10px 30px rgba(2,8,20,0.65), 0 0 28px rgba(127,99,204,0.18);
-        }
-        .glass-btn:active {
-            transform: scale(0.98) rotate(1deg);
-        }
-        /* Vibration animation */
-        @keyframes vibe{
-            0%{transform:translateX(0) translateY(-1px) rotate(-0.6deg)}
-            15%{transform:translateX(1px) translateY(-1px) rotate(0.8deg)}
-            30%{transform:translateX(-1px) translateY(-1px) rotate(-0.8deg)}
-            45%{transform:translateX(1px) translateY(-1px) rotate(0.6deg)}
-            60%{transform:translateX(-0.5px) translateY(-1px) rotate(-0.3deg)}
-            100%{transform:translateX(0) translateY(-1px) rotate(0deg)}
-        }
-        .glass-btn.vibrating{
-            animation: vibe 360ms linear 2;
-        }
-        /* Gaming glow pulse */
-        .glass-btn.glow{
-            box-shadow:0 8px 30px rgba(127,99,204,0.14), 0 0 60px rgba(110,168,163,0.06);
-        }
-        .glass-btn:focus {
-            outline: none;
-            transform: translateY(-2px) scale(1.01);
-            box-shadow: 0 10px 30px rgba(2,8,20,0.65), 0 0 28px rgba(127,99,204,0.18);
-        }
-        .glass-btn:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-            filter: grayscale(0.3);
-        }
-        /* HOME SECTION */
-        #home-section {
+            padding: 2rem;
             text-align: center;
+            max-width: 400px;
             width: 100%;
         }
-        .home-content {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-unit);
-        }
-        @media (min-width: 900px) {
-            .home-content {
-                flex-direction: row;
-                gap: var(--spacing-unit);
-            }
-            .stats-grid-container {
-                flex: 2;
-            }
-            #leaderboard-section {
-                flex: 1;
-                margin-top: 0;
-            }
-        }
-        .stats-grid {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: var(--spacing-unit);
-            width: 100%;
-        }
-        .stat-card {
-            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            padding: calc(var(--spacing-unit) * 1);
-            backdrop-filter: blur(12px) saturate(180%);
-            box-shadow: 0 6px 30px rgba(2,6,12,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
-            position: relative;
-            overflow: hidden;
-        }
-        /* soft rim neon border */
-        .stat-card::after{
-            content:""; 
-            position:absolute; 
-            inset:0; 
-            pointer-events:none; 
-            border-radius:inherit;
-            background: conic-gradient(from 180deg at 50% 50%, rgba(127,99,204,0.06), rgba(110,168,163,0.05), rgba(214,154,122,0.04));
-            mix-blend-mode:overlay; 
-            opacity:0.45;
-        }
-        .stat-card h3 {
-            margin-top: 0;
-            margin-bottom: 8px;
-            color: var(--violet-main);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 6px;
-            font-size: 1.2em;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 0.4em;
-        }
-        .stat-value {
-            font-size: 2em;
+        
+        .logo {
+            font-size: 2rem;
             font-weight: bold;
-            color: #f0f0f0;
-        }
-        .level-completion-summary {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85em;
-            color: #aaa;
-            margin-top: 6px;
-        }
-        .level-completion-summary span {
             color: var(--violet-main);
-            font-weight: bold;
+            margin-bottom: 1.5rem;
         }
-        .quiz-progress-bar {
-            height: 5px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            overflow: hidden;
-            margin: 8px 0;
-        }
-        .quiz-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--violet-main), var(--violet-dark));
-            border-radius: 2px;
-            transition: width 0.5s ease;
-        }
-        .quiz-subcards {
+        
+        .auth-tabs {
             display: flex;
-            gap: 8px;
-            margin-top: 8px;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
-        .quiz-subcard {
+        
+        .auth-tab {
             flex: 1;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.05);
+            border: none;
             border-radius: 8px;
-            padding: 10px;
+            color: #aaa;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .auth-tab.active {
+            background: var(--violet-main);
+            color: white;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .auth-btn {
+            background: var(--violet-main);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            text-align: center;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 4px 12px rgba(2,6,12,0.4);
-        }
-        .quiz-subcard:hover {
-            background: rgba(255,255,255,0.08);
-            box-shadow: 0 6px 20px rgba(127,99,204,0.25);
-            transform: translateY(-2px);
-        }
-        .subcard-title {
-            font-size: 0.85rem;
-            margin-bottom: 4px;
-            color: var(--violet-main);
-        }
-        .subcard-level {
-            font-weight: bold;
-            font-size: 1rem;
-            margin-bottom: 3px;
-        }
-        .subcard-thumb {
-            width: 34px;
-            height: 34px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 5px;
-            margin: 3px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.1rem;
-            color: var(--violet-main);
-        }
-        .subcard-thumb img {
             width: 100%;
-            height: 100%;
-            object-fit: contain;
+            margin-top: 0.5rem;
         }
-        .subcard-progress {
-            height: 3px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 1px;
-            margin-top: 3px;
-            overflow: hidden;
+        
+        .auth-btn:hover {
+            background: var(--violet-dark);
         }
-        .subcard-progress-fill {
-            height: 100%;
-            background: #2ecc71;
-            border-radius: 1px;
+        
+        .error-message {
+            color: #ff6b6b;
+            margin: 0.5rem 0;
+            font-size: 0.9em;
+            min-height: 1.5rem;
         }
-        .level-completed {
-            color: #2ecc71;
-        }
-        /* LEADERBOARD */
-        #leaderboard-section {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .leaderboard-container {
-            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            padding: calc(var(--spacing-unit) * 1);
-            backdrop-filter: blur(12px) saturate(180%);
-            box-shadow: 0 6px 30px rgba(2,6,12,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
-            position: relative;
-            overflow: hidden;
-        }
-        .leaderboard-container::after{
-            content:""; 
-            position:absolute; 
-            inset:0; 
-            pointer-events:none; 
-            border-radius:inherit;
-            background: conic-gradient(from 180deg at 50% 50%, rgba(127,99,204,0.06), rgba(110,168,163,0.05), rgba(214,154,122,0.04));
-            mix-blend-mode:overlay; 
-            opacity:0.45;
-        }
-        .leaderboard-title {
-            text-align: center;
-            margin-bottom: 16px;
-            color: var(--violet-main);
-            font-size: 1.2em;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 0.4em;
-        }
-        .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 12px;
-            margin: 6px 0;
-            background: var(--glass-bg);
-            border-radius: 6px;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 2px 8px rgba(2,6,12,0.3);
-        }
-        .leaderboard-rank {
-            font-size: 1.2em;
-            font-weight: bold;
-            width: 36px;
-        }
-        .leaderboard-name {
-            flex: 1;
-            font-weight: 500;
-            font-size: 0.95em;
-        }
-        .leaderboard-score {
-            font-size: 1em;
-            color: rgb(204, 158, 9);
-            font-weight: bold;
-        }
-        .loading-spinner {
+        
+        .loading {
             display: inline-block;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border: 2px solid rgba(255,255,255,0.3);
             border-radius: 50%;
             border-top-color: var(--violet-main);
             animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
         }
+        
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        /* TOAST */
-        #toast {
-            position: fixed;
-            bottom: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.85);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
-            z-index: 9999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-            font-size: 0.85em;
-        }
-        #toast.show {
-            opacity: 1;
-        }
+        
         .hidden {
-            display: none !important;
-        }
-        /* MOBILE CAROUSEL — Updated style */
-        @media (max-width: 899px) {
-            #mobile-leaderboard-carousel {
-                position: relative;
-                border-radius: 20px;
-                padding: 16px;
-                background: rgba(255,255,255,0.08);
-                backdrop-filter: blur(14px) saturate(1.7);
-                overflow: hidden;
-            }
-            #mobile-leaderboard-carousel::before {
-                content: "";
-                position: absolute;
-                inset: 0;
-                border-radius: inherit;
-                padding: 3px;
-                background: linear-gradient(90deg, #ff9a3c, #ffe060, #fff4b0, #00ff9d, #00c8ff, #8b00ff, #ff9a3c);
-                background-size: 400% 400%;
-                mask: 
-                    linear-gradient(#fff 0 0) content-box, 
-                    linear-gradient(#fff 0 0);
-                mask-composite: exclude;
-                -webkit-mask: 
-                    linear-gradient(#fff 0 0) content-box, 
-                    linear-gradient(#fff 0 0);
-                -webkit-mask-composite: xor;
-                animation: gradientShift 6s ease-in-out infinite;
-            }
-            @keyframes gradientShift {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
-            }
-            #carousel-slides {
-                display: flex;
-                gap: 18px;
-                width: 100%;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
-                padding: 4px 0;
-            }
-            #mobile-leaderboard-carousel::-webkit-scrollbar {
-                display: none;
-            }
-            .carousel-slide {
-                min-width: 100%;
-                flex: 0 0 auto;
-                position: relative;
-                display: flex;
-                align-items: stretch;
-            }
-            .neon-bordered {
-                position: relative;
-                width: 100%;
-                height: 100%;
-                padding: 10px;
-                display: flex;
-                flex-direction: column;
-            }
-            .glass-inner {
-                background: rgba(255,255,255,0.10);
-                border: 1px solid rgba(255,255,255,0.16);
-                border-radius: 16px;
-                padding: 16px;
-                position: relative;
-                z-index: 1;
-                backdrop-filter: blur(14px);
-                -webkit-backdrop-filter: blur(14px);
-                box-shadow: 0 0 25px rgba(0,0,0,0.35);
-                transition: transform 0.25s ease, box-shadow 0.4s ease;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                align-items: stretch;
-                flex: 1;
-                min-height: 0;
-            }
-            .glass-inner:hover {
-                transform: scale(1.02);
-                box-shadow: 0 0 32px rgba(255,255,255,0.20), 0 0 60px rgba(255,255,255,0.15);
-            }
-            .slide-title {
-                text-align: center;
-                font-size: 1.15rem;
-                margin-bottom: 12px;
-                font-weight: 600;
-                background: linear-gradient(90deg, #ff8a00, #ffe600, #00ff9d, #00c8ff);
-                background-size: 400% 400%;
-                -webkit-background-clip: text;
-                background-clip: text;
-                -webkit-text-fill-color: transparent;
-                color: transparent;
-                animation: titleGradientShift 4s ease-in-out infinite;
-            }
-            @keyframes titleGradientShift {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
-            }
-            .leaderboard-item {
-                display: flex;
-                justify-content: space-between;
-                padding: 7px 0;
-                border-bottom: 1px solid rgba(255,255,255,0.06);
-                font-size: 0.95rem;
-            }
-            .leaderboard-item:last-child {
-                border-bottom: none;
-            }
-            #mobile-leaderboard-global,
-            #mobile-leaderboard-season {
-                display: flex;
-                flex-direction: column;
-                overflow-y: auto;
-                max-height: calc(100vh - 280px);
-                padding-right: 4px;
-            }
-            #leaderboard-section {
-                order: -1;
-                max-width: 100%;
-            }
-            html, body {
-                overflow-x: hidden;
-                overflow-y: auto;
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-            }
-            html::-webkit-scrollbar,
-            body::-webkit-scrollbar {
-                display: none;
-            }
-            #desktop-leaderboard {
-                display: none !important;
-            }
-        }
-        @media (min-width: 900px) {
-            #mobile-leaderboard-carousel {
-                display: none !important;
-            }
-        }
-        /* === ADDED STYLES FOR HORIZONTAL ALIGNMENT === */
-        .user-info {
-            display: flex;
-            gap: 0.8rem;
-            flex-wrap: nowrap;
-            align-items: center;
-        }
-        .next-page-btn {
-            display: block;
-            margin: var(--spacing-unit) auto 0;
-            width: fit-content;
-            height: var(--next-btn-height);
-            font-size: var(--next-btn-font-size);
-            padding: 0 24px;
-            line-height: var(--next-btn-height);
-        }
-        /* Loading screen during auth check */
-        .loading-auth {
-            position: fixed;
-            inset: 0;
-            background: var(--bg-dark);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 99999;
-            font-size: 1.2em;
-            color: #d7e6f2;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <!-- loading screen -->
-    <div class="loading-auth" id="auth-check-screen">Vérification de la session…</div>
-    <!-- visual layers -->
-    <div class="cosmic" aria-hidden="true"></div>
-    <header>
-        <nav class="navbar">
-            <div class="nav-left">
-                <span class="nav-title">🎯 Quiz Master</span>
+    <div class="container">
+        <div class="logo">🎯 Quiz Master</div>
+        
+        <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">🔑 Connexion</button>
+            <button class="auth-tab" data-tab="register">📝 Inscription</button>
+        </div>
+        
+        <div id="login-form">
+            <div class="form-group">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" placeholder="votre@email.com" required>
             </div>
-            <div class="nav-right" id="nav-logged-in">
-                <div class="user-info">
-                    <a href="statistiques.html" class="glass-btn" title="Statistiques">📊</a>
-                    <a href="settings.html" class="glass-btn" title="Réglages">⚙️</a>
-                    <button class="glass-btn logout" id="logout-btn" title="Déconnexion">🚪</button>
-                </div>
+            <div class="form-group">
+                <label for="login-password">Mot de passe</label>
+                <input type="password" id="login-password" placeholder="••••••••" required minlength="8">
             </div>
-        </nav>
-    </header>
-    <main>
-        <section id="home-section">
-            <div class="home-content">
-                <div class="stats-grid-container">
-                    <div class="stats-grid">
-                        <!-- Carte départements -->
-                        <div class="stat-card" id="dept-card">
-                            <h3>🗺️ Quiz Départements</h3>
-                            <div class="quiz-card-content">
-                                <div class="score-placeholder" id="home-dept-score-container">
-                                    <span class="loading-spinner"></span>
-                                </div>
-                                <div class="level-completion-summary" id="dept-completion-summary">
-                                    <span>Niveaux complétés à 100% : <span id="dept-niveaux100">0</span></span>
-                                    <span>Progression totale : <span id="dept-niveaux100-ratio">0</span>/10</span>
-                                </div>
-                                <div class="quiz-progress-bar">
-                                    <div class="quiz-progress-fill" id="dept-progress-fill" style="width: 0%"></div>
-                                </div>
-                                <div class="quiz-subcards">
-                                    <div class="quiz-subcard" id="dept-levels-access">
-                                        <div class="subcard-title">Tous les niveaux</div>
-                                    </div>
-                                    <div class="quiz-subcard" id="dept-next-level">
-                                        <div class="subcard-title">Prochain niveau</div>
-                                        <div class="subcard-level" id="dept-next-level-number">1</div>
-                                        <div class="subcard-thumb" id="dept-next-level-thumb">
-                                            <img id="dept-next-level-thumb-img" src="images/departements1.png" alt="Niveau 1" />
-                                        </div>
-                                        <div class="subcard-progress">
-                                            <div class="subcard-progress-fill" id="dept-next-level-progress" style="width: 0%"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Carte chinois -->
-                        <div class="stat-card" id="chinois-card">
-                            <h3>🇨🇳 Quiz Chinois</h3>
-                            <div class="quiz-card-content">
-                                <div class="score-placeholder" id="home-chinois-score-container">
-                                    <span class="loading-spinner"></span>
-                                </div>
-                                <div class="level-completion-summary" id="chinois-completion-summary">
-                                    <span>Niveaux complétés à 100% : <span id="chinois-niveaux100">0</span></span>
-                                    <span>Progression totale : <span id="chinois-niveaux100-ratio">0</span>/10</span>
-                                </div>
-                                <div class="quiz-progress-bar">
-                                    <div class="quiz-progress-fill" id="chinois-progress-fill" style="width: 0%"></div>
-                                </div>
-                                <div class="quiz-subcards">
-                                    <div class="quiz-subcard" id="chinois-levels-access">
-                                        <div class="subcard-title">Tous les niveaux</div>
-                                    </div>
-                                    <div class="quiz-subcard" id="chinois-next-level">
-                                        <div class="subcard-title">Prochain niveau</div>
-                                        <div class="subcard-level" id="chinois-next-level-number">1</div>
-                                        <div class="subcard-thumb">
-                                            <span>🔢</span>
-                                        </div>
-                                        <div class="subcard-progress">
-                                            <div class="subcard-progress-fill" id="chinois-next-level-progress" style="width: 0%"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Carte anglais -->
-                        <div class="stat-card" id="anglais-card">
-                            <h3>🇬🇧 Quiz Anglais</h3>
-                            <div class="quiz-card-content">
-                                <div class="score-placeholder" id="home-anglais-score-container">
-                                    <span class="loading-spinner"></span>
-                                </div>
-                                <div class="level-completion-summary" id="anglais-completion-summary">
-                                    <span>Niveaux complétés à 100% : <span id="anglais-niveaux100">0</span></span>
-                                    <span>Progression totale : <span id="anglais-niveaux100-ratio">0</span>/10</span>
-                                </div>
-                                <div class="quiz-progress-bar">
-                                    <div class="quiz-progress-fill" id="anglais-progress-fill" style="width: 0%"></div>
-                                </div>
-                                <div class="quiz-subcards">
-                                    <div class="quiz-subcard" id="anglais-levels-access">
-                                        <div class="subcard-title">Tous les niveaux</div>
-                                    </div>
-                                    <div class="quiz-subcard" id="anglais-next-level">
-                                        <div class="subcard-title">Prochain niveau</div>
-                                        <div class="subcard-level" id="anglais-next-level-number">1</div>
-                                        <div class="subcard-thumb">
-                                            <span>🇬🇧</span>
-                                        </div>
-                                        <div class="subcard-progress">
-                                            <div class="subcard-progress-fill" id="anglais-next-level-progress" style="width: 0%"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="leaderboard-section">
-                    <div id="desktop-leaderboard" class="leaderboard-container">
-                        <h2 class="leaderboard-title">🏆 Classement Mondial</h2>
-                        <div id="leaderboard-list">
-                            <div style="text-align: center; opacity: 0.6;">
-                                <span class="loading-spinner"></span> Chargement…
-                            </div>
-                        </div>
-                    </div>
-                    <div id="mobile-leaderboard-carousel" class="hidden">
-                        <div id="carousel-slides">
-                            <div class="carousel-slide neon-bordered">
-                                <div class="glass-inner">
-                                    <h3 class="slide-title">🏆 Classement Mondial</h3>
-                                    <div id="mobile-leaderboard-global">
-                                        <div style="text-align: center; opacity: 0.6;">
-                                            <span class="loading-spinner"></span> Chargement…
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="carousel-slide neon-bordered">
-                                <div class="glass-inner">
-                                    <h3 class="slide-title">📅 Classement Saison</h3>
-                                    <div id="mobile-leaderboard-season">
-                                        <div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="carousel-slide neon-bordered">
-                                <div class="glass-inner">
-                                    <h3 class="slide-title">💡 Astuce du Jour</h3>
-                                    <div style="text-align: center; font-size: 0.95rem; opacity: 0.85;">
-                                        Révisez 10 min par jour pour progresser rapidement !
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="error-message" id="login-error"></div>
+            <button class="auth-btn" id="login-submit">Se connecter</button>
+        </div>
+        
+        <div id="register-form" class="hidden">
+            <div class="form-group">
+                <label for="register-pseudo">Pseudo</label>
+                <input type="text" id="register-pseudo" placeholder="votre_pseudo" required minlength="3" maxlength="20">
             </div>
-            <a href="index2.html" class="glass-btn next-page-btn">➡️ Plus de quiz</a>
-        </section>
-    </main>
-    <div id="hover-warning"></div>
-    <div id="toast">Débloqué à {{points}} points globaux</div>
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc, updateDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-        const firebaseConfig = {
-            apiKey: "AIzaSyDytQnPS_ZVbVuTkS8m3iUAOGMgm64A0XE",
-            authDomain: "quiz-master-io.firebaseapp.com",
-            projectId: "quiz-master-io",
-            storageBucket: "quiz-master-io.firebasestorage.app",
-            messagingSenderId: "773382469164",
-            appId: "1:773382469164:web:5e24a9a62ce543f5190389"
-        };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        window.db = db;
-        const THEMES = ['departements', 'chinois', 'anglais'];
-        const UI_THEMES = {
-            departements: 'dept',
-            chinois: 'chinois',
-            anglais: 'anglais'
-        };
-        const CACHE_DURATION_MS = 40 * 60 * 1000;
-        let cachedPlayers = null;
-        let lastFetchTime = 0;
-        const LEADERBOARD_LOCAL_KEY = 'leaderboard_cache_v2';
-        // ============ AUTH CHECK ============
-        let authResolved = false;
-        function showLoading() {
-            document.getElementById('auth-check-screen').style.display = 'flex';
-        }
-        function hideLoading() {
-            document.getElementById('auth-check-screen').style.display = 'none';
-        }
-        function redirectToLogin() {
-            window.location.href = 'accueil.html';
-        }
-        // ============ UTILS ============
-        function getQuizUrl(category, levelId) {
-            if (category === 'departements') {
-                return `quiz-departement-n${levelId}.html`;
-            } else {
-                return `quiz-${category}-n${levelId}.html`;
-            }
-        }
-        async function fetchGlobalScoresOnly() {
-            const usersSnapshot = await getDocs(collection(db, 'users'));
-            const players = {};
-            usersSnapshot.forEach(doc => {
-                const data = doc.data();
-                const pseudo = data.pseudo;
-                if (pseudo) {
-                    players[pseudo] = { globalScore: data.globalScore ?? 0 };
-                }
-            });
-            return players;
-        }
-        function saveToLocal(players) {
-            try {
-                localStorage.setItem(LEADERBOARD_LOCAL_KEY, JSON.stringify({
-                    timestamp: Date.now(),
-                    players
-                }));
-            } catch (e) { /* ignore */ }
-        }
-        function loadFromLocal() {
-            try {
-                const raw = localStorage.getItem(LEADERBOARD_LOCAL_KEY);
-                if (!raw) return null;
-                const { timestamp, players } = JSON.parse(raw);
-                if (Date.now() - timestamp > CACHE_DURATION_MS) {
-                    localStorage.removeItem(LEADERBOARD_LOCAL_KEY);
-                    return null;
-                }
-                return players;
-            } catch (e) {
-                return null;
-            }
-        }
-        async function loadLeaderboardData() {
-            if (cachedPlayers && (Date.now() - lastFetchTime) < CACHE_DURATION_MS) {
-                return cachedPlayers;
-            }
-            let players = null;
-            try {
-                players = await fetchGlobalScoresOnly();
-                cachedPlayers = players;
-                lastFetchTime = Date.now();
-                saveToLocal(players);
-            } catch (error) {
-                console.warn('Impossible de charger depuis Firebase → tentative depuis localStorage');
-            }
-            if (!players) {
-                players = loadFromLocal();
-            }
-            return players || {};
-        }
-        async function getRanking() {
-            const players = await loadLeaderboardData();
-            return Object.entries(players)
-                .map(([name, scores]) => ({ name, score: scores.globalScore ?? 0 }))
-                .sort((a, b) => b.score - a.score)
-                .slice(0, 10);
-        }
-        async function loadLeaderboard() {
-            const leaderboardList = document.getElementById('leaderboard-list');
-            const mobileGlobal = document.getElementById('mobile-leaderboard-global');
-            leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;"><span class="loading-spinner"></span> Chargement…</div>';
-            mobileGlobal.innerHTML = '<div style="text-align: center; opacity: 0.6;"><span class="loading-spinner"></span> Chargement…</div>';
-            let top10 = null;
-            try {
-                const globalTop = await getRanking();
-                top10 = globalTop.length > 0 ? globalTop : null;
-            } catch (error) {
-                console.error('Erreur lors du chargement du leaderboard:', error);
-            }
-            if (!top10) {
-                const local = loadFromLocal();
-                if (local) {
-                    const fallback = Object.entries(local)
-                        .map(([name, scores]) => ({ name, score: scores.globalScore ?? 0 }))
-                        .sort((a, b) => b.score - a.score)
-                        .slice(0, 10);
-                    top10 = fallback;
-                }
-            }
-            const renderLeaderboardItem = (item, index) => {
-                const rank = index + 1;
-                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
-                const li = document.createElement('div');
-                li.className = 'leaderboard-item';
-                const escapedName = item.name
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;");
-                li.innerHTML = `<div class="leaderboard-rank">${medal || rank}</div><div class="leaderboard-name">${escapedName}</div><div class="leaderboard-score">${item.score}</div>`;
-                return li;
-            };
-            if (top10 && top10.length > 0) {
-                leaderboardList.innerHTML = '';
-                top10.forEach((item, i) => leaderboardList.appendChild(renderLeaderboardItem(item, i)));
-                mobileGlobal.innerHTML = '';
-                top10.forEach((item, i) => mobileGlobal.appendChild(renderLeaderboardItem(item, i)));
-            } else {
-                leaderboardList.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur pour le moment</div>';
-                mobileGlobal.innerHTML = '<div style="text-align: center; opacity: 0.6;">Aucun joueur</div>';
-            }
-            if (window.matchMedia("(max-width: 899px)").matches) {
-                document.getElementById('mobile-leaderboard-carousel').classList.remove('hidden');
-            }
-            document.getElementById('mobile-leaderboard-season').innerHTML = '<div style="text-align: center; opacity: 0.6;">Classement saison non disponible</div>';
-        }
-        function navigateTo(url) {
-            window.location.href = url;
-        }
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2000);
-        }
-        function showHoverWarning(text, x, y) {
-            const warn = document.getElementById("hover-warning");
-            warn.textContent = text;
-            warn.style.left = (x + 12) + "px";
-            warn.style.top = (y + 12) + "px";
-            warn.style.opacity = 1;
-            setTimeout(() => { warn.style.opacity = 0; }, 1800);
-        }
-        function setupCardListeners() {
-            THEMES.forEach(theme => {
-                const uiKey = UI_THEMES[theme];
-                const accessBtn = document.getElementById(`${uiKey}-levels-access`);
-                const nextBtn = document.getElementById(`${uiKey}-next-level`);
-                if (accessBtn) {
-                    accessBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        navigateTo(`dossier-quiz-${theme}.html`);
-                    });
-                }
-                if (nextBtn) {
-                    nextBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const levelId = parseInt(document.getElementById(`${uiKey}-next-level-number`).textContent.trim(), 10);
-                        navigateTo(getQuizUrl(theme, levelId));
-                    });
-                }
-            });
-        }
-        async function updateQuizCardUI(theme, globalScore, quizNiveaux = {}, quizNiveaux100 = {}) {
-            const totalLevels = theme === 'departements' ? 10 : 10;
-            const completedLevels = quizNiveaux100[theme] || 0;
-            const progressPercent = Math.min(100, Math.round((completedLevels / totalLevels) * 100));
-            const uiTheme = UI_THEMES[theme];
-            const progressFill = document.getElementById(`${uiTheme}-progress-fill`);
-            if (progressFill) {
-                progressFill.style.width = `${progressPercent}%`;
-            }
-            let nextLevelId = (quizNiveaux[theme] || 1);
-            const currentScore = quizNiveaux[`${theme}_n${nextLevelId}`] ?? 0;
-            const subProgress = Math.min(100, Math.round((currentScore / 10) * 100));
-            const nextLevelProgressEl = document.getElementById(`${uiTheme}-next-level-progress`);
-            if (nextLevelProgressEl) nextLevelProgressEl.style.width = `${subProgress}%`;
-            const nextLevelNumberEl = document.getElementById(`${uiTheme}-next-level-number`);
-            if (nextLevelNumberEl) nextLevelNumberEl.textContent = nextLevelId;
-            if (theme === 'departements') {
-                document.getElementById('dept-next-level-thumb-img').src = `images/departements${nextLevelId}.png`;
-                document.getElementById('dept-next-level-thumb-img').alt = `Niveau ${nextLevelId}`;
-            }
-            document.getElementById(`${uiTheme}-niveaux100`).textContent = completedLevels;
-            document.getElementById(`${uiTheme}-niveaux100-ratio`).textContent = completedLevels;
-        }
-        async function loadUserData(user) {
-            try {
-                const userDocRef = doc(db, 'users', user.uid);
-                const userDoc = await getDoc(userDocRef);
-                let userData = userDoc.data();
-                if (!userData) {
-                    // This should not happen since auth is valid, but safe fallback
-                    redirectToLogin();
-                    return;
-                }
-                // Ensure required fields exist
-                if (!userData.niveaux) {
-                    userData.niveaux = THEMES.reduce((acc, t) => ({ ...acc, [t]: 1 }), {});
-                    await updateDoc(userDocRef, { niveaux: userData.niveaux });
-                }
-                if (!userData.niveaux100) {
-                    userData.niveaux100 = THEMES.reduce((acc, t) => ({ ...acc, [t]: 0 }), {});
-                    await updateDoc(userDocRef, { niveaux100: userData.niveaux100 });
-                }
-                const quizScores = userData.quizScores || {};
-                const globalScore = userData.globalScore || 0;
-                const quizNiveaux = userData.niveaux || {};
-                const quizNiveaux100 = userData.niveaux100 || {};
-                THEMES.forEach(theme => {
-                    const containerId = `home-${UI_THEMES[theme]}-score-container`;
-                    const container = document.getElementById(containerId);
-                    const score = quizScores[theme] || 0;
-                    const span = document.createElement('div');
-                    span.className = 'stat-value';
-                    span.id = `home-${UI_THEMES[theme]}-score`;
-                    span.textContent = score;
-                    container.innerHTML = '';
-                    container.appendChild(span);
-                });
-                THEMES.forEach(theme => {
-                    updateQuizCardUI(theme, globalScore, quizNiveaux, quizNiveaux100);
-                });
-            } catch (error) {
-                console.error('Erreur chargement données:', error);
-                showToast('Erreur de chargement');
-            }
-        }
-        function logoutUser() {
-            signOut(auth)
-                .then(() => {
-                    window.location.href = 'accueil.html';
-                })
-                .catch((error) => {
-                    console.error('Erreur lors de la déconnexion:', error);
-                    showToast('Erreur lors de la déconnexion');
-                });
-        }
-        // ============ PAGE INIT ============
-        async function initPage(user) {
-            hideLoading();
-            await loadUserData(user);
-            loadLeaderboard();
-            setupCardListeners();
-            document.getElementById('logout-btn').addEventListener('click', logoutUser);
-        }
-        // ============ AUTH HANDLER ============
-        onAuthStateChanged(auth, (user) => {
-            authResolved = true;
-            if (user) {
-                initPage(user);
-            } else {
-                redirectToLogin();
+            <div class="form-group">
+                <label for="register-email">Email</label>
+                <input type="email" id="register-email" placeholder="votre@email.com" required>
+            </div>
+            <div class="form-group">
+                <label for="register-password">Mot de passe</label>
+                <input type="password" id="register-password" placeholder="••••••••" required minlength="8">
+            </div>
+            <div class="error-message" id="register-error"></div>
+            <button class="auth-btn" id="register-submit">S'inscrire</button>
+        </div>
+        
+        <div id="loading" class="hidden">
+            <div class="loading"></div>
+            <p>Chargement...</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration API
+        const API_BASE_URL = 'https://vps-ef56fd92.vps.ovh.net'; // À adapter avec votre domaine OVH
+        
+        // Vérifier si l'utilisateur est déjà connecté
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (await checkAuth()) {
+                window.location.href = 'accueil.html';
             }
         });
-        // Optional: hide loading if auth resolves instantly (unlikely but safe)
-        setTimeout(() => {
-            if (!authResolved) return;
-            hideLoading();
-        }, 500);
-    </script>
-    <style>
-        #hover-warning {
-            position: absolute;
-            background: rgba(0,0,0,0.85);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            z-index: 2001;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s;
+        
+        // Basculer entre les onglets
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('register-form').classList.add('hidden');
+                
+                if (tab.dataset.tab === 'login') {
+                    document.getElementById('login-form').classList.remove('hidden');
+                } else {
+                    document.getElementById('register-form').classList.remove('hidden');
+                }
+                
+                // Réinitialiser les messages d'erreur
+                document.getElementById('login-error').textContent = '';
+                document.getElementById('register-error').textContent = '';
+            });
+        });
+        
+        // Soumission du formulaire de connexion
+        document.getElementById('login-submit').addEventListener('click', async () => {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errorEl = document.getElementById('login-error');
+            
+            if (!email || !password) {
+                errorEl.textContent = 'Veuillez remplir tous les champs';
+                return;
+            }
+            
+            showLoading(true);
+            errorEl.textContent = '';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Erreur de connexion');
+                }
+                
+                // Stocker le token JWT
+                localStorage.setItem('quiz_token', data.token);
+                
+                // Redirection vers la page d'accueil
+                window.location.href = 'accueil.html';
+                
+            } catch (error) {
+                errorEl.textContent = error.message || 'Erreur de connexion';
+                console.error('Erreur lors de la connexion:', error);
+            } finally {
+                showLoading(false);
+            }
+        });
+        
+        // Soumission du formulaire d'inscription
+        document.getElementById('register-submit').addEventListener('click', async () => {
+            const pseudo = document.getElementById('register-pseudo').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-password').value;
+            const errorEl = document.getElementById('register-error');
+            
+            if (!pseudo || !email || !password) {
+                errorEl.textContent = 'Veuillez remplir tous les champs';
+                return;
+            }
+            
+            if (pseudo.length < 3) {
+                errorEl.textContent = 'Le pseudo doit contenir au moins 3 caractères';
+                return;
+            }
+            
+            if (password.length < 8) {
+                errorEl.textContent = 'Le mot de passe doit contenir au moins 8 caractères';
+                return;
+            }
+            
+            showLoading(true);
+            errorEl.textContent = '';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ pseudo, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Erreur lors de l\'inscription');
+                }
+                
+                // Connexion automatique après inscription
+                localStorage.setItem('quiz_token', data.token);
+                
+                // Redirection vers la page d'accueil
+                window.location.href = 'accueil.html';
+                
+            } catch (error) {
+                errorEl.textContent = error.message || 'Erreur lors de l\'inscription';
+                console.error('Erreur lors de l\'inscription:', error);
+            } finally {
+                showLoading(false);
+            }
+        });
+        
+        // Vérifier si l'utilisateur est déjà authentifié
+        async function checkAuth() {
+            const token = localStorage.getItem('quiz_token');
+            if (!token) return false;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                return response.ok;
+            } catch (error) {
+                console.error('Erreur lors de la vérification de la session:', error);
+                return false;
+            }
         }
-    </style>
+        
+        // Afficher/masquer l'indicateur de chargement
+        function showLoading(show) {
+            document.getElementById('loading').classList.toggle('hidden', !show);
+            document.getElementById('login-submit').disabled = show;
+            document.getElementById('register-submit').disabled = show;
+        }
+    </script>
 </body>
 </html>
-
-
-
-
