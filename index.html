@@ -225,7 +225,22 @@
 
     <script>
         // Configuration API
-        const API_BASE_URL = 'https://vps-ef56fd92.vps.ovh.net'; // À adapter avec votre domaine OVH
+        const getApiBaseUrl = () => {
+            // En production sur GitHub Pages
+            if (window.location.hostname === 'myrrakha.github.io') {
+                return 'https://vps-ef56fd92.vps.ovh.net/api';
+            }
+            
+            // En développement local
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                return 'http://localhost:3000/api';
+            }
+            
+            // Fallback pour le domaine direct
+            return `https://${window.location.hostname}/api`;
+        };
+
+        const API_BASE_URL = getApiBaseUrl();
         
         // Vérifier si l'utilisateur est déjà connecté
         document.addEventListener('DOMContentLoaded', async () => {
