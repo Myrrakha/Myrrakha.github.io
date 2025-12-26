@@ -285,6 +285,7 @@
             errorEl.textContent = '';
             
             try {
+                console.log(`🚀 Tentative de connexion vers: ${API_BASE_URL}/auth/login`);
                 const response = await fetch(`${API_BASE_URL}/auth/login`, {
                     method: 'POST',
                     headers: {
@@ -309,7 +310,7 @@
                 
             } catch (error) {
                 errorEl.textContent = error.message || 'Erreur de connexion';
-                console.error('Erreur lors de la connexion:', error);
+                console.error('❌ Erreur lors de la connexion (FETCH):', error);
             } finally {
                 showLoading(false);
             }
@@ -341,7 +342,7 @@
             errorEl.textContent = '';
             
             try {
-                console.log("API_BASE_URL =", API_BASE_URL);
+                console.log(`🚀 Tentative d'inscription vers: ${API_BASE_URL}/auth/register`);
 
                 const response = await fetch(`${API_BASE_URL}/auth/register`, {
                     method: 'POST',
@@ -367,7 +368,7 @@
                 
             } catch (error) {
                 errorEl.textContent = error.message || 'Erreur lors de l\'inscription';
-                console.error('Erreur lors de l\'inscription:', error);
+                console.error('❌ Erreur lors de l\'inscription (FETCH):', error);
             } finally {
                 showLoading(false);
             }
@@ -401,5 +402,4 @@
         }
     </script>
 </body>
-
 </html>
