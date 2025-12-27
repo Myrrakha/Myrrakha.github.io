@@ -225,22 +225,7 @@
 
     <script>
         // Configuration API
-        const getApiBaseUrl = () => {
-            // En production sur GitHub Pages
-            if (window.location.hostname === 'myrrakha.github.io') {
-                return 'http://vps-ef56fd92.vps.ovh.net:3001/api';
-            }
-            
-            // En développement local
-            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                return 'http://vps-ef56fd92.vps.ovh.net:3001/api';
-            }
-            
-            // Fallback pour le domaine direct
-            return `http://${window.location.hostname}/api`;
-        };
-
-        const API_BASE_URL = getApiBaseUrl();
+        const API_BASE_URL = 'https://vps-ef56fd92.vps.ovh.net/api';
         
         // Vérifier si l'utilisateur est déjà connecté
         document.addEventListener('DOMContentLoaded', async () => {
@@ -402,5 +387,4 @@
         }
     </script>
 </body>
-
 </html>
